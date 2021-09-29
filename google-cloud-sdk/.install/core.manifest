@@ -1357,6 +1357,7 @@ lib/googlecloudsdk/command_lib/dataflow/job_utils.py
 lib/googlecloudsdk/command_lib/dataflow/snapshot_utils.py
 lib/googlecloudsdk/command_lib/dataflow/sql_util.py
 lib/googlecloudsdk/command_lib/dataplex/__init__.py
+lib/googlecloudsdk/command_lib/dataplex/flags.py
 lib/googlecloudsdk/command_lib/dataplex/resource_args.py
 lib/googlecloudsdk/command_lib/dataplex/resources.yaml
 lib/googlecloudsdk/command_lib/dataproc/__init__.py
@@ -1461,8 +1462,11 @@ lib/googlecloudsdk/command_lib/edge_cache/resources.yaml
 lib/googlecloudsdk/command_lib/edge_cache/util.py
 lib/googlecloudsdk/command_lib/edge_container/__init__.py
 lib/googlecloudsdk/command_lib/edge_container/admin_users.py
+lib/googlecloudsdk/command_lib/edge_container/flags.py
 lib/googlecloudsdk/command_lib/edge_container/hub.py
+lib/googlecloudsdk/command_lib/edge_container/kubeconfig.py
 lib/googlecloudsdk/command_lib/edge_container/locations.py
+lib/googlecloudsdk/command_lib/edge_container/resource_args.py
 lib/googlecloudsdk/command_lib/edge_container/resources.yaml
 lib/googlecloudsdk/command_lib/edge_container/vpn.py
 lib/googlecloudsdk/command_lib/emulators/__init__.py
@@ -1625,6 +1629,8 @@ lib/googlecloudsdk/command_lib/help_search/rater.py
 lib/googlecloudsdk/command_lib/help_search/search.py
 lib/googlecloudsdk/command_lib/help_search/search_util.py
 lib/googlecloudsdk/command_lib/iam/__init__.py
+lib/googlecloudsdk/command_lib/iam/byoid_utilities/__init__.py
+lib/googlecloudsdk/command_lib/iam/byoid_utilities/cred_config.py
 lib/googlecloudsdk/command_lib/iam/completers.py
 lib/googlecloudsdk/command_lib/iam/flags.py
 lib/googlecloudsdk/command_lib/iam/flags.yaml
@@ -1634,8 +1640,6 @@ lib/googlecloudsdk/command_lib/iam/policies_flags.py
 lib/googlecloudsdk/command_lib/iam/resources.yaml
 lib/googlecloudsdk/command_lib/iam/workforce_pools/__init__.py
 lib/googlecloudsdk/command_lib/iam/workforce_pools/flags.py
-lib/googlecloudsdk/command_lib/iam/workload_identity_pools/__init__.py
-lib/googlecloudsdk/command_lib/iam/workload_identity_pools/cred_config.py
 lib/googlecloudsdk/command_lib/iap/__init__.py
 lib/googlecloudsdk/command_lib/iap/exceptions.py
 lib/googlecloudsdk/command_lib/iap/resources.yaml
@@ -1728,6 +1732,8 @@ lib/googlecloudsdk/command_lib/media/asset/transformers/__init__.py
 lib/googlecloudsdk/command_lib/media/asset/transformers/hooks.py
 lib/googlecloudsdk/command_lib/media/asset/utils.py
 lib/googlecloudsdk/command_lib/memcache/__init__.py
+lib/googlecloudsdk/command_lib/memcache/instances_create_util.py
+lib/googlecloudsdk/command_lib/memcache/instances_describe_util.py
 lib/googlecloudsdk/command_lib/memcache/instances_util.py
 lib/googlecloudsdk/command_lib/memcache/resources.yaml
 lib/googlecloudsdk/command_lib/meta/__init__.py
@@ -2247,9 +2253,9 @@ lib/googlecloudsdk/core/document_renderers/token_renderer.py
 lib/googlecloudsdk/core/exceptions.py
 lib/googlecloudsdk/core/execution_utils.py
 lib/googlecloudsdk/core/feature_flags/__init__.py
+lib/googlecloudsdk/core/feature_flags/config.py
 lib/googlecloudsdk/core/feature_flags/feature_flag_config_file_validator.py
 lib/googlecloudsdk/core/feature_flags/feature_flags_config_schema.yaml
-lib/googlecloudsdk/core/feature_flags/parse.py
 lib/googlecloudsdk/core/gapic_util.py
 lib/googlecloudsdk/core/gapic_util_internal.py
 lib/googlecloudsdk/core/http.py
@@ -2702,6 +2708,7 @@ lib/googlecloudsdk/schemas/networkservices/v1/Routing.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/Timeout.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRedirect.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRewrite.yaml
+lib/googlecloudsdk/schemas/networkservices/v1alpha1/AddValue.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/CDNPolicy.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/CDNPolicyCacheKeyPolicy.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/CORSPolicy.yaml
@@ -2755,8 +2762,10 @@ lib/googlecloudsdk/schemas/networkservices/v1alpha1/QueryParameterMatcher.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/RouteAction.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/RouteRule.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/Router.yaml
+lib/googlecloudsdk/schemas/networkservices/v1alpha1/RouterProxySettings.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/Routing.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/ServiceGraph.yaml
+lib/googlecloudsdk/schemas/networkservices/v1alpha1/SetValue.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/TcpRoute.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/TcpRouteRouteAction.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/TcpRouteRouteDestination.yaml
@@ -4663,8 +4672,6 @@ lib/surface/anthos/config/controller/list.yaml
 lib/surface/anthos/config/operations/__init__.py
 lib/surface/anthos/config/operations/describe.yaml
 lib/surface/anthos/config/operations/list.yaml
-lib/surface/anthos/config/validate/__init__.py
-lib/surface/anthos/config/validate/terraform.py
 lib/surface/anthos/create_login_config.py
 lib/surface/anthos/export.py
 lib/surface/anthos/packages/__init__.py
@@ -5449,6 +5456,7 @@ lib/surface/compute/instances/ops_agents/policies/update.py
 lib/surface/compute/instances/os_inventory/__init__.py
 lib/surface/compute/instances/os_inventory/describe.py
 lib/surface/compute/instances/os_inventory/list_instances.py
+lib/surface/compute/instances/perform_maintenance.py
 lib/surface/compute/instances/remove_iam_policy_binding.yaml
 lib/surface/compute/instances/remove_labels.py
 lib/surface/compute/instances/remove_metadata.py
@@ -5544,6 +5552,7 @@ lib/surface/compute/network_firewall_policies/clone_rules.py
 lib/surface/compute/network_firewall_policies/create.py
 lib/surface/compute/network_firewall_policies/delete.py
 lib/surface/compute/network_firewall_policies/describe.py
+lib/surface/compute/network_firewall_policies/get_effective_firewalls.py
 lib/surface/compute/network_firewall_policies/list.py
 lib/surface/compute/network_firewall_policies/rules/__init__.py
 lib/surface/compute/network_firewall_policies/rules/create.py
@@ -6033,6 +6042,7 @@ lib/surface/container/azure/node_pools/create.py
 lib/surface/container/azure/node_pools/delete.py
 lib/surface/container/azure/node_pools/describe.py
 lib/surface/container/azure/node_pools/list.py
+lib/surface/container/azure/node_pools/update.py
 lib/surface/container/azure/operations/__init__.py
 lib/surface/container/azure/operations/describe.py
 lib/surface/container/azure/operations/list.py
@@ -6753,6 +6763,7 @@ lib/surface/edge_container/clusters/__init__.py
 lib/surface/edge_container/clusters/create.yaml
 lib/surface/edge_container/clusters/delete.yaml
 lib/surface/edge_container/clusters/describe.yaml
+lib/surface/edge_container/clusters/get_credentials.py
 lib/surface/edge_container/clusters/list.yaml
 lib/surface/edge_container/clusters/node_pools/__init__.py
 lib/surface/edge_container/clusters/node_pools/create.yaml
@@ -6760,6 +6771,7 @@ lib/surface/edge_container/clusters/node_pools/delete.yaml
 lib/surface/edge_container/clusters/node_pools/describe.yaml
 lib/surface/edge_container/clusters/node_pools/list.yaml
 lib/surface/edge_container/clusters/node_pools/update.yaml
+lib/surface/edge_container/clusters/print_access_token.py
 lib/surface/edge_container/machines/__init__.py
 lib/surface/edge_container/machines/describe.yaml
 lib/surface/edge_container/machines/list.yaml
@@ -7164,6 +7176,7 @@ lib/surface/iam/simulator/__init__.py
 lib/surface/iam/simulator/replay_recent_access.py
 lib/surface/iam/workforce_pools/__init__.py
 lib/surface/iam/workforce_pools/create.py
+lib/surface/iam/workforce_pools/create_cred_config.py
 lib/surface/iam/workforce_pools/delete.yaml
 lib/surface/iam/workforce_pools/describe.yaml
 lib/surface/iam/workforce_pools/list.py
@@ -8090,6 +8103,8 @@ lib/surface/resource_config/bulk_export.py
 lib/surface/resource_config/list_resource_types.py
 lib/surface/resource_config/terraform/__init__.py
 lib/surface/resource_config/terraform/generate_import.py
+lib/surface/resource_config/validate/__init__.py
+lib/surface/resource_config/validate/terraform.py
 lib/surface/resource_manager/__init__.py
 lib/surface/resource_manager/folders/__init__.py
 lib/surface/resource_manager/folders/add_iam_policy_binding.yaml
