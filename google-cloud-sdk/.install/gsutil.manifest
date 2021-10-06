@@ -67,6 +67,7 @@ platform/gsutil/gslib/commands/requesterpays.py
 platform/gsutil/gslib/commands/retention.py
 platform/gsutil/gslib/commands/rewrite.py
 platform/gsutil/gslib/commands/rm.py
+platform/gsutil/gslib/commands/rpo.py
 platform/gsutil/gslib/commands/rsync.py
 platform/gsutil/gslib/commands/setmeta.py
 platform/gsutil/gslib/commands/signurl.py
@@ -177,6 +178,7 @@ platform/gsutil/gslib/tests/test_retention.py
 platform/gsutil/gslib/tests/test_retention_util.py
 platform/gsutil/gslib/tests/test_rewrite.py
 platform/gsutil/gslib/tests/test_rm.py
+platform/gsutil/gslib/tests/test_rpo.py
 platform/gsutil/gslib/tests/test_rsync.py
 platform/gsutil/gslib/tests/test_rsync_funcs.py
 platform/gsutil/gslib/tests/test_seek_ahead_thread.py

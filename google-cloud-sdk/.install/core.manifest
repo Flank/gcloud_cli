@@ -2646,13 +2646,18 @@ lib/googlecloudsdk/schemas/compute/v1/UrlMapTestHeader.yaml
 lib/googlecloudsdk/schemas/compute/v1/UrlRewrite.yaml
 lib/googlecloudsdk/schemas/compute/v1/WeightedBackendService.yaml
 lib/googlecloudsdk/schemas/gkebackup/v1alpha1/SubstitutionRules.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/CertificateProviderInstance.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ClientTlsPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/Destination.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1CertificateProvider.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1GrpcEndpoint.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/HttpHeaderMatch.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/LabelsValue.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/MTLSPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/Rule.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ServerTlsPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/Source.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ValidationCA.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProvider.yaml
@@ -2690,6 +2695,10 @@ lib/googlecloudsdk/schemas/networkservices/v1/CORSPolicy.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/EdgeCacheKeyset.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/EdgeCacheOrigin.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/EdgeCacheService.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/EndpointMatcher.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/EndpointMatcherMetadataLabelMatcher.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/EndpointMatcherMetadataLabelMatcherMetadataLabels.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/EndpointPolicy.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/HeaderAction.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/HeaderActionAddHeader.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/HeaderActionRemoveHeader.yaml
@@ -2706,6 +2715,7 @@ lib/googlecloudsdk/schemas/networkservices/v1/RouteAction.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/RouteRule.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/Routing.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/Timeout.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TrafficPortSelector.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRedirect.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRewrite.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/AddValue.yaml
@@ -2933,6 +2943,12 @@ lib/googlecloudsdk/third_party/apis/baremetalsolution/v2/baremetalsolution_v2_cl
 lib/googlecloudsdk/third_party/apis/baremetalsolution/v2/baremetalsolution_v2_messages.py
 lib/googlecloudsdk/third_party/apis/baremetalsolution/v2/resources.py
 lib/googlecloudsdk/third_party/apis/baremetalsolution_v2.json
+lib/googlecloudsdk/third_party/apis/beyondcorp/__init__.py
+lib/googlecloudsdk/third_party/apis/beyondcorp/v1alpha/__init__.py
+lib/googlecloudsdk/third_party/apis/beyondcorp/v1alpha/beyondcorp_v1alpha_client.py
+lib/googlecloudsdk/third_party/apis/beyondcorp/v1alpha/beyondcorp_v1alpha_messages.py
+lib/googlecloudsdk/third_party/apis/beyondcorp/v1alpha/resources.py
+lib/googlecloudsdk/third_party/apis/beyondcorp_v1alpha.json
 lib/googlecloudsdk/third_party/apis/bigquery/__init__.py
 lib/googlecloudsdk/third_party/apis/bigquery/v2/__init__.py
 lib/googlecloudsdk/third_party/apis/bigquery/v2/bigquery_v2_client.py
@@ -5195,6 +5211,7 @@ lib/surface/compute/backend_buckets/list.py
 lib/surface/compute/backend_buckets/update.py
 lib/surface/compute/backend_services/__init__.py
 lib/surface/compute/backend_services/add_backend.py
+lib/surface/compute/backend_services/add_service_bindings.py
 lib/surface/compute/backend_services/add_signed_url_key.py
 lib/surface/compute/backend_services/config/__init__.py
 lib/surface/compute/backend_services/config/export.py
@@ -5208,6 +5225,7 @@ lib/surface/compute/backend_services/get_health.py
 lib/surface/compute/backend_services/import.py
 lib/surface/compute/backend_services/list.py
 lib/surface/compute/backend_services/remove_backend.py
+lib/surface/compute/backend_services/remove_service_bindings.py
 lib/surface/compute/backend_services/set_security_policy.py
 lib/surface/compute/backend_services/update.py
 lib/surface/compute/backend_services/update_backend.py
@@ -8641,6 +8659,8 @@ lib/surface/transcoder/templates/delete.py
 lib/surface/transcoder/templates/describe.py
 lib/surface/transcoder/templates/list.py
 lib/surface/transfer/__init__.py
+lib/surface/transfer/agents/__init__.py
+lib/surface/transfer/agents/install.py
 lib/surface/transfer/jobs/__init__.py
 lib/surface/transfer/jobs/create.py
 lib/surface/transfer/jobs/delete.py
