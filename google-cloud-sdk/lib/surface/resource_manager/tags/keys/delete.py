@@ -70,6 +70,5 @@ class Delete(base.Command):
     if args.async_:
       return op
 
-    return operations.WaitForDeleteOperation(
-        op,
-        'Waiting for TagKey [{}] to be deleted'.format(tag_key))
+    return operations.WaitForReturnOperation(
+        op, 'Waiting for TagKey [{}] to be deleted'.format(tag_key))

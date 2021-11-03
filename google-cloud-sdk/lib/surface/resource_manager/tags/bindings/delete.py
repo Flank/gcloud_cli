@@ -95,7 +95,7 @@ class Delete(base.Command):
         if args.async_ or op.done:
           return op
         else:
-          return operations.WaitForDeleteOperation(
+          return operations.WaitForReturnOperation(
               op,
               "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
               "deleted with [{}]".format(args.parent, args.tag_value, op.name))
@@ -116,7 +116,7 @@ class Delete(base.Command):
         if args.async_ or op.done:
           return op
         else:
-          return operations.WaitForDeleteOperation(
+          return operations.WaitForReturnOperation(
               op,
               "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
               "deleted with [{}]".format(args.parent, tag_value, op.name))

@@ -90,8 +90,7 @@ class Create(base.Command):
       if args.async_ or op.done:
         return op
       else:
-        return operations.WaitForOperation(
+        return operations.WaitForReturnOperation(
             op,
             "Waiting for TagBinding for parent [{}] and tag value [{}] to be "
-            "created with [{}]".format(resource_name, tag_value, op.name),
-            service=service)
+            "created with [{}]".format(resource_name, tag_value, op.name))
