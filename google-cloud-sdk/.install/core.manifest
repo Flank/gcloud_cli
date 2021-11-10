@@ -131,6 +131,9 @@ lib/googlecloudsdk/api_lib/auth/external_account.py
 lib/googlecloudsdk/api_lib/auth/refresh_token.py
 lib/googlecloudsdk/api_lib/auth/service_account.py
 lib/googlecloudsdk/api_lib/auth/util.py
+lib/googlecloudsdk/api_lib/beyondcorp/__init__.py
+lib/googlecloudsdk/api_lib/beyondcorp/app/__init__.py
+lib/googlecloudsdk/api_lib/beyondcorp/app/util.py
 lib/googlecloudsdk/api_lib/bigtable/__init__.py
 lib/googlecloudsdk/api_lib/bigtable/app_profiles.py
 lib/googlecloudsdk/api_lib/bigtable/backups.py
@@ -748,6 +751,7 @@ lib/googlecloudsdk/api_lib/util/resource_search.py
 lib/googlecloudsdk/api_lib/util/waiter.py
 lib/googlecloudsdk/api_lib/vmware/__init__.py
 lib/googlecloudsdk/api_lib/vmware/clusters.py
+lib/googlecloudsdk/api_lib/vmware/hcxactivationkeys.py
 lib/googlecloudsdk/api_lib/vmware/locations.py
 lib/googlecloudsdk/api_lib/vmware/nodetypes.py
 lib/googlecloudsdk/api_lib/vmware/operations.py
@@ -932,6 +936,7 @@ lib/googlecloudsdk/command_lib/beyondcorp/app/connections/flags.yaml
 lib/googlecloudsdk/command_lib/beyondcorp/app/connections/hooks.py
 lib/googlecloudsdk/command_lib/beyondcorp/app/connectors/__init__.py
 lib/googlecloudsdk/command_lib/beyondcorp/app/connectors/flags.yaml
+lib/googlecloudsdk/command_lib/beyondcorp/app/connectors/hooks.py
 lib/googlecloudsdk/command_lib/beyondcorp/app/resources.yaml
 lib/googlecloudsdk/command_lib/beyondcorp/app/util.py
 lib/googlecloudsdk/command_lib/bigtable/__init__.py
@@ -2132,6 +2137,7 @@ lib/googlecloudsdk/command_lib/transfer/__init__.py
 lib/googlecloudsdk/command_lib/transfer/creds_util.py
 lib/googlecloudsdk/command_lib/transfer/jobs_apitools_util.py
 lib/googlecloudsdk/command_lib/transfer/jobs_flag_util.py
+lib/googlecloudsdk/command_lib/transfer/list_util.py
 lib/googlecloudsdk/command_lib/transfer/name_util.py
 lib/googlecloudsdk/command_lib/util/__init__.py
 lib/googlecloudsdk/command_lib/util/anthos/__init__.py
@@ -2551,6 +2557,7 @@ lib/googlecloudsdk/schemas/compute/beta/DisplayDevice.yaml
 lib/googlecloudsdk/schemas/compute/beta/Duration.yaml
 lib/googlecloudsdk/schemas/compute/beta/FileContentBuffer.yaml
 lib/googlecloudsdk/schemas/compute/beta/ForwardingRule.yaml
+lib/googlecloudsdk/schemas/compute/beta/ForwardingRuleServiceDirectoryRegistration.yaml
 lib/googlecloudsdk/schemas/compute/beta/GrpcServiceConfig.yaml
 lib/googlecloudsdk/schemas/compute/beta/GuestOsFeature.yaml
 lib/googlecloudsdk/schemas/compute/beta/HostRule.yaml
@@ -4754,6 +4761,10 @@ lib/surface/anthos/config/controller/list.yaml
 lib/surface/anthos/config/operations/__init__.py
 lib/surface/anthos/config/operations/describe.yaml
 lib/surface/anthos/config/operations/list.yaml
+lib/surface/anthos/config/sync/__init__.py
+lib/surface/anthos/config/sync/repo/__init__.py
+lib/surface/anthos/config/sync/repo/describe.py
+lib/surface/anthos/config/sync/repo/list.py
 lib/surface/anthos/create_login_config.py
 lib/surface/anthos/export.py
 lib/surface/anthos/packages/__init__.py
@@ -5007,11 +5018,13 @@ lib/surface/beyondcorp/app/connections/create.yaml
 lib/surface/beyondcorp/app/connections/delete.yaml
 lib/surface/beyondcorp/app/connections/describe.yaml
 lib/surface/beyondcorp/app/connections/list.yaml
+lib/surface/beyondcorp/app/connections/update.yaml
 lib/surface/beyondcorp/app/connectors/__init__.py
 lib/surface/beyondcorp/app/connectors/create.yaml
 lib/surface/beyondcorp/app/connectors/delete.yaml
 lib/surface/beyondcorp/app/connectors/describe.yaml
 lib/surface/beyondcorp/app/connectors/list.yaml
+lib/surface/beyondcorp/app/connectors/update.yaml
 lib/surface/bigtable/__init__.py
 lib/surface/bigtable/app_profiles/__init__.py
 lib/surface/bigtable/app_profiles/create.py
@@ -7975,6 +7988,7 @@ lib/surface/network_services/http_routes/import.yaml
 lib/surface/network_services/http_routes/list.yaml
 lib/surface/network_services/meshes/__init__.py
 lib/surface/network_services/meshes/delete.yaml
+lib/surface/network_services/meshes/describe.yaml
 lib/surface/network_services/meshes/export.yaml
 lib/surface/network_services/meshes/import.yaml
 lib/surface/network_services/meshes/list.yaml
@@ -8311,6 +8325,8 @@ lib/surface/resource_manager/tags/bindings/__init__.py
 lib/surface/resource_manager/tags/bindings/create.py
 lib/surface/resource_manager/tags/bindings/delete.py
 lib/surface/resource_manager/tags/bindings/list.py
+lib/surface/resource_manager/tags/holds/__init__.py
+lib/surface/resource_manager/tags/holds/create.py
 lib/surface/resource_manager/tags/keys/__init__.py
 lib/surface/resource_manager/tags/keys/add_iam_policy_binding.py
 lib/surface/resource_manager/tags/keys/create.py
@@ -8843,6 +8859,11 @@ lib/surface/vmware/clusters/delete.py
 lib/surface/vmware/clusters/describe.py
 lib/surface/vmware/clusters/list.py
 lib/surface/vmware/clusters/update.py
+lib/surface/vmware/hcx/__init__.py
+lib/surface/vmware/hcx/activationkeys/__init__.py
+lib/surface/vmware/hcx/activationkeys/create.py
+lib/surface/vmware/hcx/activationkeys/describe.py
+lib/surface/vmware/hcx/activationkeys/list.py
 lib/surface/vmware/locations/__init__.py
 lib/surface/vmware/locations/list.py
 lib/surface/vmware/nodetypes/__init__.py

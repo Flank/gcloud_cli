@@ -1530,6 +1530,7 @@ lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/publisher_impl.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/single_partition_subscriber.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/single_publisher.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/single_subscriber.py
+lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/sorted_list.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/streaming_pull_manager.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/subscriber_impl.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/message_transformer.py
@@ -1542,6 +1543,7 @@ lib/third_party/google/cloud/pubsublite/cloudpubsub/subscriber_client_interface.
 lib/third_party/google/cloud/pubsublite/internal/__init__.py
 lib/third_party/google/cloud/pubsublite/internal/constructable_from_service_account.py
 lib/third_party/google/cloud/pubsublite/internal/endpoints.py
+lib/third_party/google/cloud/pubsublite/internal/fast_serialize.py
 lib/third_party/google/cloud/pubsublite/internal/require_started.py
 lib/third_party/google/cloud/pubsublite/internal/routing_metadata.py
 lib/third_party/google/cloud/pubsublite/internal/status_codes.py
@@ -1550,6 +1552,7 @@ lib/third_party/google/cloud/pubsublite/internal/wire/__init__.py
 lib/third_party/google/cloud/pubsublite/internal/wire/admin_client_impl.py
 lib/third_party/google/cloud/pubsublite/internal/wire/assigner.py
 lib/third_party/google/cloud/pubsublite/internal/wire/assigner_impl.py
+lib/third_party/google/cloud/pubsublite/internal/wire/client_cache.py
 lib/third_party/google/cloud/pubsublite/internal/wire/committer.py
 lib/third_party/google/cloud/pubsublite/internal/wire/committer_impl.py
 lib/third_party/google/cloud/pubsublite/internal/wire/connection.py
@@ -1566,6 +1569,7 @@ lib/third_party/google/cloud/pubsublite/internal/wire/partition_count_watching_p
 lib/third_party/google/cloud/pubsublite/internal/wire/permanent_failable.py
 lib/third_party/google/cloud/pubsublite/internal/wire/publisher.py
 lib/third_party/google/cloud/pubsublite/internal/wire/pubsub_context.py
+lib/third_party/google/cloud/pubsublite/internal/wire/reset_signal.py
 lib/third_party/google/cloud/pubsublite/internal/wire/retrying_connection.py
 lib/third_party/google/cloud/pubsublite/internal/wire/routing_policy.py
 lib/third_party/google/cloud/pubsublite/internal/wire/routing_publisher.py
@@ -1573,8 +1577,10 @@ lib/third_party/google/cloud/pubsublite/internal/wire/serial_batcher.py
 lib/third_party/google/cloud/pubsublite/internal/wire/single_partition_publisher.py
 lib/third_party/google/cloud/pubsublite/internal/wire/subscriber.py
 lib/third_party/google/cloud/pubsublite/internal/wire/subscriber_impl.py
+lib/third_party/google/cloud/pubsublite/internal/wire/subscriber_reset_handler.py
 lib/third_party/google/cloud/pubsublite/internal/wire/work_item.py
 lib/third_party/google/cloud/pubsublite/testing/__init__.py
+lib/third_party/google/cloud/pubsublite/testing/test_reset_signal.py
 lib/third_party/google/cloud/pubsublite/testing/test_utils.py
 lib/third_party/google/cloud/pubsublite/types/__init__.py
 lib/third_party/google/cloud/pubsublite/types/backlog_location.py
@@ -1791,7 +1797,11 @@ lib/third_party/google/pubsub_v1/types/__init__.py
 lib/third_party/google/pubsub_v1/types/pubsub.py
 lib/third_party/google/pubsub_v1/types/schema.py
 lib/third_party/google/rpc/__init__.py
+lib/third_party/google/rpc/code.proto
+lib/third_party/google/rpc/code_pb2.py
 lib/third_party/google/rpc/context/attribute_context_pb2.py
+lib/third_party/google/rpc/error_details.proto
+lib/third_party/google/rpc/error_details_pb2.py
 lib/third_party/google/rpc/status.proto
 lib/third_party/google/rpc/status_pb2.py
 lib/third_party/google/rpc/status_pb2_grpc.py
