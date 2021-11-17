@@ -29,9 +29,9 @@ from googlecloudsdk.command_lib.resource_manager import tag_utils
 @base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Create(base.Command):
-  """Creates a TagHold resource.
+  """Create a TagHold resource.
 
-    Creates a TagHold under a TagValue, indicating that the TagValue is being
+    Create a TagHold under a TagValue, indicating that the TagValue is being
     used by a holder (cloud resource) from an (optional) origin. The TagValue
     can be represented with its numeric id or its namespaced name of
     {org_id}/{tag_key_short_name}/{tag_value_short_name}.
@@ -44,12 +44,12 @@ class Create(base.Command):
           origin creator-origin, in region us-central1-a, with help link
           www.example.help.link.com, run:
 
-              $ {command} tagValues/123  --holder=cloud-resource-holder   --origin=creator-origin  --help-link=www.example.help.link.com  --location=us-central1-a
+              $ {command} tagValues/123 --holder=cloud-resource-holder --origin=creator-origin --help-link=www.example.help.link.com --location=us-central1-a
 
           To create a TagHold under TagValue test under TagKey env in organization id
           789, with holder cloud-resource-holder, run:
 
-              $ {command} 789/env/test  --holder=cloud-resource-holder
+              $ {command} 789/env/test --holder=cloud-resource-holder
           """
   }
 
