@@ -692,6 +692,7 @@ lib/googlecloudsdk/api_lib/spanner/backups.py
 lib/googlecloudsdk/api_lib/spanner/database_operations.py
 lib/googlecloudsdk/api_lib/spanner/database_sessions.py
 lib/googlecloudsdk/api_lib/spanner/databases.py
+lib/googlecloudsdk/api_lib/spanner/instance_config_operations.py
 lib/googlecloudsdk/api_lib/spanner/instance_configs.py
 lib/googlecloudsdk/api_lib/spanner/instance_operations.py
 lib/googlecloudsdk/api_lib/spanner/instances.py
@@ -1524,7 +1525,6 @@ lib/googlecloudsdk/command_lib/emulators/config.py
 lib/googlecloudsdk/command_lib/emulators/datastore_util.py
 lib/googlecloudsdk/command_lib/emulators/firestore_util.py
 lib/googlecloudsdk/command_lib/emulators/flags.py
-lib/googlecloudsdk/command_lib/emulators/proxy_util.py
 lib/googlecloudsdk/command_lib/emulators/pubsub_util.py
 lib/googlecloudsdk/command_lib/emulators/spanner_util.py
 lib/googlecloudsdk/command_lib/emulators/util.py
@@ -1934,6 +1934,7 @@ lib/googlecloudsdk/command_lib/pubsub/resource_args.py
 lib/googlecloudsdk/command_lib/pubsub/resources.yaml
 lib/googlecloudsdk/command_lib/pubsub/util.py
 lib/googlecloudsdk/command_lib/recaptcha/__init__.py
+lib/googlecloudsdk/command_lib/recaptcha/firewall_policies_util.py
 lib/googlecloudsdk/command_lib/recaptcha/hooks.py
 lib/googlecloudsdk/command_lib/recaptcha/migrate_util.py
 lib/googlecloudsdk/command_lib/recaptcha/resources.yaml
@@ -2253,6 +2254,7 @@ lib/googlecloudsdk/core/cache/cache_update_ops.py
 lib/googlecloudsdk/core/cache/completion_cache.py
 lib/googlecloudsdk/core/cache/exceptions.py
 lib/googlecloudsdk/core/cache/file_cache.py
+lib/googlecloudsdk/core/cache/function_result_cache.py
 lib/googlecloudsdk/core/cache/metadata_table.py
 lib/googlecloudsdk/core/cache/persistent_cache_base.py
 lib/googlecloudsdk/core/cache/resource_cache.py
@@ -2695,6 +2697,7 @@ lib/googlecloudsdk/schemas/compute/v1/Metadata.yaml
 lib/googlecloudsdk/schemas/compute/v1/MetadataFilter.yaml
 lib/googlecloudsdk/schemas/compute/v1/MetadataFilterLabelMatch.yaml
 lib/googlecloudsdk/schemas/compute/v1/NetworkInterface.yaml
+lib/googlecloudsdk/schemas/compute/v1/NetworkPerformanceConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/OutlierDetection.yaml
 lib/googlecloudsdk/schemas/compute/v1/PathMatcher.yaml
 lib/googlecloudsdk/schemas/compute/v1/PathRule.yaml
@@ -7115,7 +7118,6 @@ lib/surface/emulators/pubsub/start.py
 lib/surface/emulators/spanner/__init__.py
 lib/surface/emulators/spanner/env_init.py
 lib/surface/emulators/spanner/start.py
-lib/surface/emulators/start.py
 lib/surface/endpoints/__init__.py
 lib/surface/endpoints/configs/__init__.py
 lib/surface/endpoints/configs/describe.py
@@ -7160,6 +7162,11 @@ lib/surface/eventarc/attributes/service_names/list.py
 lib/surface/eventarc/attributes/types/__init__.py
 lib/surface/eventarc/attributes/types/describe.py
 lib/surface/eventarc/attributes/types/list.py
+lib/surface/eventarc/channel_connections/__init__.py
+lib/surface/eventarc/channel_connections/create.py
+lib/surface/eventarc/channel_connections/delete.py
+lib/surface/eventarc/channel_connections/describe.py
+lib/surface/eventarc/channel_connections/list.py
 lib/surface/eventarc/channels/__init__.py
 lib/surface/eventarc/channels/create.py
 lib/surface/eventarc/channels/delete.py
@@ -8238,6 +8245,7 @@ lib/surface/org_policies/disable_inherit.py
 lib/surface/org_policies/enable_enforce.py
 lib/surface/org_policies/enable_inherit.py
 lib/surface/org_policies/list.py
+lib/surface/org_policies/list_custom_constraints.py
 lib/surface/org_policies/reset.py
 lib/surface/org_policies/set_custom_constraint.py
 lib/surface/org_policies/set_policy.py
@@ -8416,6 +8424,12 @@ lib/surface/pubsub/topics/set_iam_policy.py
 lib/surface/pubsub/topics/set_iam_policy.yaml
 lib/surface/pubsub/topics/update.py
 lib/surface/recaptcha/__init__.py
+lib/surface/recaptcha/firewallpolicies/__init__.py
+lib/surface/recaptcha/firewallpolicies/create.yaml
+lib/surface/recaptcha/firewallpolicies/delete.yaml
+lib/surface/recaptcha/firewallpolicies/describe.yaml
+lib/surface/recaptcha/firewallpolicies/list.yaml
+lib/surface/recaptcha/firewallpolicies/update.yaml
 lib/surface/recaptcha/keys/__init__.py
 lib/surface/recaptcha/keys/create.yaml
 lib/surface/recaptcha/keys/delete.yaml
@@ -8633,6 +8647,7 @@ lib/surface/scc/assets/list_marks.yaml
 lib/surface/scc/assets/run_discovery.yaml
 lib/surface/scc/assets/update_marks.yaml
 lib/surface/scc/findings/__init__.py
+lib/surface/scc/findings/bulk_mute.yaml
 lib/surface/scc/findings/create.yaml
 lib/surface/scc/findings/group.yaml
 lib/surface/scc/findings/list.yaml
