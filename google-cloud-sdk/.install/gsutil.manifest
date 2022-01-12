@@ -121,6 +121,7 @@ platform/gsutil/gslib/tests/test_bucketconfig.py
 platform/gsutil/gslib/tests/test_bucketpolicyonly.py
 platform/gsutil/gslib/tests/test_cat.py
 platform/gsutil/gslib/tests/test_cloud_api_delegator.py
+platform/gsutil/gslib/tests/test_command.py
 platform/gsutil/gslib/tests/test_command_runner.py
 platform/gsutil/gslib/tests/test_compose.py
 platform/gsutil/gslib/tests/test_context_config.py

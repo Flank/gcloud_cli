@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import endpoint_utils as endpoints
@@ -54,13 +55,18 @@ class List(base.ListCommand):
 
   def Run(self, args):
     location = args.location if args.IsSpecified("location") else None
-    resource_name = tag_utils.GetCanonicalResourceName(
-        args.parent, location, base.ReleaseTrack.GA)
+    resource_name = tag_utils.GetCanonicalResourceName(args.parent, location,
+                                                       base.ReleaseTrack.GA)
 
     with endpoints.CrmEndpointOverrides(location):
       service = tags.TagBindingsService()
       messages = tags.TagMessages()
-
       list_req = messages.CloudresourcemanagerTagBindingsListRequest(
           parent=resource_name)
-      return service.List(list_req)
+
+      return list_pager.YieldFromList(
+          service,
+          list_req,
+          batch_size_attribute="pageSize",
+          batch_size=args.page_size,
+          field="tagBindings")
