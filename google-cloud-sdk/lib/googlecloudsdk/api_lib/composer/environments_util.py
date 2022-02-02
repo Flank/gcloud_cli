@@ -246,7 +246,9 @@ def _CreateNodeConfig(messages, flags):
   if not (flags.location or flags.machine_type or flags.network or
           flags.subnetwork or flags.service_account or flags.oauth_scopes or
           flags.tags or flags.disk_size_gb or flags.use_ip_aliases or
-          flags.enable_ip_masq_agent):
+          flags.cluster_secondary_range_name or
+          flags.services_secondary_range_name or flags.cluster_ipv4_cidr_block
+          or flags.services_ipv4_cidr_block or flags.enable_ip_masq_agent):
     return None
 
   config = messages.NodeConfig(
@@ -260,7 +262,9 @@ def _CreateNodeConfig(messages, flags):
     config.oauthScopes = sorted([s.strip() for s in flags.oauth_scopes])
   if flags.tags:
     config.tags = sorted([t.strip() for t in flags.tags])
-  if flags.use_ip_aliases:
+  if (flags.use_ip_aliases or flags.cluster_secondary_range_name or
+      flags.services_secondary_range_name or flags.cluster_ipv4_cidr_block or
+      flags.services_ipv4_cidr_block):
     config.ipAllocationPolicy = messages.IPAllocationPolicy(
         useIpAliases=flags.use_ip_aliases,
         clusterSecondaryRangeName=flags.cluster_secondary_range_name,
@@ -534,7 +538,7 @@ def StoreEnvironmentState(environment_ref,
 
 def LoadEnvironmentState(environment_ref,
                          skip_pypi_packages_installation,
-                         snapshot_location,
+                         snapshot_path,
                          release_track=base.ReleaseTrack.ALPHA):
   """Calls the Composer Environments.LoadEnvironmentState method.
 
@@ -543,7 +547,7 @@ def LoadEnvironmentState(environment_ref,
       state for.
     skip_pypi_packages_installation: skip installing the pypi packages during
       the operation
-    snapshot_location: location of the snapshots to load the state of the
+    snapshot_path: path of the specific snapshot to load the state of the
       environment.
     release_track: base.ReleaseTrack, the release track of command. Will dictate
       which Composer client library will be used.
@@ -556,8 +560,7 @@ def LoadEnvironmentState(environment_ref,
       environment=environment_ref.RelativeName(),
       loadEnvironmentStateRequest=message_module.LoadEnvironmentStateRequest(
           skipPypiPackagesInstallation=skip_pypi_packages_installation,
-          snapshotLocation=snapshot_location
-          ))
+          snapshotPath=snapshot_path))
   return GetService(
       release_track=release_track).LoadEnvironmentState(request_message)
 

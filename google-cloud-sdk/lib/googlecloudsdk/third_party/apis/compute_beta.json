@@ -4,7 +4,7 @@
   "id": "compute:beta",
   "name": "compute",
   "version": "beta",
-  "revision": "20220107",
+  "revision": "20220124",
   "title": "Compute Engine API",
   "description": "Creates and runs virtual machines on Google Cloud Platform. ",
   "ownerDomain": "google.com",
@@ -3471,25 +3471,21 @@
           "type": "string",
           "enumDescriptions": [
             "The network interface can have both IPv4 and IPv6 addresses.",
-            "The network interface will be assigned IPv4 address.",
-            ""
+            "The network interface will be assigned IPv4 address."
           ],
           "enum": [
             "IPV4_IPV6",
-            "IPV4_ONLY",
-            "UNSPECIFIED_STACK_TYPE"
+            "IPV4_ONLY"
           ]
         },
         "ipv6AccessType": {
           "description": "[Output Only] One of EXTERNAL, INTERNAL to indicate whether the IP can be accessed from the Internet. This field is always inherited from its subnetwork. Valid only if stackType is IPV4_IPV6.",
           "type": "string",
           "enumDescriptions": [
-            "This network interface can have external IPv6.",
-            "IPv6 access type not set. Means this network interface hasn't been turned on IPv6 yet."
+            "This network interface can have external IPv6."
           ],
           "enum": [
-            "EXTERNAL",
-            "UNSPECIFIED_IPV6_ACCESS_TYPE"
+            "EXTERNAL"
           ]
         },
         "queueCount": {
@@ -3873,7 +3869,7 @@
       "type": "object",
       "properties": {
         "onHostMaintenance": {
-          "description": "Defines the maintenance behavior for this instance. For standard instances, the default behavior is MIGRATE. For preemptible instances, the default and only possible behavior is TERMINATE. For more information, see Setting Instance Scheduling Options.",
+          "description": "Defines the maintenance behavior for this instance. For standard instances, the default behavior is MIGRATE. For preemptible instances, the default and only possible behavior is TERMINATE. For more information, see Set VM availability policies.",
           "type": "string",
           "enumDescriptions": [
             "*[Default]* Allows Compute Engine to automatically migrate instances out of the way of maintenance events.",
@@ -28510,25 +28506,21 @@
           "type": "string",
           "enumDescriptions": [
             "New VMs in this subnet can have both IPv4 and IPv6 addresses.",
-            "New VMs in this subnet will only be assigned IPv4 addresses.",
-            ""
+            "New VMs in this subnet will only be assigned IPv4 addresses."
           ],
           "enum": [
             "IPV4_IPV6",
-            "IPV4_ONLY",
-            "UNSPECIFIED_STACK_TYPE"
+            "IPV4_ONLY"
           ]
         },
         "ipv6AccessType": {
           "description": "The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation or the first time the subnet is updated into IPV4_IPV6 dual stack. If the ipv6_type is EXTERNAL then this subnet cannot enable direct path.",
           "type": "string",
           "enumDescriptions": [
-            "VMs on this subnet will be assigned IPv6 addresses that are accesible via the Internet, as well as the VPC network.",
-            "IPv6 access type not set. Means this subnet hasn't been turned on IPv6 yet."
+            "VMs on this subnet will be assigned IPv6 addresses that are accesible via the Internet, as well as the VPC network."
           ],
           "enum": [
-            "EXTERNAL",
-            "UNSPECIFIED_IPV6_ACCESS_TYPE"
+            "EXTERNAL"
           ]
         },
         "kind": {
@@ -38106,7 +38098,7 @@
             "https://www.googleapis.com/auth/cloud-platform",
             "https://www.googleapis.com/auth/compute"
           ],
-          "description": "Sets an instance's scheduling options. You can only call this method on a stopped instance, that is, a VM instance that is in a `TERMINATED` state. See Instance Life Cycle for more information on the possible instance states."
+          "description": "Sets an instance's scheduling options. You can only call this method on a stopped instance, that is, a VM instance that is in a `TERMINATED` state. See Instance Life Cycle for more information on the possible instance states. For more information about setting scheduling options for a VM, see Set VM availability policies."
         },
         "getSerialPortOutput": {
           "id": "compute.instances.getSerialPortOutput",
@@ -39259,7 +39251,7 @@
             "https://www.googleapis.com/auth/cloud-platform",
             "https://www.googleapis.com/auth/compute"
           ],
-          "description": "This method suspends a running instance, saving its state to persistent storage, and allows you to resume the instance at a later time. Suspended instances incur reduced per-minute, virtual machine usage charges while they are suspended. Any resources the virtual machine is using, such as persistent disks and static IP addresses, will continue to be charged until they are deleted. For more information, see Suspending and resuming an instance."
+          "description": "This method suspends a running instance, saving its state to persistent storage, and allows you to resume the instance at a later time. Suspended instances have no compute costs (cores or RAM), and incur only storage charges for the saved VM memory and localSSD data. Any charged resources the virtual machine was using, such as persistent disks and static IP addresses, will continue to be charged while the instance is suspended. For more information, see Suspending and resuming an instance."
         },
         "resume": {
           "id": "compute.instances.resume",

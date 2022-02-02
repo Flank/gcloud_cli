@@ -449,7 +449,9 @@ class CloudassetAnalyzeIamPolicyRequest(_messages.Message):
       section of the result will expand any Google groups appearing in an IAM
       policy binding. If IamPolicyAnalysisQuery.identity_selector is
       specified, the identity in the result will be determined by the
-      selector, and this flag is not allowed to set. Default is false.
+      selector, and this flag is not allowed to set. If true, the default max
+      expansion per group is 1000 for AssetService.AnalyzeIamPolicy][].
+      Default is false.
     analysisQuery_options_expandResources: Optional. If true and
       IamPolicyAnalysisQuery.resource_selector is not specified, the resource
       section of the result will expand any resource attached to an IAM policy
@@ -464,7 +466,9 @@ class CloudassetAnalyzeIamPolicyRequest(_messages.Message):
       together with this option. For example, if the request analyzes for
       which users have permission P on a GCP project with this option enabled,
       the results will include all users who have permission P on that project
-      or any lower resource. Default is false.
+      or any lower resource. If true, the default max expansion per resource
+      is 1000 for AssetService.AnalyzeIamPolicy][] and 100000 for
+      AssetService.AnalyzeIamPolicyLongrunning][]. Default is false.
     analysisQuery_options_expandRoles: Optional. If true, the access section
       of result will expand any roles appearing in IAM policy bindings to
       include their permissions. If IamPolicyAnalysisQuery.access_selector is
@@ -606,7 +610,8 @@ class CloudassetAssetsListRequest(_messages.Message):
     parent: Required. Name of the organization or project the assets belong
       to. Format: "organizations/[organization-number]" (such as
       "organizations/123"), "projects/[project-id]" (such as "projects/my-
-      project-id"), or "projects/[project-number]" (such as "projects/12345").
+      project-id"), "projects/[project-number]" (such as "projects/12345"), or
+      "folders/[folder-number]" (such as "folders/12345").
     readTime: Timestamp to take an asset snapshot. This can only be set to a
       timestamp between the current time and the current time minus 35 days
       (inclusive). If not specified, the current time will be used. Due to
@@ -3355,7 +3360,8 @@ class Options(_messages.Message):
       expand any Google groups appearing in an IAM policy binding. If
       IamPolicyAnalysisQuery.identity_selector is specified, the identity in
       the result will be determined by the selector, and this flag is not
-      allowed to set. Default is false.
+      allowed to set. If true, the default max expansion per group is 1000 for
+      AssetService.AnalyzeIamPolicy][]. Default is false.
     expandResources: Optional. If true and
       IamPolicyAnalysisQuery.resource_selector is not specified, the resource
       section of the result will expand any resource attached to an IAM policy
@@ -3370,7 +3376,9 @@ class Options(_messages.Message):
       together with this option. For example, if the request analyzes for
       which users have permission P on a GCP project with this option enabled,
       the results will include all users who have permission P on that project
-      or any lower resource. Default is false.
+      or any lower resource. If true, the default max expansion per resource
+      is 1000 for AssetService.AnalyzeIamPolicy][] and 100000 for
+      AssetService.AnalyzeIamPolicyLongrunning][]. Default is false.
     expandRoles: Optional. If true, the access section of result will expand
       any roles appearing in IAM policy bindings to include their permissions.
       If IamPolicyAnalysisQuery.access_selector is specified, the access

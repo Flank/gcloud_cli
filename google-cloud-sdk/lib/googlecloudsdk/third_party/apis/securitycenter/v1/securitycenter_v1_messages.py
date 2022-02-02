@@ -604,13 +604,13 @@ class Finding(_messages.Message):
       "XSS_FLASH_INJECTION"
     createTime: The time at which the finding was created in Security Command
       Center.
-    eventTime: The time at which the event took place, or when an update to
-      the finding occurred. For example, if the finding represents an open
-      firewall it would capture the time the detector believes the firewall
-      became open. The accuracy is determined by the detector. If the finding
-      were to be resolved afterward, this time would reflect when the finding
-      was resolved. Must not be set to a value greater than the current
-      timestamp.
+    eventTime: The time the finding was first detected. If an existing finding
+      is updated, then this is the time the update occurred. For example, if
+      the finding represents an open firewall, this property captures the time
+      the detector believes the firewall became open. The accuracy is
+      determined by the detector. If the finding is later resolved, then this
+      time reflects when the finding was resolved. This must not be set to a
+      value greater than the current timestamp.
     externalSystems: Output only. Third party SIEM/SOAR fields within SCC,
       contains external system information and external system finding fields.
     externalUri: The URI that, if available, points to a web page outside of
@@ -895,6 +895,56 @@ class GetPolicyOptions(_messages.Message):
   """
 
   requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudSecuritycenterV1BigQueryExport(_messages.Message):
+  r"""Configures how to deliver Findings to BigQuery Instance.
+
+  Fields:
+    createTime: Output only. The time at which the big query export was
+      created. This field is set by the server and will be ignored if provided
+      on export on creation.
+    dataset: The dataset to write findings' updates to. Its format is
+      "projects/[project_id]/datasets/[bigquery_dataset_id]". BigQuery Dataset
+      unique ID must contain only letters (a-z, A-Z), numbers (0-9), or
+      underscores (_).
+    description: The description of the export (max of 1024 characters).
+    filter: Expression that defines the filter to apply across create/update
+      events of findings. The expression is a list of zero or more
+      restrictions combined via logical operators `AND` and `OR`. Parentheses
+      are supported, and `OR` has higher precedence than `AND`. Restrictions
+      have the form ` ` and may have a `-` character in front of them to
+      indicate negation. The fields map to those defined in the corresponding
+      resource. The supported operators are: * `=` for all value types. * `>`,
+      `<`, `>=`, `<=` for integer values. * `:`, meaning substring matching,
+      for strings. The supported value types are: * string literals in quotes.
+      * integer literals without quotes. * boolean literals `true` and `false`
+      without quotes.
+    mostRecentEditor: Output only. Email address of the user who last edited
+      the big query export. This field is set by the server and will be
+      ignored if provided on export creation or update.
+    name: The relative resource name of this export. See: https://cloud.google
+      .com/apis/design/resource_names#relative_resource_name. Example format:
+      "organizations/{organization_id}/bigQueryExports/{export_id}" Example
+      format: "folders/{folder_id}/bigQueryExports/{export_id}" Example
+      format: "projects/{project_id}/bigQueryExports/{export_id}" This field
+      is provided in responses, and is ignored when provided in create
+      requests.
+    principal: Output only. The service account that needs permission to
+      create table, upload data to the big query dataset.
+    updateTime: Output only. The most recent time at which the big export was
+      updated. This field is set by the server and will be ignored if provided
+      on export creation or update.
+  """
+
+  createTime = _messages.StringField(1)
+  dataset = _messages.StringField(2)
+  description = _messages.StringField(3)
+  filter = _messages.StringField(4)
+  mostRecentEditor = _messages.StringField(5)
+  name = _messages.StringField(6)
+  principal = _messages.StringField(7)
+  updateTime = _messages.StringField(8)
 
 
 class GoogleCloudSecuritycenterV1BulkMuteFindingsResponse(_messages.Message):
@@ -1692,6 +1742,19 @@ class ListAssetsResult(_messages.Message):
 
   asset = _messages.MessageField('Asset', 1)
   stateChange = _messages.EnumField('StateChangeValueValuesEnum', 2)
+
+
+class ListBigQueryExportsResponse(_messages.Message):
+  r"""Response message for listing BigQuery exports.
+
+  Fields:
+    bigQueryExports: The BigQuery exports from the specified parent.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  bigQueryExports = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListFindingsResponse(_messages.Message):
@@ -2549,7 +2612,8 @@ class SecuritycenterFoldersAssetsUpdateSecurityMarksRequest(_messages.Message):
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be
@@ -2560,6 +2624,85 @@ class SecuritycenterFoldersAssetsUpdateSecurityMarksRequest(_messages.Message):
   securityMarks = _messages.MessageField('SecurityMarks', 2)
   startTime = _messages.StringField(3)
   updateMask = _messages.StringField(4)
+
+
+class SecuritycenterFoldersBigQueryExportsCreateRequest(_messages.Message):
+  r"""A SecuritycenterFoldersBigQueryExportsCreateRequest object.
+
+  Fields:
+    bigQueryExportId: Required. Unique identifier provided by the client
+      within the parent scope. It must consist of lower case letters, numbers,
+      and hyphen, with the first character a letter, the last a letter or a
+      number, and a 63 character maximum.
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    parent: Required. Resource name of the new big query export's parent. Its
+      format is "organizations/[organization_id]", "folders/[folder_id]", or
+      "projects/[project_id]".
+  """
+
+  bigQueryExportId = _messages.StringField(1)
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterFoldersBigQueryExportsDeleteRequest(_messages.Message):
+  r"""A SecuritycenterFoldersBigQueryExportsDeleteRequest object.
+
+  Fields:
+    name: Required. Name of the big query export to delete. Its format is
+      organizations/{organization}/bigQueryExports/{export_id},
+      folders/{folder}/bigQueryExports/{export_id}, or
+      projects/{project}/bigQueryExports/{export_id}
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SecuritycenterFoldersBigQueryExportsListRequest(_messages.Message):
+  r"""A SecuritycenterFoldersBigQueryExportsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of configs to return. The service may return
+      fewer than this value. If unspecified, at most 10 configs will be
+      returned. The maximum value is 1000; values above 1000 will be coerced
+      to 1000.
+    pageToken: A page token, received from a previous `ListBigQueryExports`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListBigQueryExports` must match the call
+      that provided the page token.
+    parent: Required. The parent, which owns the collection of BigQuery
+      exports. Its format is "organizations/[organization_id]",
+      "folders/[folder_id]", "projects/[project_id]".
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterFoldersBigQueryExportsPatchRequest(_messages.Message):
+  r"""A SecuritycenterFoldersBigQueryExportsPatchRequest object.
+
+  Fields:
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    name: The relative resource name of this export. See: https://cloud.google
+      .com/apis/design/resource_names#relative_resource_name. Example format:
+      "organizations/{organization_id}/bigQueryExports/{export_id}" Example
+      format: "folders/{folder_id}/bigQueryExports/{export_id}" Example
+      format: "projects/{project_id}/bigQueryExports/{export_id}" This field
+      is provided in responses, and is ignored when provided in create
+      requests.
+    updateMask: The list of fields to be updated. If empty all mutable fields
+      will be updated.
+  """
+
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class SecuritycenterFoldersFindingsBulkMuteRequest(_messages.Message):
@@ -2867,7 +3010,8 @@ class SecuritycenterFoldersSourcesFindingsUpdateSecurityMarksRequest(_messages.M
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be
@@ -3038,7 +3182,8 @@ class SecuritycenterOrganizationsAssetsUpdateSecurityMarksRequest(_messages.Mess
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be
@@ -3049,6 +3194,85 @@ class SecuritycenterOrganizationsAssetsUpdateSecurityMarksRequest(_messages.Mess
   securityMarks = _messages.MessageField('SecurityMarks', 2)
   startTime = _messages.StringField(3)
   updateMask = _messages.StringField(4)
+
+
+class SecuritycenterOrganizationsBigQueryExportsCreateRequest(_messages.Message):
+  r"""A SecuritycenterOrganizationsBigQueryExportsCreateRequest object.
+
+  Fields:
+    bigQueryExportId: Required. Unique identifier provided by the client
+      within the parent scope. It must consist of lower case letters, numbers,
+      and hyphen, with the first character a letter, the last a letter or a
+      number, and a 63 character maximum.
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    parent: Required. Resource name of the new big query export's parent. Its
+      format is "organizations/[organization_id]", "folders/[folder_id]", or
+      "projects/[project_id]".
+  """
+
+  bigQueryExportId = _messages.StringField(1)
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterOrganizationsBigQueryExportsDeleteRequest(_messages.Message):
+  r"""A SecuritycenterOrganizationsBigQueryExportsDeleteRequest object.
+
+  Fields:
+    name: Required. Name of the big query export to delete. Its format is
+      organizations/{organization}/bigQueryExports/{export_id},
+      folders/{folder}/bigQueryExports/{export_id}, or
+      projects/{project}/bigQueryExports/{export_id}
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SecuritycenterOrganizationsBigQueryExportsListRequest(_messages.Message):
+  r"""A SecuritycenterOrganizationsBigQueryExportsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of configs to return. The service may return
+      fewer than this value. If unspecified, at most 10 configs will be
+      returned. The maximum value is 1000; values above 1000 will be coerced
+      to 1000.
+    pageToken: A page token, received from a previous `ListBigQueryExports`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListBigQueryExports` must match the call
+      that provided the page token.
+    parent: Required. The parent, which owns the collection of BigQuery
+      exports. Its format is "organizations/[organization_id]",
+      "folders/[folder_id]", "projects/[project_id]".
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterOrganizationsBigQueryExportsPatchRequest(_messages.Message):
+  r"""A SecuritycenterOrganizationsBigQueryExportsPatchRequest object.
+
+  Fields:
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    name: The relative resource name of this export. See: https://cloud.google
+      .com/apis/design/resource_names#relative_resource_name. Example format:
+      "organizations/{organization_id}/bigQueryExports/{export_id}" Example
+      format: "folders/{folder_id}/bigQueryExports/{export_id}" Example
+      format: "projects/{project_id}/bigQueryExports/{export_id}" This field
+      is provided in responses, and is ignored when provided in create
+      requests.
+    updateMask: The list of fields to be updated. If empty all mutable fields
+      will be updated.
+  """
+
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class SecuritycenterOrganizationsFindingsBulkMuteRequest(_messages.Message):
@@ -3522,7 +3746,8 @@ class SecuritycenterOrganizationsSourcesFindingsUpdateSecurityMarksRequest(_mess
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be
@@ -3770,7 +3995,8 @@ class SecuritycenterProjectsAssetsUpdateSecurityMarksRequest(_messages.Message):
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be
@@ -3781,6 +4007,85 @@ class SecuritycenterProjectsAssetsUpdateSecurityMarksRequest(_messages.Message):
   securityMarks = _messages.MessageField('SecurityMarks', 2)
   startTime = _messages.StringField(3)
   updateMask = _messages.StringField(4)
+
+
+class SecuritycenterProjectsBigQueryExportsCreateRequest(_messages.Message):
+  r"""A SecuritycenterProjectsBigQueryExportsCreateRequest object.
+
+  Fields:
+    bigQueryExportId: Required. Unique identifier provided by the client
+      within the parent scope. It must consist of lower case letters, numbers,
+      and hyphen, with the first character a letter, the last a letter or a
+      number, and a 63 character maximum.
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    parent: Required. Resource name of the new big query export's parent. Its
+      format is "organizations/[organization_id]", "folders/[folder_id]", or
+      "projects/[project_id]".
+  """
+
+  bigQueryExportId = _messages.StringField(1)
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterProjectsBigQueryExportsDeleteRequest(_messages.Message):
+  r"""A SecuritycenterProjectsBigQueryExportsDeleteRequest object.
+
+  Fields:
+    name: Required. Name of the big query export to delete. Its format is
+      organizations/{organization}/bigQueryExports/{export_id},
+      folders/{folder}/bigQueryExports/{export_id}, or
+      projects/{project}/bigQueryExports/{export_id}
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SecuritycenterProjectsBigQueryExportsListRequest(_messages.Message):
+  r"""A SecuritycenterProjectsBigQueryExportsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of configs to return. The service may return
+      fewer than this value. If unspecified, at most 10 configs will be
+      returned. The maximum value is 1000; values above 1000 will be coerced
+      to 1000.
+    pageToken: A page token, received from a previous `ListBigQueryExports`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListBigQueryExports` must match the call
+      that provided the page token.
+    parent: Required. The parent, which owns the collection of BigQuery
+      exports. Its format is "organizations/[organization_id]",
+      "folders/[folder_id]", "projects/[project_id]".
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class SecuritycenterProjectsBigQueryExportsPatchRequest(_messages.Message):
+  r"""A SecuritycenterProjectsBigQueryExportsPatchRequest object.
+
+  Fields:
+    googleCloudSecuritycenterV1BigQueryExport: A
+      GoogleCloudSecuritycenterV1BigQueryExport resource to be passed as the
+      request body.
+    name: The relative resource name of this export. See: https://cloud.google
+      .com/apis/design/resource_names#relative_resource_name. Example format:
+      "organizations/{organization_id}/bigQueryExports/{export_id}" Example
+      format: "folders/{folder_id}/bigQueryExports/{export_id}" Example
+      format: "projects/{project_id}/bigQueryExports/{export_id}" This field
+      is provided in responses, and is ignored when provided in create
+      requests.
+    updateMask: The list of fields to be updated. If empty all mutable fields
+      will be updated.
+  """
+
+  googleCloudSecuritycenterV1BigQueryExport = _messages.MessageField('GoogleCloudSecuritycenterV1BigQueryExport', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class SecuritycenterProjectsFindingsBulkMuteRequest(_messages.Message):
@@ -4089,7 +4394,8 @@ class SecuritycenterProjectsSourcesFindingsUpdateSecurityMarksRequest(_messages.
     securityMarks: A SecurityMarks resource to be passed as the request body.
     startTime: The time at which the updated SecurityMarks take effect. If not
       set uses current server time. Updates will be applied to the
-      SecurityMarks that are active immediately preceding this time.
+      SecurityMarks that are active immediately preceding this time. Must be
+      smaller or equal to the server time.
     updateMask: The FieldMask to use when updating the security marks
       resource. The field mask must not contain duplicate fields. If empty or
       set to "marks", all marks will be replaced. Individual marks can be

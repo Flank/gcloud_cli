@@ -427,6 +427,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       consumer_defined_name is used for notification/UI purposes for consumer
       to recognize their instances.
     createTime: Output only. Timestamp when the resource was created.
+    instanceType: Optional. The instance_type of this instance of format: proj
+      ects/{project_id}/locations/{location_id}/instanceTypes/{instance_type_i
+      d}. Instance Type represents a high-level tier or SKU of the service
+      that this instance belong to. When enabled(eg: Maintenance Rollout),
+      Rollout uses 'instance_type' along with 'software_versions' to determine
+      whether instance needs an update or not.
     labels: Optional. Resource labels to represent user provided metadata.
       Each label is a key-value pair, where both the key and the value are
       arbitrary strings provided by the user.
@@ -629,19 +635,20 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
 
   consumerDefinedName = _messages.StringField(1)
   createTime = _messages.StringField(2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  maintenancePolicyNames = _messages.MessageField('MaintenancePolicyNamesValue', 4)
-  maintenanceSchedules = _messages.MessageField('MaintenanceSchedulesValue', 5)
-  maintenanceSettings = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings', 6)
-  name = _messages.StringField(7)
-  producerMetadata = _messages.MessageField('ProducerMetadataValue', 8)
-  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 9, repeated=True)
-  slmInstanceTemplate = _messages.StringField(10)
-  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 11)
-  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 12)
-  state = _messages.EnumField('StateValueValuesEnum', 13)
-  tenantProjectId = _messages.StringField(14)
-  updateTime = _messages.StringField(15)
+  instanceType = _messages.StringField(3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  maintenancePolicyNames = _messages.MessageField('MaintenancePolicyNamesValue', 5)
+  maintenanceSchedules = _messages.MessageField('MaintenanceSchedulesValue', 6)
+  maintenanceSettings = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings', 7)
+  name = _messages.StringField(8)
+  producerMetadata = _messages.MessageField('ProducerMetadataValue', 9)
+  provisionedResources = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1ProvisionedResource', 10, repeated=True)
+  slmInstanceTemplate = _messages.StringField(11)
+  sloMetadata = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata', 12)
+  softwareVersions = _messages.MessageField('SoftwareVersionsValue', 13)
+  state = _messages.EnumField('StateValueValuesEnum', 14)
+  tenantProjectId = _messages.StringField(15)
+  updateTime = _messages.StringField(16)
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSchedule(_messages.Message):
@@ -1211,6 +1218,66 @@ class ManagedidentitiesProjectsLocationsGlobalDomainsAttachTrustRequest(_message
 
   attachTrustRequest = _messages.MessageField('AttachTrustRequest', 1)
   name = _messages.StringField(2, required=True)
+
+
+class ManagedidentitiesProjectsLocationsGlobalDomainsBackupsGetIamPolicyRequest(_messages.Message):
+  r"""A
+  ManagedidentitiesProjectsLocationsGlobalDomainsBackupsGetIamPolicyRequest
+  object.
+
+  Fields:
+    options_requestedPolicyVersion: Optional. The maximum policy version that
+      will be used to format the policy. Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected. Requests for
+      policies with any conditional role bindings must specify version 3.
+      Policies with no conditional role bindings may specify any valid value
+      or leave the field unset. The policy in the response might use the
+      policy version that you specified, or it might use a lower policy
+      version. For example, if you specify version 3, but the policy has no
+      conditional role bindings, the response uses version 1. To learn which
+      resources support conditions in their IAM policies, see the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
+
+
+class ManagedidentitiesProjectsLocationsGlobalDomainsBackupsSetIamPolicyRequest(_messages.Message):
+  r"""A
+  ManagedidentitiesProjectsLocationsGlobalDomainsBackupsSetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class ManagedidentitiesProjectsLocationsGlobalDomainsBackupsTestIamPermissionsRequest(_messages.Message):
+  r"""A ManagedidentitiesProjectsLocationsGlobalDomainsBackupsTestIamPermissio
+  nsRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
 class ManagedidentitiesProjectsLocationsGlobalDomainsCreateRequest(_messages.Message):

@@ -579,7 +579,7 @@ class DataplexProjectsLocationsLakesPatchRequest(_messages.Message):
     googleCloudDataplexV1Lake: A GoogleCloudDataplexV1Lake resource to be
       passed as the request body.
     name: Output only. The relative resource name of the lake, of the form:
-      projects/{project_number}/locations/{location_id}/lakes/{lake_id}
+      projects/{project_number}/locations/{location_id}/lakes/{lake_id}.
     updateMask: Required. Mask of fields to update.
     validateOnly: Optional. Only validate the request, but do not perform
       mutations. The default is false.
@@ -963,7 +963,7 @@ class DataplexProjectsLocationsLakesZonesAssetsPatchRequest(_messages.Message):
       passed as the request body.
     name: Output only. The relative resource name of the asset, of the form: p
       rojects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{
-      zone_id}/assets/{asset_id}
+      zone_id}/assets/{asset_id}.
     updateMask: Required. Mask of fields to update.
     validateOnly: Optional. Only validate the request, but do not perform
       mutations. The default is false.
@@ -1149,7 +1149,7 @@ class DataplexProjectsLocationsLakesZonesEntitiesPartitionsListRequest(_messages
       provided the page token.
     parent: Required. The resource name of the parent entity: projects/{projec
       t_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/entiti
-      es/{entity_id}`.
+      es/{entity_id}.
   """
 
   filter = _messages.StringField(1)
@@ -1227,7 +1227,7 @@ class DataplexProjectsLocationsLakesZonesPatchRequest(_messages.Message):
       passed as the request body.
     name: Output only. The relative resource name of the zone, of the form: pr
       ojects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{z
-      one_id}
+      one_id}.
     updateMask: Required. Mask of fields to update.
     validateOnly: Optional. Only validate the request, but do not perform
       mutations. The default is false.
@@ -1360,12 +1360,12 @@ class GoogleCloudDataplexV1Action(_messages.Message):
   Fields:
     asset: Output only. The relative resource name of the asset, of the form:
       projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/
-      {zone_id}/assets/{asset_id}
+      {zone_id}/assets/{asset_id}.
     category: The category of issue associated with the action.
     dataLocations: The list of data locations associated with this action.
       Cloud Storage locations are represented as URI paths(E.g.
       gs://bucket/table1/year=2020/month=Jan/). BigQuery locations refer to
-      resource names(E.g. //bigquery.googleapis.com/projects/project-
+      resource names(E.g. bigquery.googleapis.com/projects/project-
       id/datasets/dataset-id).
     detectTime: The time that the issue was detected.
     failedSecurityPolicyApply: Details for issues related to applying security
@@ -1380,7 +1380,7 @@ class GoogleCloudDataplexV1Action(_messages.Message):
       data partition structure.
     issue: Detailed description of the issue requiring action.
     lake: Output only. The relative resource name of the lake, of the form:
-      projects/{project_number}/locations/{location_id}/lakes/{lake_id}
+      projects/{project_number}/locations/{location_id}/lakes/{lake_id}.
     missingData: Details for issues related to absence of data within managed
       resources.
     missingResource: Details for issues related to absence of a managed
@@ -1389,19 +1389,19 @@ class GoogleCloudDataplexV1Action(_messages.Message):
       projects/{project}/locations/{location}/lakes/{lake}/actions/{action} pr
       ojects/{project}/locations/{location}/lakes/{lake}/zones/{zone}/actions/
       {action} projects/{project}/locations/{location}/lakes/{lake}/zones/{zon
-      e}/assets/{asset}/actions/{action}
+      e}/assets/{asset}/actions/{action}.
     unauthorizedResource: Details for issues related to lack of permissions to
       access data resources.
     zone: Output only. The relative resource name of the zone, of the form: pr
       ojects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{z
-      one_id}
+      one_id}.
   """
 
   class CategoryValueValuesEnum(_messages.Enum):
     r"""The category of issue associated with the action.
 
     Values:
-      CATEGORY_UNSPECIFIED: Unspecified category
+      CATEGORY_UNSPECIFIED: Unspecified category.
       RESOURCE_MANAGEMENT: Resource management related issues.
       SECURITY_POLICY: Security policy related issues.
       DATA_DISCOVERY: Data and discovery related issues.
@@ -1571,7 +1571,7 @@ class GoogleCloudDataplexV1Asset(_messages.Message):
     labels: Optional. User defined labels for the asset.
     name: Output only. The relative resource name of the asset, of the form: p
       rojects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{
-      zone_id}/assets/{asset_id}
+      zone_id}/assets/{asset_id}.
     resourceSpec: Required. Specification of the resource that is referenced
       by this asset.
     resourceStatus: Output only. Status of the resource referenced by this
@@ -1732,8 +1732,8 @@ class GoogleCloudDataplexV1AssetDiscoveryStatus(_messages.Message):
       STATE_UNSPECIFIED: State is unspecified.
       SCHEDULED: Discovery for the asset is scheduled.
       IN_PROGRESS: Discovery for the asset is running.
-      PAUSED: Discovery for the asset is currently paused--for example due to
-        a lack of available resources. It will be automatically resumed.
+      PAUSED: Discovery for the asset is currently paused (e.g. due to a lack
+        of available resources). It will be automatically resumed.
       DISABLED: Discovery for the asset is disabled.
     """
     STATE_UNSPECIFIED = 0
@@ -1779,7 +1779,7 @@ class GoogleCloudDataplexV1AssetResourceSpec(_messages.Message):
       projects/{project_number}/datasets/{dataset_id} If the creation policy
       indicates ATTACH behavior, then an existing resource must be provided.
       If the policy indicates CREATE behavior, new resource will be created
-      with the given name.However if it is empty, nthen the resource will be
+      with the given name.However if it is empty, then the resource will be
       created using {asset_id}-{UUID} template for name. The location of the
       referenced resource must always match that of the asset.
     type: Required. Immutable. Type of resource.
@@ -1996,6 +1996,171 @@ class GoogleCloudDataplexV1ContentSqlScript(_messages.Message):
   engine = _messages.EnumField('EngineValueValuesEnum', 1)
 
 
+class GoogleCloudDataplexV1DiscoveryEvent(_messages.Message):
+  r"""The payload associated with Discovery data processing.
+
+  Enums:
+    TypeValueValuesEnum: The type of the event being logged.
+
+  Fields:
+    action: Details about the action associated with the event.
+    assetId: The id of the associated asset.
+    config: Details about discovery configuration in effect.
+    dataLocation: The data location associated with the event.
+    entity: Details about the entity associated with the event.
+    lakeId: The id of the associated lake.
+    message: The log message.
+    partition: Details about the partition associated with the event.
+    type: The type of the event being logged.
+    zoneId: The id of the associated zone.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the event being logged.
+
+    Values:
+      EVENT_TYPE_UNSPECIFIED: An unspecified event type.
+      CONFIG: An event representing discovery configuration in effect.
+      ENTITY_CREATED: An event representing a metadata entity being created.
+      ENTITY_UPDATED: An event representing a metadata entity being updated.
+      ENTITY_DELETED: An event representing a metadata entity being deleted.
+      PARTITION_CREATED: An event representing a partition being created.
+      PARTITION_UPDATED: An event representing a partition being updated.
+      PARTITION_DELETED: An event representing a partition being deleted.
+    """
+    EVENT_TYPE_UNSPECIFIED = 0
+    CONFIG = 1
+    ENTITY_CREATED = 2
+    ENTITY_UPDATED = 3
+    ENTITY_DELETED = 4
+    PARTITION_CREATED = 5
+    PARTITION_UPDATED = 6
+    PARTITION_DELETED = 7
+
+  action = _messages.MessageField('GoogleCloudDataplexV1DiscoveryEventActionDetails', 1)
+  assetId = _messages.StringField(2)
+  config = _messages.MessageField('GoogleCloudDataplexV1DiscoveryEventConfigDetails', 3)
+  dataLocation = _messages.StringField(4)
+  entity = _messages.MessageField('GoogleCloudDataplexV1DiscoveryEventEntityDetails', 5)
+  lakeId = _messages.StringField(6)
+  message = _messages.StringField(7)
+  partition = _messages.MessageField('GoogleCloudDataplexV1DiscoveryEventPartitionDetails', 8)
+  type = _messages.EnumField('TypeValueValuesEnum', 9)
+  zoneId = _messages.StringField(10)
+
+
+class GoogleCloudDataplexV1DiscoveryEventActionDetails(_messages.Message):
+  r"""Details about the action.
+
+  Fields:
+    type: The type of action. Eg. IncompatibleDataSchema, InvalidDataFormat
+  """
+
+  type = _messages.StringField(1)
+
+
+class GoogleCloudDataplexV1DiscoveryEventConfigDetails(_messages.Message):
+  r"""Details about configuration events.
+
+  Messages:
+    ParametersValue: A list of discovery configuration parameters in effect.
+      The keys are the field paths within DiscoverySpec. Eg. includePatterns,
+      excludePatterns, csvOptions.disableTypeInference, etc.
+
+  Fields:
+    parameters: A list of discovery configuration parameters in effect. The
+      keys are the field paths within DiscoverySpec. Eg. includePatterns,
+      excludePatterns, csvOptions.disableTypeInference, etc.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ParametersValue(_messages.Message):
+    r"""A list of discovery configuration parameters in effect. The keys are
+    the field paths within DiscoverySpec. Eg. includePatterns,
+    excludePatterns, csvOptions.disableTypeInference, etc.
+
+    Messages:
+      AdditionalProperty: An additional property for a ParametersValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type ParametersValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ParametersValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  parameters = _messages.MessageField('ParametersValue', 1)
+
+
+class GoogleCloudDataplexV1DiscoveryEventEntityDetails(_messages.Message):
+  r"""Details about the entity.
+
+  Enums:
+    TypeValueValuesEnum: The type of the entity resource.
+
+  Fields:
+    entity: The name of the entity resource. The name is the fully-qualified
+      resource name.
+    type: The type of the entity resource.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the entity resource.
+
+    Values:
+      ENTITY_TYPE_UNSPECIFIED: An unspecified event type.
+      TABLE: Entities representing structured data.
+      FILESET: Entities representing unstructured data.
+    """
+    ENTITY_TYPE_UNSPECIFIED = 0
+    TABLE = 1
+    FILESET = 2
+
+  entity = _messages.StringField(1)
+  type = _messages.EnumField('TypeValueValuesEnum', 2)
+
+
+class GoogleCloudDataplexV1DiscoveryEventPartitionDetails(_messages.Message):
+  r"""Details about the partition.
+
+  Enums:
+    TypeValueValuesEnum: The type of the containing entity resource.
+
+  Fields:
+    entity: The name to the containing entity resource. The name is the fully-
+      qualified resource name.
+    partition: The name to the partition resource. The name is the fully-
+      qualified resource name.
+    type: The type of the containing entity resource.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the containing entity resource.
+
+    Values:
+      ENTITY_TYPE_UNSPECIFIED: An unspecified event type.
+      TABLE: Entities representing structured data.
+      FILESET: Entities representing unstructured data.
+    """
+    ENTITY_TYPE_UNSPECIFIED = 0
+    TABLE = 1
+    FILESET = 2
+
+  entity = _messages.StringField(1)
+  partition = _messages.StringField(2)
+  type = _messages.EnumField('TypeValueValuesEnum', 3)
+
+
 class GoogleCloudDataplexV1Entity(_messages.Message):
   r"""Represents tables and fileset metadata contained within a zone.
 
@@ -2033,7 +2198,7 @@ class GoogleCloudDataplexV1Entity(_messages.Message):
       /entities/{id}.
     schema: Required. The description of the data structure and layout. The
       schema is not included in list responses. It is only included in SCHEMA
-      and FULL entity views of a get entity response.
+      and FULL entity views of a GetEntity response.
     system: Required. Identifies the storage system of the entity data.
     type: Required. The type of entity.
     updateTime: Output only. The time when the entity was last updated.
@@ -2297,11 +2462,17 @@ class GoogleCloudDataplexV1EnvironmentSessionSpec(_messages.Message):
   r"""A GoogleCloudDataplexV1EnvironmentSessionSpec object.
 
   Fields:
+    enableFastStartup: Optional. If True, this causes sessions to be pre-
+      created and available for faster startup to enable interactive
+      exploration use-cases. This defaults to False to avoid additional billed
+      charges. These can only be set to True for the environment with name set
+      to "default", and with default configuration.
     maxIdleDuration: Optional. The idle time configuration of the session. The
       session will be auto-terminated at the end of this period.
   """
 
-  maxIdleDuration = _messages.StringField(1)
+  enableFastStartup = _messages.BooleanField(1)
+  maxIdleDuration = _messages.StringField(2)
 
 
 class GoogleCloudDataplexV1EnvironmentSessionStatus(_messages.Message):
@@ -2328,7 +2499,7 @@ class GoogleCloudDataplexV1Job(_messages.Message):
     name: Output only. The relative resource name of the job, of the form:
       projects/{project_number}/locations/{location_id}/lakes/{lake_id}/
       tasks/{task_id}/jobs/{job_id}.
-    retryCount: Output only. The number of times the job has been retried
+    retryCount: Output only. . The number of times the job has been retried
       (excluding the initial attempt).
     service: Output only. The underlying service running a job.
     serviceJob: Output only. The full resource name for the job run under a
@@ -2477,7 +2648,7 @@ class GoogleCloudDataplexV1Lake(_messages.Message):
       service instance association.
     metastoreStatus: Output only. Metastore status of the lake.
     name: Output only. The relative resource name of the lake, of the form:
-      projects/{project_number}/locations/{location_id}/lakes/{lake_id}
+      projects/{project_number}/locations/{location_id}/lakes/{lake_id}.
     serviceAccount: Output only. Service account associated with this lake.
       This service account must be authorized to access or operate on
       resources managed by the lake.
@@ -2562,6 +2733,7 @@ class GoogleCloudDataplexV1LakeMetastoreStatus(_messages.Message):
     StateValueValuesEnum: Current state of association.
 
   Fields:
+    endpoint: The URI of the endpoint used to access the Metastore service.
     message: Additional information about the current status.
     state: Current state of association.
     updateTime: Last update time of the metastore status of the lake.
@@ -2583,9 +2755,10 @@ class GoogleCloudDataplexV1LakeMetastoreStatus(_messages.Message):
     UPDATING = 3
     ERROR = 4
 
-  message = _messages.StringField(1)
-  state = _messages.EnumField('StateValueValuesEnum', 2)
-  updateTime = _messages.StringField(3)
+  endpoint = _messages.StringField(1)
+  message = _messages.StringField(2)
+  state = _messages.EnumField('StateValueValuesEnum', 3)
+  updateTime = _messages.StringField(4)
 
 
 class GoogleCloudDataplexV1ListActionsResponse(_messages.Message):
@@ -2855,6 +3028,7 @@ class GoogleCloudDataplexV1SchemaPartitionField(_messages.Message):
       TIME: Time field.
       RECORD: Structured field. Nested fields that define the structure of the
         map. If all nested fields are nullable, this field represents a union.
+      NULL: Null field that does not have values.
     """
     TYPE_UNSPECIFIED = 0
     BOOLEAN = 1
@@ -2871,6 +3045,7 @@ class GoogleCloudDataplexV1SchemaPartitionField(_messages.Message):
     DATE = 12
     TIME = 13
     RECORD = 14
+    NULL = 15
 
   name = _messages.StringField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -2926,6 +3101,7 @@ class GoogleCloudDataplexV1SchemaSchemaField(_messages.Message):
       TIME: Time field.
       RECORD: Structured field. Nested fields that define the structure of the
         map. If all nested fields are nullable, this field represents a union.
+      NULL: Null field that does not have values.
     """
     TYPE_UNSPECIFIED = 0
     BOOLEAN = 1
@@ -2942,6 +3118,7 @@ class GoogleCloudDataplexV1SchemaSchemaField(_messages.Message):
     DATE = 12
     TIME = 13
     RECORD = 14
+    NULL = 15
 
   description = _messages.StringField(1)
   fields = _messages.MessageField('GoogleCloudDataplexV1SchemaSchemaField', 2, repeated=True)
@@ -2985,6 +3162,77 @@ class GoogleCloudDataplexV1Session(_messages.Message):
   name = _messages.StringField(2)
   state = _messages.EnumField('StateValueValuesEnum', 3)
   userId = _messages.StringField(4)
+
+
+class GoogleCloudDataplexV1SessionEvent(_messages.Message):
+  r"""These messages contain information about sessions within an environment.
+  The monitored resource is 'Environment'.
+
+  Enums:
+    TypeValueValuesEnum: The type of the event.
+
+  Fields:
+    message: The log message.
+    query: The execution details of the query.
+    sessionId: Unique identifier for the session.
+    type: The type of the event.
+    userId: The information about the user that created the session.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""The type of the event.
+
+    Values:
+      EVENT_TYPE_UNSPECIFIED: An unspecified event type.
+      START: Event for start of a session.
+      STOP: Event for stop of a session.
+      QUERY: Query events in the session.
+    """
+    EVENT_TYPE_UNSPECIFIED = 0
+    START = 1
+    STOP = 2
+    QUERY = 3
+
+  message = _messages.StringField(1)
+  query = _messages.MessageField('GoogleCloudDataplexV1SessionEventQueryDetail', 2)
+  sessionId = _messages.StringField(3)
+  type = _messages.EnumField('TypeValueValuesEnum', 4)
+  userId = _messages.StringField(5)
+
+
+class GoogleCloudDataplexV1SessionEventQueryDetail(_messages.Message):
+  r"""Execution details of the query.
+
+  Enums:
+    EngineValueValuesEnum: Query Execution engine.
+
+  Fields:
+    dataProcessedBytes: The data processed by the query.
+    duration: Time taken for execution of the query.
+    engine: Query Execution engine.
+    queryId: The unique Query id identifying the query.
+    queryText: The query text executed.
+    resultSizeBytes: The size of results the query produced.
+  """
+
+  class EngineValueValuesEnum(_messages.Enum):
+    r"""Query Execution engine.
+
+    Values:
+      ENGINE_UNSPECIFIED: An unspecified Engine type.
+      SPARK_SQL: Spark-sql engine is specified in Query.
+      BIGQUERY: BigQuery engine is specified in Query.
+    """
+    ENGINE_UNSPECIFIED = 0
+    SPARK_SQL = 1
+    BIGQUERY = 2
+
+  dataProcessedBytes = _messages.IntegerField(1)
+  duration = _messages.StringField(2)
+  engine = _messages.EnumField('EngineValueValuesEnum', 3)
+  queryId = _messages.StringField(4)
+  queryText = _messages.StringField(5)
+  resultSizeBytes = _messages.IntegerField(6)
 
 
 class GoogleCloudDataplexV1StorageFormat(_messages.Message):
@@ -3033,11 +3281,11 @@ class GoogleCloudDataplexV1StorageFormat(_messages.Message):
       ORC: Orc-formatted structured data.
       CSV: Csv-formatted semi-structured data.
       JSON: Json-formatted semi-structured data.
-      IMAGE: Image data formats (such as jpg and png)
-      AUDIO: Audio data formats (such as mp3, and wav)
-      VIDEO: Video data formats (such as mp4 and mpg)
-      TEXT: Textual data formats (such as txt and xml)
-      TFRECORD: TensorFlow record format
+      IMAGE: Image data formats (such as jpg and png).
+      AUDIO: Audio data formats (such as mp3, and wav).
+      VIDEO: Video data formats (such as mp4 and mpg).
+      TEXT: Textual data formats (such as txt and xml).
+      TFRECORD: TensorFlow record format.
       OTHER: Data that doesn't match a specific format.
       UNKNOWN: Data of an unknown format.
     """
@@ -3083,7 +3331,7 @@ class GoogleCloudDataplexV1StorageFormatCsvOptions(_messages.Message):
 
 
 class GoogleCloudDataplexV1StorageFormatJsonOptions(_messages.Message):
-  r"""Describes JSON data format
+  r"""Describes JSON data format.
 
   Fields:
     encoding: Optional. The character encoding of the data. The default is
@@ -3250,8 +3498,7 @@ class GoogleCloudDataplexV1TaskInfrastructureSpec(_messages.Message):
   Fields:
     batch: Compute resources needed for a Task when using Dataproc Serverless.
     containerImage: Container Image Runtime Configuration.
-    vpcNetwork: A GoogleCloudDataplexV1TaskInfrastructureSpecVpcNetwork
-      attribute.
+    vpcNetwork: Vpc network.
   """
 
   batch = _messages.MessageField('GoogleCloudDataplexV1TaskInfrastructureSpecBatchComputeResources', 1)
@@ -3350,28 +3597,29 @@ class GoogleCloudDataplexV1TaskSparkTaskConfig(_messages.Message):
   r"""User-specified config for running a Spark task.
 
   Fields:
-    archiveUris: Optional. GCS URIs of archives to be extracted into the
-      working directory of each executor. Supported file types: .jar, .tar,
-      .tar.gz, .tgz, and .zip.
-    fileUris: Optional. GCS URIs of files to be placed in the working
-      directory of each executor.
+    archiveUris: Optional. Cloud Storage URIs of archives to be extracted into
+      the working directory of each executor. Supported file types: .jar,
+      .tar, .tar.gz, .tgz, and .zip.
+    fileUris: Optional. Cloud Storage URIs of files to be placed in the
+      working directory of each executor.
     infrastructureSpec: Optional. Infrastructure specification for the
       execution.
     mainClass: The name of the driver's main class. The jar file that contains
       the class must be in the default CLASSPATH or specified in
       jar_file_uris. The execution args are passed in as a sequence of named
       process arguments (--key=value).
-    mainJarFileUri: The GCS URI of the jar file that contains the main class.
-      The execution args are passed in as a sequence of named process
-      arguments (--key=value).
-    pythonScriptFile: The GCS URI of the main Python file to use as the
-      driver. Must be a .py file. The execution args are passed in as a
+    mainJarFileUri: The Cloud Storage URI of the jar file that contains the
+      main class. The execution args are passed in as a sequence of named
+      process arguments (--key=value).
+    pythonScriptFile: The Gcloud Storage URI of the main Python file to use as
+      the driver. Must be a .py file. The execution args are passed in as a
       sequence of named process arguments (--key=value).
     sqlScript: The query text. The execution args are used to declare a set of
       script variables (set key="value";).
-    sqlScriptFile: A reference to a query file. This can be the GCS URI of the
-      query file or it can the path to a SqlScript Content. The execution args
-      are used to declare a set of script variables (set key="value";).
+    sqlScriptFile: A reference to a query file. This can be the Cloud Storage
+      URI of the query file or it can the path to a SqlScript Content. The
+      execution args are used to declare a set of script variables (set
+      key="value";).
   """
 
   archiveUris = _messages.StringField(1, repeated=True)
@@ -3453,7 +3701,7 @@ class GoogleCloudDataplexV1Zone(_messages.Message):
     labels: Optional. User defined labels for the zone.
     name: Output only. The relative resource name of the zone, of the form: pr
       ojects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{z
-      one_id}
+      one_id}.
     resourceSpec: Required. Specification of the resources that are referenced
       by the assets within this zone.
     state: Output only. Current state of the zone.

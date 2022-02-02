@@ -21,7 +21,8 @@ class GoogleCloudRecommenderV1alpha2CostProjection(_messages.Message):
     cost: An approximate projection on amount saved or amount incurred.
       Negative cost units indicate cost savings and positive cost units
       indicate increase. See google.type.Money documentation for
-      positive/negative units.
+      positive/negative units. A user's permissions may affect whether the
+      cost is computed using list prices or custom contract prices.
     duration: Duration for which this cost applies.
   """
 
@@ -68,7 +69,7 @@ class GoogleCloudRecommenderV1alpha2Impact(_messages.Message):
 
 class GoogleCloudRecommenderV1alpha2Insight(_messages.Message):
   r"""An insight along with the information used to derive the insight. The
-  insight may have associated recomendations as well.
+  insight may have associated recommendations as well.
 
   Enums:
     CategoryValueValuesEnum: Category being targeted by the insight.

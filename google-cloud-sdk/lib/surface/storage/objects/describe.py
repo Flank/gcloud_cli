@@ -18,11 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.storage import api_factory
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import storage_url
+from googlecloudsdk.command_lib.storage import wildcard_iterator
 
 
-@base.Hidden
-class Describe(base.ListCommand):
+class Describe(base.DescribeCommand):
   """Describe a Cloud Storage object."""
 
   detailed_help = {
@@ -36,11 +39,11 @@ class Describe(base.ListCommand):
       Describe a Google Cloud Storage object with the url
       "gs://bucket/my-object":
 
-        $ *{command}* gs://bucket/my-object
+        $ {command} gs://bucket/my-object
 
       Desribe object with JSON formatting, only returning the "name" key:
 
-        $ *{command}* gs://bucket/my-object --format=json(name)
+        $ {command} gs://bucket/my-object --format=json(name)
       """,
   }
 
@@ -49,5 +52,11 @@ class Describe(base.ListCommand):
     parser.add_argument('url', help='Specifies URL of object to describe.')
 
   def Run(self, args):
-    del args  # Unused.
-    raise NotImplementedError
+    if wildcard_iterator.contains_wildcard(args.url):
+      raise errors.InvalidUrlError(
+          'Describe does not accept wildcards because it returns a single'
+          ' resource. Please use the `ls` or `objects list` command for'
+          ' retrieving multiple resources.')
+    url = storage_url.storage_url_from_string(args.url)
+    return api_factory.get_api(url.scheme).get_object_metadata(
+        url.bucket_name, url.object_name).metadata

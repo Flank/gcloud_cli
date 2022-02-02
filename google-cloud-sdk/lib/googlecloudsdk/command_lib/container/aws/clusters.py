@@ -156,9 +156,6 @@ class Client(object):
     net.vpcId = args.vpc_id
     net.podAddressCidrBlocks.append(args.pod_address_cidr_blocks)
     net.serviceAddressCidrBlocks.append(args.service_address_cidr_blocks)
-    if self.track == base.ReleaseTrack.ALPHA and args.service_load_balancer_subnet_ids is not None:
-      net.serviceLoadBalancerSubnetIds.extend(
-          args.service_load_balancer_subnet_ids)
 
     if args.tags:
       tag_type = type(cp).TagsValue.AdditionalProperty
@@ -175,8 +172,12 @@ class Client(object):
       raise UnsupportedPropertyError(
           'The property [auth/credential_file_override] '
           'is not supported by this command.')
-    username = properties.VALUES.core.account.GetOrFail()
-    a.adminUsers.append(self._CreateAwsClusterUser(username))
+    if args.admin_users:
+      for username in args.admin_users:
+        a.adminUsers.append(self._CreateAwsClusterUser(username))
+    else:
+      username = properties.VALUES.core.account.GetOrFail()
+      a.adminUsers.append(self._CreateAwsClusterUser(username))
 
     return self.service.Create(req)
 

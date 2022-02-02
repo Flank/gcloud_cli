@@ -32,6 +32,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute import exceptions as compute_exceptions
 from googlecloudsdk.command_lib.compute import flags
+from googlecloudsdk.command_lib.compute import resource_manager_tags_utils
 from googlecloudsdk.command_lib.compute import scope as compute_scopes
 from googlecloudsdk.command_lib.compute import secure_tags_utils
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
@@ -163,6 +164,7 @@ def _CommonArgs(parser,
   instances_flags.AddMinNodeCpuArg(parser)
   instances_flags.AddNestedVirtualizationArgs(parser)
   instances_flags.AddThreadsPerCoreArgs(parser)
+  instances_flags.AddEnableUefiNetworkingArgs(parser)
   if support_numa_node_count:
     instances_flags.AddNumaNodeCountArgs(parser)
   instances_flags.AddStackTypeArgs(parser)
@@ -233,6 +235,7 @@ class Create(base.CreateCommand):
   _support_multi_writer = False
   _support_subinterface = False
   _support_secure_tag = False
+  _support_resource_manager_tags = False
   _support_node_project = False
   _support_provisioning_model = False
   _support_termination_action = False
@@ -240,7 +243,6 @@ class Create(base.CreateCommand):
   _support_numa_node_count = False
   _support_visible_core_count = False
   _support_disk_architecture = False
-  _support_enable_uefi_networking = False
   _support_network_queue_count = False
 
   @classmethod
@@ -420,6 +422,19 @@ class Create(base.CreateCommand):
       if self._support_secure_tag and args.secure_tags:
         instance.secureTags = secure_tags_utils.GetSecureTags(args.secure_tags)
 
+      if self._support_resource_manager_tags and args.resource_manager_tags:
+        ret_resource_manager_tags = resource_manager_tags_utils.GetResourceManagerTags(
+            args.resource_manager_tags)
+        if ret_resource_manager_tags is not None:
+          params = compute_client.messages.InstanceParams
+          instance.params = params(
+              resourceManagerTags=params.ResourceManagerTagsValue(
+                  additionalProperties=[
+                      params.ResourceManagerTagsValue.AdditionalProperty(
+                          key=key, value=value) for key, value in sorted(
+                              six.iteritems(ret_resource_manager_tags))
+                  ]))
+
       if args.private_ipv6_google_access_type is not None:
         instance.privateIpv6GoogleAccess = (
             instances_flags.GetPrivateIpv6GoogleAccessTypeFlagMapper(
@@ -431,18 +446,15 @@ class Create(base.CreateCommand):
           args.visible_core_count is not None)
       if (args.enable_nested_virtualization is not None or
           args.threads_per_core is not None or
-          (self._support_numa_node_count and
-           args.numa_node_count is not None) or has_visible_core_count or
-          (self._support_enable_uefi_networking and
-           args.enable_uefi_networking is not None)):
+          (self._support_numa_node_count and args.numa_node_count is not None)
+          or has_visible_core_count or args.enable_uefi_networking is not None):
         visible_core_count = args.visible_core_count if has_visible_core_count else None
         instance.advancedMachineFeatures = (
             instance_utils.CreateAdvancedMachineFeaturesMessage(
                 compute_client.messages, args.enable_nested_virtualization,
                 args.threads_per_core,
                 args.numa_node_count if self._support_numa_node_count else None,
-                visible_core_count, args.enable_uefi_networking
-                if self._support_enable_uefi_networking else None))
+                visible_core_count, args.enable_uefi_networking))
 
       resource_policies = getattr(args, 'resource_policies', None)
       if resource_policies:
@@ -609,13 +621,13 @@ class CreateBeta(Create):
   _support_multi_writer = True
   _support_subinterface = False
   _support_secure_tag = False
+  _support_resource_manager_tags = False
   _support_node_project = False
   _support_host_error_timeout_seconds = True
   _support_numa_node_count = False
   _support_provisioning_model = True
   _support_termination_action = True
   _support_disk_architecture = False
-  _support_enable_uefi_networking = False
   _support_network_queue_count = False
 
   def GetSourceMachineImage(self, args, resources):
@@ -687,6 +699,7 @@ class CreateAlpha(CreateBeta):
   _support_multi_writer = True
   _support_subinterface = True
   _support_secure_tag = True
+  _support_resource_manager_tags = True
   _support_node_project = True
   _support_provisioning_model = True
   _support_termination_action = True
@@ -694,7 +707,6 @@ class CreateAlpha(CreateBeta):
   _support_numa_node_count = True
   _support_visible_core_count = True
   _support_disk_architecture = True
-  _support_enable_uefi_networking = True
   _support_network_queue_count = True
 
   @classmethod
@@ -735,8 +747,8 @@ class CreateAlpha(CreateBeta):
         parser, utils.COMPUTE_ALPHA_API_VERSION)
     instances_flags.AddStableFleetArgs(parser)
     instances_flags.AddSecureTagsArgs(parser)
+    instances_flags.AddResourceManagerTagsArgs(parser)
     instances_flags.AddVisibleCoreCountArgs(parser)
-    instances_flags.AddEnableUefiNetworkingArgs(parser)
 
 
 Create.detailed_help = DETAILED_HELP

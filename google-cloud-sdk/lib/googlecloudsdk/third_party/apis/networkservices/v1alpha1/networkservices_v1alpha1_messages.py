@@ -956,6 +956,9 @@ class Gateway(_messages.Message):
       resource.
 
   Fields:
+    authorizationPolicy: Optional. A fully-qualified AuthorizationPolicy URL
+      reference. Specifies how traffic is authorized. If empty, authorization
+      checks are disabled.
     createTime: Output only. The timestamp when the resource was created.
     description: Optional. A free-text description of the resource. Max length
       1024 characters.
@@ -971,6 +974,11 @@ class Gateway(_messages.Message):
       single coniguration to the proxy/load balancer. Max length 64
       characters. Scope should start with a letter and can only have letters,
       numbers, hyphens.
+    serverTlsPolicy: Optional. A fully-qualified ServerTLSPolicy URL
+      reference. Specifies how TLS traffic is terminated. If empty, TLS
+      termination is disabled.
+    swgConfig: Optional. This should be set when configuring a gateway of type
+      'Secure_Web_Gateway'
     type: Immutable. The type of the customer managed gateway.
     updateTime: Output only. The timestamp when the resource was updated.
   """
@@ -983,9 +991,12 @@ class Gateway(_messages.Message):
         unspecified.
       OPEN_MESH: The type of the customer managed gateway is TrafficDirector
         Open Mesh.
+      SECURE_WEB_GATEWAY: The type of the customer managed gateway is
+        SecureWebGateway (SWG).
     """
     TYPE_UNSPECIFIED = 0
     OPEN_MESH = 1
+    SECURE_WEB_GATEWAY = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -1011,14 +1022,34 @@ class Gateway(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  description = _messages.StringField(2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  name = _messages.StringField(4)
-  ports = _messages.IntegerField(5, repeated=True, variant=_messages.Variant.INT32)
-  scope = _messages.StringField(6)
-  type = _messages.EnumField('TypeValueValuesEnum', 7)
-  updateTime = _messages.StringField(8)
+  authorizationPolicy = _messages.StringField(1)
+  createTime = _messages.StringField(2)
+  description = _messages.StringField(3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  ports = _messages.IntegerField(6, repeated=True, variant=_messages.Variant.INT32)
+  scope = _messages.StringField(7)
+  serverTlsPolicy = _messages.StringField(8)
+  swgConfig = _messages.MessageField('GatewaySecureWebGatewayConfig', 9)
+  type = _messages.EnumField('TypeValueValuesEnum', 10)
+  updateTime = _messages.StringField(11)
+
+
+class GatewaySecureWebGatewayConfig(_messages.Message):
+  r"""Contains fields necessary for gateways of type 'Secure_Web_Gateway'
+
+  Fields:
+    certificateUrls: A fully-qualified Certificates URL reference. The proxy
+      presents a Certificate (selected based on SNI) when establishing a TLS
+      connection. This feature only applies to gateways of type
+      'SECURE_WEB_GATEWAY'.
+    securityPolicy: A fully-qualified SecurityPolicy URL reference. Defines
+      how a server should apply security policy to inbound (VM to Proxy)
+      initiated connections.
+  """
+
+  certificateUrls = _messages.StringField(1, repeated=True)
+  securityPolicy = _messages.StringField(2)
 
 
 class GrpcRoute(_messages.Message):
@@ -1217,78 +1248,6 @@ class GrpcRouteHeaderMatch(_messages.Message):
   value = _messages.StringField(3)
 
 
-class GrpcRouteHeaderModifier(_messages.Message):
-  r"""Specifies how to modify gRPC headers in a request or a response.
-
-  Messages:
-    AddValue: Add the headers with given map where key is the name of the
-      header, value is the value of the header.
-    SetValue: Completely overwrite/replace the headers with given map where
-      key is the name of the header, value is the value of the header.
-
-  Fields:
-    add: Add the headers with given map where key is the name of the header,
-      value is the value of the header.
-    remove: Remove headers (matching by header names) specified in the list.
-    set: Completely overwrite/replace the headers with given map where key is
-      the name of the header, value is the value of the header.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class AddValue(_messages.Message):
-    r"""Add the headers with given map where key is the name of the header,
-    value is the value of the header.
-
-    Messages:
-      AdditionalProperty: An additional property for a AddValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type AddValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a AddValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class SetValue(_messages.Message):
-    r"""Completely overwrite/replace the headers with given map where key is
-    the name of the header, value is the value of the header.
-
-    Messages:
-      AdditionalProperty: An additional property for a SetValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type SetValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a SetValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  add = _messages.MessageField('AddValue', 1)
-  remove = _messages.StringField(2, repeated=True)
-  set = _messages.MessageField('SetValue', 3)
-
-
 class GrpcRouteMethodMatch(_messages.Message):
   r"""Specifies a match against a method.
 
@@ -1328,29 +1287,12 @@ class GrpcRouteMethodMatch(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 4)
 
 
-class GrpcRouteRequestMirrorPolicy(_messages.Message):
-  r"""Specifies the policy on how requests are mirrored to a separate mirrored
-  destination service. The proxy does not wait for responses from the mirrored
-  service. Prior to sending traffic to the mirrored service, the
-  host/authority header is suffixed with -shadow.
-
-  Fields:
-    destination: The destination the requests will be mirrored to. The weight
-      of the destination will be ignored.
-  """
-
-  destination = _messages.MessageField('GrpcRouteDestination', 1)
-
-
 class GrpcRouteRetryPolicy(_messages.Message):
   r"""The specifications for retries.
 
   Fields:
     numRetries: Specifies the allowed number of retries. This number must be >
       0. If not specpfied, default to 1.
-    perTryTimeout: If not specified, will use the timeout set in the
-      RouteAction. If timeout is not set in the RouteAction, will use the
-      largest timeout among all Backend Services associated with the route.
     retryConditions: - connect-failure: Router will retry on failures
       connecting to Backend Services, for example due to connection timeouts.
       - refused-stream: Router will retry if the backend service resets the
@@ -1365,8 +1307,7 @@ class GrpcRouteRetryPolicy(_messages.Message):
   """
 
   numRetries = _messages.IntegerField(1, variant=_messages.Variant.UINT32)
-  perTryTimeout = _messages.StringField(2)
-  retryConditions = _messages.StringField(3, repeated=True)
+  retryConditions = _messages.StringField(2, repeated=True)
 
 
 class GrpcRouteRouteAction(_messages.Message):
@@ -1385,40 +1326,18 @@ class GrpcRouteRouteAction(_messages.Message):
       requests from clients can be aborted by for a percentage of requests.
       timeout and retry_policy will be ignored by clients that are configured
       with a fault_injection_policy
-    requestHeaderModifier: Optional. The specification for modifying the
-      headers of a matching request prior to delivery of the request to the
-      destination. Cannot be set if the route is attached to a Router whose
-      type is PROXYLESS_GRPC.
-    requestMirrorPolicy: Optional. Specifies the policy on how requests
-      intended for the route's destination are mirrored to a separate mirrored
-      destination. The proxy will not wait for the mirrored destination to
-      respond before returning the response. Prior to sending traffic to the
-      mirrored service, the host / authority header is suffixed with -shadow.
-      Cannot be set if the route is attached to a Router whose type is
-      PROXYLESS_GRPC.
-    responseHeaderModifier: Optional. The specification for modifying the
-      headers of a response prior to sending the response back to the client.
-      Cannot be set if the route is attached to a Router whose type is
-      PROXYLESS_GRPC.
     retryPolicy: Optional. Specifies the retry policy associated with this
       route.
     timeout: Optional. Specifies the timeout for selected route. Timeout is
       computed from the time the request has been fully processed (i.e. end of
       stream) up until the response has been completely processed. Timeout
       includes all retries.
-    urlRewrite: Optional. The specification for rewrite URL before forwarding
-      requests to the destination. Cannot be set if the route is attached to a
-      Router whose type is PROXYLESS_GRPC.
   """
 
   destinations = _messages.MessageField('GrpcRouteDestination', 1, repeated=True)
   faultInjectionPolicy = _messages.MessageField('GrpcRouteFaultInjectionPolicy', 2)
-  requestHeaderModifier = _messages.MessageField('GrpcRouteHeaderModifier', 3)
-  requestMirrorPolicy = _messages.MessageField('GrpcRouteRequestMirrorPolicy', 4)
-  responseHeaderModifier = _messages.MessageField('GrpcRouteHeaderModifier', 5)
-  retryPolicy = _messages.MessageField('GrpcRouteRetryPolicy', 6)
-  timeout = _messages.StringField(7)
-  urlRewrite = _messages.MessageField('GrpcRouteURLRewrite', 8)
+  retryPolicy = _messages.MessageField('GrpcRouteRetryPolicy', 3)
+  timeout = _messages.StringField(4)
 
 
 class GrpcRouteRouteMatch(_messages.Message):
@@ -1450,22 +1369,6 @@ class GrpcRouteRouteRule(_messages.Message):
 
   action = _messages.MessageField('GrpcRouteRouteAction', 1)
   matches = _messages.MessageField('GrpcRouteRouteMatch', 2, repeated=True)
-
-
-class GrpcRouteURLRewrite(_messages.Message):
-  r"""The specification to modify the URL of the request, prior to forwarding
-  the request to the destination.
-
-  Fields:
-    hostRewrite: Prior to forwarding the request to the selected destination,
-      the requests host header is replaced by this value.
-    pathPrefixRewrite: Prior to forwarding the request to the selected
-      destination, the matching portion of the requests path is replaced by
-      this value.
-  """
-
-  hostRewrite = _messages.StringField(1)
-  pathPrefixRewrite = _messages.StringField(2)
 
 
 class HeaderAction(_messages.Message):
@@ -2626,9 +2529,6 @@ class Mesh(_messages.Message):
   workload communication within a service mesh. Routes that point to mesh
   dictate how requests are routed within this logical mesh boundary.
 
-  Enums:
-    TypeValueValuesEnum: Immutable. The type of the Mesh resource.
-
   Messages:
     LabelsValue: Optional. Set of label tags associated with the Mesh
       resource.
@@ -2641,35 +2541,13 @@ class Mesh(_messages.Message):
       instructs the SIDECAR proxy to listen on the specified port of localhost
       (127.0.0.1) address. The SIDECAR proxy will expect all traffic to be
       redirected to this port regardless of its actual ip:port destination. If
-      unset, a port '15001' is used as the interception port. This field is
-      only valid if the type of Mesh is SIDECAR.
+      unset, a port '15001' is used as the interception port. This will is
+      applicable only for sidecar proxy deployments.
     labels: Optional. Set of label tags associated with the Mesh resource.
     name: Required. Name of the Mesh resource. It matches pattern
       `projects/*/locations/global/meshes/`.
-    scope: Optional. Scope defines a logical configuration boundary for mesh.
-      The routes pointing to this particular mesh resource defines the mesh
-      configuration and the scope field name is used by mesh clients to
-      receive that configuration. There cannot be more than one Mesh resource
-      instance of the same type (SIDECAR or PROXYLESS_GRPC) with the same
-      scope. Max length 64 characters. Scope should start with a letter and
-      can only have letters, numbers, hyphens. If no scope is supplied
-      'default' is used as the scope.
-    type: Immutable. The type of the Mesh resource.
     updateTime: Output only. The timestamp when the resource was updated.
   """
-
-  class TypeValueValuesEnum(_messages.Enum):
-    r"""Immutable. The type of the Mesh resource.
-
-    Values:
-      TYPE_UNSPECIFIED: The type of Mesh is unspecified.
-      PROXYLESS_GRPC: The Mesh is used in Proxyless gRPC model. Routes being
-        referenced must be gRPC routes for this type.
-      SIDECAR: The Mesh is used in customer-managed sidecar proxy model.
-    """
-    TYPE_UNSPECIFIED = 0
-    PROXYLESS_GRPC = 1
-    SIDECAR = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -2700,9 +2578,7 @@ class Mesh(_messages.Message):
   interceptionPort = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   labels = _messages.MessageField('LabelsValue', 4)
   name = _messages.StringField(5)
-  scope = _messages.StringField(6)
-  type = _messages.EnumField('TypeValueValuesEnum', 7)
-  updateTime = _messages.StringField(8)
+  updateTime = _messages.StringField(6)
 
 
 class MetadataLabelMatcher(_messages.Message):

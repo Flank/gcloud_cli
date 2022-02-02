@@ -15,6 +15,21 @@ from apitools.base.py import extra_types
 package = 'baremetalsolution'
 
 
+class AllowedClient(_messages.Message):
+  r"""Represents an 'access point' for the share.
+
+  Fields:
+    allowedClientsCidr: The subnet of IP addresses permitted to access the
+      share.
+    network: The network the access point sits on.
+    shareIp: The IP address of the share on this network.
+  """
+
+  allowedClientsCidr = _messages.StringField(1)
+  network = _messages.StringField(2)
+  shareIp = _messages.StringField(3)
+
+
 class BaremetalsolutionProjectsLocationsGetRequest(_messages.Message):
   r"""A BaremetalsolutionProjectsLocationsGetRequest object.
 
@@ -39,15 +54,35 @@ class BaremetalsolutionProjectsLocationsInstancesListRequest(_messages.Message):
   r"""A BaremetalsolutionProjectsLocationsInstancesListRequest object.
 
   Fields:
+    filter: List filter.
     pageSize: Requested page size. Server may return fewer items than
       requested. If unspecified, the server will pick an appropriate default.
     pageToken: A token identifying a page of results from the server.
     parent: Required. Parent value for ListInstancesRequest.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class BaremetalsolutionProjectsLocationsInstancesPatchRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsInstancesPatchRequest object.
+
+  Fields:
+    instance: A Instance resource to be passed as the request body.
+    name: Output only. The resource name of this `Instance`. Resource names
+      are schemeless URIs that follow the conventions in
+      https://cloud.google.com/apis/design/resource_names. Format:
+      `projects/{project}/locations/{location}/instances/{instance}`
+    updateMask: The list of fields to update. The only currently supported
+      fields are: `labels`
+  """
+
+  instance = _messages.MessageField('Instance', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class BaremetalsolutionProjectsLocationsInstancesResetRequest(_messages.Message):
@@ -61,6 +96,19 @@ class BaremetalsolutionProjectsLocationsInstancesResetRequest(_messages.Message)
 
   name = _messages.StringField(1, required=True)
   resetInstanceRequest = _messages.MessageField('ResetInstanceRequest', 2)
+
+
+class BaremetalsolutionProjectsLocationsInstancesStartRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsInstancesStartRequest object.
+
+  Fields:
+    name: Required. Name of the resource.
+    startInstanceRequest: A StartInstanceRequest resource to be passed as the
+      request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  startInstanceRequest = _messages.MessageField('StartInstanceRequest', 2)
 
 
 class BaremetalsolutionProjectsLocationsListRequest(_messages.Message):
@@ -97,10 +145,55 @@ class BaremetalsolutionProjectsLocationsNetworksListRequest(_messages.Message):
   r"""A BaremetalsolutionProjectsLocationsNetworksListRequest object.
 
   Fields:
+    filter: List filter.
     pageSize: Requested page size. The server might return fewer items than
       requested. If unspecified, server will pick an appropriate default.
     pageToken: A token identifying a page of results from the server.
     parent: Required. Parent value for ListNetworksRequest.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class BaremetalsolutionProjectsLocationsNetworksPatchRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsNetworksPatchRequest object.
+
+  Fields:
+    name: Output only. The resource name of this `Network`. Resource names are
+      schemeless URIs that follow the conventions in
+      https://cloud.google.com/apis/design/resource_names. Format:
+      `projects/{project}/locations/{location}/networks/{network}`
+    network: A Network resource to be passed as the request body.
+    updateMask: The list of fields to update. The only currently supported
+      fields are: `labels`
+  """
+
+  name = _messages.StringField(1, required=True)
+  network = _messages.MessageField('Network', 2)
+  updateMask = _messages.StringField(3)
+
+
+class BaremetalsolutionProjectsLocationsNfsSharesGetRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsNfsSharesGetRequest object.
+
+  Fields:
+    name: Required. Name of the resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class BaremetalsolutionProjectsLocationsNfsSharesListRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsNfsSharesListRequest object.
+
+  Fields:
+    pageSize: Requested page size. The server might return fewer items than
+      requested. If unspecified, server will pick an appropriate default.
+    pageToken: A token identifying a page of results from the server.
+    parent: Required. Parent value for ListNfsSharesRequest.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -154,6 +247,7 @@ class BaremetalsolutionProjectsLocationsSnapshotSchedulePoliciesListRequest(_mes
   object.
 
   Fields:
+    filter: List filter.
     pageSize: The maximum number of items to return.
     pageToken: The next_page_token value returned from a previous List
       request, if any.
@@ -161,9 +255,10 @@ class BaremetalsolutionProjectsLocationsSnapshotSchedulePoliciesListRequest(_mes
       Policies.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class BaremetalsolutionProjectsLocationsSnapshotSchedulePoliciesPatchRequest(_messages.Message):
@@ -196,15 +291,17 @@ class BaremetalsolutionProjectsLocationsVolumesListRequest(_messages.Message):
   r"""A BaremetalsolutionProjectsLocationsVolumesListRequest object.
 
   Fields:
+    filter: List filter.
     pageSize: Requested page size. The server might return fewer items than
       requested. If unspecified, server will pick an appropriate default.
     pageToken: A token identifying a page of results from the server.
     parent: Required. Parent value for ListVolumesRequest.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class BaremetalsolutionProjectsLocationsVolumesLunsGetRequest(_messages.Message):
@@ -242,7 +339,7 @@ class BaremetalsolutionProjectsLocationsVolumesPatchRequest(_messages.Message):
       `projects/{project}/locations/{location}/volumes/{volume}`
     updateMask: The list of fields to update. The only currently supported
       fields are: `snapshot_auto_delete_behavior`
-      `snapshot_schedule_policy_name`
+      `snapshot_schedule_policy_name` 'labels' 'requested_size_gib'
     volume: A Volume resource to be passed as the request body.
   """
 
@@ -462,6 +559,20 @@ class ListNetworksResponse(_messages.Message):
   unreachable = _messages.StringField(3, repeated=True)
 
 
+class ListNfsSharesResponse(_messages.Message):
+  r"""Response message containing the list of NFS shares.
+
+  Fields:
+    nextPageToken: A token identifying a page of results from the server.
+    nfsShares: The list of NFS shares.
+    unreachable: Locations that could not be reached.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  nfsShares = _messages.MessageField('NfsShare', 2, repeated=True)
+  unreachable = _messages.StringField(3, repeated=True)
+
+
 class ListSnapshotSchedulePoliciesResponse(_messages.Message):
   r"""Response message containing the list of snapshot schedule policies.
 
@@ -666,19 +777,20 @@ class Network(_messages.Message):
     StateValueValuesEnum: The Network state.
     TypeValueValuesEnum: The type of this network.
 
+  Messages:
+    LabelsValue: Labels as key value pairs.
+
   Fields:
     cidr: The cidr of the Network.
     id: An identifier for the `Network`, generated by the backend.
     ipAddress: IP address configured.
+    labels: Labels as key value pairs.
     macAddress: List of physical interfaces.
     name: Output only. The resource name of this `Network`. Resource names are
       schemeless URIs that follow the conventions in
       https://cloud.google.com/apis/design/resource_names. Format:
-      `projects/{project}/locations/{location}/networks/{network}` This field
-      will contain the same value as field "network", which will soon be
-      deprecated. Please use this field to reference the name of the network
-      resource.
-    network: Name of the network.
+      `projects/{project}/locations/{location}/networks/{network}`
+    servicesCidr: IP range for reserved for services (e.g. NFS).
     state: The Network state.
     type: The type of this network.
     vlanId: The vlan id of the Network.
@@ -710,16 +822,73 @@ class Network(_messages.Message):
     CLIENT = 1
     PRIVATE = 2
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels as key value pairs.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   cidr = _messages.StringField(1)
   id = _messages.StringField(2)
   ipAddress = _messages.StringField(3)
-  macAddress = _messages.StringField(4, repeated=True)
-  name = _messages.StringField(5)
-  network = _messages.StringField(6)
-  state = _messages.EnumField('StateValueValuesEnum', 7)
-  type = _messages.EnumField('TypeValueValuesEnum', 8)
-  vlanId = _messages.StringField(9)
-  vrf = _messages.MessageField('VRF', 10)
+  labels = _messages.MessageField('LabelsValue', 4)
+  macAddress = _messages.StringField(5, repeated=True)
+  name = _messages.StringField(6)
+  servicesCidr = _messages.StringField(7)
+  state = _messages.EnumField('StateValueValuesEnum', 8)
+  type = _messages.EnumField('TypeValueValuesEnum', 9)
+  vlanId = _messages.StringField(10)
+  vrf = _messages.MessageField('VRF', 11)
+
+
+class NfsShare(_messages.Message):
+  r"""An NFS share.
+
+  Enums:
+    StateValueValuesEnum: The state of the NFS share.
+
+  Fields:
+    allowedClients: List of allowed access points.
+    name: Output only. The name of the NFS share.
+    nfsShareId: Output only. An identifier for the NFS share, generated by the
+      backend.
+    state: The state of the NFS share.
+    volume: The volume containing the share.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The state of the NFS share.
+
+    Values:
+      STATE_UNSPECIFIED: The share is in an unknown state.
+      PROVISIONED: The share has been provisioned.
+    """
+    STATE_UNSPECIFIED = 0
+    PROVISIONED = 1
+
+  allowedClients = _messages.MessageField('AllowedClient', 1, repeated=True)
+  name = _messages.StringField(2)
+  nfsShareId = _messages.StringField(3)
+  state = _messages.EnumField('StateValueValuesEnum', 4)
+  volume = _messages.StringField(5)
 
 
 class Operation(_messages.Message):
@@ -887,19 +1056,48 @@ class SnapshotReservationDetail(_messages.Message):
 class SnapshotSchedulePolicy(_messages.Message):
   r"""A snapshot schedule policy.
 
+  Messages:
+    LabelsValue: Labels as key value pairs.
+
   Fields:
     description: The description of the snapshot schedule policy.
     id: An identifier for the snapshot schedule policy, generated by the
       backend.
+    labels: Labels as key value pairs.
     name: Output only. The name of the snapshot schedule policy.
     schedules: The snapshot schedules contained in this policy. You can
       specify a maximum of 5 schedules.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels as key value pairs.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   description = _messages.StringField(1)
   id = _messages.StringField(2)
-  name = _messages.StringField(3)
-  schedules = _messages.MessageField('Schedule', 4, repeated=True)
+  labels = _messages.MessageField('LabelsValue', 3)
+  name = _messages.StringField(4)
+  schedules = _messages.MessageField('Schedule', 5, repeated=True)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -963,6 +1161,10 @@ class StandardQueryParameters(_messages.Message):
   trace = _messages.StringField(10)
   uploadType = _messages.StringField(11)
   upload_protocol = _messages.StringField(12)
+
+
+class StartInstanceRequest(_messages.Message):
+  r"""Message requesting to start a server."""
 
 
 class Status(_messages.Message):
@@ -1070,6 +1272,9 @@ class Volume(_messages.Message):
     StateValueValuesEnum: The state of this storage volume.
     StorageTypeValueValuesEnum: The storage type for this volume.
 
+  Messages:
+    LabelsValue: Labels as key value pairs.
+
   Fields:
     autoGrownSizeGib: The size, in GiB, that this storage volume has expanded
       as a result of an auto grow policy. In the absence of auto-grow, the
@@ -1079,6 +1284,7 @@ class Volume(_messages.Message):
       requested size if the storage volume has been configured with auto grow
       or auto shrink.
     id: An identifier for the `Volume`, generated by the backend.
+    labels: Labels as key value pairs.
     name: Output only. The resource name of this `Volume`. Resource names are
       schemeless URIs that follow the conventions in
       https://cloud.google.com/apis/design/resource_names. Format:
@@ -1137,17 +1343,42 @@ class Volume(_messages.Message):
     SSD = 1
     HDD = 2
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels as key value pairs.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   autoGrownSizeGib = _messages.IntegerField(1)
   currentSizeGib = _messages.IntegerField(2)
   id = _messages.StringField(3)
-  name = _messages.StringField(4)
-  remainingSpaceGib = _messages.IntegerField(5)
-  requestedSizeGib = _messages.IntegerField(6)
-  snapshotAutoDeleteBehavior = _messages.EnumField('SnapshotAutoDeleteBehaviorValueValuesEnum', 7)
-  snapshotReservationDetail = _messages.MessageField('SnapshotReservationDetail', 8)
-  snapshotSchedulePolicy = _messages.StringField(9)
-  state = _messages.EnumField('StateValueValuesEnum', 10)
-  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 11)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  remainingSpaceGib = _messages.IntegerField(6)
+  requestedSizeGib = _messages.IntegerField(7)
+  snapshotAutoDeleteBehavior = _messages.EnumField('SnapshotAutoDeleteBehaviorValueValuesEnum', 8)
+  snapshotReservationDetail = _messages.MessageField('SnapshotReservationDetail', 9)
+  snapshotSchedulePolicy = _messages.StringField(10)
+  state = _messages.EnumField('StateValueValuesEnum', 11)
+  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 12)
 
 
 class VolumeSnapshot(_messages.Message):

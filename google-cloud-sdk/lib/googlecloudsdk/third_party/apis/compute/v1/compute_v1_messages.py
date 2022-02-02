@@ -39290,11 +39290,8 @@ class NetworkInterface(_messages.Message):
 
     Values:
       EXTERNAL: This network interface can have external IPv6.
-      UNSPECIFIED_IPV6_ACCESS_TYPE: IPv6 access type not set. Means this
-        network interface hasn't been turned on IPv6 yet.
     """
     EXTERNAL = 0
-    UNSPECIFIED_IPV6_ACCESS_TYPE = 1
 
   class NicTypeValueValuesEnum(_messages.Enum):
     r"""The type of vNIC to be used on this interface. This may be gVNIC or
@@ -39318,11 +39315,9 @@ class NetworkInterface(_messages.Message):
     Values:
       IPV4_IPV6: The network interface can have both IPv4 and IPv6 addresses.
       IPV4_ONLY: The network interface will be assigned IPv4 address.
-      UNSPECIFIED_STACK_TYPE: <no description>
     """
     IPV4_IPV6 = 0
     IPV4_ONLY = 1
-    UNSPECIFIED_STACK_TYPE = 2
 
   accessConfigs = _messages.MessageField('AccessConfig', 1, repeated=True)
   aliasIpRanges = _messages.MessageField('AliasIpRange', 2, repeated=True)
@@ -50274,8 +50269,7 @@ class Scheduling(_messages.Message):
     OnHostMaintenanceValueValuesEnum: Defines the maintenance behavior for
       this instance. For standard instances, the default behavior is MIGRATE.
       For preemptible instances, the default and only possible behavior is
-      TERMINATE. For more information, see Setting Instance Scheduling
-      Options.
+      TERMINATE. For more information, see Set VM availability policies.
     ProvisioningModelValueValuesEnum: Specifies the provisioning model of the
       instance.
 
@@ -50299,7 +50293,7 @@ class Scheduling(_messages.Message):
     onHostMaintenance: Defines the maintenance behavior for this instance. For
       standard instances, the default behavior is MIGRATE. For preemptible
       instances, the default and only possible behavior is TERMINATE. For more
-      information, see Setting Instance Scheduling Options.
+      information, see Set VM availability policies.
     preemptible: Defines whether the instance is preemptible. This can only be
       set during instance creation or while the instance is stopped and
       therefore, in a `TERMINATED` state. See Instance Life Cycle for more
@@ -50324,7 +50318,7 @@ class Scheduling(_messages.Message):
     r"""Defines the maintenance behavior for this instance. For standard
     instances, the default behavior is MIGRATE. For preemptible instances, the
     default and only possible behavior is TERMINATE. For more information, see
-    Setting Instance Scheduling Options.
+    Set VM availability policies.
 
     Values:
       MIGRATE: *[Default]* Allows Compute Engine to automatically migrate
@@ -53703,11 +53697,8 @@ class Subnetwork(_messages.Message):
     Values:
       EXTERNAL: VMs on this subnet will be assigned IPv6 addresses that are
         accesible via the Internet, as well as the VPC network.
-      UNSPECIFIED_IPV6_ACCESS_TYPE: IPv6 access type not set. Means this
-        subnet hasn't been turned on IPv6 yet.
     """
     EXTERNAL = 0
-    UNSPECIFIED_IPV6_ACCESS_TYPE = 1
 
   class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
     r"""The private IPv6 google access type for the VMs in this subnet. This
@@ -53774,11 +53765,9 @@ class Subnetwork(_messages.Message):
     Values:
       IPV4_IPV6: New VMs in this subnet can have both IPv4 and IPv6 addresses.
       IPV4_ONLY: New VMs in this subnet will only be assigned IPv4 addresses.
-      UNSPECIFIED_STACK_TYPE: <no description>
     """
     IPV4_IPV6 = 0
     IPV4_ONLY = 1
-    UNSPECIFIED_STACK_TYPE = 2
 
   class StateValueValuesEnum(_messages.Enum):
     r"""[Output Only] The state of the subnetwork, which can be one of the
@@ -58799,11 +58788,44 @@ class UrlMapsScopedList(_messages.Message):
 class UrlMapsValidateRequest(_messages.Message):
   r"""A UrlMapsValidateRequest object.
 
+  Enums:
+    LoadBalancingSchemesValueListEntryValuesEnum:
+
   Fields:
+    loadBalancingSchemes: Specifies the load balancer type(s) this validation
+      request is for. Use EXTERNAL_MANAGED for HTTP/HTTPS External Global Load
+      Balancer with Advanced Traffic Management. Use EXTERNAL for Classic
+      HTTP/HTTPS External Global Load Balancer. Other load balancer types are
+      not supported. For more information, refer to Choosing a load balancer.
+      If unspecified, the load balancing scheme will be inferred from the
+      backend service resources this URL map references. If that can not be
+      inferred (for example, this URL map only references backend buckets, or
+      this Url map is for rewrites and redirects only and doesn't reference
+      any backends), EXTERNAL will be used as the default type. If specified,
+      the scheme(s) must not conflict with the load balancing scheme of the
+      backend service resources this Url map references.
     resource: Content of the UrlMap to be validated.
   """
 
-  resource = _messages.MessageField('UrlMap', 1)
+  class LoadBalancingSchemesValueListEntryValuesEnum(_messages.Enum):
+    r"""LoadBalancingSchemesValueListEntryValuesEnum enum type.
+
+    Values:
+      EXTERNAL: Signifies that this will be used for Classic L7 External Load
+        Balancing.
+      EXTERNAL_MANAGED: Signifies that this will be used for Envoy-based L7
+        External Load Balancing.
+      LOAD_BALANCING_SCHEME_UNSPECIFIED: If unspecified, the validation will
+        try to infer the scheme from the backend service resources this Url
+        map references. If the inferrence is not possible, EXTERNAL will be
+        used as the default type.
+    """
+    EXTERNAL = 0
+    EXTERNAL_MANAGED = 1
+    LOAD_BALANCING_SCHEME_UNSPECIFIED = 2
+
+  loadBalancingSchemes = _messages.EnumField('LoadBalancingSchemesValueListEntryValuesEnum', 1, repeated=True)
+  resource = _messages.MessageField('UrlMap', 2)
 
 
 class UrlMapsValidateResponse(_messages.Message):

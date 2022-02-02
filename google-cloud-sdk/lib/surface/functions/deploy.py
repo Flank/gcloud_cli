@@ -71,6 +71,9 @@ class Deploy(base.Command):
     # Add args for specifying ignore files to upload source
     flags.AddIgnoreFileFlag(parser)
 
+    # Add flags for secrets
+    secrets_config.ConfigureFlags(parser)
+
     # Add flags for network settings
     flags.AddVPCConnectorMutexGroup(parser)
     flags.AddEgressSettingsFlag(parser)
@@ -93,9 +96,6 @@ class DeployBeta(Deploy):
     """Register beta flags for this command."""
     Deploy.Args(parser, track)
 
-    # Configure flags for secrets
-    secrets_config.ConfigureFlags(parser)
-
     # Configure flags for CMEK
     flags.AddKMSKeyFlags(parser)
     flags.AddDockerRepositoryFlags(parser)
@@ -106,6 +106,7 @@ class DeployBeta(Deploy):
     flags.AddTriggerLocationFlag(parser, track)
     flags.AddTriggerServiceAccountFlag(parser, track)
     flags.AddGen2Flag(parser, track)
+    flags.AddServeAllTrafficLatestRevisionFlag(parser, track)
 
   def Run(self, args):
     if flags.ShouldUseGen2():

@@ -130,7 +130,7 @@
     },
     "GoogleCloudRecommenderV1alpha2Insight": {
       "id": "GoogleCloudRecommenderV1alpha2Insight",
-      "description": "An insight along with the information used to derive the insight. The insight may have associated recomendations as well.",
+      "description": "An insight along with the information used to derive the insight. The insight may have associated recommendations as well.",
       "type": "object",
       "properties": {
         "name": {
@@ -460,7 +460,7 @@
       "type": "object",
       "properties": {
         "cost": {
-          "description": "An approximate projection on amount saved or amount incurred. Negative cost units indicate cost savings and positive cost units indicate increase. See google.type.Money documentation for positive\/negative units.",
+          "description": "An approximate projection on amount saved or amount incurred. Negative cost units indicate cost savings and positive cost units indicate increase. See google.type.Money documentation for positive\/negative units. A user's permissions may affect whether the cost is computed using list prices or custom contract prices.",
           "$ref": "GoogleTypeMoney"
         },
         "duration": {

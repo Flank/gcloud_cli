@@ -41796,11 +41796,8 @@ class NetworkInterface(_messages.Message):
 
     Values:
       EXTERNAL: This network interface can have external IPv6.
-      UNSPECIFIED_IPV6_ACCESS_TYPE: IPv6 access type not set. Means this
-        network interface hasn't been turned on IPv6 yet.
     """
     EXTERNAL = 0
-    UNSPECIFIED_IPV6_ACCESS_TYPE = 1
 
   class NicTypeValueValuesEnum(_messages.Enum):
     r"""The type of vNIC to be used on this interface. This may be gVNIC or
@@ -41824,11 +41821,9 @@ class NetworkInterface(_messages.Message):
     Values:
       IPV4_IPV6: The network interface can have both IPv4 and IPv6 addresses.
       IPV4_ONLY: The network interface will be assigned IPv4 address.
-      UNSPECIFIED_STACK_TYPE: <no description>
     """
     IPV4_IPV6 = 0
     IPV4_ONLY = 1
-    UNSPECIFIED_STACK_TYPE = 2
 
   accessConfigs = _messages.MessageField('AccessConfig', 1, repeated=True)
   aliasIpRanges = _messages.MessageField('AliasIpRange', 2, repeated=True)
@@ -53038,8 +53033,7 @@ class Scheduling(_messages.Message):
     OnHostMaintenanceValueValuesEnum: Defines the maintenance behavior for
       this instance. For standard instances, the default behavior is MIGRATE.
       For preemptible instances, the default and only possible behavior is
-      TERMINATE. For more information, see Setting Instance Scheduling
-      Options.
+      TERMINATE. For more information, see Set VM availability policies.
     ProvisioningModelValueValuesEnum: Specifies the provisioning model of the
       instance.
 
@@ -53071,7 +53065,7 @@ class Scheduling(_messages.Message):
     onHostMaintenance: Defines the maintenance behavior for this instance. For
       standard instances, the default behavior is MIGRATE. For preemptible
       instances, the default and only possible behavior is TERMINATE. For more
-      information, see Setting Instance Scheduling Options.
+      information, see Set VM availability policies.
     preemptible: Defines whether the instance is preemptible. This can only be
       set during instance creation or while the instance is stopped and
       therefore, in a `TERMINATED` state. See Instance Life Cycle for more
@@ -53110,7 +53104,7 @@ class Scheduling(_messages.Message):
     r"""Defines the maintenance behavior for this instance. For standard
     instances, the default behavior is MIGRATE. For preemptible instances, the
     default and only possible behavior is TERMINATE. For more information, see
-    Setting Instance Scheduling Options.
+    Set VM availability policies.
 
     Values:
       MIGRATE: *[Default]* Allows Compute Engine to automatically migrate
@@ -56848,11 +56842,8 @@ class Subnetwork(_messages.Message):
     Values:
       EXTERNAL: VMs on this subnet will be assigned IPv6 addresses that are
         accesible via the Internet, as well as the VPC network.
-      UNSPECIFIED_IPV6_ACCESS_TYPE: IPv6 access type not set. Means this
-        subnet hasn't been turned on IPv6 yet.
     """
     EXTERNAL = 0
-    UNSPECIFIED_IPV6_ACCESS_TYPE = 1
 
   class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
     r"""The private IPv6 google access type for the VMs in this subnet. This
@@ -56919,11 +56910,9 @@ class Subnetwork(_messages.Message):
     Values:
       IPV4_IPV6: New VMs in this subnet can have both IPv4 and IPv6 addresses.
       IPV4_ONLY: New VMs in this subnet will only be assigned IPv4 addresses.
-      UNSPECIFIED_STACK_TYPE: <no description>
     """
     IPV4_IPV6 = 0
     IPV4_ONLY = 1
-    UNSPECIFIED_STACK_TYPE = 2
 
   class StateValueValuesEnum(_messages.Enum):
     r"""[Output Only] The state of the subnetwork, which can be one of the

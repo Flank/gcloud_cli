@@ -41,6 +41,10 @@ def _clear_fields(args, job):
     job.transferSpec.sourceAgentPoolName = None
   if args.clear_destination_agent_pool:
     job.transferSpec.sinkAgentPoolName = None
+  if args.clear_intermediate_storage_path:
+    job.transferSpec.gcsIntermediateDataLocation = None
+  if args.clear_manifest_file:
+    job.transferSpec.transferManifest = None
   if args.clear_include_prefixes:
     job.transferSpec.objectConditions.includePrefixes = []
   if args.clear_exclude_prefixes:
@@ -60,6 +64,8 @@ def _clear_fields(args, job):
     job.notificationConfig = None
   if args.clear_notification_event_types:
     job.notificationConfig.eventTypes = []
+  if args.clear_log_config:
+    job.loggingConfig = None
 
 
 class Update(base.Command):

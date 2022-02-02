@@ -38,7 +38,7 @@ $ {command} my-cluster --location=us-west1 --aws-region=AWS_REGION --cluster-ver
 """
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Create an Anthos cluster on AWS."""
 
@@ -65,6 +65,7 @@ class Create(base.CreateCommand):
     flags.AddValidateOnly(parser, 'cluster to create')
     flags.AddFleetProject(parser)
     flags.AddTags(parser, 'cluster')
+    flags.AddAdminUsers(parser)
 
     aws_flags.AddAwsRegion(parser)
     aws_flags.AddIamInstanceProfile(parser)
@@ -123,14 +124,3 @@ class Create(base.CreateCommand):
       log.CreatedResource(
           cluster_ref, kind=constants.AWS_CLUSTER_KIND, is_async=async_)
       return cluster_client.Get(cluster_ref)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(Create):
-  """Create an Anthos cluster on AWS."""
-
-  @staticmethod
-  def Args(parser, track=base.ReleaseTrack.BETA):
-    """Registers alpha track flags for this command."""
-    Create.Args(parser)
-    aws_flags.AddServiceLoadBalancerSubnetIDs(parser)

@@ -33,6 +33,14 @@ _DETAILED_HELP = {
         To list all triggers in location ``us-central1'', run:
 
           $ {command} --location=us-central1
+
+        To list all triggers in all locations, run:
+
+          $ {command} --location=-
+
+        or
+
+          $ {command}
         """,
 }
 
@@ -69,7 +77,7 @@ def _Destination(trigger):
   Based on different destination types, this function returns a destination
   string accordingly:
 
-    * Cloud Run trigger: "Cloud Run: {cloud run service}"
+    * Cloud Run trigger: "Cloud Run: {cloud run service or job}"
     * GKE trigger: "GKE: {gke service}"
     * Workflows trigger: "Workflows: {workflow name}"
     * Cloud Functions trigger: "Cloud Functions: {cloud function name}"
@@ -89,7 +97,12 @@ def _Destination(trigger):
 
   if 'cloudRun' in destination:
     dest = destination.get('cloudRun')
-    return 'Cloud Run: {}'.format(dest.get('service'))
+    # While not explicit in the API, these are effectively oneof.
+    job = dest.get('job')
+    if job:
+      return 'Cloud Run job: {}'.format(job)
+    service = dest.get('service')
+    return 'Cloud Run service: {}'.format(service)
   elif 'gke' in destination:
     dest = destination.get('gke')
     return 'GKE: {}'.format(dest.get('service'))
@@ -120,7 +133,7 @@ class List(base.ListCommand):
         parser,
         "The location for which to list triggers. This should be either "
         "``global'' or one of the supported regions.",
-        required=True)
+        required=False)
     parser.display_info.AddFormat(_FORMAT)
     parser.display_info.AddUriFunc(triggers.GetTriggerURI)
     parser.display_info.AddTransforms({

@@ -24,6 +24,7 @@ import datetime
 import re
 
 from apitools.base.py import encoding
+from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.run.integrations import api_utils
 from googlecloudsdk.api_lib.run.integrations import types_utils
 from googlecloudsdk.api_lib.util import apis
@@ -169,6 +170,28 @@ class RunAppsOperations(object):
     except KeyError:
       raise exceptions.IntegrationNotFoundError(
           'Integration [{}] cannot be found'.format(name))
+
+  def GetIntegrationStatus(self, name):
+    """Get status of an integration.
+
+    Args:
+      name: str, the name of the resource.
+
+    Returns:
+      The ResourceStatus of the integration, or None if not found
+    """
+    try:
+      application_status = api_utils.GetApplicationStatus(
+          self._client, self.GetAppRef(_DEFAULT_APP_NAME))
+      app_status_dict = encoding.MessageToDict(application_status)
+      for status in app_status_dict['resource']:
+        if status['resourceName'] == name:
+          return status
+      return None
+    except KeyError:
+      return None
+    except api_exceptions.HttpError:
+      return None
 
   def CreateIntegration(self, integration_type, parameters, service, name=None):
     """Create an integration.

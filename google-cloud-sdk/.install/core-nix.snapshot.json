@@ -2,7 +2,7 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "3667eb37bc2469afaca049f7d2d7ce7a6fb6cfccc6631b76c3c3abaec4924bf4",
+        "contents_checksum": "19113373fd25e9a41df941313ddd1c2e9b1fb8e789074db2833963b35fb6d1b0",
         "source": "",
         "type": "tar"
       },
@@ -12,8 +12,8 @@
         "ssh-tools"
       ],
       "details": {
-        "description": "Handles all core functionality for the Cloud SDK.",
-        "display_name": "Cloud SDK Core Libraries (Platform Specific)"
+        "description": "Handles all core functionality for the Google Cloud CLI.",
+        "display_name": "GoogleCloud CLI Core Libraries (Platform Specific)"
       },
       "id": "core-nix",
       "is_configuration": false,
@@ -29,16 +29,16 @@
       },
       "platform_required": false,
       "version": {
-        "build_number": 20220114150752,
-        "version_string": "2022.01.14"
+        "build_number": 20220128152443,
+        "version_string": "2022.01.28"
       }
     }
   ],
-  "revision": 20220114150752,
+  "revision": 20220128152443,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "369.0.0"
+  "version": "371.0.0"
 }
