@@ -2,7 +2,7 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "ff1e3ad832843e7487cb001f3c89fd10498a164ed7ab793cde301545e95f04d2",
+        "contents_checksum": "c03c35f4b29fba3e28bf7595187a3872f64cf4d06a6a043389c1c8f3d2bc3df2",
         "source": "",
         "type": "tar"
       },
@@ -14,7 +14,7 @@
       ],
       "details": {
         "description": "Handles all core functionality for the Google Cloud CLI.",
-        "display_name": "GoogleCloud CLI Core Libraries"
+        "display_name": "Google Cloud CLI Core Libraries"
       },
       "id": "core",
       "is_configuration": false,
@@ -23,16 +23,16 @@
       "platform": {},
       "platform_required": false,
       "version": {
-        "build_number": 20220128152443,
-        "version_string": "2022.01.28"
+        "build_number": 20220204151646,
+        "version_string": "2022.02.04"
       }
     }
   ],
-  "revision": 20220128152443,
+  "revision": 20220204151646,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "371.0.0"
+  "version": "372.0.0"
 }
