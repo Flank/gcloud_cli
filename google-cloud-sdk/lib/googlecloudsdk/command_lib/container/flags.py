@@ -1077,7 +1077,7 @@ def AddMonitoringFlag(parser, autopilot=False):
 
   help_text = """\
 Set the components that have monitoring enabled. Valid component values are:
-`SYSTEM`, `NONE`
+`SYSTEM`, `WORKLOAD` (Deprecated), `NONE`
 
 For more information, look at
 https://cloud.google.com/stackdriver/docs/solutions/gke/installing#available-metrics
@@ -1483,7 +1483,6 @@ def AddAutoprovisioningNetworkTagsFlag(parser, help_text):
   parser.add_argument(
       '--autoprovisioning-network-tags',
       metavar='TAGS',
-      hidden=True,
       type=arg_parsers.ArgList(min_length=1),
       help=help_text)
 
@@ -1523,7 +1522,6 @@ for examples.
   parser.add_argument(
       '--autoprovisioning-network-tags',
       metavar='TAGS',
-      hidden=True,
       type=arg_parsers.ArgList(),
       help=help_text)
 
@@ -2547,10 +2545,20 @@ Examples:
 
   $ {{command}} {example_target} --scopes=bigquery,storage-rw,compute-ro
 
-Multiple SCOPEs can be specified, separated by commas. `logging-write`
-and/or `monitoring` are added unless Cloud Logging and/or Cloud Monitoring
-are disabled (see `--enable-cloud-logging` and `--enable-cloud-monitoring`
-for more information).
+Multiple scopes can be specified, separated by commas. Various scopes are
+automatically added based on feature usage. Such scopes are not added if an
+equivalent scope already exists.
+
+- `monitoring-write`: always added to ensure metrics can be written
+- `logging-write`: added if Cloud Logging is enabled
+  (`--enable-cloud-logging`/`--logging`)
+- `monitoring`: added if Cloud Monitoring is enabled
+  (`--enable-cloud-monitoring`/`--monitoring`)
+- `gke-default`: added for Autopilot clusters that use the default service
+  account
+- `cloud-platform`: added for Autopilot clusters that use any other service
+  account
+
 {scopes_help}
 """.format(
     example_target=example_target, scopes_help=compute_constants.ScopesHelp()))
@@ -3124,6 +3132,34 @@ def AddPrivateIpv6GoogleAccessTypeFlag(api_version, parser, hidden=False):
   messages = apis.GetMessagesModule('container', api_version)
   util.GetPrivateIpv6GoogleAccessTypeMapper(
       messages, hidden).choice_arg.AddToParser(parser)
+
+
+def AddStackTypeFlag(parser):
+  """Adds --stack-type flag to the given parser.
+
+  Args:
+    parser: A given parser.
+  """
+  help_text = "IP stack type of the node VMs. Defaults to 'ipv4'"
+  parser.add_argument(
+      '--stack-type',
+      help=help_text,
+      hidden=True,
+      choices=['ipv4', 'ipv4-ipv6'])
+
+
+def AddIpv6AccessTypeFlag(parser):
+  """Adds --ipv6-access-type flag to the given parser.
+
+  Args:
+    parser: A given parser.
+  """
+  help_text = "IPv6 access type of the subnetwork. Defaults to 'external'"
+  parser.add_argument(
+      '--ipv6-access-type',
+      help=help_text,
+      hidden=True,
+      choices=['external', 'internal'])
 
 
 def AddEnableIntraNodeVisibilityFlag(parser, hidden=False):
@@ -3764,7 +3800,7 @@ The set of zones in which the node pool's nodes should be located.
 
 Multiple locations can be specified, separated by commas. For example:
 
-  $ {command} node-pool-1 --node-locations=us-central1-a,us-central1-b"""
+  $ {command} node-pool-1 --cluster=sample-cluster --node-locations=us-central1-a,us-central1-b"""
   else:
     help_text = """\
 Set of zones in which the node pool's nodes should be located.
@@ -3773,7 +3809,7 @@ from the node pool, depending on whether locations are being added or removed.
 
 Multiple locations can be specified, separated by commas. For example:
 
-  $ {command} node-pool-1 --node-locations=us-central1-a,us-central1-b"""
+  $ {command} node-pool-1 --cluster=sample-cluster --node-locations=us-central1-a,us-central1-b"""
   parser.add_argument(
       '--node-locations',
       type=arg_parsers.ArgList(min_length=1),
@@ -3990,14 +4026,21 @@ either a node-pool upgrade or node-pool creation.
       '--enable-gvnic', help=help_text, default=None, action='store_true')
 
 
-def AddEnableConfidentialNodesFlag(parser, for_node_pool=False, hidden=False):
+def AddEnableConfidentialNodesFlag(parser, for_node_pool=False, hidden=False,
+                                   is_update=False):
   """Adds a --enable-confidential-nodes flag to the given parser."""
   target = 'node pool' if for_node_pool else 'cluster'
+
   help_text = """\
 Enable confidential nodes for the {}. Enabling Confidential Nodes
 will create nodes using Confidential VM
 https://cloud.google.com/compute/confidential-vm/docs/about-cvm.""".format(
     target)
+
+  if is_update:
+    help_text = """\
+    Recreate all the nodes in the node pool to be confidential VM
+    https://cloud.google.com/compute/confidential-vm/docs/about-cvm."""
 
   parser.add_argument(
       '--enable-confidential-nodes',

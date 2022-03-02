@@ -124,12 +124,12 @@ def _LooksLikeAProjectName(project):
   return any(c in project for c in ' !"\'')
 
 
-def _BooleanValidator(property_name, value):
+def _BooleanValidator(property_name, property_value):
   """Validates boolean properties.
 
   Args:
     property_name: str, the name of the property
-    value: str | bool, the value to validate
+    property_value: PropertyValue | str | bool, the value to validate
 
   Raises:
     InvalidValueError: if value is not boolean
@@ -137,6 +137,10 @@ def _BooleanValidator(property_name, value):
   accepted_strings = [
       'true', '1', 'on', 'yes', 'y', 'false', '0', 'off', 'no', 'n', '', 'none'
   ]
+  if isinstance(property_value, PropertyValue):
+    value = property_value.value
+  else:
+    value = property_value
   if Stringize(value).lower() not in accepted_strings:
     raise InvalidValueError(
         'The [{0}] value [{1}] is not valid. Possible values: [{2}]. '
@@ -245,6 +249,31 @@ or it can be set temporarily by the environment variable [{env_var}]""".format(
     self.property = prop
 
 
+class PropertyValue(object):
+  """Represents a value and source for a property.
+
+  Attributes:
+    value: any, the value of the property.
+    source: enum, where the value was sourced from, or UNKNOWN.
+  """
+
+  class PropertySource(enum.Enum):
+    UNKNOWN = 'unknown'
+    PROPERTY_FILE = 'property file'
+    ENVIRONMENT = 'environment'
+    FLAG = 'flag'
+    CALLBACK = 'callback'
+    DEFAULT = 'default'
+    FEATURE_FLAG = 'feature flag'
+
+  def __init__(self, value, source=PropertySource.UNKNOWN):
+    self.value = value
+    self.source = source
+
+  def __str__(self):
+    return '{0} ({1})'.format(six.text_type(self.value), self.source.value)
+
+
 class _Sections(object):
   """Represents the available sections in the properties file.
 
@@ -281,6 +310,10 @@ class _Sections(object):
       SDK.
     container: Section, The section containing container properties for the
       Cloud SDK.
+    container_aws: Section, The section containing properties for Anthos
+      clusters on AWS.
+    container_azure: Section, The section containing properties for Anthos
+      clusters on Azure.
     context_aware: Section, The section containing context aware access
       configurations for the Cloud SDK.
     core: Section, The section containing core properties for the Cloud SDK.
@@ -398,6 +431,8 @@ class _Sections(object):
     self.composer = _SectionComposer()
     self.compute = _SectionCompute()
     self.container = _SectionContainer()
+    self.container_aws = _SectionContainerAws()
+    self.container_azure = _SectionContainerAzure()
     self.context_aware = _SectionContextAware()
     self.core = _SectionCore()
     self.ssh = _SectionSsh()
@@ -468,6 +503,8 @@ class _Sections(object):
         self.composer,
         self.compute,
         self.container,
+        self.container_aws,
+        self.container_azure,
         self.context_aware,
         self.core,
         self.ssh,
@@ -609,6 +646,39 @@ class _Sections(object):
     result = {}
     for section in self:
       section_result = section.AllValues(
+          list_unset=list_unset,
+          include_hidden=include_hidden,
+          properties_file=properties_file,
+          only_file_contents=only_file_contents)
+      if section_result:
+        result[section.name] = section_result
+    return result
+
+  def AllPropertyValues(self,
+                        list_unset=False,
+                        include_hidden=False,
+                        properties_file=None,
+                        only_file_contents=False):
+    """Gets the entire collection of property values for all sections.
+
+    Args:
+      list_unset: bool, If True, include unset properties in the result.
+      include_hidden: bool, True to include hidden properties in the result. If
+        a property has a value set but is hidden, it will be included regardless
+        of this setting.
+      properties_file: PropertyFile, the file to read settings from.  If None
+        the active property file will be used.
+      only_file_contents: bool, True if values should be taken only from the
+        properties file, false if flags, env vars, etc. should be consulted too.
+        Mostly useful for listing file contents.
+
+    Returns:
+      {str:{str:PropertyValue}}, A dict of sections to dicts of properties to
+        property values.
+    """
+    result = {}
+    for section in self:
+      section_result = section.AllPropertyValues(
           list_unset=list_unset,
           include_hidden=include_hidden,
           properties_file=properties_file,
@@ -812,7 +882,11 @@ class _Section(object):
       if only_file_contents:
         value = properties_file.Get(prop.section, prop.name)
       else:
-        value = _GetPropertyWithoutDefault(prop, properties_file)
+        property_value = _GetPropertyWithoutDefault(prop, properties_file)
+        if property_value is None:
+          value = None
+        else:
+          value = property_value.value
 
       if value is None:
         if not list_unset:
@@ -825,6 +899,59 @@ class _Section(object):
 
       # Always include if value is set (even if hidden)
       result[prop.name] = value
+    return result
+
+  def AllPropertyValues(self,
+                        list_unset=False,
+                        include_hidden=False,
+                        properties_file=None,
+                        only_file_contents=False):
+    """Gets all the properties and their values for this section.
+
+    Args:
+      list_unset: bool, If True, include unset properties in the result.
+      include_hidden: bool, True to include hidden properties in the result. If
+        a property has a value set but is hidden, it will be included regardless
+        of this setting.
+      properties_file: properties_file.PropertiesFile, the file to read settings
+        from.  If None the active property file will be used.
+      only_file_contents: bool, True if values should be taken only from the
+        properties file, false if flags, env vars, etc. should be consulted too.
+        Mostly useful for listing file contents.
+
+    Returns:
+      {str:PropertyValue}, The dict of {property:value} for this section.
+    """
+    properties_file = (
+        properties_file or named_configs.ActivePropertiesFile.Load())
+
+    result = {}
+    for prop in self:
+      if prop.is_internal:
+        # Never show internal properties, ever.
+        continue
+      if (prop.is_hidden and not include_hidden and
+          _GetPropertyWithoutCallback(prop, properties_file) is None):
+        continue
+
+      if only_file_contents:
+        property_value = PropertyValue(
+            properties_file.Get(prop.section, prop.name),
+            PropertyValue.PropertySource.PROPERTY_FILE)
+      else:
+        property_value = _GetPropertyWithoutDefault(prop, properties_file)
+
+      if (property_value is None) or (property_value.value is None):
+        if not list_unset:
+          # Never include if not set and not including unset property_values.
+          continue
+        if prop.is_hidden and not include_hidden:
+          # If including unset property_values, exclude if hidden and not
+          # including hidden properties.
+          continue
+
+      # Always include if value is set (even if hidden)
+      result[prop.name] = property_value
     return result
 
 
@@ -1263,27 +1390,41 @@ class _SectionAuth(_Section):
         'information.')
     self.impersonate_service_account = self._Add(
         'impersonate_service_account',
-        help_text='After setting this property, all API requests will be made '
-        'as the given service account instead of the currently selected '
-        'account. This is done without needing to create, download, and '
-        'activate a key for the account. In order to perform operations as the '
-        'service account, your currently selected account must have an IAM '
-        'role that includes the iam.serviceAccounts.getAccessToken permission '
-        'for the service account. The roles/iam.serviceAccountTokenCreator '
-        'role has this permission or you may create a custom role. '
-        'A list of service accounts, separated with comma, can be '
-        'specified. In such cases, it creates an impersonation '
-        'delegation chain. Any given service account in the list must '
-        'have the roles/iam.serviceAccountTokenCreator role on its '
-        'subsequent service account. For example, when '
-        '--impersonate-service-account=sv1@developer.gserviceaccount.com,'
-        'sv2@developer.gserviceaccount.com, the active account must have '
-        'the roles/iam.serviceAccountTokenCreator role on '
-        'sv1@developer.gserviceaccount.com which must has the '
-        'roles/iam.serviceAccountTokenCreator role on '
-        'sv2@developer.gserviceaccount.com. '
-        'sv2@developer.gserviceaccount.com is target impersonated service '
-        'account and sv1@developer.gserviceaccount.com is the delegate.',
+        help_text="""\
+        For this `gcloud` invocation, all API requests will be
+        made as the given service account or target service account in an
+        impersonation delegation chain instead of the currently selected
+        account. You can specify either a single service account as the
+        impersonator, or a comma-separated list of service accounts to
+        create an impersonation delegation chain. This is done without
+        needing to create, download, and activate a key for the service
+        account or accounts.
+
+        In order to make API requests as a service account, your
+        currently selected account must have an IAM role that includes
+        the `iam.serviceAccounts.getAccessToken` permission for the
+        service account or accounts.
+
+        The `roles/iam.serviceAccountTokenCreator` role has
+        the `iam.serviceAccounts.getAccessToken permission`. You can
+        also create a custom role.
+
+        You can specify a list of service accounts, separated with
+        commas. This creates an impersonation delegation chain in which
+        each service account delegates its permissions to the next
+        service account in the chain. Each service account in the list
+        must have the `roles/iam.serviceAccountTokenCreator` role on the
+        next service account in the list. For example, when
+        `--impersonate-service-account=`
+        ``SERVICE_ACCOUNT_1'',``SERVICE_ACCOUNT_2'',
+        the active account must have the
+        `roles/iam.serviceAccountTokenCreator` role on
+        ``SERVICE_ACCOUNT_1'', which must have the
+        `roles/iam.serviceAccountTokenCreator` role on
+        ``SERVICE_ACCOUNT_2''.
+        ``SERVICE_ACCOUNT_1'' is the impersonated service
+        account and ``SERVICE_ACCOUNT_2'' is the delegate.
+        """,
     )
     self.disable_code_verifier = self._AddBool(
         'disable_code_verifier',
@@ -1315,13 +1456,8 @@ class _SectionAws(_Section):
     super(_SectionAws, self).__init__('aws', hidden=True)
     self.location = self._Add(
         'location',
-        help_text='Default Google Cloud location `gcloud` should use for '
-        'container aws surface.',
-        hidden=True)
-    self.aws_region = self._Add(
-        'aws_region',
-        help_text='Default AWS region `gcloud` should use for '
-        'container aws surface.',
+        help_text=('DEPRECATED. Use `container_aws/location` instead. '
+                   'This property will be removed in a future release.'),
         hidden=True)
 
 
@@ -1329,16 +1465,11 @@ class _SectionAzure(_Section):
   """Contains the properties for the 'azure' section."""
 
   def __init__(self):
-    super(_SectionAzure, self).__init__('azure')
+    super(_SectionAzure, self).__init__('azure', hidden=True)
     self.location = self._Add(
         'location',
-        help_text='Default Google Cloud location `gcloud` should use for '
-        'container azure surface.',
-        hidden=True)
-    self.azure_region = self._Add(
-        'azure_region',
-        help_text='Default Azure region `gcloud` should use for '
-        'container azure surface.',
+        help_text=('DEPRECATED. Use `container_azure/location` instead. '
+                   'This property will be removed in a future release.'),
         hidden=True)
 
 
@@ -1356,17 +1487,15 @@ class _SectionBilling(_Section):
         'quota_project',
         default=_SectionBilling.CURRENT_PROJECT,
         help_text=textwrap.dedent("""\
-        Project that will be charged quota for the
-        operations performed in `gcloud`. When unset, the default is
-        [CURRENT_PROJECT]; this will charge quota against the currently set
-        project for operations performed on it. Additionally, some existing
-        APIs will continue to use a shared project for quota by default, when
-        this property is unset.
-        +
-        If you need to operate on one project, but
-        need quota against a different project, you can use this property to
-        specify the alternate project."""))
-
+             The Google Cloud project that is billed and charged quota for
+             operations performed in `gcloud`. When unset, the default is
+             [CURRENT_PROJECT]. This default bills and charges quota against the
+             current project. If you need to operate on one project, but need to
+             bill your usage against or use quota from a different project, you
+             can use this flag to specify the billing project. If both
+             `billing/quota_project` and `--billing-project` are specified,
+             `--billing-project` takes precedence.
+             """))
 
 class _SectionBlueprints(_Section):
   """Contains the properties for the 'blueprints' section."""
@@ -1580,6 +1709,28 @@ class _SectionContainer(_Section):
         hidden=True,
         help_text='If True, validate that the --tag value to container builds '
         'submit is in the gcr.io or *.gcr.io namespace.')
+
+
+class _SectionContainerAws(_Section):
+  """Contains the properties for the 'container_aws' section."""
+
+  def __init__(self):
+    super(_SectionContainerAws, self).__init__('container_aws')
+    self.location = self._Add(
+        'location',
+        help_text=('Default Google Cloud location to use for Anthos clusters '
+                   'on AWS.'))
+
+
+class _SectionContainerAzure(_Section):
+  """Contains the properties for the 'container_azure' section."""
+
+  def __init__(self):
+    super(_SectionContainerAzure, self).__init__('container_azure')
+    self.location = self._Add(
+        'location',
+        help_text=('Default Google Cloud location to use for Anthos clusters '
+                   'on Azure.'))
 
 
 class _SectionContextAware(_Section):
@@ -2080,8 +2231,15 @@ class _SectionDiagnostics(_Section):
 
   def __init__(self):
     super(_SectionDiagnostics, self).__init__('diagnostics', hidden=True)
+    # TODO(b/188055204): Remove legacy property once Cloud Shell is updated
     self.hidden_property_whitelist = self._Add(
         'hidden_property_whitelist',
+        internal=True,
+        help_text=('Comma separated list of hidden properties that should be '
+                   'allowed by the hidden properties diagnostic.'))
+
+    self.hidden_property_allowlist = self._Add(
+        'hidden_property_allowlist',
         internal=True,
         help_text=('Comma separated list of hidden properties that should be '
                    'allowed by the hidden properties diagnostic.'))
@@ -3196,11 +3354,31 @@ class _Property(object):
     Returns:
       str, The value for this property.
     """
-    value = _GetProperty(self, named_configs.ActivePropertiesFile.Load(),
-                         required)
+    property_value = self.GetPropertyValue(required, validate)
+    if property_value is None:
+      return None
+    return Stringize(property_value.value)
+
+  def GetPropertyValue(self, required=False, validate=True):
+    """Gets the value for this property.
+
+    Looks first in the environment, then in the workspace config, then in the
+    global config, and finally at callbacks.
+
+    Args:
+      required: bool, True to raise an exception if the property is not set.
+      validate: bool, Whether or not to run the fetched value through the
+        validation function.
+
+    Returns:
+      PropertyValue, The value for this property.
+    """
+    property_value = _GetProperty(self,
+                                  named_configs.ActivePropertiesFile.Load(),
+                                  required)
     if validate:
-      self.Validate(value)
-    return value
+      self.Validate(property_value)
+    return property_value
 
   def IsExplicitlySet(self):
     """Determines if this property has been explicitly set by the user.
@@ -3210,21 +3388,28 @@ class _Property(object):
     Returns:
       True, if the value was explicitly set, False otherwise.
     """
-    value = _GetPropertyWithoutCallback(
+    property_value = _GetPropertyWithoutCallback(
         self, named_configs.ActivePropertiesFile.Load())
-    return value is not None
+    if property_value is None:
+      return False
+    return property_value.value is not None
 
-  def Validate(self, value):
+  def Validate(self, property_value):
     """Test to see if the value is valid for this property.
 
     Args:
-      value: str, The value of the property to be validated.
+      property_value: str | PropertyValue, The value of the property to be
+        validated.
 
     Raises:
       InvalidValueError: If the value was invalid according to the property's
           validator.
     """
     if self.__validator:
+      if isinstance(property_value, PropertyValue):
+        value = property_value.value
+      else:
+        value = property_value
       try:
         self.__validator(value)
       except InvalidValueError as e:
@@ -3280,14 +3465,18 @@ class _Property(object):
       self.Validate(value)
     return value
 
-  def Set(self, value):
+  def Set(self, property_value):
     """Sets the value for this property as an environment variable.
 
     Args:
-      value: str/bool, The proposed value for this property.  If None, it is
-        removed from the environment.
+      property_value: PropertyValue | str | bool, The proposed value for this
+        property.  If None, it is removed from the environment.
     """
-    self.Validate(value)
+    self.Validate(property_value)
+    if isinstance(property_value, PropertyValue):
+      value = property_value.value
+    else:
+      value = property_value
     if value is not None:
       value = Stringize(value)
     encoding.SetEncodedValue(os.environ, self.EnvironmentName(), value)
@@ -3494,7 +3683,7 @@ def _GetProperty(prop, properties_file, required):
     RequiredPropertyError: If the property was required but unset.
 
   Returns:
-    str, The value of the property, or None if it is not set.
+    PropertyValue, The value of the property, or None if it is not set.
   """
 
   flag_to_use = None
@@ -3506,13 +3695,14 @@ def _GetProperty(prop, properties_file, required):
     if prop in first_invocation:
       flag_to_use = first_invocation.get(prop).flag
 
-  value = _GetPropertyWithoutDefault(prop, properties_file)
-  if value is not None:
-    return Stringize(value)
+  property_value = _GetPropertyWithoutDefault(prop, properties_file)
+  if property_value is not None and property_value.value is not None:
+    return property_value
 
   # Still nothing, check the final default.
   if prop.default is not None:
-    return Stringize(prop.default)
+    return PropertyValue(
+        Stringize(prop.default), PropertyValue.PropertySource.DEFAULT)
 
   # Not set, throw if required.
   if required:
@@ -3553,23 +3743,26 @@ def _GetPropertyWithoutDefault(prop, properties_file):
       properties files to use.
 
   Returns:
-    str, The value of the property, or None if it is not set.
+    PropertyValue, The value of the property, or None if it is not set.
   """
   # Try to get a value from args, env, or property file.
-  value = _GetPropertyWithoutCallback(prop, properties_file)
-  if value is not None:
-    return Stringize(value)
+  property_value = _GetPropertyWithoutCallback(prop, properties_file)
+  if property_value and property_value.value is not None:
+    return property_value
 
   # No value, try getting a value from the callbacks.
   for callback in prop.callbacks:
     value = callback()
     if value is not None:
-      return Stringize(value)
+      return PropertyValue(
+          Stringize(value), PropertyValue.PropertySource.CALLBACK)
 
   # Feature Flag callback
   if (prop.is_feature_flag and
       prop != VALUES.core.enable_feature_flags and FeatureFlagEnabled()):
-    return GetValueFromFeatureFlag(prop)
+    return PropertyValue(
+        GetValueFromFeatureFlag(prop),
+        PropertyValue.PropertySource.FEATURE_FLAG)
 
   return None
 
@@ -3591,7 +3784,7 @@ def _GetPropertyWithoutCallback(prop, properties_file):
     properties_file: PropertiesFile, An already loaded properties files to use.
 
   Returns:
-    str, The value of the property, or None if it is not set.
+    PropertyValue, The value of the property, or None if it is not set.
   """
   # Look for a value in the flags that were used on this command.
   invocation_stack = VALUES.GetInvocationStack()
@@ -3602,17 +3795,20 @@ def _GetPropertyWithoutCallback(prop, properties_file):
     if not value_flag:
       continue
     if value_flag.value is not None:
-      return Stringize(value_flag.value)
+      return PropertyValue(
+          Stringize(value_flag.value), PropertyValue.PropertySource.FLAG)
 
   # Check the environment variable overrides.
   value = encoding.GetEncodedValue(os.environ, prop.EnvironmentName())
   if value is not None:
-    return Stringize(value)
+    return PropertyValue(
+        Stringize(value), PropertyValue.PropertySource.ENVIRONMENT)
 
   # Check the property file itself.
   value = properties_file.Get(prop.section, prop.name)
   if value is not None:
-    return Stringize(value)
+    return PropertyValue(
+        Stringize(value), PropertyValue.PropertySource.PROPERTY_FILE)
 
   return None
 
@@ -3630,12 +3826,13 @@ def _GetBoolProperty(prop, properties_file, required, validate=False):
   Returns:
     bool, The value of the property, or None if it is not set.
   """
-  value = _GetProperty(prop, properties_file, required)
+  property_value = _GetProperty(prop, properties_file, required)
   if validate:
-    _BooleanValidator(prop.name, value)
-  if value is None or Stringize(value).lower() == 'none':
+    _BooleanValidator(prop.name, property_value)
+  if property_value is None or property_value.value is None or Stringize(
+      property_value.value).lower() == 'none':
     return None
-  return value.lower() in ['1', 'true', 'on', 'yes', 'y']
+  return property_value.value.lower() in ['1', 'true', 'on', 'yes', 'y']
 
 
 def _GetIntProperty(prop, properties_file, required):
@@ -3650,15 +3847,15 @@ def _GetIntProperty(prop, properties_file, required):
   Returns:
     int, The integer value of the property, or None if it is not set.
   """
-  value = _GetProperty(prop, properties_file, required)
-  if value is None:
+  property_value = _GetProperty(prop, properties_file, required)
+  if property_value is None or property_value.value is None:
     return None
   try:
-    return int(value)
+    return int(property_value.value)
   except ValueError:
     raise InvalidValueError(
         'The property [{prop}] must have an integer value: [{value}]'.format(
-            prop=prop, value=value))
+            prop=prop, value=property_value.value))
 
 
 def GetMetricsEnvironment():

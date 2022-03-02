@@ -1020,7 +1020,10 @@
             "Target is the internet.",
             "Target is a Google API.",
             "Target is a Google Kubernetes Engine cluster master.",
-            "Target is a Cloud SQL instance."
+            "Target is a Cloud SQL instance.",
+            "Target is a published service using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-services).",
+            "Target is all Google APIs using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis).",
+            "Target is VPC-SC using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis)."
           ],
           "enum": [
             "TARGET_UNSPECIFIED",
@@ -1028,7 +1031,10 @@
             "INTERNET",
             "GOOGLE_API",
             "GKE_MASTER",
-            "CLOUD_SQL_INSTANCE"
+            "CLOUD_SQL_INSTANCE",
+            "PSC_PUBLISHED_SERVICE",
+            "PSC_GOOGLE_API",
+            "PSC_VPC_SC"
           ]
         },
         "resourceUri": {
@@ -1154,7 +1160,9 @@
             "Packet was dropped because the Cloud SQL instance has neither a private nor a public IP address.",
             "Packet could be dropped because the Cloud function is not in an active status.",
             "Packet could be dropped because no VPC connector is set.",
-            "Packet could be dropped because the VPC connector is not in a running state."
+            "Packet could be dropped because the VPC connector is not in a running state.",
+            "Packet could be dropped because it was sent from a different region to a regional forwarding without global access.",
+            "Privte Service Connect (PSC) connection is not in accepted state."
           ],
           "enum": [
             "CAUSE_UNSPECIFIED",
@@ -1181,7 +1189,9 @@
             "CLOUD_SQL_INSTANCE_NO_IP_ADDRESS",
             "CLOUD_FUNCTION_NOT_ACTIVE",
             "VPC_CONNECTOR_NOT_SET",
-            "VPC_CONNECTOR_NOT_RUNNING"
+            "VPC_CONNECTOR_NOT_RUNNING",
+            "FORWARDING_RULE_REGION_MISMATCH",
+            "PSC_CONNECTION_NOT_ACCEPTED"
           ]
         },
         "resourceUri": {

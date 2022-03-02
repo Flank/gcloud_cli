@@ -91,9 +91,9 @@ def AddTypeArg(parser):
       help=help_text)
 
 
-def AddCommonNatArgs(parser, for_create=False, with_type=False):
+def AddCommonNatArgs(parser, for_create=False, with_private_nat=False):
   """Adds common arguments for creating and updating NATs."""
-  _AddIpAllocationArgs(parser, for_create, with_type=with_type)
+  _AddIpAllocationArgs(parser, for_create, with_private_nat)
   _AddSubnetworkArgs(parser, for_create)
   _AddTimeoutsArgs(parser, for_create)
   _AddMinPortsPerVmArg(parser, for_create)
@@ -115,13 +115,12 @@ def _AddRulesArg(parser):
       help=textwrap.dedent("""\
           Path to YAML file containing NAT Rules applied to the NAT.
           The YAML file format must follow the REST API schema for NAT Rules.
-          See [API Discovery docs]
-          (https://www.googleapis.com/discovery/v1/apis/compute/alpha/rest) for
-          reference."""),
+          See [API Discovery docs](https://www.googleapis.com/discovery/v1/apis/compute/alpha/rest)
+          for reference."""),
       required=False)
 
 
-def _AddIpAllocationArgs(parser, for_create=False, with_type=False):
+def _AddIpAllocationArgs(parser, for_create, with_private_nat):
   """Adds a mutually exclusive group to specify IP allocation options."""
 
   # If NAT Type is not supported, one of these flags is always required
@@ -131,7 +130,7 @@ def _AddIpAllocationArgs(parser, for_create=False, with_type=False):
   # and these flags are not supported if type is private. This is validated
   # when parsing args.
   ip_allocation = parser.add_mutually_exclusive_group(
-      required=for_create and not with_type)
+      required=for_create and not with_private_nat)
   ip_allocation.add_argument(
       '--auto-allocate-nat-external-ips',
       help='Automatically allocate external IP addresses for Cloud NAT',

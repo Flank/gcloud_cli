@@ -596,6 +596,8 @@ class CreateClusterOptions(object):
       enable_managed_prometheus=None,
       maintenance_interval=None,
       disable_pod_cidr_overprovision=None,
+      stack_type=None,
+      ipv6_access_type=None,
   ):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
@@ -751,6 +753,8 @@ class CreateClusterOptions(object):
     self.enable_managed_prometheus = enable_managed_prometheus
     self.maintenance_interval = maintenance_interval
     self.disable_pod_cidr_overprovision = disable_pod_cidr_overprovision
+    self.stack_type = stack_type
+    self.ipv6_access_type = ipv6_access_type
 
 
 class UpdateClusterOptions(object):
@@ -1667,6 +1671,10 @@ class APIAdapter(object):
       cluster.networkConfig.serviceExternalIpsConfig = self.messages.ServiceExternalIPsConfig(
           enabled=options.enable_service_externalips)
 
+    if options.enable_identity_service:
+      cluster.identityServiceConfig = self.messages.IdentityServiceConfig(
+          enabled=options.enable_identity_service)
+
     return cluster
 
   def ParseNodeConfig(self, options):
@@ -2558,6 +2566,11 @@ class APIAdapter(object):
       update = self.messages.ClusterUpdate(
           desiredServiceExternalIpsConfig=self.messages
           .ServiceExternalIPsConfig(enabled=options.enable_service_externalips))
+
+    if options.enable_identity_service is not None:
+      update = self.messages.ClusterUpdate(
+          desiredIdentityServiceConfig=self.messages.IdentityServiceConfig(
+              enabled=options.enable_identity_service))
 
     return update
 
@@ -3916,6 +3929,14 @@ class V1Beta1Adapter(V1Adapter):
       cluster.ipAllocationPolicy.podCidrOverprovisionConfig = self.messages.PodCIDROverprovisionConfig(
           disable=options.disable_pod_cidr_overprovision)
 
+    if options.stack_type is not None:
+      cluster.ipAllocationPolicy.stackType = util.GetStackTypeMapper(
+          self.messages, hidden=False).GetEnumForChoice(options.stack_type)
+    if options.ipv6_access_type is not None:
+      cluster.ipAllocationPolicy.ipv6AccessType = util.GetIpv6AccessTypeMapper(
+          self.messages, hidden=False).GetEnumForChoice(
+              options.ipv6_access_type)
+
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
@@ -4427,6 +4448,15 @@ class V1Alpha1Adapter(V1Beta1Adapter):
     if options.disable_pod_cidr_overprovision is not None:
       cluster.ipAllocationPolicy.podCidrOverprovisionConfig = self.messages.PodCIDROverprovisionConfig(
           disable=options.disable_pod_cidr_overprovision)
+
+    if options.stack_type is not None:
+      cluster.ipAllocationPolicy.stackType = util.GetStackTypeMapper(
+          self.messages, hidden=False).GetEnumForChoice(options.stack_type)
+
+    if options.ipv6_access_type is not None:
+      cluster.ipAllocationPolicy.ipv6AccessType = util.GetIpv6AccessTypeMapper(
+          self.messages, hidden=False).GetEnumForChoice(
+              options.ipv6_access_type)
 
     cluster.master = _GetMasterForClusterCreate(options, self.messages)
 

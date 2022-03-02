@@ -56,11 +56,43 @@ _SOURCE_DISK_DETAILED_HELP = """\
 """
 
 _SOURCE_DISK_ZONE_EXPLANATION = """\
-      Zone of the source disk, this argument is not required if target disk is in same zone of source disk.
+      Zone of the source disk. This argument is not required if the target disk
+      is in the same zone as the source disk.
 """
 
 _SOURCE_DISK_REGION_EXPLANATION = """\
-      Region of the source disk, this argument is not required if target disk is in same region of source disk.
+      Region of the source disk. This argument is not required if the target
+      disk is in the same region as the source disk.
+"""
+
+_ASYNC_PRIMARY_DISK_HELP = """\
+      Primary disk for asynchronous replication. This flag is required when
+      creating a secondary disk.
+"""
+
+_ASYNC_PRIMARY_DISK_ZONE_EXPLANATION = """\
+      Zone of the primary disk for asynchronous replication. The primary and
+      secondary disks must not be in the same region.
+"""
+
+_ASYNC_PRIMARY_DISK_REGION_EXPLANATION = """\
+      Region of the primary disk for asynchronous replication. The primary and
+      secondary disks must not be in the same region.
+"""
+
+_ASYNC_SECONDARY_DISK_HELP = """\
+      Secondary disk for asynchronous replication. This flag is required when
+      starting replication. It is also required when stopping replication on the
+      primary disk. It must not be used when stopping replication on the
+      secondary disk.
+"""
+
+_ASYNC_SECONDARY_DISK_ZONE_EXPLANATION = """\
+      Zone of the secondary disk for asynchronous replication.
+"""
+
+_ASYNC_SECONDARY_DISK_REGION_EXPLANATION = """\
+      Region of the secondary disk for asynchronous replication.
 """
 
 DEFAULT_LIST_FORMAT = """\
@@ -143,13 +175,8 @@ def AddProvisionedIopsFlag(parser, arg_parsers, constants):
               default=constants.DEFAULT_PROVISIONED_IOPS))
 
 
-def AddArchitectureFlag(parser, messages):
-  architecture_enum_type = messages.Disk.ArchitectureValueValuesEnum
-  excluded_enums = [
-      'ARCHITECTURE_UNSPECIFIED',
-  ]
-  architecture_choices = sorted(
-      [e for e in architecture_enum_type.names() if e not in excluded_enums])
+def AddArchitectureFlag(parser):
+  architecture_choices = sorted(['ARM64', 'X86_64'])
   return parser.add_argument(
       '--architecture',
       choices=architecture_choices,
@@ -201,3 +228,32 @@ SOURCE_DISK_ARG = compute_flags.ResourceArgument(
     required=False,
     zone_help_text=_SOURCE_DISK_ZONE_EXPLANATION,
     region_help_text=_SOURCE_DISK_REGION_EXPLANATION)
+
+ASYNC_PRIMARY_DISK_ARG = compute_flags.ResourceArgument(
+    resource_name='async primary disk',
+    name='--primary-disk',
+    completer=compute_completers.DisksCompleter,
+    zonal_collection='compute.disks',
+    regional_collection='compute.regionDisks',
+    short_help='Primary disk for asynchronous replication. This option creates'
+    ' a secondary disk for a given primary disk.',
+    detailed_help=_ASYNC_PRIMARY_DISK_HELP,
+    plural=False,
+    required=False,
+    use_existing_default_scope=False,
+    zone_help_text=_ASYNC_PRIMARY_DISK_ZONE_EXPLANATION,
+    region_help_text=_ASYNC_PRIMARY_DISK_REGION_EXPLANATION)
+
+ASYNC_SECONDARY_DISK_ARG = compute_flags.ResourceArgument(
+    resource_name='async secondary disk',
+    name='--secondary-disk',
+    completer=compute_completers.DisksCompleter,
+    zonal_collection='compute.disks',
+    regional_collection='compute.regionDisks',
+    short_help='Secondary disk for asynchronous replication.',
+    detailed_help=_ASYNC_SECONDARY_DISK_HELP,
+    plural=False,
+    required=False,
+    use_existing_default_scope=False,
+    zone_help_text=_ASYNC_SECONDARY_DISK_ZONE_EXPLANATION,
+    region_help_text=_ASYNC_SECONDARY_DISK_REGION_EXPLANATION)

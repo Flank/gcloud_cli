@@ -3086,6 +3086,140 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
+class PolicyControllerHubConfig(_messages.Message):
+  r"""Configuration for Policy Controller
+
+  Enums:
+    InstallSpecValueValuesEnum: The install_spec represents the intended state
+      specified by the latest request that mutated install_spec in the feature
+      spec, not the lifecycle state of the feature observed by the Hub feature
+      controller that is reported in the feature state.
+
+  Fields:
+    auditIntervalSeconds: Sets the interval for Policy Controller Audit Scans
+      (in seconds). When set to 0, this disables audit functionality
+      altogether.
+    exemptableNamespaces: The set of namespaces that are excluded from Policy
+      Controller checks. Namespaces do not need to currently exist on the
+      cluster.
+    installSpec: The install_spec represents the intended state specified by
+      the latest request that mutated install_spec in the feature spec, not
+      the lifecycle state of the feature observed by the Hub feature
+      controller that is reported in the feature state.
+    logDeniesEnabled: Logs all denies and dry run failures.
+    mutationEnabled: Enables the ability to mutate resources using Policy
+      Controller.
+    referentialRulesEnabled: Enables the ability to use Constraint Templates
+      that reference to objects other than the object currently being
+      evaluated.
+    templateLibraryConfig: Configures the library templates to install along
+      with Policy Controller.
+  """
+
+  class InstallSpecValueValuesEnum(_messages.Enum):
+    r"""The install_spec represents the intended state specified by the latest
+    request that mutated install_spec in the feature spec, not the lifecycle
+    state of the feature observed by the Hub feature controller that is
+    reported in the feature state.
+
+    Values:
+      INSTALL_SPEC_UNSPECIFIED: Spec is unknown.
+      INSTALL_SPEC_NOT_INSTALLED: Request to uninstall Policy Controller.
+      INSTALL_SPEC_ENABLED: Request to install and enable Policy Controller.
+      INSTALL_SPEC_DISABLED: Request to disable Policy Controller. If Policy
+        Controller is not installed, it will be installed but disabled.
+    """
+    INSTALL_SPEC_UNSPECIFIED = 0
+    INSTALL_SPEC_NOT_INSTALLED = 1
+    INSTALL_SPEC_ENABLED = 2
+    INSTALL_SPEC_DISABLED = 3
+
+  auditIntervalSeconds = _messages.IntegerField(1)
+  exemptableNamespaces = _messages.StringField(2, repeated=True)
+  installSpec = _messages.EnumField('InstallSpecValueValuesEnum', 3)
+  logDeniesEnabled = _messages.BooleanField(4)
+  mutationEnabled = _messages.BooleanField(5)
+  referentialRulesEnabled = _messages.BooleanField(6)
+  templateLibraryConfig = _messages.MessageField('PolicyControllerTemplateLibraryConfig', 7)
+
+
+class PolicyControllerHubState(_messages.Message):
+  r"""State of the Policy Controller.
+
+  Messages:
+    DeploymentStatesValue: Map from deployment name to deployment state.
+      Example deployments are gatekeeper-controller-manager, gatekeeper-audit
+      deployment, and gatekeeper-mutation.
+
+  Fields:
+    deploymentStates: Map from deployment name to deployment state. Example
+      deployments are gatekeeper-controller-manager, gatekeeper-audit
+      deployment, and gatekeeper-mutation.
+    version: The version of Gatekeeper Policy Controller deployed.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class DeploymentStatesValue(_messages.Message):
+    r"""Map from deployment name to deployment state. Example deployments are
+    gatekeeper-controller-manager, gatekeeper-audit deployment, and
+    gatekeeper-mutation.
+
+    Messages:
+      AdditionalProperty: An additional property for a DeploymentStatesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        DeploymentStatesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a DeploymentStatesValue object.
+
+      Enums:
+        ValueValueValuesEnum:
+
+      Fields:
+        key: Name of the additional property.
+        value: A ValueValueValuesEnum attribute.
+      """
+
+      class ValueValueValuesEnum(_messages.Enum):
+        r"""ValueValueValuesEnum enum type.
+
+        Values:
+          DEPLOYMENT_STATE_UNSPECIFIED: Deployment's state cannot be
+            determined
+          DEPLOYMENT_STATE_NOT_INSTALLED: Deployment is not installed
+          DEPLOYMENT_STATE_INSTALLED: Deployment is installed
+          DEPLOYMENT_STATE_ERROR: Deployment was attempted to be installed,
+            but has errors
+        """
+        DEPLOYMENT_STATE_UNSPECIFIED = 0
+        DEPLOYMENT_STATE_NOT_INSTALLED = 1
+        DEPLOYMENT_STATE_INSTALLED = 2
+        DEPLOYMENT_STATE_ERROR = 3
+
+      key = _messages.StringField(1)
+      value = _messages.EnumField('ValueValueValuesEnum', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  deploymentStates = _messages.MessageField('DeploymentStatesValue', 1)
+  version = _messages.MessageField('PolicyControllerHubVersion', 2)
+
+
+class PolicyControllerHubVersion(_messages.Message):
+  r"""The build version of Gatekeeper that Policy Controller is using.
+
+  Fields:
+    version: The gatekeeper image tag that is composed of ACM version, git
+      tag, build number.
+  """
+
+  version = _messages.StringField(1)
+
+
 class PolicyControllerMembershipSpec(_messages.Message):
   r"""**Policy Controller**: Configuration for a single cluster. Intended to
   parallel the PolicyController CR.
@@ -3096,7 +3230,7 @@ class PolicyControllerMembershipSpec(_messages.Message):
     version: Version of Policy Controller installed.
   """
 
-  policyControllerHubConfig = _messages.MessageField('PolicyControllerPolicyControllerHubConfig', 1)
+  policyControllerHubConfig = _messages.MessageField('PolicyControllerHubConfig', 1)
   version = _messages.StringField(2)
 
 
@@ -3169,142 +3303,8 @@ class PolicyControllerMembershipState(_messages.Message):
 
   clusterName = _messages.StringField(1)
   membershipSpec = _messages.MessageField('PolicyControllerMembershipSpec', 2)
-  policyControllerHubState = _messages.MessageField('PolicyControllerPolicyControllerHubState', 3)
+  policyControllerHubState = _messages.MessageField('PolicyControllerHubState', 3)
   state = _messages.EnumField('StateValueValuesEnum', 4)
-
-
-class PolicyControllerPolicyControllerHubConfig(_messages.Message):
-  r"""Configuration for Policy Controller
-
-  Enums:
-    InstallSpecValueValuesEnum: The install_spec represents the intended state
-      specified by the latest request that mutated install_spec in the feature
-      spec, not the lifecycle state of the feature observed by the Hub feature
-      controller that is reported in the feature state.
-
-  Fields:
-    auditIntervalSeconds: Sets the interval for Policy Controller Audit Scans
-      (in seconds). When set to 0, this disables audit functionality
-      altogether.
-    exemptableNamespaces: The set of namespaces that are excluded from Policy
-      Controller checks. Namespaces do not need to currently exist on the
-      cluster.
-    installSpec: The install_spec represents the intended state specified by
-      the latest request that mutated install_spec in the feature spec, not
-      the lifecycle state of the feature observed by the Hub feature
-      controller that is reported in the feature state.
-    logDeniesEnabled: Logs all denies and dry run failures.
-    mutationEnabled: Enables the ability to mutate resources using Policy
-      Controller.
-    referentialRulesEnabled: Enables the ability to use Constraint Templates
-      that reference to objects other than the object currently being
-      evaluated.
-    templateLibraryConfig: Configures the library templates to install along
-      with Policy Controller.
-  """
-
-  class InstallSpecValueValuesEnum(_messages.Enum):
-    r"""The install_spec represents the intended state specified by the latest
-    request that mutated install_spec in the feature spec, not the lifecycle
-    state of the feature observed by the Hub feature controller that is
-    reported in the feature state.
-
-    Values:
-      INSTALL_SPEC_UNSPECIFIED: Spec is unknown.
-      INSTALL_SPEC_NOT_INSTALLED: Request to uninstall Policy Controller.
-      INSTALL_SPEC_ENABLED: Request to install and enable Policy Controller.
-      INSTALL_SPEC_DISABLED: Request to disable Policy Controller. If Policy
-        Controller is not installed, it will be installed but disabled.
-    """
-    INSTALL_SPEC_UNSPECIFIED = 0
-    INSTALL_SPEC_NOT_INSTALLED = 1
-    INSTALL_SPEC_ENABLED = 2
-    INSTALL_SPEC_DISABLED = 3
-
-  auditIntervalSeconds = _messages.IntegerField(1)
-  exemptableNamespaces = _messages.StringField(2, repeated=True)
-  installSpec = _messages.EnumField('InstallSpecValueValuesEnum', 3)
-  logDeniesEnabled = _messages.BooleanField(4)
-  mutationEnabled = _messages.BooleanField(5)
-  referentialRulesEnabled = _messages.BooleanField(6)
-  templateLibraryConfig = _messages.MessageField('PolicyControllerTemplateLibraryConfig', 7)
-
-
-class PolicyControllerPolicyControllerHubState(_messages.Message):
-  r"""State of the Policy Controller.
-
-  Messages:
-    DeploymentStatesValue: Map from deployment name to deployment state.
-      Example deployments are gatekeeper-controller-manager, gatekeeper-audit
-      deployment, and gatekeeper-mutation.
-
-  Fields:
-    deploymentStates: Map from deployment name to deployment state. Example
-      deployments are gatekeeper-controller-manager, gatekeeper-audit
-      deployment, and gatekeeper-mutation.
-    version: The version of Gatekeeper Policy Controller deployed.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class DeploymentStatesValue(_messages.Message):
-    r"""Map from deployment name to deployment state. Example deployments are
-    gatekeeper-controller-manager, gatekeeper-audit deployment, and
-    gatekeeper-mutation.
-
-    Messages:
-      AdditionalProperty: An additional property for a DeploymentStatesValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type
-        DeploymentStatesValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a DeploymentStatesValue object.
-
-      Enums:
-        ValueValueValuesEnum:
-
-      Fields:
-        key: Name of the additional property.
-        value: A ValueValueValuesEnum attribute.
-      """
-
-      class ValueValueValuesEnum(_messages.Enum):
-        r"""ValueValueValuesEnum enum type.
-
-        Values:
-          DEPLOYMENT_STATE_UNSPECIFIED: Deployment's state cannot be
-            determined
-          DEPLOYMENT_STATE_NOT_INSTALLED: Deployment is not installed
-          DEPLOYMENT_STATE_INSTALLED: Deployment is installed
-          DEPLOYMENT_STATE_ERROR: Deployment was attempted to be installed,
-            but has errors
-        """
-        DEPLOYMENT_STATE_UNSPECIFIED = 0
-        DEPLOYMENT_STATE_NOT_INSTALLED = 1
-        DEPLOYMENT_STATE_INSTALLED = 2
-        DEPLOYMENT_STATE_ERROR = 3
-
-      key = _messages.StringField(1)
-      value = _messages.EnumField('ValueValueValuesEnum', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  deploymentStates = _messages.MessageField('DeploymentStatesValue', 1)
-  version = _messages.MessageField('PolicyControllerPolicyControllerHubVersion', 2)
-
-
-class PolicyControllerPolicyControllerHubVersion(_messages.Message):
-  r"""The build version of Gatekeeper that Policy Controller is using.
-
-  Fields:
-    version: The gatekeeper image tag that is composed of ACM version, git
-      tag, build number.
-  """
-
-  version = _messages.StringField(1)
 
 
 class PolicyControllerTemplateLibraryConfig(_messages.Message):
@@ -3469,6 +3469,8 @@ class ServiceMeshControlPlaneManagement(_messages.Message):
       NEEDS_ATTENTION: NEEDS_ATTENTION means that the component is ready, but
         some user intervention is required. (For example that the user should
         migrate workloads to a new control plane revision.)
+      DEGRADED: DEGRADED means that the component is ready, but operating in a
+        degraded state.
     """
     LIFECYCLE_STATE_UNSPECIFIED = 0
     DISABLED = 1
@@ -3477,6 +3479,7 @@ class ServiceMeshControlPlaneManagement(_messages.Message):
     ACTIVE = 4
     STALLED = 5
     NEEDS_ATTENTION = 6
+    DEGRADED = 7
 
   details = _messages.MessageField('ServiceMeshStatusDetails', 1, repeated=True)
   state = _messages.EnumField('StateValueValuesEnum', 2)
@@ -3540,6 +3543,8 @@ class ServiceMeshControlPlaneRevision(_messages.Message):
       NEEDS_ATTENTION: NEEDS_ATTENTION means that the component is ready, but
         some user intervention is required. (For example that the user should
         migrate workloads to a new control plane revision.)
+      DEGRADED: DEGRADED means that the component is ready, but operating in a
+        degraded state.
     """
     LIFECYCLE_STATE_UNSPECIFIED = 0
     DISABLED = 1
@@ -3548,6 +3553,7 @@ class ServiceMeshControlPlaneRevision(_messages.Message):
     ACTIVE = 4
     STALLED = 5
     NEEDS_ATTENTION = 6
+    DEGRADED = 7
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""Type of the control plane revision.
@@ -3574,6 +3580,47 @@ class ServiceMeshControlPlaneRevision(_messages.Message):
   version = _messages.StringField(7)
 
 
+class ServiceMeshDataPlaneManagement(_messages.Message):
+  r"""Status of data plane management. Only reported per-member.
+
+  Enums:
+    StateValueValuesEnum: Lifecycle status of data plane management.
+
+  Fields:
+    details: Explanation of the status.
+    state: Lifecycle status of data plane management.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Lifecycle status of data plane management.
+
+    Values:
+      LIFECYCLE_STATE_UNSPECIFIED: Unspecified
+      DISABLED: DISABLED means that the component is not enabled.
+      FAILED_PRECONDITION: FAILED_PRECONDITION means that provisioning cannot
+        proceed because of some characteristic of the member cluster.
+      PROVISIONING: PROVISIONING means that provisioning is in progress.
+      ACTIVE: ACTIVE means that the component is ready for use.
+      STALLED: STALLED means that provisioning could not be done.
+      NEEDS_ATTENTION: NEEDS_ATTENTION means that the component is ready, but
+        some user intervention is required. (For example that the user should
+        migrate workloads to a new control plane revision.)
+      DEGRADED: DEGRADED means that the component is ready, but operating in a
+        degraded state.
+    """
+    LIFECYCLE_STATE_UNSPECIFIED = 0
+    DISABLED = 1
+    FAILED_PRECONDITION = 2
+    PROVISIONING = 3
+    ACTIVE = 4
+    STALLED = 5
+    NEEDS_ATTENTION = 6
+    DEGRADED = 7
+
+  details = _messages.MessageField('ServiceMeshStatusDetails', 1, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
 class ServiceMeshFeatureState(_messages.Message):
   r"""**Service Mesh**: State for the whole Hub, as analyzed by the Service
   Mesh Hub Controller.
@@ -3591,9 +3638,13 @@ class ServiceMeshMembershipSpec(_messages.Message):
 
   Enums:
     ControlPlaneValueValuesEnum: Enables automatic control plane management.
+    DefaultChannelValueValuesEnum: Determines which release channel to use for
+      default injection and service mesh APIs.
 
   Fields:
     controlPlane: Enables automatic control plane management.
+    defaultChannel: Determines which release channel to use for default
+      injection and service mesh APIs.
   """
 
   class ControlPlaneValueValuesEnum(_messages.Enum):
@@ -3612,23 +3663,72 @@ class ServiceMeshMembershipSpec(_messages.Message):
     AUTOMATIC = 1
     MANUAL = 2
 
+  class DefaultChannelValueValuesEnum(_messages.Enum):
+    r"""Determines which release channel to use for default injection and
+    service mesh APIs.
+
+    Values:
+      CHANNEL_UNSPECIFIED: Unspecified
+      RAPID: RAPID channel is offered on an early access basis for customers
+        who want to test new releases.
+      REGULAR: REGULAR channel is intended for production users who want to
+        take advantage of new features.
+      STABLE: STABLE channel includes versions that are known to be stable and
+        reliable in production.
+    """
+    CHANNEL_UNSPECIFIED = 0
+    RAPID = 1
+    REGULAR = 2
+    STABLE = 3
+
   controlPlane = _messages.EnumField('ControlPlaneValueValuesEnum', 1)
+  defaultChannel = _messages.EnumField('DefaultChannelValueValuesEnum', 2)
 
 
 class ServiceMeshMembershipState(_messages.Message):
   r"""**Service Mesh**: State for a single Membership, as analyzed by the
   Service Mesh Hub Controller.
 
+  Enums:
+    DefaultChannelValueValuesEnum: Release channel to use for default
+      injection and service mesh APIs.
+
   Fields:
     analysisMessages: Output only. Results of running Service Mesh analyzers.
+    configApiVersion: The API version (i.e. Istio CRD version) for configuring
+      service mesh in this cluster. This version is influenced by the
+      `default_channel` field.
     controlPlaneManagement: Output only. Status of control plane management
     controlPlaneRevisions: Output only. State of all control plane revisions
       that are available in the cluster.
+    dataPlaneManagement: Output only. Status of data plane management.
+    defaultChannel: Release channel to use for default injection and service
+      mesh APIs.
   """
 
+  class DefaultChannelValueValuesEnum(_messages.Enum):
+    r"""Release channel to use for default injection and service mesh APIs.
+
+    Values:
+      CHANNEL_UNSPECIFIED: Unspecified
+      RAPID: RAPID channel is offered on an early access basis for customers
+        who want to test new releases.
+      REGULAR: REGULAR channel is intended for production users who want to
+        take advantage of new features.
+      STABLE: STABLE channel includes versions that are known to be stable and
+        reliable in production.
+    """
+    CHANNEL_UNSPECIFIED = 0
+    RAPID = 1
+    REGULAR = 2
+    STABLE = 3
+
   analysisMessages = _messages.MessageField('ServiceMeshAnalysisMessage', 1, repeated=True)
-  controlPlaneManagement = _messages.MessageField('ServiceMeshControlPlaneManagement', 2)
-  controlPlaneRevisions = _messages.MessageField('ServiceMeshControlPlaneRevision', 3, repeated=True)
+  configApiVersion = _messages.StringField(2)
+  controlPlaneManagement = _messages.MessageField('ServiceMeshControlPlaneManagement', 3)
+  controlPlaneRevisions = _messages.MessageField('ServiceMeshControlPlaneRevision', 4, repeated=True)
+  dataPlaneManagement = _messages.MessageField('ServiceMeshDataPlaneManagement', 5)
+  defaultChannel = _messages.EnumField('DefaultChannelValueValuesEnum', 6)
 
 
 class ServiceMeshStatusDetails(_messages.Message):

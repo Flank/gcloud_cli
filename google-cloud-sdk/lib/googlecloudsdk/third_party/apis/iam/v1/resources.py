@@ -70,6 +70,17 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  LOCATIONS_WORKFORCEPOOLS_PROVIDERS_KEYS = (
+      'locations.workforcePools.providers.keys',
+      '{+name}',
+      {
+          '':
+              'locations/{locationsId}/workforcePools/{workforcePoolsId}/'
+              'providers/{providersId}/keys/{keysId}',
+      },
+      ['name'],
+      True
+  )
   LOCATIONS_WORKFORCEPOOLS_PROVIDERS_OPERATIONS = (
       'locations.workforcePools.providers.operations',
       '{+name}',
@@ -87,6 +98,17 @@ class Collections(enum.Enum):
       '{subjectsId}',
       {},
       ['locationsId', 'workforcePoolsId', 'subjectsId'],
+      True
+  )
+  LOCATIONS_WORKFORCEPOOLS_SUBJECTS_OPERATIONS = (
+      'locations.workforcePools.subjects.operations',
+      '{+name}',
+      {
+          '':
+              'locations/{locationsId}/workforcePools/{workforcePoolsId}/'
+              'subjects/{subjectsId}/operations/{operationsId}',
+      },
+      ['name'],
       True
   )
   ORGANIZATIONS = (
@@ -151,6 +173,30 @@ class Collections(enum.Enum):
               'projects/{projectsId}/locations/{locationsId}/'
               'workloadIdentityPools/{workloadIdentityPoolsId}/providers/'
               '{providersId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_WORKLOADIDENTITYPOOLS_PROVIDERS_KEYS = (
+      'projects.locations.workloadIdentityPools.providers.keys',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'workloadIdentityPools/{workloadIdentityPoolsId}/providers/'
+              '{providersId}/keys/{keysId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_WORKLOADIDENTITYPOOLS_PROVIDERS_KEYS_OPERATIONS = (
+      'projects.locations.workloadIdentityPools.providers.keys.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'workloadIdentityPools/{workloadIdentityPoolsId}/providers/'
+              '{providersId}/keys/{keysId}/operations/{operationsId}',
       },
       ['name'],
       True

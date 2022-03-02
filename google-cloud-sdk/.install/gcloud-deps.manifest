@@ -3764,7 +3764,6 @@ lib/third_party/requests/_internal_utils.py
 lib/third_party/requests/adapters.py
 lib/third_party/requests/api.py
 lib/third_party/requests/auth.py
-lib/third_party/requests/cacert.pem
 lib/third_party/requests/certs.py
 lib/third_party/requests/compat.py
 lib/third_party/requests/cookies.py
@@ -3772,7 +3771,6 @@ lib/third_party/requests/exceptions.py
 lib/third_party/requests/help.py
 lib/third_party/requests/hooks.py
 lib/third_party/requests/models.py
-lib/third_party/requests/old_certs.py
 lib/third_party/requests/packages/__init__.py
 lib/third_party/requests/sessions.py
 lib/third_party/requests/status_codes.py

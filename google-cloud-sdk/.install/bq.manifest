@@ -18,7 +18,6 @@ platform/bq/table_formatter.py
 platform/bq/table_formatter_test.py
 platform/bq/third_party/absl/__init__.py
 platform/bq/third_party/absl/_collections_abc.py
-platform/bq/third_party/absl/_enum_module.py
 platform/bq/third_party/absl/app.py
 platform/bq/third_party/absl/app.pyi
 platform/bq/third_party/absl/command_name.py
