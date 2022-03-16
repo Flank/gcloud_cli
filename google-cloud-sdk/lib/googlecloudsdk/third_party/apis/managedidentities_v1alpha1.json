@@ -879,10 +879,6 @@
           "description": "Description for Schema Change.",
           "type": "string"
         },
-        "ldif": {
-          "description": "Deprecated. Please use ldif_source field. LDIF File Resource name for Schema Extensions. Represented in the form of projects\/{project_id}\/buckets\/{bucket_name}\/objects\/{object_name}",
-          "type": "string"
-        },
         "createTime": {
           "description": "Output only. The time the schema extension was created.",
           "readOnly": true,
@@ -1341,10 +1337,10 @@
           "type": "string"
         },
         "notificationParameters": {
-          "description": "Optional. notification_parameters are information that service producers may like to include that is not relevant to Rollout. This parameter will only be passed to Gamma and Cloud Logging for notification\/logging purpose.",
+          "description": "Optional. notification_parameter are information that service producers may like to include that is not relevant to Rollout. This parameter will only be passed to Gamma and Cloud Logging for notification\/logging purpose.",
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "$ref": "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter"
           }
         }
       }
@@ -1701,7 +1697,7 @@
     },
     "Date": {
       "id": "Date",
-      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values * A month and day, with a zero year (e.g., an anniversary) * A year on its own, with a zero month and a zero day * A year and month, with a zero day (e.g., a credit card expiration date) Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
+      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
       "type": "object",
       "properties": {
         "year": {
@@ -1718,6 +1714,20 @@
           "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter": {
+      "id": "GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter",
+      "description": "Contains notification related data.",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Optional. Array of string values. e.g. instance's replica information.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
@@ -2812,6 +2822,31 @@
                             "https://www.googleapis.com/auth/cloud-platform"
                           ],
                           "description": "Lists Schema Extensions history for a given domain."
+                        },
+                        "get": {
+                          "id": "managedidentities.projects.locations.global.domains.schemaExtensions.get",
+                          "path": "v1alpha1/{+name}",
+                          "flatPath": "v1alpha1/projects/{projectsId}/locations/global/domains/{domainsId}/schemaExtensions/{schemaExtensionsId}",
+                          "httpMethod": "GET",
+                          "parameters": {
+                            "name": {
+                              "description": "Required. Managed AD Schema Extension resource name using the form: `projects\/{project_id}\/locations\/global\/domains\/{domain_name}\/schemaExtensions\/{schema_extension_id}`",
+                              "pattern": "^projects\/[^\/]+\/locations\/global\/domains\/[^\/]+\/schemaExtensions\/[^\/]+$",
+                              "location": "path",
+                              "required": true,
+                              "type": "string"
+                            }
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "SchemaExtension"
+                          },
+                          "scopes": [
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "description": "Gets details of a single SchemaExtension."
                         }
                       }
                     }

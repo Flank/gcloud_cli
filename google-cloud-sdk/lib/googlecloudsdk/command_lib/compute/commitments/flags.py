@@ -93,6 +93,11 @@ def TranslateResourcesArgGroup(messages, args):
   return resources
 
 
+def TranslateMergeArg(arg):
+  """List arguments are delineated by a comma."""
+  return arg.split(',') if arg else []
+
+
 def MakeCommitmentArg(plural):
   return compute_flags.ResourceArgument(
       resource_name='commitment',
@@ -141,6 +146,20 @@ def AddLicenceBasedFlags(parser):
   parser.add_argument('--amount', required=True, type=int,
                       help='Number of licenses purchased.')
   AddPlan(parser)
+
+
+def AddSplitSourceCommitment(parser):
+  return parser.add_argument(
+      '--split-source-commitment',
+      required=False,
+      help='Split the resources of previous commitment into a new commitment.')
+
+
+def AddMergeSourceCommitments(parser):
+  return parser.add_argument(
+      '--merge-source-commitments',
+      required=False,
+      help='Merge the resources of two or more commitments into one new commitment.')  #  pylint:disable=line-too-long
 
 
 def AddResourcesArgGroup(parser):

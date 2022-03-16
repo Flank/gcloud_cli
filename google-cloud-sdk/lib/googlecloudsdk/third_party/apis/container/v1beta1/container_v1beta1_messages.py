@@ -27,6 +27,7 @@ class AcceleratorConfig(_messages.Message):
       are described in the NVIDIA [mig user
       guide](https://docs.nvidia.com/datacenter/tesla/mig-user-
       guide/#partitioning).
+    gpuSharingConfig: The configuration for GPU sharing options.
     maxTimeSharedClientsPerGpu: The number of time-shared GPU resources to
       expose for each physical GPU.
   """
@@ -34,7 +35,8 @@ class AcceleratorConfig(_messages.Message):
   acceleratorCount = _messages.IntegerField(1)
   acceleratorType = _messages.StringField(2)
   gpuPartitionSize = _messages.StringField(3)
-  maxTimeSharedClientsPerGpu = _messages.IntegerField(4)
+  gpuSharingConfig = _messages.MessageField('GPUSharingConfig', 4)
+  maxTimeSharedClientsPerGpu = _messages.IntegerField(5)
 
 
 class AddonsConfig(_messages.Message):
@@ -1809,10 +1811,11 @@ class Date(_messages.Message):
   time of day and time zone are either specified elsewhere or are
   insignificant. The date is relative to the Gregorian Calendar. This can
   represent one of the following: * A full date, with non-zero year, month,
-  and day values * A month and day, with a zero year (e.g., an anniversary) *
-  A year on its own, with a zero month and a zero day * A year and month, with
-  a zero day (e.g., a credit card expiration date) Related types: *
-  google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
+  and day values. * A month and day, with a zero year (for example, an
+  anniversary). * A year on its own, with a zero month and a zero day. * A
+  year and month, with a zero day (for example, a credit card expiration
+  date). Related types: * google.type.TimeOfDay * google.type.DateTime *
+  google.protobuf.Timestamp
 
   Fields:
     day: Day of a month. Must be from 1 to 31 and valid for the year and
@@ -1901,6 +1904,37 @@ class Filter(_messages.Message):
     SECURITY_BULLETIN_EVENT = 3
 
   eventType = _messages.EnumField('EventTypeValueListEntryValuesEnum', 1, repeated=True)
+
+
+class GPUSharingConfig(_messages.Message):
+  r"""GPUSharingConfig represents the GPU sharing configuration for Hardware
+  Accelerators.
+
+  Enums:
+    GpuSharingStrategyValueValuesEnum: The type of GPU sharing strategy to
+      enable on the GPU node.
+
+  Fields:
+    gpuSharingStrategy: The type of GPU sharing strategy to enable on the GPU
+      node.
+    maxSharedClientsPerGpu: The max number of containers that can share a
+      physical GPU.
+  """
+
+  class GpuSharingStrategyValueValuesEnum(_messages.Enum):
+    r"""The type of GPU sharing strategy to enable on the GPU node.
+
+    Values:
+      GPU_SHARING_STRATEGY_UNSPECIFIED: Default value.
+      TIME_SHARING: GPUs are time-shared between containers.
+      MPS: GPUs are shared between containers with NVIDIA MPS.
+    """
+    GPU_SHARING_STRATEGY_UNSPECIFIED = 0
+    TIME_SHARING = 1
+    MPS = 2
+
+  gpuSharingStrategy = _messages.EnumField('GpuSharingStrategyValueValuesEnum', 1)
+  maxSharedClientsPerGpu = _messages.IntegerField(2)
 
 
 class GcePersistentDiskCsiDriverConfig(_messages.Message):
@@ -2820,7 +2854,7 @@ class MonitoringComponentConfig(_messages.Message):
     Values:
       COMPONENT_UNSPECIFIED: Default value. This shouldn't be used.
       SYSTEM_COMPONENTS: system components
-      WORKLOADS: workloads
+      WORKLOADS: Deprecated: Use Google Cloud Managed Service for Prometheus.
       APISERVER: kube-apiserver
       SCHEDULER: kube-scheduler
       CONTROLLER_MANAGER: kube-controller-manager
@@ -3038,7 +3072,9 @@ class NetworkTags(_messages.Message):
 
 
 class NodeConfig(_messages.Message):
-  r"""Parameters that describe the nodes in a cluster.
+  r"""Parameters that describe the nodes in a cluster. *Note:* GKE Autopilot
+  clusters do not recognize parameters in `NodeConfig`. Use
+  AutoprovisioningNodePoolDefaults instead.
 
   Messages:
     LabelsValue: The map of Kubernetes labels (key/value pairs) to be applied
@@ -3584,9 +3620,14 @@ class NodePoolAutoscaling(_messages.Message):
   r"""NodePoolAutoscaling contains information required by cluster autoscaler
   to adjust the size of the node pool to the current cluster usage.
 
+  Enums:
+    LocationPolicyValueValuesEnum: Location policy used when scaling up a
+      nodepool.
+
   Fields:
     autoprovisioned: Can this node pool be deleted automatically.
     enabled: Is autoscaling enabled for this node pool.
+    locationPolicy: Location policy used when scaling up a nodepool.
     maxNodeCount: Maximum number of nodes for one location in the NodePool.
       Must be >= min_node_count. There has to be enough quota to scale up the
       cluster.
@@ -3594,10 +3635,24 @@ class NodePoolAutoscaling(_messages.Message):
       Must be >= 1 and <= max_node_count.
   """
 
+  class LocationPolicyValueValuesEnum(_messages.Enum):
+    r"""Location policy used when scaling up a nodepool.
+
+    Values:
+      LOCATION_POLICY_UNSPECIFIED: Not set.
+      BALANCED: BALANCED is a best effort policy that aims to balance the
+        sizes of different zones.
+      ANY: ANY policy picks zones that have the highest capacity available.
+    """
+    LOCATION_POLICY_UNSPECIFIED = 0
+    BALANCED = 1
+    ANY = 2
+
   autoprovisioned = _messages.BooleanField(1)
   enabled = _messages.BooleanField(2)
-  maxNodeCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  minNodeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  locationPolicy = _messages.EnumField('LocationPolicyValueValuesEnum', 3)
+  maxNodeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  minNodeCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class NodePoolDefaults(_messages.Message):

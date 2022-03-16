@@ -2584,6 +2584,8 @@ class GooglePrivacyDlpV2ByteContentItem(_messages.Message):
       TEXT_UTF8: plain text
       WORD_DOCUMENT: docx, docm, dotx, dotm
       PDF: pdf
+      POWERPOINT_DOCUMENT: powerpoint
+      EXCEL_DOCUMENT: excel
       AVRO: avro
       CSV: csv
       TSV: tsv
@@ -2597,9 +2599,11 @@ class GooglePrivacyDlpV2ByteContentItem(_messages.Message):
     TEXT_UTF8 = 6
     WORD_DOCUMENT = 7
     PDF = 8
-    AVRO = 9
-    CSV = 10
-    TSV = 11
+    POWERPOINT_DOCUMENT = 9
+    EXCEL_DOCUMENT = 10
+    AVRO = 11
+    CSV = 12
+    TSV = 13
 
   data = _messages.BytesField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -2796,6 +2800,10 @@ class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
       AVRO: Included file extensions: avro
       CSV: Included file extensions: csv
       TSV: Included file extensions: tsv
+      POWERPOINT: Powerpoint files >30 MB will be scanned as binary files.
+        Included file extensions: pptx, pptm, potx, potm, pot
+      EXCEL: Excel files >30 MB will be scanned as binary files. Included file
+        extensions: xlsx, xlsm, xltx, xltm
     """
     FILE_TYPE_UNSPECIFIED = 0
     BINARY_FILE = 1
@@ -2806,6 +2814,8 @@ class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
     AVRO = 6
     CSV = 7
     TSV = 8
+    POWERPOINT = 9
+    EXCEL = 10
 
   class SampleMethodValueValuesEnum(_messages.Enum):
     r"""SampleMethodValueValuesEnum enum type.
@@ -6522,10 +6532,11 @@ class GoogleTypeDate(_messages.Message):
   time of day and time zone are either specified elsewhere or are
   insignificant. The date is relative to the Gregorian Calendar. This can
   represent one of the following: * A full date, with non-zero year, month,
-  and day values * A month and day, with a zero year (e.g., an anniversary) *
-  A year on its own, with a zero month and a zero day * A year and month, with
-  a zero day (e.g., a credit card expiration date) Related types: *
-  google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
+  and day values. * A month and day, with a zero year (for example, an
+  anniversary). * A year on its own, with a zero month and a zero day. * A
+  year and month, with a zero day (for example, a credit card expiration
+  date). Related types: * google.type.TimeOfDay * google.type.DateTime *
+  google.protobuf.Timestamp
 
   Fields:
     day: Day of a month. Must be from 1 to 31 and valid for the year and

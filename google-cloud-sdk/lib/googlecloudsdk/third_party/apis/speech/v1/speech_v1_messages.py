@@ -31,7 +31,9 @@ class CreateCustomClassRequest(_messages.Message):
     customClass: Required. The custom class to create.
     customClassId: Required. The ID to use for the custom class, which will
       become the final component of the custom class' resource name. This
-      value should be 4-63 characters, and valid characters are /a-z-/.
+      value should restrict to letters, numbers, and hyphens, with the first
+      character a letter, the last a letter or a number, and be 4-63
+      characters.
   """
 
   customClass = _messages.MessageField('CustomClass', 1)
@@ -45,7 +47,8 @@ class CreatePhraseSetRequest(_messages.Message):
     phraseSet: Required. The phrase set to create.
     phraseSetId: Required. The ID to use for the phrase set, which will become
       the final component of the phrase set's resource name. This value should
-      be 4-63 characters, and valid characters are /a-z-/.
+      restrict to letters, numbers, and hyphens, with the first character a
+      letter, the last a letter or a number, and be 4-63 characters.
   """
 
   phraseSet = _messages.MessageField('PhraseSet', 1)
@@ -1009,7 +1012,10 @@ class SpeechRecognitionAlternative(_messages.Message):
       field is not guaranteed to be accurate and users should not rely on it
       to be always provided. The default of 0.0 is a sentinel value indicating
       `confidence` was not set.
-    transcript: Transcript text representing the words that the user spoke.
+    transcript: Transcript text representing the words that the user spoke. In
+      languages that use spaces to separate words, the transcript might have a
+      leading space if it isn't the first result. You can concatenate each
+      result to obtain the full transcript without using a separator.
     words: A list of word-specific information for each recognized word. Note:
       When `enable_speaker_diarization` is true, you will see all the words
       from the beginning of the audio.

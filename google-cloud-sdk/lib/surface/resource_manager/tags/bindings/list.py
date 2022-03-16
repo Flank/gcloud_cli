@@ -52,21 +52,37 @@ class List(base.ListCommand):
         parser, ("Region or zone of the resource for listing TagBindings. This "
                  "field should not be set if the resource is a global resource "
                  "like projects, folders and organizations."))
+    arguments.AddEffectiveArgToParser(parser, (
+        "Show all effective TagBindings on the resource. TagBindings applied at a higher level will be inherited to all descendants."
+    ))
 
   def Run(self, args):
     location = args.location if args.IsSpecified("location") else None
     resource_name = tag_utils.GetCanonicalResourceName(args.parent, location,
                                                        base.ReleaseTrack.GA)
 
+    show_effective = args.IsSpecified("effective")
     with endpoints.CrmEndpointOverrides(location):
-      service = tags.TagBindingsService()
       messages = tags.TagMessages()
-      list_req = messages.CloudresourcemanagerTagBindingsListRequest(
-          parent=resource_name)
 
-      return list_pager.YieldFromList(
-          service,
-          list_req,
-          batch_size_attribute="pageSize",
-          batch_size=args.page_size,
-          field="tagBindings")
+      if show_effective:
+        service = tags.EffectiveTagsService()
+        list_effective_req = messages.CloudresourcemanagerEffectiveTagsListRequest(
+            parent=resource_name)
+        return list_pager.YieldFromList(
+            service,
+            list_effective_req,
+            batch_size_attribute="pageSize",
+            batch_size=0,
+            field="effectiveTags")
+      else:
+        service = tags.TagBindingsService()
+        list_req = messages.CloudresourcemanagerTagBindingsListRequest(
+            parent=resource_name)
+
+        return list_pager.YieldFromList(
+            service,
+            list_req,
+            batch_size_attribute="pageSize",
+            batch_size=args.page_size,
+            field="tagBindings")

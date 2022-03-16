@@ -35,7 +35,7 @@ from googlecloudsdk.core import properties
 
 _CreateTargetArgs = collections.namedtuple('_TargetArgs', [
     'project', 'zone', 'instance', 'interface', 'port', 'region', 'network',
-    'host'
+    'host', 'dest_group'
 ])
 
 _ON_PREM_EXTRA_DESCRIPTION = """
@@ -51,6 +51,15 @@ To use the IP address or FQDN of your remote VM (eg, for on-prem), you must also
 specify the `--region` and `--network` flags:
 
   $ {command} 10.1.2.3 3389 --region=us-central1 --network=default
+"""
+
+_NUMPY_HELP_TEXT = """
+
+To increase the performance of the tunnel, consider installing NumPy. To install
+NumPy, see: https://numpy.org/install/.
+After installing NumPy, run the following command to allow gcloud to access
+external packages:
+  export CLOUDSDK_PYTHON_SITEPACKAGES=1
 """
 
 
@@ -152,10 +161,20 @@ If `LOCAL_PORT` is 0, an arbitrary unused local port is chosen."""
 
     if target.host:
       iap_tunnel_helper.ConfigureForHost(target.region, target.network,
-                                         target.host, target.port)
+                                         target.host, target.port,
+                                         target.dest_group)
     else:
       iap_tunnel_helper.ConfigureForInstance(target.zone, target.instance,
                                              target.interface, target.port)
+
+    # Check if user has numpy installed, show message asking them to install.
+    # Numpy will be used later inside the websocket library to speed up the
+    # transfer rate. Showing the message here before the process start looks
+    # better than showing when the actual import happen inside the websocket.
+    try:
+      import numpy  # pylint: disable=g-import-not-at-top, unused-import
+    except ImportError:
+      log.warning(_NUMPY_HELP_TEXT)
 
     iap_tunnel_helper.Run()
 
@@ -169,6 +188,7 @@ If `LOCAL_PORT` is 0, an arbitrary unused local port is chosen."""
           network=args.network,
           host=args.instance_name,
           port=args.instance_port,
+          dest_group=args.dest_group,
           zone=None,
           instance=None,
           interface=None)
@@ -190,7 +210,8 @@ If `LOCAL_PORT` is 0, an arbitrary unused local port is chosen."""
         port=args.instance_port,
         region=None,
         network=None,
-        host=None)
+        host=None,
+        dest_group=None)
 
   def _GetLocalHostPort(self, args):
     local_host_arg = args.local_host_port.host or 'localhost'

@@ -150,7 +150,7 @@
     },
     "SendDebugCaptureRequest": {
       "id": "SendDebugCaptureRequest",
-      "description": "Request to send encoded debug information.",
+      "description": "Request to send encoded debug information. Next ID: 8",
       "type": "object",
       "properties": {
         "workerId": {
@@ -164,6 +164,24 @@
         "data": {
           "description": "The encoded debug information.",
           "type": "string"
+        },
+        "dataFormat": {
+          "description": "Format for the data field above (id=5).",
+          "type": "string",
+          "enumDescriptions": [
+            "Format unspecified, parsing is determined based upon page type and legacy encoding. (go\/protodosdonts#do-include-an-unspecified-value-in-an-enum)",
+            "Raw HTML string.",
+            "JSON-encoded string.",
+            "Websafe encoded zlib-compressed string.",
+            "Websafe encoded brotli-compressed string."
+          ],
+          "enum": [
+            "DATA_FORMAT_UNSPECIFIED",
+            "RAW",
+            "JSON",
+            "ZLIB",
+            "BROTLI"
+          ]
         },
         "location": {
           "description": "The [regional endpoint] (https:\/\/cloud.google.com\/dataflow\/docs\/concepts\/regional-endpoints) that contains the job specified by job_id.",
@@ -1199,6 +1217,13 @@
         "environmentId": {
           "description": "Environment ID for the Beam runner API proto Environment that corresponds to the current SDK Harness.",
           "type": "string"
+        },
+        "capabilities": {
+          "description": "The set of capabilities enumerated in the above Environment proto. See also https:\/\/github.com\/apache\/beam\/blob\/master\/model\/pipeline\/src\/main\/proto\/beam_runner_api.proto",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -6629,6 +6654,11 @@
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
+                      "type": "string"
+                    },
+                    "deploymentId": {
+                      "description": "The ID to use for the Cloud Dataflow job deployment, which will become the final component of the deployment's resource name. This value should be 4-63 characters, and valid characters are \/a-z-\/.",
+                      "location": "query",
                       "type": "string"
                     },
                     "requestId": {

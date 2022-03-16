@@ -46,22 +46,22 @@ class Create(base.CreateCommand):
           Create a Dataproc on GKE Cluster in us-central1 on a GKE cluster in
           the same project and region with default values:
 
-            $ {command} my-cluster --region=us-central1 --gke-cluster=my-gke-cluster --image-version=spark-1.5.75
+            $ {command} my-cluster --region=us-central1 --gke-cluster=my-gke-cluster --spark-engine-version=2.4
 
           Create a Dataproc on GKE Cluster in us-central1 on a GKE cluster in
           the same project and zone us-central1-f with default values:
 
-            $ {command} my-cluster --region=us-central1 --gke-cluster=my-gke-cluster --gke-cluster-location=us-central1-f --image-version=spark-1.5.75
+            $ {command} my-cluster --region=us-central1 --gke-cluster=my-gke-cluster --gke-cluster-location=us-central1-f --spark-engine-version=3.1
 
           Create a Dataproc on GKE Cluster in us-central1 with machine type
           'e2-standard-4', autoscaling 0-10 Nodes per zone.
 
-            $ {command} my-cluster --region='us-central1' --gke-cluster='projects/my-project/locations/us-central1/clusters/my-gke-cluster' --image-version='spark-1.5.75' --pools='name=dp-default,roles=default,machineType=e2-standard-4,min=0,max=10'
+            $ {command} my-cluster --region='us-central1' --gke-cluster='projects/my-project/locations/us-central1/clusters/my-gke-cluster' --spark-engine-version=dataproc-1.5 --pools='name=dp-default,roles=default,machineType=e2-standard-4,min=0,max=10'
 
           Create a Dataproc on GKE Cluster in us-central1 with two distinct
           NodePools.
 
-            $ {command} my-cluster --region='us-central1' --gke-cluster='projects/my-project/locations/us-central1/clusters/my-gke-cluster' --image-version='spark-1.5.75' --pools='name=dp-default,roles=default,machineType=e2-standard-4' --pools='name=workers,roles=spark-drivers;spark-executors,machineType=n2-standard-8
+            $ {command} my-cluster --region='us-central1' --gke-cluster='projects/my-project/locations/us-central1/clusters/my-gke-cluster' --spark-engine-version='dataproc-2.0' --pools='name=dp-default,roles=default,machineType=e2-standard-4' --pools='name=workers,roles=spark-drivers;spark-executors,machineType=n2-standard-8
           """
   }
 
@@ -75,10 +75,11 @@ class Create(base.CreateCommand):
     flags.AddTimeoutFlag(parser, default='35m')
 
     parser.add_argument(
-        '--image-version',
-        metavar='VERSION',
+        '--spark-engine-version',
         required=True,
-        help='The image version to use for the cluster.')
+        help="""\
+        The version of the Spark engine to run on this cluster.
+        """)
 
     parser.add_argument(
         '--staging-bucket',
@@ -124,13 +125,18 @@ class Create(base.CreateCommand):
             manipulate IAM policies on the Google Service Accounts that will be
             used by your Dataproc on GKE cluster.
             """)
+    flags.AddMetastoreServiceResourceArg(parser)
+    flags.AddHistoryServerClusterResourceArg(parser)
 
   def Run(self, args):
     dataproc = dp.Dataproc(self.ReleaseTrack())
     cluster_ref = args.CONCEPTS.cluster.Parse()
     gke_cluster_ref = args.CONCEPTS.gke_cluster.Parse()
+    metastore_service_ref = args.CONCEPTS.metastore_service.Parse()
+    history_server_cluster_ref = args.CONCEPTS.history_server_cluster.Parse()
     virtual_cluster_config = Create._GetVirtualClusterConfig(
-        dataproc, gke_cluster_ref, args)
+        dataproc, gke_cluster_ref, args, metastore_service_ref,
+        history_server_cluster_ref)
 
     Create._VerifyGkeClusterIsWorkloadIdentityEnabled(gke_cluster_ref)
 
@@ -153,25 +159,32 @@ class Create(base.CreateCommand):
         action_on_failed_primary_workers=None)
 
   @staticmethod
-  def _GetVirtualClusterConfig(dataproc, gke_cluster_ref, args):
+  def _GetVirtualClusterConfig(dataproc, gke_cluster_ref, args,
+                               metastore_service_ref,
+                               history_server_cluster_ref):
     """Get dataproc virtual cluster configuration for GKE based clusters.
 
     Args:
       dataproc: Dataproc object that contains client, messages, and resources
       gke_cluster_ref: GKE cluster reference.
       args: Arguments parsed from argparse.ArgParser.
+      metastore_service_ref: Reference to a Dataproc Metastore Service.
+      history_server_cluster_ref: Reference to a Dataproc history cluster.
 
     Returns:
       virtual_cluster_config: Dataproc virtual cluster configuration
     """
 
-    software_config = dataproc.messages.SoftwareConfig(
-        imageVersion=args.image_version)
+    kubernetes_software_config = dataproc.messages.KubernetesSoftwareConfig(
+        componentVersion=encoding.DictToAdditionalPropertyMessage(
+            {'SPARK': args.spark_engine_version},
+            dataproc.messages.KubernetesSoftwareConfig.ComponentVersionValue,
+            sort_items=True))
 
     if args.properties:
-      software_config.properties = encoding.DictToAdditionalPropertyMessage(
+      kubernetes_software_config.properties = encoding.DictToAdditionalPropertyMessage(
           args.properties,
-          dataproc.messages.SoftwareConfig.PropertiesValue,
+          dataproc.messages.KubernetesSoftwareConfig.PropertiesValue,
           sort_items=True)
 
     pools = GkeNodePoolTargetsParser.Parse(dataproc,
@@ -182,13 +195,30 @@ class Create(base.CreateCommand):
         gkeClusterTarget=gke_cluster_ref.RelativeName(), nodePoolTarget=pools)
 
     kubernetes_cluster_config = dataproc.messages.KubernetesClusterConfig(
-        kubernetesNamespace=args.namespace, gkeClusterConfig=gke_cluster_config)
+        kubernetesNamespace=args.namespace,
+        gkeClusterConfig=gke_cluster_config,
+        kubernetesSoftwareConfig=kubernetes_software_config)
+
+    metastore_config = None
+    if metastore_service_ref:
+      metastore_config = dataproc.messages.MetastoreConfig(
+          dataprocMetastoreService=metastore_service_ref.RelativeName())
+    spark_history_server_config = None
+    if history_server_cluster_ref:
+      spark_history_server_config = dataproc.messages.SparkHistoryServerConfig(
+          dataprocCluster=history_server_cluster_ref.RelativeName())
+
+    auxiliary_services_config = None
+    if metastore_config or spark_history_server_config:
+      auxiliary_services_config = dataproc.messages.AuxiliaryServicesConfig(
+          metastoreConfig=metastore_config,
+          sparkHistoryServerConfig=spark_history_server_config)
 
     virtual_cluster_config = dataproc.messages.VirtualClusterConfig(
         stagingBucket=args.staging_bucket,
         tempBucket=args.temp_bucket,
-        softwareConfig=software_config,
-        kubernetesClusterConfig=kubernetes_cluster_config)
+        kubernetesClusterConfig=kubernetes_cluster_config,
+        auxiliaryServicesConfig=auxiliary_services_config)
 
     return virtual_cluster_config
 

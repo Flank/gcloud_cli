@@ -27,7 +27,7 @@ from googlecloudsdk.core.util import files
 DETAILED_HELP = {
     'DESCRIPTION':
         """
-          Add a Bare Metal Solution interactive serial console SSH key.
+          Add a public SSH key to the project for accessing the interactive serial console in Bare Metal Solution."
         """,
     'EXAMPLES':
         """
@@ -44,9 +44,10 @@ DETAILED_HELP = {
 }
 
 
+@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Add(base.CreateCommand):
-  """Add a Bare Metal Solution interactive serial console SSH key."""
+  """Add a public SSH key to the project for accessing the interactive serial console in Bare Metal Solution."""
 
   @staticmethod
   def Args(parser):

@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.resource_manager import tags
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
@@ -53,6 +54,10 @@ class List(base.ListCommand):
       tag_key = tag_utils.GetTagKeyFromNamespacedName(args.parent).name
 
     list_request = messages.CloudresourcemanagerTagValuesListRequest(
-        parent=tag_key)
-    response = service.List(list_request)
-    return response.tagValues
+        parent=tag_key, pageSize=args.page_size)
+    return list_pager.YieldFromList(
+        service,
+        list_request,
+        batch_size_attribute="pageSize",
+        batch_size=args.page_size,
+        field="tagValues")

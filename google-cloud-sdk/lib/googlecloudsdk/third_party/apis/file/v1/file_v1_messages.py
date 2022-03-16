@@ -156,10 +156,11 @@ class Date(_messages.Message):
   time of day and time zone are either specified elsewhere or are
   insignificant. The date is relative to the Gregorian Calendar. This can
   represent one of the following: * A full date, with non-zero year, month,
-  and day values * A month and day, with a zero year (e.g., an anniversary) *
-  A year on its own, with a zero month and a zero day * A year and month, with
-  a zero day (e.g., a credit card expiration date) Related types: *
-  google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
+  and day values. * A month and day, with a zero year (for example, an
+  anniversary). * A year on its own, with a zero month and a zero day. * A
+  year and month, with a zero day (for example, a credit card expiration
+  date). Related types: * google.type.TimeOfDay * google.type.DateTime *
+  google.protobuf.Timestamp
 
   Fields:
     day: Day of a month. Must be from 1 to 31 and valid for the year and
@@ -592,7 +593,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     MaintenanceSchedulesValue: The MaintenanceSchedule contains the scheduling
       information of published maintenance schedule with same key as
       software_versions.
-    NotificationParametersValue: Optional. notification_parameters are
+    NotificationParametersValue: Optional. notification_parameter are
       information that service producers may like to include that is not
       relevant to Rollout. This parameter will only be passed to Gamma and
       Cloud Logging for notification/logging purpose.
@@ -632,7 +633,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       |project_number}/locations/{location_id}/instances/{instance_id}` Note:
       Either project_id or project_number can be used, but keep it consistent
       with other APIs (e.g. RescheduleUpdate)
-    notificationParameters: Optional. notification_parameters are information
+    notificationParameters: Optional. notification_parameter are information
       that service producers may like to include that is not relevant to
       Rollout. This parameter will only be passed to Gamma and Cloud Logging
       for notification/logging purpose.
@@ -766,7 +767,7 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class NotificationParametersValue(_messages.Message):
-    r"""Optional. notification_parameters are information that service
+    r"""Optional. notification_parameter are information that service
     producers may like to include that is not relevant to Rollout. This
     parameter will only be passed to Gamma and Cloud Logging for
     notification/logging purpose.
@@ -785,11 +786,13 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
 
       Fields:
         key: Name of the additional property.
-        value: A string attribute.
+        value: A
+          GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter
+          attribute.
       """
 
       key = _messages.StringField(1)
-      value = _messages.StringField(2)
+      value = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter', 2)
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
@@ -978,6 +981,17 @@ class GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata(_messages.M
   perSliEligibility = _messages.MessageField('GoogleCloudSaasacceleratorManagementProvidersV1PerSliSloEligibility', 3)
 
 
+class GoogleCloudSaasacceleratorManagementProvidersV1NotificationParameter(_messages.Message):
+  r"""Contains notification related data.
+
+  Fields:
+    values: Optional. Array of string values. e.g. instance's replica
+      information.
+  """
+
+  values = _messages.StringField(1, repeated=True)
+
+
 class GoogleCloudSaasacceleratorManagementProvidersV1PerSliSloEligibility(_messages.Message):
   r"""PerSliSloEligibility is a mapping from an SLI name to eligibility.
 
@@ -1134,7 +1148,7 @@ class Instance(_messages.Message):
     state: Output only. The instance state.
     statusMessage: Output only. Additional information about the instance
       state, if available.
-    suspensionReasons: Output only. field indicates all the reasons the
+    suspensionReasons: Output only. Field indicates all the reasons the
       instance is in "SUSPENDED" state.
     tier: The service tier of the instance.
   """

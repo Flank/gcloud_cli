@@ -281,10 +281,11 @@ class Date(_messages.Message):
   time of day and time zone are either specified elsewhere or are
   insignificant. The date is relative to the Gregorian Calendar. This can
   represent one of the following: * A full date, with non-zero year, month,
-  and day values * A month and day, with a zero year (e.g., an anniversary) *
-  A year on its own, with a zero month and a zero day * A year and month, with
-  a zero day (e.g., a credit card expiration date) Related types: *
-  google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
+  and day values. * A month and day, with a zero year (for example, an
+  anniversary). * A year on its own, with a zero month and a zero day. * A
+  year and month, with a zero day (for example, a credit card expiration
+  date). Related types: * google.type.TimeOfDay * google.type.DateTime *
+  google.protobuf.Timestamp
 
   Fields:
     day: Day of a month. Must be from 1 to 31 and valid for the year and
@@ -352,17 +353,21 @@ class ExecStepConfig(_messages.Message):
     (https://en.wikipedia.org/wiki/Shebang_\(Unix\)).
 
     Values:
-      INTERPRETER_UNSPECIFIED: Invalid for a Windows ExecStepConfig. For a
-        Linux ExecStepConfig, the interpreter will be parsed from the shebang
-        line of the script if unspecified.
-      SHELL: Indicates that the script is run with `/bin/sh` on Linux and
-        `cmd` on Windows.
-      POWERSHELL: Indicates that the file is run with PowerShell flags
-        `-NonInteractive`, `-NoProfile`, and `-ExecutionPolicy Bypass`.
+      INTERPRETER_UNSPECIFIED: If the interpreter is not specified, the value
+        defaults to `NONE`.
+      NONE: Indicates that the file is run as follows on each operating
+        system: + For Linux VMs, the file is ran as an executable and the
+        interpreter might be parsed from the [shebang
+        line](https://wikipedia.org/wiki/Shebang_(Unix)) of the file. + For
+        Windows VM, this value is not supported.
+      SHELL: Indicates that the file is run with `/bin/sh` on Linux and `cmd`
+        on Windows.
+      POWERSHELL: Indicates that the file is run with PowerShell.
     """
     INTERPRETER_UNSPECIFIED = 0
-    SHELL = 1
-    POWERSHELL = 2
+    NONE = 1
+    SHELL = 2
+    POWERSHELL = 3
 
   allowedSuccessCodes = _messages.IntegerField(1, repeated=True, variant=_messages.Variant.INT32)
   gcsObject = _messages.MessageField('GcsObject', 2)
@@ -2110,8 +2115,19 @@ class OsconfigProjectsLocationsInstancesVulnerabilityReportsListRequest(_message
   object.
 
   Fields:
-    filter: If provided, this field specifies the criteria that must be met by
-      a `vulnerabilityReport` API resource to be included in the response.
+    filter: This field supports filtering by the severity level for the
+      vulnerability. For a list of severity levels, see [Severity levels for
+      vulnerabilities](https://cloud.google.com/container-
+      analysis/docs/container-scanning-
+      overview#severity_levels_for_vulnerabilities). The filter field follows
+      the rules described in the [AIP-160](https://google.aip.dev/160)
+      guidelines as follows: + **Filter for a specific severity type**: you
+      can list reports that contain vulnerabilities that are classified as
+      medium by specifying `vulnerabilities.details.severity:MEDIUM`. +
+      **Filter for a range of severities** : you can list reports that have
+      vulnerabilities that are classified as critical or high by specifying
+      `vulnerabilities.details.severity:HIGH OR
+      vulnerabilities.details.severity:CRITICAL`
     pageSize: The maximum number of results to return.
     pageToken: A pagination token returned from a previous call to
       `ListVulnerabilityReports` that indicates where this listing should

@@ -1815,13 +1815,22 @@ MAP = {
                 mtls_endpoint_override=''),
     },
     'krmapihosting': {
+        'v1':
+            APIDef(
+                ApitoolsClientDef(
+                    class_path='googlecloudsdk.third_party.apis.krmapihosting.v1',
+                    client_classpath='krmapihosting_v1_client.KrmapihostingV1',
+                    messages_modulepath='krmapihosting_v1_messages'),
+                default_version=True,
+                enable_mtls=True,
+                mtls_endpoint_override=''),
         'v1alpha1':
             APIDef(
                 ApitoolsClientDef(
                     class_path='googlecloudsdk.third_party.apis.krmapihosting.v1alpha1',
                     client_classpath='krmapihosting_v1alpha1_client.KrmapihostingV1alpha1',
                     messages_modulepath='krmapihosting_v1alpha1_messages'),
-                default_version=True,
+                default_version=False,
                 enable_mtls=True,
                 mtls_endpoint_override=''),
     },
@@ -2963,6 +2972,17 @@ MAP = {
                     client_classpath='workflows_v1beta_client.WorkflowsV1beta',
                     messages_modulepath='workflows_v1beta_messages'),
                 default_version=False,
+                enable_mtls=True,
+                mtls_endpoint_override=''),
+    },
+    'workstations': {
+        'v1alpha1':
+            APIDef(
+                ApitoolsClientDef(
+                    class_path='googlecloudsdk.third_party.apis.workstations.v1alpha1',
+                    client_classpath='workstations_v1alpha1_client.WorkstationsV1alpha1',
+                    messages_modulepath='workstations_v1alpha1_messages'),
+                default_version=True,
                 enable_mtls=True,
                 mtls_endpoint_override=''),
     },
