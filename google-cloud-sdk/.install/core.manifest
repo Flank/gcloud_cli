@@ -677,6 +677,7 @@ lib/googlecloudsdk/api_lib/run/global_methods.py
 lib/googlecloudsdk/api_lib/run/integrations/__init__.py
 lib/googlecloudsdk/api_lib/run/integrations/api_utils.py
 lib/googlecloudsdk/api_lib/run/integrations/types_utils.py
+lib/googlecloudsdk/api_lib/run/integrations/validator.py
 lib/googlecloudsdk/api_lib/run/job.py
 lib/googlecloudsdk/api_lib/run/k8s_object.py
 lib/googlecloudsdk/api_lib/run/metric_names.py
@@ -1761,6 +1762,10 @@ lib/googlecloudsdk/command_lib/identity/groups/memberships/hooks.py
 lib/googlecloudsdk/command_lib/identity/resources.yaml
 lib/googlecloudsdk/command_lib/ids/__init__.py
 lib/googlecloudsdk/command_lib/ids/flags.py
+lib/googlecloudsdk/command_lib/immersive_stream/__init__.py
+lib/googlecloudsdk/command_lib/immersive_stream/xr/__init__.py
+lib/googlecloudsdk/command_lib/immersive_stream/xr/resources.yaml
+lib/googlecloudsdk/command_lib/immersive_stream/xr/util.py
 lib/googlecloudsdk/command_lib/info_holder.py
 lib/googlecloudsdk/command_lib/init_util.py
 lib/googlecloudsdk/command_lib/interactive/__init__.py
@@ -2206,9 +2211,6 @@ lib/googlecloudsdk/command_lib/storage/upload_stream.py
 lib/googlecloudsdk/command_lib/storage/user_request_args_factory.py
 lib/googlecloudsdk/command_lib/storage/util.py
 lib/googlecloudsdk/command_lib/storage/wildcard_iterator.py
-lib/googlecloudsdk/command_lib/stream/__init__.py
-lib/googlecloudsdk/command_lib/stream/resources.yaml
-lib/googlecloudsdk/command_lib/stream/util.py
 lib/googlecloudsdk/command_lib/survey/__init__.py
 lib/googlecloudsdk/command_lib/survey/contents/GeneralSurvey.yaml
 lib/googlecloudsdk/command_lib/survey/question.py
@@ -2324,6 +2326,7 @@ lib/googlecloudsdk/command_lib/workflows/resources.yaml
 lib/googlecloudsdk/command_lib/workspace_add_ons/__init__.py
 lib/googlecloudsdk/command_lib/workspace_add_ons/resources.yaml
 lib/googlecloudsdk/command_lib/workspace_add_ons/util.py
+lib/googlecloudsdk/command_lib/workstations/resources.yaml
 lib/googlecloudsdk/core/__init__.py
 lib/googlecloudsdk/core/argv_utils.py
 lib/googlecloudsdk/core/branding.py
@@ -2734,6 +2737,7 @@ lib/googlecloudsdk/schemas/compute/v1/BackendService.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicyBypassCacheOnRequestHeader.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicyNegativeCachingPolicy.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceConnectionTrackingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceFailoverPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceIAP.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceLogConfig.yaml
@@ -2749,6 +2753,7 @@ lib/googlecloudsdk/schemas/compute/v1/DisplayDevice.yaml
 lib/googlecloudsdk/schemas/compute/v1/Duration.yaml
 lib/googlecloudsdk/schemas/compute/v1/FileContentBuffer.yaml
 lib/googlecloudsdk/schemas/compute/v1/ForwardingRule.yaml
+lib/googlecloudsdk/schemas/compute/v1/ForwardingRuleServiceDirectoryRegistration.yaml
 lib/googlecloudsdk/schemas/compute/v1/GuestOsFeature.yaml
 lib/googlecloudsdk/schemas/compute/v1/HostRule.yaml
 lib/googlecloudsdk/schemas/compute/v1/HttpFaultAbort.yaml
@@ -2787,6 +2792,7 @@ lib/googlecloudsdk/schemas/compute/v1/SecuritySettings.yaml
 lib/googlecloudsdk/schemas/compute/v1/ServiceAccount.yaml
 lib/googlecloudsdk/schemas/compute/v1/ShieldedInstanceConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/ShieldedInstanceIntegrityPolicy.yaml
+lib/googlecloudsdk/schemas/compute/v1/Subsetting.yaml
 lib/googlecloudsdk/schemas/compute/v1/Tags.yaml
 lib/googlecloudsdk/schemas/compute/v1/TargetHttpProxy.yaml
 lib/googlecloudsdk/schemas/compute/v1/TargetHttpsProxy.yaml
@@ -4916,8 +4922,8 @@ lib/surface/alloydb/clusters/__init__.py
 lib/surface/alloydb/clusters/create.py
 lib/surface/alloydb/clusters/delete.py
 lib/surface/alloydb/clusters/describe.py
-lib/surface/alloydb/clusters/import.py
 lib/surface/alloydb/clusters/list.py
+lib/surface/alloydb/clusters/restore.py
 lib/surface/alloydb/clusters/update.py
 lib/surface/alloydb/instances/__init__.py
 lib/surface/alloydb/instances/create.py
@@ -7785,6 +7791,10 @@ lib/surface/iam/workforce_pools/providers/create_oidc.yaml
 lib/surface/iam/workforce_pools/providers/create_saml.yaml
 lib/surface/iam/workforce_pools/providers/delete.yaml
 lib/surface/iam/workforce_pools/providers/describe.yaml
+lib/surface/iam/workforce_pools/providers/keys/__init__.py
+lib/surface/iam/workforce_pools/providers/keys/create.yaml
+lib/surface/iam/workforce_pools/providers/keys/operations/__init__.py
+lib/surface/iam/workforce_pools/providers/keys/operations/describe.yaml
 lib/surface/iam/workforce_pools/providers/list.yaml
 lib/surface/iam/workforce_pools/providers/operations/__init__.py
 lib/surface/iam/workforce_pools/providers/operations/describe.yaml
@@ -7851,8 +7861,11 @@ lib/surface/iap/settings/set.py
 lib/surface/iap/tcp/__init__.py
 lib/surface/iap/tcp/dest_groups/__init__.py
 lib/surface/iap/tcp/dest_groups/add_iam_policy_binding.py
+lib/surface/iap/tcp/dest_groups/create.py
+lib/surface/iap/tcp/dest_groups/delete.py
 lib/surface/iap/tcp/dest_groups/get_iam_policy.py
 lib/surface/iap/tcp/dest_groups/remove_iam_policy_binding.py
+lib/surface/iap/tcp/dest_groups/set_iam_policy.py
 lib/surface/iap/web/__init__.py
 lib/surface/iap/web/add_iam_policy_binding.py
 lib/surface/iap/web/disable.py
@@ -7886,6 +7899,14 @@ lib/surface/ids/endpoints/create.py
 lib/surface/ids/endpoints/delete.py
 lib/surface/ids/endpoints/describe.py
 lib/surface/ids/endpoints/list.py
+lib/surface/immersive_stream/__init__.py
+lib/surface/immersive_stream/xr/__init__.py
+lib/surface/immersive_stream/xr/contents/__init__.py
+lib/surface/immersive_stream/xr/contents/describe.yaml
+lib/surface/immersive_stream/xr/contents/list.yaml
+lib/surface/immersive_stream/xr/instances/__init__.py
+lib/surface/immersive_stream/xr/instances/describe.yaml
+lib/surface/immersive_stream/xr/instances/list.yaml
 lib/surface/info.py
 lib/surface/init.py
 lib/surface/interactive.py
@@ -9347,13 +9368,6 @@ lib/surface/storage/rm.py
 lib/surface/storage/rsync.py
 lib/surface/storage/service_agent.py
 lib/surface/storage/sign_url.py
-lib/surface/stream/__init__.py
-lib/surface/stream/contents/__init__.py
-lib/surface/stream/contents/describe.yaml
-lib/surface/stream/contents/list.yaml
-lib/surface/stream/instances/__init__.py
-lib/surface/stream/instances/describe.yaml
-lib/surface/stream/instances/list.yaml
 lib/surface/survey.py
 lib/surface/tasks/__init__.py
 lib/surface/tasks/acknowledge.py
@@ -9387,6 +9401,8 @@ lib/surface/tasks/queues/update_app_engine_queue.py
 lib/surface/tasks/queues/update_pull_queue.py
 lib/surface/tasks/renew_lease.py
 lib/surface/tasks/run.py
+lib/surface/terraform/__init__.py
+lib/surface/terraform/vet.py
 lib/surface/topic/__init__.py
 lib/surface/topic/accessibility.py
 lib/surface/topic/arg_files.py
@@ -9546,6 +9562,10 @@ lib/surface/workspace_add_ons/deployments/list.yaml
 lib/surface/workspace_add_ons/deployments/replace.yaml
 lib/surface/workspace_add_ons/deployments/uninstall.yaml
 lib/surface/workspace_add_ons/get_authorization.yaml
+lib/surface/workstations/__init__.py
+lib/surface/workstations/clusters/__init__.py
+lib/surface/workstations/clusters/list.yaml
+lib/surface/workstations/list.yaml
 path.bash.inc
 path.fish.inc
 path.zsh.inc
