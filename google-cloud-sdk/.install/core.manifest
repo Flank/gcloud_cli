@@ -602,6 +602,7 @@ lib/googlecloudsdk/api_lib/ml_engine/predict.py
 lib/googlecloudsdk/api_lib/ml_engine/versions_api.py
 lib/googlecloudsdk/api_lib/monitoring/__init__.py
 lib/googlecloudsdk/api_lib/monitoring/channels.py
+lib/googlecloudsdk/api_lib/monitoring/metrics_scopes.py
 lib/googlecloudsdk/api_lib/monitoring/policies.py
 lib/googlecloudsdk/api_lib/network_connectivity/__init__.py
 lib/googlecloudsdk/api_lib/network_connectivity/networkconnectivity_client.py
@@ -741,7 +742,6 @@ lib/googlecloudsdk/api_lib/sql/network.py
 lib/googlecloudsdk/api_lib/sql/operations.py
 lib/googlecloudsdk/api_lib/sql/ssl/__init__.py
 lib/googlecloudsdk/api_lib/sql/ssl/server_ca_certs.py
-lib/googlecloudsdk/api_lib/sql/user_prop_reducers.py
 lib/googlecloudsdk/api_lib/sql/validate.py
 lib/googlecloudsdk/api_lib/storage/__init__.py
 lib/googlecloudsdk/api_lib/storage/api_factory.py
@@ -1652,6 +1652,7 @@ lib/googlecloudsdk/command_lib/functions/v1/delete/__init__.py
 lib/googlecloudsdk/command_lib/functions/v1/delete/command.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/__init__.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/command.py
+lib/googlecloudsdk/command_lib/functions/v1/deploy/enum_util.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/labels_util.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/source_util.py
 lib/googlecloudsdk/command_lib/functions/v1/deploy/trigger_util.py
@@ -1924,6 +1925,7 @@ lib/googlecloudsdk/command_lib/ml_engine/resources.yaml
 lib/googlecloudsdk/command_lib/ml_engine/uploads.py
 lib/googlecloudsdk/command_lib/ml_engine/versions_util.py
 lib/googlecloudsdk/command_lib/monitoring/__init__.py
+lib/googlecloudsdk/command_lib/monitoring/completers.py
 lib/googlecloudsdk/command_lib/monitoring/flags.py
 lib/googlecloudsdk/command_lib/monitoring/hooks.py
 lib/googlecloudsdk/command_lib/monitoring/resource_args.py
@@ -2047,6 +2049,7 @@ lib/googlecloudsdk/command_lib/run/integrations/formatters/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/base_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/custom_domain_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/fallback_formatter.py
+lib/googlecloudsdk/command_lib/run/integrations/formatters/states.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/messages_util.py
 lib/googlecloudsdk/command_lib/run/integrations/run_apps_operations.py
@@ -2100,6 +2103,10 @@ lib/googlecloudsdk/command_lib/scc/settings/__init__.py
 lib/googlecloudsdk/command_lib/scc/settings/exceptions.py
 lib/googlecloudsdk/command_lib/scc/settings/flags.py
 lib/googlecloudsdk/command_lib/scc/settings/utils.py
+lib/googlecloudsdk/command_lib/scc/slz_overwatch/__init__.py
+lib/googlecloudsdk/command_lib/scc/slz_overwatch/instances.py
+lib/googlecloudsdk/command_lib/scc/slz_overwatch/overwatch_flags.py
+lib/googlecloudsdk/command_lib/scc/slz_overwatch/util.py
 lib/googlecloudsdk/command_lib/scc/sources/__init__.py
 lib/googlecloudsdk/command_lib/scc/sources/request_hooks.py
 lib/googlecloudsdk/command_lib/scc/sources/response_hooks.py
@@ -2154,6 +2161,7 @@ lib/googlecloudsdk/command_lib/storage/errors.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
 lib/googlecloudsdk/command_lib/storage/flags.py
 lib/googlecloudsdk/command_lib/storage/hash_util.py
+lib/googlecloudsdk/command_lib/storage/metrics_util.py
 lib/googlecloudsdk/command_lib/storage/name_expansion.py
 lib/googlecloudsdk/command_lib/storage/optimize_parameters_util.py
 lib/googlecloudsdk/command_lib/storage/paths.py
@@ -2179,6 +2187,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/cp/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_component_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_task_factory.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_task_iterator.py
+lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/daisy_chain_copy_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/delete_temporary_components_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/download_util.py
@@ -2205,6 +2214,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/task_executor.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_graph.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_graph_executor.py
 lib/googlecloudsdk/command_lib/storage/tasks/task_status.py
+lib/googlecloudsdk/command_lib/storage/tasks/task_util.py
 lib/googlecloudsdk/command_lib/storage/thread_messages.py
 lib/googlecloudsdk/command_lib/storage/tracker_file_util.py
 lib/googlecloudsdk/command_lib/storage/upload_stream.py
@@ -5671,6 +5681,7 @@ lib/surface/compute/firewall_rules/create.py
 lib/surface/compute/firewall_rules/delete.py
 lib/surface/compute/firewall_rules/describe.py
 lib/surface/compute/firewall_rules/list.py
+lib/surface/compute/firewall_rules/migrate.py
 lib/surface/compute/firewall_rules/update.py
 lib/surface/compute/forwarding_rules/__init__.py
 lib/surface/compute/forwarding_rules/config/__init__.py
@@ -7902,11 +7913,17 @@ lib/surface/ids/endpoints/list.py
 lib/surface/immersive_stream/__init__.py
 lib/surface/immersive_stream/xr/__init__.py
 lib/surface/immersive_stream/xr/contents/__init__.py
+lib/surface/immersive_stream/xr/contents/create.yaml
+lib/surface/immersive_stream/xr/contents/delete.yaml
 lib/surface/immersive_stream/xr/contents/describe.yaml
 lib/surface/immersive_stream/xr/contents/list.yaml
 lib/surface/immersive_stream/xr/instances/__init__.py
+lib/surface/immersive_stream/xr/instances/delete.yaml
 lib/surface/immersive_stream/xr/instances/describe.yaml
 lib/surface/immersive_stream/xr/instances/list.yaml
+lib/surface/immersive_stream/xr/operations/__init__.py
+lib/surface/immersive_stream/xr/operations/describe.yaml
+lib/surface/immersive_stream/xr/operations/wait.yaml
 lib/surface/info.py
 lib/surface/init.py
 lib/surface/interactive.py
@@ -8381,6 +8398,11 @@ lib/surface/monitoring/dashboards/delete.yaml
 lib/surface/monitoring/dashboards/describe.yaml
 lib/surface/monitoring/dashboards/list.yaml
 lib/surface/monitoring/dashboards/update.yaml
+lib/surface/monitoring/metrics_scopes/__init__.py
+lib/surface/monitoring/metrics_scopes/create.py
+lib/surface/monitoring/metrics_scopes/delete.py
+lib/surface/monitoring/metrics_scopes/describe.yaml
+lib/surface/monitoring/metrics_scopes/list.py
 lib/surface/monitoring/policies/__init__.py
 lib/surface/monitoring/policies/conditions/__init__.py
 lib/surface/monitoring/policies/conditions/create.py
@@ -8921,13 +8943,6 @@ lib/surface/run/domain_mappings/create.py
 lib/surface/run/domain_mappings/delete.py
 lib/surface/run/domain_mappings/describe.py
 lib/surface/run/domain_mappings/list.py
-lib/surface/run/executions/__init__.py
-lib/surface/run/executions/delete.py
-lib/surface/run/executions/describe.py
-lib/surface/run/executions/list.py
-lib/surface/run/executions/tasks/__init__.py
-lib/surface/run/executions/tasks/describe.py
-lib/surface/run/executions/tasks/list.py
 lib/surface/run/integrations/__init__.py
 lib/surface/run/integrations/apply.py
 lib/surface/run/integrations/create.py
@@ -8943,10 +8958,17 @@ lib/surface/run/jobs/add_iam_policy_binding.yaml
 lib/surface/run/jobs/create.py
 lib/surface/run/jobs/delete.py
 lib/surface/run/jobs/describe.py
+lib/surface/run/jobs/execute.py
+lib/surface/run/jobs/executions/__init__.py
+lib/surface/run/jobs/executions/delete.py
+lib/surface/run/jobs/executions/describe.py
+lib/surface/run/jobs/executions/list.py
+lib/surface/run/jobs/executions/tasks/__init__.py
+lib/surface/run/jobs/executions/tasks/describe.py
+lib/surface/run/jobs/executions/tasks/list.py
 lib/surface/run/jobs/get_iam_policy.yaml
 lib/surface/run/jobs/list.py
 lib/surface/run/jobs/remove_iam_policy_binding.yaml
-lib/surface/run/jobs/run.py
 lib/surface/run/jobs/set_iam_policy.yaml
 lib/surface/run/jobs/update.py
 lib/surface/run/regions/__init__.py
@@ -9130,7 +9152,6 @@ lib/surface/service_directory/services/set_iam_policy.py
 lib/surface/service_directory/services/update.py
 lib/surface/services/__init__.py
 lib/surface/services/api_keys/__init__.py
-lib/surface/services/api_keys/clone.py
 lib/surface/services/api_keys/create.py
 lib/surface/services/api_keys/delete.py
 lib/surface/services/api_keys/describe.py
