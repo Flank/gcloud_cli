@@ -695,6 +695,8 @@ lib/googlecloudsdk/api_lib/runtime_config/transforms.py
 lib/googlecloudsdk/api_lib/runtime_config/util.py
 lib/googlecloudsdk/api_lib/scc/__init__.py
 lib/googlecloudsdk/api_lib/scc/securitycenter_client.py
+lib/googlecloudsdk/api_lib/scc/slz_overwatch/__init__.py
+lib/googlecloudsdk/api_lib/scc/slz_overwatch/overwatch.py
 lib/googlecloudsdk/api_lib/scheduler/__init__.py
 lib/googlecloudsdk/api_lib/scheduler/jobs.py
 lib/googlecloudsdk/api_lib/scheduler/locations.py
@@ -1292,6 +1294,10 @@ lib/googlecloudsdk/command_lib/compute/tpus/execution_groups/__init__.py
 lib/googlecloudsdk/command_lib/compute/tpus/execution_groups/util.py
 lib/googlecloudsdk/command_lib/compute/tpus/flags.py
 lib/googlecloudsdk/command_lib/compute/tpus/flags.yaml
+lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/__init__.py
+lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/flags.yaml
+lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/resources.yaml
+lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/util.py
 lib/googlecloudsdk/command_lib/compute/tpus/resources.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/tpu_vm/__init__.py
 lib/googlecloudsdk/command_lib/compute/tpus/tpu_vm/exceptions.py
@@ -2049,6 +2055,7 @@ lib/googlecloudsdk/command_lib/run/integrations/formatters/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/base_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/custom_domain_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/fallback_formatter.py
+lib/googlecloudsdk/command_lib/run/integrations/formatters/redis_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/states.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/messages_util.py
@@ -2161,6 +2168,7 @@ lib/googlecloudsdk/command_lib/storage/errors.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
 lib/googlecloudsdk/command_lib/storage/flags.py
 lib/googlecloudsdk/command_lib/storage/hash_util.py
+lib/googlecloudsdk/command_lib/storage/manifest_util.py
 lib/googlecloudsdk/command_lib/storage/metrics_util.py
 lib/googlecloudsdk/command_lib/storage/name_expansion.py
 lib/googlecloudsdk/command_lib/storage/optimize_parameters_util.py
@@ -4297,6 +4305,12 @@ lib/googlecloudsdk/third_party/apis/secretmanager/v1/resources.py
 lib/googlecloudsdk/third_party/apis/secretmanager/v1/secretmanager_v1_client.py
 lib/googlecloudsdk/third_party/apis/secretmanager/v1/secretmanager_v1_messages.py
 lib/googlecloudsdk/third_party/apis/secretmanager_v1.json
+lib/googlecloudsdk/third_party/apis/securedlandingzone/__init__.py
+lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/__init__.py
+lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/resources.py
+lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/securedlandingzone_v1beta_client.py
+lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/securedlandingzone_v1beta_messages.py
+lib/googlecloudsdk/third_party/apis/securedlandingzone_v1beta.json
 lib/googlecloudsdk/third_party/apis/securitycenter/__init__.py
 lib/googlecloudsdk/third_party/apis/securitycenter/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/securitycenter/v1/resources.py
@@ -6351,6 +6365,11 @@ lib/surface/compute/tpus/list.yaml
 lib/surface/compute/tpus/locations/__init__.py
 lib/surface/compute/tpus/locations/describe.yaml
 lib/surface/compute/tpus/locations/list.yaml
+lib/surface/compute/tpus/queued_resources/__init__.py
+lib/surface/compute/tpus/queued_resources/create.yaml
+lib/surface/compute/tpus/queued_resources/delete.yaml
+lib/surface/compute/tpus/queued_resources/describe.yaml
+lib/surface/compute/tpus/queued_resources/list.yaml
 lib/surface/compute/tpus/reimage.yaml
 lib/surface/compute/tpus/start.yaml
 lib/surface/compute/tpus/stop.yaml
@@ -7875,6 +7894,7 @@ lib/surface/iap/tcp/dest_groups/add_iam_policy_binding.py
 lib/surface/iap/tcp/dest_groups/create.py
 lib/surface/iap/tcp/dest_groups/delete.py
 lib/surface/iap/tcp/dest_groups/get_iam_policy.py
+lib/surface/iap/tcp/dest_groups/list.py
 lib/surface/iap/tcp/dest_groups/remove_iam_policy_binding.py
 lib/surface/iap/tcp/dest_groups/set_iam_policy.py
 lib/surface/iap/web/__init__.py
@@ -7913,6 +7933,7 @@ lib/surface/ids/endpoints/list.py
 lib/surface/immersive_stream/__init__.py
 lib/surface/immersive_stream/xr/__init__.py
 lib/surface/immersive_stream/xr/contents/__init__.py
+lib/surface/immersive_stream/xr/contents/build.yaml
 lib/surface/immersive_stream/xr/contents/create.yaml
 lib/surface/immersive_stream/xr/contents/delete.yaml
 lib/surface/immersive_stream/xr/contents/describe.yaml
@@ -9069,6 +9090,11 @@ lib/surface/scc/settings/services/modules/describe_explicit.py
 lib/surface/scc/settings/services/modules/disable.py
 lib/surface/scc/settings/services/modules/enable.py
 lib/surface/scc/settings/services/modules/update.py
+lib/surface/scc/slz_overwatch/__init__.py
+lib/surface/scc/slz_overwatch/activate.py
+lib/surface/scc/slz_overwatch/create.py
+lib/surface/scc/slz_overwatch/enable.py
+lib/surface/scc/slz_overwatch/suspend.py
 lib/surface/scc/sources/__init__.py
 lib/surface/scc/sources/describe.yaml
 lib/surface/scheduler/__init__.py

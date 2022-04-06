@@ -25,7 +25,6 @@ from googlecloudsdk.command_lib.resource_manager import operations
 from googlecloudsdk.command_lib.resource_manager import tag_arguments as arguments
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.Command):
   """Delete a TagHold.
