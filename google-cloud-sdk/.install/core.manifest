@@ -317,9 +317,6 @@ lib/googlecloudsdk/api_lib/compute/zones/__init__.py
 lib/googlecloudsdk/api_lib/compute/zones/service.py
 lib/googlecloudsdk/api_lib/container/__init__.py
 lib/googlecloudsdk/api_lib/container/api_adapter.py
-lib/googlecloudsdk/api_lib/container/aws/__init__.py
-lib/googlecloudsdk/api_lib/container/azure/__init__.py
-lib/googlecloudsdk/api_lib/container/azure/util.py
 lib/googlecloudsdk/api_lib/container/backup_restore/__init__.py
 lib/googlecloudsdk/api_lib/container/backup_restore/poller.py
 lib/googlecloudsdk/api_lib/container/backup_restore/util.py
@@ -343,6 +340,8 @@ lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_adapter.py
 lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_util.py
 lib/googlecloudsdk/api_lib/container/fleet/util.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/__init__.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/azure.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/update_mask.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/util.py
 lib/googlecloudsdk/api_lib/container/images/__init__.py
 lib/googlecloudsdk/api_lib/container/images/container_analysis_data_util.py
@@ -796,6 +795,7 @@ lib/googlecloudsdk/api_lib/vmware/__init__.py
 lib/googlecloudsdk/api_lib/vmware/clusters.py
 lib/googlecloudsdk/api_lib/vmware/hcxactivationkeys.py
 lib/googlecloudsdk/api_lib/vmware/locations.py
+lib/googlecloudsdk/api_lib/vmware/networkpeering.py
 lib/googlecloudsdk/api_lib/vmware/networks.py
 lib/googlecloudsdk/api_lib/vmware/nodetypes.py
 lib/googlecloudsdk/api_lib/vmware/operations.py
@@ -1286,6 +1286,7 @@ lib/googlecloudsdk/command_lib/compute/target_pools/__init__.py
 lib/googlecloudsdk/command_lib/compute/target_pools/flags.py
 lib/googlecloudsdk/command_lib/compute/target_ssl_proxies/__init__.py
 lib/googlecloudsdk/command_lib/compute/target_ssl_proxies/flags.py
+lib/googlecloudsdk/command_lib/compute/target_ssl_proxies/target_ssl_proxies_utils.py
 lib/googlecloudsdk/command_lib/compute/target_tcp_proxies/__init__.py
 lib/googlecloudsdk/command_lib/compute/target_tcp_proxies/flags.py
 lib/googlecloudsdk/command_lib/compute/target_vpn_gateways/__init__.py
@@ -2061,6 +2062,7 @@ lib/googlecloudsdk/command_lib/run/integrations/formatters/states.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/messages_util.py
 lib/googlecloudsdk/command_lib/run/integrations/run_apps_operations.py
+lib/googlecloudsdk/command_lib/run/integrations/stages.py
 lib/googlecloudsdk/command_lib/run/integrations/types_describe_printer.py
 lib/googlecloudsdk/command_lib/run/messages_util.py
 lib/googlecloudsdk/command_lib/run/name_generator.py
@@ -4722,6 +4724,7 @@ lib/googlecloudsdk/third_party/gapic_wrappers/logging/__init__.py
 lib/googlecloudsdk/third_party/gapic_wrappers/logging/v2/__init__.py
 lib/googlecloudsdk/third_party/gapic_wrappers/logging/v2/async_client.py
 lib/googlecloudsdk/third_party/gapic_wrappers/logging/v2/client.py
+lib/googlecloudsdk/third_party/gapic_wrappers/logging/v2/rest_client.py
 lib/googlecloudsdk/third_party/regen_apis_config.yaml
 lib/surface/__init__.py
 lib/surface/access_approval/__init__.py
@@ -5437,6 +5440,9 @@ lib/surface/builds/enterprise_config/github/delete.py
 lib/surface/builds/enterprise_config/github/describe.py
 lib/surface/builds/enterprise_config/github/list.py
 lib/surface/builds/enterprise_config/github/update.py
+lib/surface/builds/enterprise_config/gitlab/__init__.py
+lib/surface/builds/enterprise_config/gitlab/describe.py
+lib/surface/builds/enterprise_config/gitlab/list.py
 lib/surface/builds/list.py
 lib/surface/builds/log.py
 lib/surface/builds/reject.yaml
@@ -5454,6 +5460,7 @@ lib/surface/builds/triggers/create/__init__.py
 lib/surface/builds/triggers/create/bitbucketserver.py
 lib/surface/builds/triggers/create/cloud_source_repositories.py
 lib/surface/builds/triggers/create/github.py
+lib/surface/builds/triggers/create/manual.py
 lib/surface/builds/triggers/create/pubsub.py
 lib/surface/builds/triggers/create/webhook.py
 lib/surface/builds/triggers/delete.py
@@ -7585,6 +7592,7 @@ lib/surface/firebase/test/network_profiles/list.py
 lib/surface/firestore/__init__.py
 lib/surface/firestore/databases/__init__.py
 lib/surface/firestore/databases/create.py
+lib/surface/firestore/databases/describe.yaml
 lib/surface/firestore/export.py
 lib/surface/firestore/import.py
 lib/surface/firestore/indexes/__init__.py
@@ -9541,6 +9549,12 @@ lib/surface/vmware/hcx/activationkeys/describe.py
 lib/surface/vmware/hcx/activationkeys/list.py
 lib/surface/vmware/locations/__init__.py
 lib/surface/vmware/locations/list.py
+lib/surface/vmware/network_peerings/__init__.py
+lib/surface/vmware/network_peerings/create.py
+lib/surface/vmware/network_peerings/delete.py
+lib/surface/vmware/network_peerings/describe.py
+lib/surface/vmware/network_peerings/list.py
+lib/surface/vmware/network_peerings/update.py
 lib/surface/vmware/networks/__init__.py
 lib/surface/vmware/networks/create.py
 lib/surface/vmware/networks/delete.py
@@ -9631,6 +9645,7 @@ lib/surface/workstations/__init__.py
 lib/surface/workstations/clusters/__init__.py
 lib/surface/workstations/clusters/list.yaml
 lib/surface/workstations/list.yaml
+lib/surface/workstations/start_tcp_tunnel.py
 path.bash.inc
 path.fish.inc
 path.zsh.inc
