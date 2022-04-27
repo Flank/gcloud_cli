@@ -25,6 +25,7 @@ lib/googlecloudsdk/__init__.py
 lib/googlecloudsdk/api_lib/__init__.py
 lib/googlecloudsdk/api_lib/access_approval/__init__.py
 lib/googlecloudsdk/api_lib/access_approval/requests.py
+lib/googlecloudsdk/api_lib/access_approval/service_account.py
 lib/googlecloudsdk/api_lib/access_approval/settings.py
 lib/googlecloudsdk/api_lib/accesscontextmanager/__init__.py
 lib/googlecloudsdk/api_lib/accesscontextmanager/acm_printer.py
@@ -340,7 +341,10 @@ lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_adapter.py
 lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_util.py
 lib/googlecloudsdk/api_lib/container/fleet/util.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/__init__.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/aws.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/azure.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/client.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/operations.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/update_mask.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/util.py
 lib/googlecloudsdk/api_lib/container/images/__init__.py
@@ -449,6 +453,10 @@ lib/googlecloudsdk/api_lib/edge_cloud/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/container/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/container/util.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/__init__.py
+lib/googlecloudsdk/api_lib/edge_cloud/networking/interconnects/__init__.py
+lib/googlecloudsdk/api_lib/edge_cloud/networking/interconnects/interconnects.py
+lib/googlecloudsdk/api_lib/edge_cloud/networking/networks/__init__.py
+lib/googlecloudsdk/api_lib/edge_cloud/networking/networks/networks.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/routers/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/routers/routers.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/utils.py
@@ -550,6 +558,10 @@ lib/googlecloudsdk/api_lib/identity/admin_directory.py
 lib/googlecloudsdk/api_lib/identity/cloudidentity_client.py
 lib/googlecloudsdk/api_lib/ids/__init__.py
 lib/googlecloudsdk/api_lib/ids/ids_api.py
+lib/googlecloudsdk/api_lib/immersive_stream/__init__.py
+lib/googlecloudsdk/api_lib/immersive_stream/xr/__init__.py
+lib/googlecloudsdk/api_lib/immersive_stream/xr/api_util.py
+lib/googlecloudsdk/api_lib/immersive_stream/xr/instances.py
 lib/googlecloudsdk/api_lib/krmapihosting/__init__.py
 lib/googlecloudsdk/api_lib/krmapihosting/util.py
 lib/googlecloudsdk/api_lib/kuberun/__init__.py
@@ -891,6 +903,7 @@ lib/googlecloudsdk/command_lib/ai/resources.yaml
 lib/googlecloudsdk/command_lib/ai/tensorboards_util.py
 lib/googlecloudsdk/command_lib/ai/validation.py
 lib/googlecloudsdk/command_lib/alloydb/__init__.py
+lib/googlecloudsdk/command_lib/alloydb/cluster_helper.py
 lib/googlecloudsdk/command_lib/alloydb/flags.py
 lib/googlecloudsdk/command_lib/alloydb/instance_helper.py
 lib/googlecloudsdk/command_lib/anthos/__init__.py
@@ -1342,14 +1355,10 @@ lib/googlecloudsdk/command_lib/config/virtualenv/__init__.py
 lib/googlecloudsdk/command_lib/config/virtualenv/util.py
 lib/googlecloudsdk/command_lib/container/__init__.py
 lib/googlecloudsdk/command_lib/container/aws/__init__.py
-lib/googlecloudsdk/command_lib/container/aws/clusters.py
 lib/googlecloudsdk/command_lib/container/aws/flags.py
-lib/googlecloudsdk/command_lib/container/aws/node_pools.py
 lib/googlecloudsdk/command_lib/container/aws/resource_args.py
-lib/googlecloudsdk/command_lib/container/aws/resources.yaml
 lib/googlecloudsdk/command_lib/container/azure/__init__.py
 lib/googlecloudsdk/command_lib/container/azure/resource_args.py
-lib/googlecloudsdk/command_lib/container/azure/util.py
 lib/googlecloudsdk/command_lib/container/backup_restore/__init__.py
 lib/googlecloudsdk/command_lib/container/backup_restore/flags.yaml
 lib/googlecloudsdk/command_lib/container/backup_restore/hooks.py
@@ -1393,6 +1402,7 @@ lib/googlecloudsdk/command_lib/container/fleet/rbac_util.py
 lib/googlecloudsdk/command_lib/container/fleet/resources.yaml
 lib/googlecloudsdk/command_lib/container/fleet/util.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/__init__.py
+lib/googlecloudsdk/command_lib/container/gkemulticloud/command_util.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/constants.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/endpoint_util.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/errors.py
@@ -1773,6 +1783,8 @@ lib/googlecloudsdk/command_lib/ids/__init__.py
 lib/googlecloudsdk/command_lib/ids/flags.py
 lib/googlecloudsdk/command_lib/immersive_stream/__init__.py
 lib/googlecloudsdk/command_lib/immersive_stream/xr/__init__.py
+lib/googlecloudsdk/command_lib/immersive_stream/xr/flags.py
+lib/googlecloudsdk/command_lib/immersive_stream/xr/resource_args.py
 lib/googlecloudsdk/command_lib/immersive_stream/xr/resources.yaml
 lib/googlecloudsdk/command_lib/immersive_stream/xr/util.py
 lib/googlecloudsdk/command_lib/info_holder.py
@@ -2177,6 +2189,7 @@ lib/googlecloudsdk/command_lib/storage/name_expansion.py
 lib/googlecloudsdk/command_lib/storage/optimize_parameters_util.py
 lib/googlecloudsdk/command_lib/storage/paths.py
 lib/googlecloudsdk/command_lib/storage/plurality_checkable_iterator.py
+lib/googlecloudsdk/command_lib/storage/posix_util.py
 lib/googlecloudsdk/command_lib/storage/progress_callbacks.py
 lib/googlecloudsdk/command_lib/storage/resources.yaml
 lib/googlecloudsdk/command_lib/storage/resources/__init__.py
@@ -3036,11 +3049,21 @@ lib/googlecloudsdk/third_party/apis/aiplatform_v1.json
 lib/googlecloudsdk/third_party/apis/aiplatform_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/aiplatform_v1beta1.json
 lib/googlecloudsdk/third_party/apis/alloydb/__init__.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/__init__.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/alloydb_v1alpha_client.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/alloydb_v1alpha_messages.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/resources.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/alloydb_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/alloydb_v1alpha1_messages.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/resources.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1beta/__init__.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1beta/alloydb_v1beta_client.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1beta/alloydb_v1beta_messages.py
+lib/googlecloudsdk/third_party/apis/alloydb/v1beta/resources.py
+lib/googlecloudsdk/third_party/apis/alloydb_v1alpha.json
 lib/googlecloudsdk/third_party/apis/alloydb_v1alpha1.json
+lib/googlecloudsdk/third_party/apis/alloydb_v1beta.json
 lib/googlecloudsdk/third_party/apis/anthosevents/__init__.py
 lib/googlecloudsdk/third_party/apis/anthosevents/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/anthosevents/v1/anthosevents_v1_client.py
@@ -4733,6 +4756,8 @@ lib/surface/access_approval/requests/approve.py
 lib/surface/access_approval/requests/dismiss.py
 lib/surface/access_approval/requests/get.py
 lib/surface/access_approval/requests/list.py
+lib/surface/access_approval/service_account/__init__.py
+lib/surface/access_approval/service_account/get.py
 lib/surface/access_approval/settings/__init__.py
 lib/surface/access_approval/settings/delete.py
 lib/surface/access_approval/settings/get.py
@@ -4979,6 +5004,7 @@ lib/surface/anthos/config/controller/__init__.py
 lib/surface/anthos/config/controller/create.py
 lib/surface/anthos/config/controller/delete.yaml
 lib/surface/anthos/config/controller/describe.yaml
+lib/surface/anthos/config/controller/get_config_connector_identity.py
 lib/surface/anthos/config/controller/get_credentials.py
 lib/surface/anthos/config/controller/list.yaml
 lib/surface/anthos/config/operations/__init__.py
@@ -5145,6 +5171,8 @@ lib/surface/artifacts/docker/tags/__init__.py
 lib/surface/artifacts/docker/tags/add.py
 lib/surface/artifacts/docker/tags/delete.py
 lib/surface/artifacts/docker/tags/list.py
+lib/surface/artifacts/files/__init__.py
+lib/surface/artifacts/files/list.yaml
 lib/surface/artifacts/googet/__init__.py
 lib/surface/artifacts/googet/import.py
 lib/surface/artifacts/googet/upload.py
@@ -5441,6 +5469,7 @@ lib/surface/builds/enterprise_config/github/describe.py
 lib/surface/builds/enterprise_config/github/list.py
 lib/surface/builds/enterprise_config/github/update.py
 lib/surface/builds/enterprise_config/gitlab/__init__.py
+lib/surface/builds/enterprise_config/gitlab/delete.py
 lib/surface/builds/enterprise_config/gitlab/describe.py
 lib/surface/builds/enterprise_config/gitlab/list.py
 lib/surface/builds/list.py
@@ -6673,6 +6702,9 @@ lib/surface/container/fleet/multi_cluster_services/__init__.py
 lib/surface/container/fleet/multi_cluster_services/describe.py
 lib/surface/container/fleet/multi_cluster_services/disable.py
 lib/surface/container/fleet/multi_cluster_services/enable.py
+lib/surface/container/fleet/namespaces/__init__.py
+lib/surface/container/fleet/namespaces/create.py
+lib/surface/container/fleet/namespaces/describe.py
 lib/surface/container/fleet/policycontroller/__init__.py
 lib/surface/container/fleet/policycontroller/disable.py
 lib/surface/container/fleet/policycontroller/enable.py
@@ -7358,11 +7390,13 @@ lib/surface/edge_cloud/networking/interconnects/attachments/delete.yaml
 lib/surface/edge_cloud/networking/interconnects/attachments/describe.yaml
 lib/surface/edge_cloud/networking/interconnects/attachments/list.yaml
 lib/surface/edge_cloud/networking/interconnects/describe.yaml
+lib/surface/edge_cloud/networking/interconnects/get_diagnostics.py
 lib/surface/edge_cloud/networking/interconnects/list.yaml
 lib/surface/edge_cloud/networking/networks/__init__.py
 lib/surface/edge_cloud/networking/networks/create.yaml
 lib/surface/edge_cloud/networking/networks/delete.yaml
 lib/surface/edge_cloud/networking/networks/describe.yaml
+lib/surface/edge_cloud/networking/networks/get_status.py
 lib/surface/edge_cloud/networking/networks/list.yaml
 lib/surface/edge_cloud/networking/operations/__init__.py
 lib/surface/edge_cloud/networking/operations/describe.yaml
@@ -7373,6 +7407,7 @@ lib/surface/edge_cloud/networking/routers/add_interface.py
 lib/surface/edge_cloud/networking/routers/create.yaml
 lib/surface/edge_cloud/networking/routers/delete.yaml
 lib/surface/edge_cloud/networking/routers/describe.yaml
+lib/surface/edge_cloud/networking/routers/get_status.py
 lib/surface/edge_cloud/networking/routers/list.yaml
 lib/surface/edge_cloud/networking/routers/remove_bgp_peer.py
 lib/surface/edge_cloud/networking/routers/remove_interface.py
@@ -7953,6 +7988,7 @@ lib/surface/immersive_stream/xr/contents/describe.yaml
 lib/surface/immersive_stream/xr/contents/list.yaml
 lib/surface/immersive_stream/xr/contents/update.yaml
 lib/surface/immersive_stream/xr/instances/__init__.py
+lib/surface/immersive_stream/xr/instances/create.py
 lib/surface/immersive_stream/xr/instances/delete.yaml
 lib/surface/immersive_stream/xr/instances/describe.yaml
 lib/surface/immersive_stream/xr/instances/list.yaml
