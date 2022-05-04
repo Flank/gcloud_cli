@@ -25,7 +25,8 @@ from googlecloudsdk.command_lib.resource_manager import tag_arguments as argumen
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Update(base.Command):
   """Updates the specified TagKey resource's description.
 
@@ -40,7 +41,7 @@ class Update(base.Command):
 
             $ {command} tagKeys/123 --description=foobar
 
-          To update a TagKey named ``env" under organization ``456'',
+          To update a TagKey named ``env'' under organization ``456'',
           run:
 
             $ {command} 456/env --description=foobar

@@ -24,7 +24,8 @@ from googlecloudsdk.command_lib.resource_manager import tag_arguments as argumen
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Describe(base.Command):
   """Describes a TagKey resource.
 

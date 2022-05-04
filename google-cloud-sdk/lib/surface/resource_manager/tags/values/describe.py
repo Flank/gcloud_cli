@@ -24,7 +24,8 @@ from googlecloudsdk.command_lib.resource_manager import tag_arguments as argumen
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Describe(base.Command):
   """Describes a TagValue resource.
 
@@ -35,12 +36,12 @@ class Describe(base.Command):
   detailed_help = {
       'EXAMPLES':
           """
-          To describe a TagValue with id ``123", run:
+          To describe a TagValue with id ``123'', run:
 
             $ {command} tagValues/123
 
-          To describe a TagValue with name ``dev" with the tagKey ``env" under '
-          'organizations ``456",
+          To describe a TagValue with name ``dev'' with the tagKey ``env'' under
+          organizations ``456'',
           run:
 
             $ {command} 456/env/dev

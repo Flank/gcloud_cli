@@ -30,7 +30,8 @@ from six.moves.urllib.parse import quote
 PROJECTS_PREFIX = "//cloudresourcemanager.googleapis.com/projects/"
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Delete(base.Command):
   """Deletes a TagBinding.
 

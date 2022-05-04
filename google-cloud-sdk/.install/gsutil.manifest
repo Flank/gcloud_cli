@@ -170,6 +170,7 @@ platform/gsutil/gslib/tests/test_parallel_cp.py
 platform/gsutil/gslib/tests/test_parallelism_framework.py
 platform/gsutil/gslib/tests/test_perfdiag.py
 platform/gsutil/gslib/tests/test_plurality_checkable_iterator.py
+platform/gsutil/gslib/tests/test_posix_util.py
 platform/gsutil/gslib/tests/test_psc.py
 platform/gsutil/gslib/tests/test_rb.py
 platform/gsutil/gslib/tests/test_requester_pays.py
@@ -2319,17 +2320,7 @@ platform/gsutil/third_party/httplib2/script/release
 platform/gsutil/third_party/httplib2/script/test
 platform/gsutil/third_party/httplib2/setup.cfg
 platform/gsutil/third_party/httplib2/setup.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/__init__.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/functional/test_proxies.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/httplib2test_appengine.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/miniserver.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/other_cacerts.txt
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/smoke_test.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/test_no_socket.py
-platform/gsutil/third_party/httplib2/tests/_TODO_legacy/python2/test_ssl_context.py
 platform/gsutil/third_party/httplib2/tests/__init__.py
-platform/gsutil/third_party/httplib2/tests/fuzz_request.py
-platform/gsutil/third_party/httplib2/tests/fuzz_url.py
 platform/gsutil/third_party/httplib2/tests/test_auth.py
 platform/gsutil/third_party/httplib2/tests/test_cacerts_from_env.py
 platform/gsutil/third_party/httplib2/tests/test_cache.py
@@ -2338,7 +2329,6 @@ platform/gsutil/third_party/httplib2/tests/test_http.py
 platform/gsutil/third_party/httplib2/tests/test_https.py
 platform/gsutil/third_party/httplib2/tests/test_other.py
 platform/gsutil/third_party/httplib2/tests/test_proxy.py
-platform/gsutil/third_party/httplib2/tests/test_test_helpers.py
 platform/gsutil/third_party/httplib2/tests/test_uri.py
 platform/gsutil/third_party/httplib2/tests/tls/ca.key
 platform/gsutil/third_party/httplib2/tests/tls/ca.pem

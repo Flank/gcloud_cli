@@ -761,6 +761,7 @@ lib/googlecloudsdk/api_lib/storage/api_factory.py
 lib/googlecloudsdk/api_lib/storage/cloud_api.py
 lib/googlecloudsdk/api_lib/storage/errors.py
 lib/googlecloudsdk/api_lib/storage/gcs_api.py
+lib/googlecloudsdk/api_lib/storage/gcs_download.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_field_converters.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_upload.py
@@ -1046,6 +1047,7 @@ lib/googlecloudsdk/command_lib/cloudbuild/__init__.py
 lib/googlecloudsdk/command_lib/cloudbuild/bitbucketserver_flags.py
 lib/googlecloudsdk/command_lib/cloudbuild/execution.py
 lib/googlecloudsdk/command_lib/cloudbuild/githubenterprise_flags.py
+lib/googlecloudsdk/command_lib/cloudbuild/gitlab_flags.py
 lib/googlecloudsdk/command_lib/cloudbuild/resource_args.py
 lib/googlecloudsdk/command_lib/cloudbuild/resources.yaml
 lib/googlecloudsdk/command_lib/cloudbuild/run_flags.py
@@ -1396,6 +1398,8 @@ lib/googlecloudsdk/command_lib/container/fleet/kube_util.py
 lib/googlecloudsdk/command_lib/container/fleet/memberships/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/memberships/errors.py
 lib/googlecloudsdk/command_lib/container/fleet/memberships/util.py
+lib/googlecloudsdk/command_lib/container/fleet/mesh/__init__.py
+lib/googlecloudsdk/command_lib/container/fleet/mesh/utils.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/utils.py
 lib/googlecloudsdk/command_lib/container/fleet/rbac_util.py
@@ -1769,6 +1773,7 @@ lib/googlecloudsdk/command_lib/iam/policies_flags.py
 lib/googlecloudsdk/command_lib/iam/resources.yaml
 lib/googlecloudsdk/command_lib/iam/workforce_pools/__init__.py
 lib/googlecloudsdk/command_lib/iam/workforce_pools/flags.py
+lib/googlecloudsdk/command_lib/iam/workforce_pools/workforce_pool_waiter.py
 lib/googlecloudsdk/command_lib/iap/__init__.py
 lib/googlecloudsdk/command_lib/iap/exceptions.py
 lib/googlecloudsdk/command_lib/iap/resources.yaml
@@ -2780,6 +2785,9 @@ lib/googlecloudsdk/schemas/compute/v1/BackendServiceCdnPolicyNegativeCachingPoli
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceConnectionTrackingPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceFailoverPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceIAP.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceLocalityLoadBalancingPolicyConfig.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceLocalityLoadBalancingPolicyConfigCustomPolicy.yaml
+lib/googlecloudsdk/schemas/compute/v1/BackendServiceLocalityLoadBalancingPolicyConfigPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/BackendServiceLogConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/CacheKeyPolicy.yaml
 lib/googlecloudsdk/schemas/compute/v1/CircuitBreakers.yaml
@@ -5469,9 +5477,11 @@ lib/surface/builds/enterprise_config/github/describe.py
 lib/surface/builds/enterprise_config/github/list.py
 lib/surface/builds/enterprise_config/github/update.py
 lib/surface/builds/enterprise_config/gitlab/__init__.py
+lib/surface/builds/enterprise_config/gitlab/create.py
 lib/surface/builds/enterprise_config/gitlab/delete.py
 lib/surface/builds/enterprise_config/gitlab/describe.py
 lib/surface/builds/enterprise_config/gitlab/list.py
+lib/surface/builds/enterprise_config/gitlab/update.py
 lib/surface/builds/list.py
 lib/surface/builds/log.py
 lib/surface/builds/reject.yaml
@@ -5489,6 +5499,7 @@ lib/surface/builds/triggers/create/__init__.py
 lib/surface/builds/triggers/create/bitbucketserver.py
 lib/surface/builds/triggers/create/cloud_source_repositories.py
 lib/surface/builds/triggers/create/github.py
+lib/surface/builds/triggers/create/gitlab_enterprise.py
 lib/surface/builds/triggers/create/manual.py
 lib/surface/builds/triggers/create/pubsub.py
 lib/surface/builds/triggers/create/webhook.py
@@ -6165,6 +6176,7 @@ lib/surface/compute/public_delegated_prefixes/delegated_sub_prefixes/delete.py
 lib/surface/compute/public_delegated_prefixes/delete.py
 lib/surface/compute/public_delegated_prefixes/describe.py
 lib/surface/compute/public_delegated_prefixes/list.py
+lib/surface/compute/public_delegated_prefixes/update.py
 lib/surface/compute/regions/__init__.py
 lib/surface/compute/regions/describe.py
 lib/surface/compute/regions/list.py
@@ -6704,7 +6716,10 @@ lib/surface/container/fleet/multi_cluster_services/disable.py
 lib/surface/container/fleet/multi_cluster_services/enable.py
 lib/surface/container/fleet/namespaces/__init__.py
 lib/surface/container/fleet/namespaces/create.py
+lib/surface/container/fleet/namespaces/delete.py
 lib/surface/container/fleet/namespaces/describe.py
+lib/surface/container/fleet/namespaces/list.py
+lib/surface/container/fleet/namespaces/update.py
 lib/surface/container/fleet/policycontroller/__init__.py
 lib/surface/container/fleet/policycontroller/disable.py
 lib/surface/container/fleet/policycontroller/enable.py
@@ -7859,6 +7874,7 @@ lib/surface/iam/workforce_pools/create.py
 lib/surface/iam/workforce_pools/create_cred_config.py
 lib/surface/iam/workforce_pools/delete.yaml
 lib/surface/iam/workforce_pools/describe.yaml
+lib/surface/iam/workforce_pools/get_iam_policy.yaml
 lib/surface/iam/workforce_pools/list.py
 lib/surface/iam/workforce_pools/operations/__init__.py
 lib/surface/iam/workforce_pools/operations/describe.yaml
@@ -7869,14 +7885,19 @@ lib/surface/iam/workforce_pools/providers/delete.yaml
 lib/surface/iam/workforce_pools/providers/describe.yaml
 lib/surface/iam/workforce_pools/providers/keys/__init__.py
 lib/surface/iam/workforce_pools/providers/keys/create.yaml
+lib/surface/iam/workforce_pools/providers/keys/delete.yaml
+lib/surface/iam/workforce_pools/providers/keys/describe.yaml
+lib/surface/iam/workforce_pools/providers/keys/list.yaml
 lib/surface/iam/workforce_pools/providers/keys/operations/__init__.py
 lib/surface/iam/workforce_pools/providers/keys/operations/describe.yaml
+lib/surface/iam/workforce_pools/providers/keys/undelete.yaml
 lib/surface/iam/workforce_pools/providers/list.yaml
 lib/surface/iam/workforce_pools/providers/operations/__init__.py
 lib/surface/iam/workforce_pools/providers/operations/describe.yaml
 lib/surface/iam/workforce_pools/providers/undelete.yaml
 lib/surface/iam/workforce_pools/providers/update_oidc.yaml
 lib/surface/iam/workforce_pools/providers/update_saml.yaml
+lib/surface/iam/workforce_pools/set_iam_policy.yaml
 lib/surface/iam/workforce_pools/subjects/__init__.py
 lib/surface/iam/workforce_pools/subjects/delete.yaml
 lib/surface/iam/workforce_pools/subjects/operations/__init__.py
@@ -7992,7 +8013,7 @@ lib/surface/immersive_stream/xr/instances/create.py
 lib/surface/immersive_stream/xr/instances/delete.yaml
 lib/surface/immersive_stream/xr/instances/describe.yaml
 lib/surface/immersive_stream/xr/instances/list.yaml
-lib/surface/immersive_stream/xr/instances/update.yaml
+lib/surface/immersive_stream/xr/instances/update.py
 lib/surface/immersive_stream/xr/operations/__init__.py
 lib/surface/immersive_stream/xr/operations/describe.yaml
 lib/surface/immersive_stream/xr/operations/wait.yaml

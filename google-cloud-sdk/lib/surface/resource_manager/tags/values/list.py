@@ -25,13 +25,14 @@ from googlecloudsdk.command_lib.resource_manager import tag_arguments as argumen
 from googlecloudsdk.command_lib.resource_manager import tag_utils
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class List(base.ListCommand):
   r"""Lists TagValues under the specified parent resource.
 
   ## EXAMPLES
 
-  To list all the TagValues under ``organizations/123/env", run:
+  To list all the TagValues under ``organizations/123/env'', run:
 
         $ {command} --parent=123/env
   """

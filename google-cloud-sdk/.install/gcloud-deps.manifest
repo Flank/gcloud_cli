@@ -2612,6 +2612,7 @@ lib/third_party/ml_sdk/cloud/ml/prediction/__init__.py
 lib/third_party/ml_sdk/cloud/ml/prediction/_interfaces.py
 lib/third_party/ml_sdk/cloud/ml/prediction/custom_code_utils.py
 lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/__init__.py
+lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/bqml_xg_prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/sk_xg_prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/tf_prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/prediction_lib.py
