@@ -755,6 +755,7 @@ lib/googlecloudsdk/api_lib/sql/network.py
 lib/googlecloudsdk/api_lib/sql/operations.py
 lib/googlecloudsdk/api_lib/sql/ssl/__init__.py
 lib/googlecloudsdk/api_lib/sql/ssl/server_ca_certs.py
+lib/googlecloudsdk/api_lib/sql/users_util.py
 lib/googlecloudsdk/api_lib/sql/validate.py
 lib/googlecloudsdk/api_lib/storage/__init__.py
 lib/googlecloudsdk/api_lib/storage/api_factory.py
@@ -2172,6 +2173,7 @@ lib/googlecloudsdk/command_lib/spanner/write_util.py
 lib/googlecloudsdk/command_lib/sql/__init__.py
 lib/googlecloudsdk/command_lib/sql/export_util.py
 lib/googlecloudsdk/command_lib/sql/flags.py
+lib/googlecloudsdk/command_lib/sql/generate_login_token_util.py
 lib/googlecloudsdk/command_lib/sql/import_util.py
 lib/googlecloudsdk/command_lib/sql/instances.py
 lib/googlecloudsdk/command_lib/sql/reschedule_maintenance_util.py
@@ -5180,7 +5182,7 @@ lib/surface/artifacts/docker/tags/add.py
 lib/surface/artifacts/docker/tags/delete.py
 lib/surface/artifacts/docker/tags/list.py
 lib/surface/artifacts/files/__init__.py
-lib/surface/artifacts/files/list.yaml
+lib/surface/artifacts/files/list.py
 lib/surface/artifacts/googet/__init__.py
 lib/surface/artifacts/googet/import.py
 lib/surface/artifacts/googet/upload.py
@@ -6729,6 +6731,11 @@ lib/surface/container/fleet/service_directory/describe.py
 lib/surface/container/fleet/service_directory/disable.py
 lib/surface/container/fleet/service_directory/enable.py
 lib/surface/container/fleet/update.py
+lib/surface/container/fleet/workload_certificate/__init__.py
+lib/surface/container/fleet/workload_certificate/describe.py
+lib/surface/container/fleet/workload_certificate/disable.py
+lib/surface/container/fleet/workload_certificate/enable.py
+lib/surface/container/fleet/workload_certificate/update.py
 lib/surface/container/get_server_config.py
 lib/surface/container/hub/__init__.py
 lib/surface/container/images/__init__.py
@@ -9385,6 +9392,7 @@ lib/surface/sql/export/csv.py
 lib/surface/sql/export/sql.py
 lib/surface/sql/flags/__init__.py
 lib/surface/sql/flags/list.py
+lib/surface/sql/generate_login_token.py
 lib/surface/sql/import/__init__.py
 lib/surface/sql/import/bak.py
 lib/surface/sql/import/csv.py
