@@ -525,12 +525,12 @@ lib/googlecloudsdk/api_lib/firestore/admin_api.py
 lib/googlecloudsdk/api_lib/firestore/operations.py
 lib/googlecloudsdk/api_lib/firestore/rewrite_backend.py
 lib/googlecloudsdk/api_lib/functions/__init__.py
+lib/googlecloudsdk/api_lib/functions/secrets.py
 lib/googlecloudsdk/api_lib/functions/transforms.py
 lib/googlecloudsdk/api_lib/functions/v1/__init__.py
 lib/googlecloudsdk/api_lib/functions/v1/env_vars.py
 lib/googlecloudsdk/api_lib/functions/v1/exceptions.py
 lib/googlecloudsdk/api_lib/functions/v1/operations.py
-lib/googlecloudsdk/api_lib/functions/v1/secrets.py
 lib/googlecloudsdk/api_lib/functions/v1/triggers.py
 lib/googlecloudsdk/api_lib/functions/v1/util.py
 lib/googlecloudsdk/api_lib/functions/v2/__init__.py
@@ -635,6 +635,7 @@ lib/googlecloudsdk/api_lib/oslogin/__init__.py
 lib/googlecloudsdk/api_lib/oslogin/client.py
 lib/googlecloudsdk/api_lib/policy_intelligence/__init__.py
 lib/googlecloudsdk/api_lib/policy_intelligence/policy_analyzer.py
+lib/googlecloudsdk/api_lib/policy_intelligence/policy_troubleshooter.py
 lib/googlecloudsdk/api_lib/privateca/__init__.py
 lib/googlecloudsdk/api_lib/privateca/base.py
 lib/googlecloudsdk/api_lib/privateca/certificate_utils.py
@@ -999,6 +1000,10 @@ lib/googlecloudsdk/command_lib/beyondcorp/app/connectors/flags.yaml
 lib/googlecloudsdk/command_lib/beyondcorp/app/connectors/hooks.py
 lib/googlecloudsdk/command_lib/beyondcorp/app/resources.yaml
 lib/googlecloudsdk/command_lib/beyondcorp/app/util.py
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/__init__.py
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/gateways/__init__.py
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/gateways/flags.yaml
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/resources.yaml
 lib/googlecloudsdk/command_lib/bigtable/__init__.py
 lib/googlecloudsdk/command_lib/bigtable/arguments.py
 lib/googlecloudsdk/command_lib/bigtable/iam.py
@@ -1578,10 +1583,12 @@ lib/googlecloudsdk/command_lib/edge_cache/util.py
 lib/googlecloudsdk/command_lib/edge_cloud/__init__.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/__init__.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/admin_users.py
+lib/googlecloudsdk/command_lib/edge_cloud/container/fallthrough.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/flags.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/hub.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/kubeconfig.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/locations.py
+lib/googlecloudsdk/command_lib/edge_cloud/container/maintenance_window.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/resource_args.py
 lib/googlecloudsdk/command_lib/edge_cloud/container/resources.yaml
 lib/googlecloudsdk/command_lib/edge_cloud/container/vpn.py
@@ -5301,6 +5308,15 @@ lib/surface/beyondcorp/app/connectors/update.yaml
 lib/surface/beyondcorp/app/operations/__init__.py
 lib/surface/beyondcorp/app/operations/describe.yaml
 lib/surface/beyondcorp/app/operations/list.yaml
+lib/surface/beyondcorp/client_connector/__init__.py
+lib/surface/beyondcorp/client_connector/gateways/__init__.py
+lib/surface/beyondcorp/client_connector/gateways/create.yaml
+lib/surface/beyondcorp/client_connector/gateways/delete.yaml
+lib/surface/beyondcorp/client_connector/gateways/describe.yaml
+lib/surface/beyondcorp/client_connector/gateways/list.yaml
+lib/surface/beyondcorp/client_connector/operations/__init__.py
+lib/surface/beyondcorp/client_connector/operations/describe.yaml
+lib/surface/beyondcorp/client_connector/operations/list.yaml
 lib/surface/bigtable/__init__.py
 lib/surface/bigtable/app_profiles/__init__.py
 lib/surface/bigtable/app_profiles/config/__init__.py
@@ -5312,6 +5328,7 @@ lib/surface/bigtable/app_profiles/list.py
 lib/surface/bigtable/app_profiles/update.py
 lib/surface/bigtable/backups/__init__.py
 lib/surface/bigtable/backups/add_iam_policy_binding.yaml
+lib/surface/bigtable/backups/copy.py
 lib/surface/bigtable/backups/create.yaml
 lib/surface/bigtable/backups/delete.yaml
 lib/surface/bigtable/backups/describe.yaml
@@ -7650,6 +7667,7 @@ lib/surface/firestore/__init__.py
 lib/surface/firestore/databases/__init__.py
 lib/surface/firestore/databases/create.py
 lib/surface/firestore/databases/describe.yaml
+lib/surface/firestore/databases/update.yaml
 lib/surface/firestore/export.py
 lib/surface/firestore/import.py
 lib/surface/firestore/indexes/__init__.py
@@ -8715,6 +8733,8 @@ lib/surface/organizations/remove_iam_policy_binding.yaml
 lib/surface/organizations/set_iam_policy.py
 lib/surface/policy_intelligence/__init__.py
 lib/surface/policy_intelligence/query_activity.py
+lib/surface/policy_intelligence/troubleshoot_policy/__init__.py
+lib/surface/policy_intelligence/troubleshoot_policy/iam.py
 lib/surface/policy_troubleshoot/__init__.py
 lib/surface/policy_troubleshoot/iam.yaml
 lib/surface/privateca/__init__.py
