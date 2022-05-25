@@ -144,6 +144,7 @@ lib/googlecloudsdk/api_lib/bigtable/backups.py
 lib/googlecloudsdk/api_lib/bigtable/clusters.py
 lib/googlecloudsdk/api_lib/bigtable/instances.py
 lib/googlecloudsdk/api_lib/bigtable/operations.py
+lib/googlecloudsdk/api_lib/bigtable/tables.py
 lib/googlecloudsdk/api_lib/bigtable/util.py
 lib/googlecloudsdk/api_lib/billing/__init__.py
 lib/googlecloudsdk/api_lib/billing/billing_client.py
@@ -587,6 +588,7 @@ lib/googlecloudsdk/api_lib/lifesciences/lifesciences_client.py
 lib/googlecloudsdk/api_lib/lifesciences/lifesciences_util.py
 lib/googlecloudsdk/api_lib/logging/__init__.py
 lib/googlecloudsdk/api_lib/logging/common.py
+lib/googlecloudsdk/api_lib/logging/formatter.py
 lib/googlecloudsdk/api_lib/logging/tailing.py
 lib/googlecloudsdk/api_lib/logging/util.py
 lib/googlecloudsdk/api_lib/memcache/__init__.py
@@ -616,7 +618,8 @@ lib/googlecloudsdk/api_lib/monitoring/channels.py
 lib/googlecloudsdk/api_lib/monitoring/metrics_scopes.py
 lib/googlecloudsdk/api_lib/monitoring/policies.py
 lib/googlecloudsdk/api_lib/network_connectivity/__init__.py
-lib/googlecloudsdk/api_lib/network_connectivity/networkconnectivity_client.py
+lib/googlecloudsdk/api_lib/network_connectivity/networkconnectivity_api.py
+lib/googlecloudsdk/api_lib/network_connectivity/networkconnectivity_util.py
 lib/googlecloudsdk/api_lib/network_management/__init__.py
 lib/googlecloudsdk/api_lib/network_security/__init__.py
 lib/googlecloudsdk/api_lib/network_services/__init__.py
@@ -811,6 +814,7 @@ lib/googlecloudsdk/api_lib/vmware/clusters.py
 lib/googlecloudsdk/api_lib/vmware/hcxactivationkeys.py
 lib/googlecloudsdk/api_lib/vmware/locations.py
 lib/googlecloudsdk/api_lib/vmware/networkpeering.py
+lib/googlecloudsdk/api_lib/vmware/networkpolicies.py
 lib/googlecloudsdk/api_lib/vmware/networks.py
 lib/googlecloudsdk/api_lib/vmware/nodetypes.py
 lib/googlecloudsdk/api_lib/vmware/operations.py
@@ -1497,6 +1501,7 @@ lib/googlecloudsdk/command_lib/dataproc/jobs/spark.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/spark_r.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/spark_sql.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/submitter.py
+lib/googlecloudsdk/command_lib/dataproc/jobs/util.py
 lib/googlecloudsdk/command_lib/dataproc/local_file_uploader.py
 lib/googlecloudsdk/command_lib/dataproc/sessions/__init__.py
 lib/googlecloudsdk/command_lib/dataproc/sessions/session_message_factory.py
@@ -1965,6 +1970,7 @@ lib/googlecloudsdk/command_lib/monitoring/resource_args.py
 lib/googlecloudsdk/command_lib/monitoring/resources.yaml
 lib/googlecloudsdk/command_lib/monitoring/util.py
 lib/googlecloudsdk/command_lib/network_connectivity/__init__.py
+lib/googlecloudsdk/command_lib/network_connectivity/flags.py
 lib/googlecloudsdk/command_lib/network_connectivity/resources.yaml
 lib/googlecloudsdk/command_lib/network_connectivity/util.py
 lib/googlecloudsdk/command_lib/network_management/__init__.py
@@ -2196,6 +2202,7 @@ lib/googlecloudsdk/command_lib/storage/encryption_util.py
 lib/googlecloudsdk/command_lib/storage/errors.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
 lib/googlecloudsdk/command_lib/storage/flags.py
+lib/googlecloudsdk/command_lib/storage/gzip_util.py
 lib/googlecloudsdk/command_lib/storage/hash_util.py
 lib/googlecloudsdk/command_lib/storage/manifest_util.py
 lib/googlecloudsdk/command_lib/storage/metrics_util.py
@@ -2360,6 +2367,9 @@ lib/googlecloudsdk/command_lib/util/ssh/ssh.py
 lib/googlecloudsdk/command_lib/util/time_util.py
 lib/googlecloudsdk/command_lib/vmware/__init__.py
 lib/googlecloudsdk/command_lib/vmware/flags.py
+lib/googlecloudsdk/command_lib/vmware/network_policies/__init__.py
+lib/googlecloudsdk/command_lib/vmware/network_policies/flags.py
+lib/googlecloudsdk/command_lib/vmware/network_policies/resources.yaml
 lib/googlecloudsdk/command_lib/vmware/networks/__init__.py
 lib/googlecloudsdk/command_lib/vmware/networks/flags.py
 lib/googlecloudsdk/command_lib/vmware/networks/resources.yaml
@@ -3919,6 +3929,10 @@ lib/googlecloudsdk/third_party/apis/iam/v1beta/__init__.py
 lib/googlecloudsdk/third_party/apis/iam/v1beta/iam_v1beta_client.py
 lib/googlecloudsdk/third_party/apis/iam/v1beta/iam_v1beta_messages.py
 lib/googlecloudsdk/third_party/apis/iam/v1beta/resources.py
+lib/googlecloudsdk/third_party/apis/iam/v2/__init__.py
+lib/googlecloudsdk/third_party/apis/iam/v2/iam_v2_client.py
+lib/googlecloudsdk/third_party/apis/iam/v2/iam_v2_messages.py
+lib/googlecloudsdk/third_party/apis/iam/v2/resources.py
 lib/googlecloudsdk/third_party/apis/iam/v2alpha/__init__.py
 lib/googlecloudsdk/third_party/apis/iam/v2alpha/iam_v2alpha_client.py
 lib/googlecloudsdk/third_party/apis/iam/v2alpha/iam_v2alpha_messages.py
@@ -3929,6 +3943,7 @@ lib/googlecloudsdk/third_party/apis/iam/v2beta/iam_v2beta_messages.py
 lib/googlecloudsdk/third_party/apis/iam/v2beta/resources.py
 lib/googlecloudsdk/third_party/apis/iam_v1.json
 lib/googlecloudsdk/third_party/apis/iam_v1beta.json
+lib/googlecloudsdk/third_party/apis/iam_v2.json
 lib/googlecloudsdk/third_party/apis/iam_v2alpha.json
 lib/googlecloudsdk/third_party/apis/iam_v2beta.json
 lib/googlecloudsdk/third_party/apis/iamassist_v1alpha2.json
@@ -8562,7 +8577,9 @@ lib/surface/network_connectivity/spokes/__init__.py
 lib/surface/network_connectivity/spokes/activate.yaml
 lib/surface/network_connectivity/spokes/create.yaml
 lib/surface/network_connectivity/spokes/deactivate.yaml
+lib/surface/network_connectivity/spokes/delete.py
 lib/surface/network_connectivity/spokes/delete.yaml
+lib/surface/network_connectivity/spokes/describe.py
 lib/surface/network_connectivity/spokes/describe.yaml
 lib/surface/network_connectivity/spokes/linked_interconnect_attachments/__init__.py
 lib/surface/network_connectivity/spokes/linked_interconnect_attachments/create.yaml
@@ -9110,6 +9127,7 @@ lib/surface/run/services/get_iam_policy.yaml
 lib/surface/run/services/list.py
 lib/surface/run/services/logs/__init__.py
 lib/surface/run/services/logs/read.py
+lib/surface/run/services/logs/tail.py
 lib/surface/run/services/proxy.py
 lib/surface/run/services/remove_iam_policy_binding.yaml
 lib/surface/run/services/replace.py
@@ -9640,6 +9658,12 @@ lib/surface/vmware/network_peerings/delete.py
 lib/surface/vmware/network_peerings/describe.py
 lib/surface/vmware/network_peerings/list.py
 lib/surface/vmware/network_peerings/update.py
+lib/surface/vmware/network_policies/__init__.py
+lib/surface/vmware/network_policies/create.py
+lib/surface/vmware/network_policies/delete.py
+lib/surface/vmware/network_policies/describe.py
+lib/surface/vmware/network_policies/list.py
+lib/surface/vmware/network_policies/update.py
 lib/surface/vmware/networks/__init__.py
 lib/surface/vmware/networks/create.py
 lib/surface/vmware/networks/delete.py
