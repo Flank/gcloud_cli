@@ -125,6 +125,7 @@ lib/googlecloudsdk/api_lib/assured/endpoint_util.py
 lib/googlecloudsdk/api_lib/assured/message_util.py
 lib/googlecloudsdk/api_lib/assured/operations.py
 lib/googlecloudsdk/api_lib/assured/util.py
+lib/googlecloudsdk/api_lib/assured/violations.py
 lib/googlecloudsdk/api_lib/assured/workloads.py
 lib/googlecloudsdk/api_lib/auth/__init__.py
 lib/googlecloudsdk/api_lib/auth/exceptions.py
@@ -135,6 +136,7 @@ lib/googlecloudsdk/api_lib/auth/util.py
 lib/googlecloudsdk/api_lib/batch/__init__.py
 lib/googlecloudsdk/api_lib/batch/jobs.py
 lib/googlecloudsdk/api_lib/batch/tasks.py
+lib/googlecloudsdk/api_lib/batch/util.py
 lib/googlecloudsdk/api_lib/beyondcorp/__init__.py
 lib/googlecloudsdk/api_lib/beyondcorp/app/__init__.py
 lib/googlecloudsdk/api_lib/beyondcorp/app/util.py
@@ -767,6 +769,7 @@ lib/googlecloudsdk/api_lib/storage/cloud_api.py
 lib/googlecloudsdk/api_lib/storage/errors.py
 lib/googlecloudsdk/api_lib/storage/gcs_api.py
 lib/googlecloudsdk/api_lib/storage/gcs_download.py
+lib/googlecloudsdk/api_lib/storage/gcs_error_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_field_converters.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_upload.py
@@ -968,6 +971,7 @@ lib/googlecloudsdk/command_lib/artifacts/containeranalysis_util.py
 lib/googlecloudsdk/command_lib/artifacts/docker_util.py
 lib/googlecloudsdk/command_lib/artifacts/flags.py
 lib/googlecloudsdk/command_lib/artifacts/format_util.py
+lib/googlecloudsdk/command_lib/artifacts/go_util.py
 lib/googlecloudsdk/command_lib/artifacts/ondemandscanning_util.py
 lib/googlecloudsdk/command_lib/artifacts/print_settings/__init__.py
 lib/googlecloudsdk/command_lib/artifacts/print_settings/apt.py
@@ -1008,6 +1012,9 @@ lib/googlecloudsdk/command_lib/beyondcorp/client_connector/__init__.py
 lib/googlecloudsdk/command_lib/beyondcorp/client_connector/gateways/__init__.py
 lib/googlecloudsdk/command_lib/beyondcorp/client_connector/gateways/flags.yaml
 lib/googlecloudsdk/command_lib/beyondcorp/client_connector/resources.yaml
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/services/__init__.py
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/services/flags.yaml
+lib/googlecloudsdk/command_lib/beyondcorp/client_connector/services/hooks.py
 lib/googlecloudsdk/command_lib/bigtable/__init__.py
 lib/googlecloudsdk/command_lib/bigtable/arguments.py
 lib/googlecloudsdk/command_lib/bigtable/iam.py
@@ -2181,6 +2188,7 @@ lib/googlecloudsdk/command_lib/spanner/flags.py
 lib/googlecloudsdk/command_lib/spanner/iam.py
 lib/googlecloudsdk/command_lib/spanner/resource_args.py
 lib/googlecloudsdk/command_lib/spanner/resources.yaml
+lib/googlecloudsdk/command_lib/spanner/samples.py
 lib/googlecloudsdk/command_lib/spanner/sql.py
 lib/googlecloudsdk/command_lib/spanner/write_util.py
 lib/googlecloudsdk/command_lib/sql/__init__.py
@@ -2207,6 +2215,7 @@ lib/googlecloudsdk/command_lib/storage/hash_util.py
 lib/googlecloudsdk/command_lib/storage/manifest_util.py
 lib/googlecloudsdk/command_lib/storage/metrics_util.py
 lib/googlecloudsdk/command_lib/storage/name_expansion.py
+lib/googlecloudsdk/command_lib/storage/notification_configuration_iterator.py
 lib/googlecloudsdk/command_lib/storage/optimize_parameters_util.py
 lib/googlecloudsdk/command_lib/storage/paths.py
 lib/googlecloudsdk/command_lib/storage/plurality_checkable_iterator.py
@@ -2224,10 +2233,13 @@ lib/googlecloudsdk/command_lib/storage/resources/s3_resource_reference.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
 lib/googlecloudsdk/command_lib/storage/storage_parallel.py
 lib/googlecloudsdk/command_lib/storage/storage_url.py
+lib/googlecloudsdk/command_lib/storage/streaming_upload_file_wrapper.py
 lib/googlecloudsdk/command_lib/storage/tasks/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/create_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/delete_bucket_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/buckets/notifications/__init__.py
+lib/googlecloudsdk/command_lib/storage/tasks/buckets/notifications/delete_notification_configuration_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/update_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/compose_objects_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/__init__.py
@@ -3080,16 +3092,11 @@ lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/__init__.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/alloydb_v1alpha_client.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/alloydb_v1alpha_messages.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1alpha/resources.py
-lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/__init__.py
-lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/alloydb_v1alpha1_client.py
-lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/alloydb_v1alpha1_messages.py
-lib/googlecloudsdk/third_party/apis/alloydb/v1alpha1/resources.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1beta/__init__.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1beta/alloydb_v1beta_client.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1beta/alloydb_v1beta_messages.py
 lib/googlecloudsdk/third_party/apis/alloydb/v1beta/resources.py
 lib/googlecloudsdk/third_party/apis/alloydb_v1alpha.json
-lib/googlecloudsdk/third_party/apis/alloydb_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/alloydb_v1beta.json
 lib/googlecloudsdk/third_party/apis/anthosevents/__init__.py
 lib/googlecloudsdk/third_party/apis/anthosevents/v1/__init__.py
@@ -3202,10 +3209,15 @@ lib/googlecloudsdk/third_party/apis/baremetalsolution/v2/resources.py
 lib/googlecloudsdk/third_party/apis/baremetalsolution_v1.json
 lib/googlecloudsdk/third_party/apis/baremetalsolution_v2.json
 lib/googlecloudsdk/third_party/apis/batch/__init__.py
+lib/googlecloudsdk/third_party/apis/batch/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/batch/v1/batch_v1_client.py
+lib/googlecloudsdk/third_party/apis/batch/v1/batch_v1_messages.py
+lib/googlecloudsdk/third_party/apis/batch/v1/resources.py
 lib/googlecloudsdk/third_party/apis/batch/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/batch/v1alpha1/batch_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/batch/v1alpha1/batch_v1alpha1_messages.py
 lib/googlecloudsdk/third_party/apis/batch/v1alpha1/resources.py
+lib/googlecloudsdk/third_party/apis/batch_v1.json
 lib/googlecloudsdk/third_party/apis/batch_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/beyondcorp/__init__.py
 lib/googlecloudsdk/third_party/apis/beyondcorp/v1alpha/__init__.py
@@ -3897,6 +3909,12 @@ lib/googlecloudsdk/third_party/apis/gkemulticloud/v1/gkemulticloud_v1_messages.p
 lib/googlecloudsdk/third_party/apis/gkemulticloud/v1/resources.py
 lib/googlecloudsdk/third_party/apis/gkemulticloud/v1alpha/__init__.py
 lib/googlecloudsdk/third_party/apis/gkemulticloud_v1.json
+lib/googlecloudsdk/third_party/apis/gkeonprem/__init__.py
+lib/googlecloudsdk/third_party/apis/gkeonprem/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/gkeonprem/v1/gkeonprem_v1_client.py
+lib/googlecloudsdk/third_party/apis/gkeonprem/v1/gkeonprem_v1_messages.py
+lib/googlecloudsdk/third_party/apis/gkeonprem/v1/resources.py
+lib/googlecloudsdk/third_party/apis/gkeonprem_v1.json
 lib/googlecloudsdk/third_party/apis/gsuiteaddons/__init__.py
 lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/gsuiteaddons/v1/gsuiteaddons_v1_client.py
@@ -5039,6 +5057,7 @@ lib/surface/anthos/config/controller/describe.yaml
 lib/surface/anthos/config/controller/get_config_connector_identity.py
 lib/surface/anthos/config/controller/get_credentials.py
 lib/surface/anthos/config/controller/list.yaml
+lib/surface/anthos/config/controller/update.py
 lib/surface/anthos/config/operations/__init__.py
 lib/surface/anthos/config/operations/describe.yaml
 lib/surface/anthos/config/operations/list.yaml
@@ -5205,6 +5224,8 @@ lib/surface/artifacts/docker/tags/delete.py
 lib/surface/artifacts/docker/tags/list.py
 lib/surface/artifacts/files/__init__.py
 lib/surface/artifacts/files/list.py
+lib/surface/artifacts/go/__init__.py
+lib/surface/artifacts/go/upload.py
 lib/surface/artifacts/googet/__init__.py
 lib/surface/artifacts/googet/import.py
 lib/surface/artifacts/googet/upload.py
@@ -5279,6 +5300,9 @@ lib/surface/assured/workloads/delete.py
 lib/surface/assured/workloads/describe.py
 lib/surface/assured/workloads/list.py
 lib/surface/assured/workloads/update.py
+lib/surface/assured/workloads/violations/__init__.py
+lib/surface/assured/workloads/violations/describe.py
+lib/surface/assured/workloads/violations/list.py
 lib/surface/auth/__init__.py
 lib/surface/auth/activate_refresh_token.py
 lib/surface/auth/activate_service_account.py
@@ -5332,6 +5356,12 @@ lib/surface/beyondcorp/client_connector/gateways/list.yaml
 lib/surface/beyondcorp/client_connector/operations/__init__.py
 lib/surface/beyondcorp/client_connector/operations/describe.yaml
 lib/surface/beyondcorp/client_connector/operations/list.yaml
+lib/surface/beyondcorp/client_connector/services/__init__.py
+lib/surface/beyondcorp/client_connector/services/create.yaml
+lib/surface/beyondcorp/client_connector/services/delete.yaml
+lib/surface/beyondcorp/client_connector/services/describe.yaml
+lib/surface/beyondcorp/client_connector/services/list.yaml
+lib/surface/beyondcorp/client_connector/services/update.yaml
 lib/surface/bigtable/__init__.py
 lib/surface/bigtable/app_profiles/__init__.py
 lib/surface/bigtable/app_profiles/config/__init__.py
@@ -5375,6 +5405,7 @@ lib/surface/bigtable/instances/tables/__init__.py
 lib/surface/bigtable/instances/tables/add_iam_policy_binding.yaml
 lib/surface/bigtable/instances/tables/config/__init__.py
 lib/surface/bigtable/instances/tables/config/export.yaml
+lib/surface/bigtable/instances/tables/create.yaml
 lib/surface/bigtable/instances/tables/describe.yaml
 lib/surface/bigtable/instances/tables/get_iam_policy.yaml
 lib/surface/bigtable/instances/tables/list.py
@@ -5432,6 +5463,7 @@ lib/surface/bms/instances/update.py
 lib/surface/bms/networks/__init__.py
 lib/surface/bms/networks/describe.py
 lib/surface/bms/networks/list.py
+lib/surface/bms/networks/list_ip_reservations.py
 lib/surface/bms/networks/update.py
 lib/surface/bms/nfs_shares/__init__.py
 lib/surface/bms/nfs_shares/describe.py
@@ -7190,6 +7222,7 @@ lib/surface/deploy/delivery_pipelines/list.yaml
 lib/surface/deploy/delivery_pipelines/remove_iam_policy_binding.yaml
 lib/surface/deploy/delivery_pipelines/set_iam_policy.yaml
 lib/surface/deploy/releases/__init__.py
+lib/surface/deploy/releases/abandon.py
 lib/surface/deploy/releases/create.py
 lib/surface/deploy/releases/describe.yaml
 lib/surface/deploy/releases/list.yaml
@@ -8056,6 +8089,7 @@ lib/surface/immersive_stream/xr/instances/list.yaml
 lib/surface/immersive_stream/xr/instances/update.py
 lib/surface/immersive_stream/xr/operations/__init__.py
 lib/surface/immersive_stream/xr/operations/describe.yaml
+lib/surface/immersive_stream/xr/operations/list.yaml
 lib/surface/immersive_stream/xr/operations/wait.yaml
 lib/surface/info.py
 lib/surface/init.py
@@ -8587,9 +8621,12 @@ lib/surface/network_connectivity/spokes/linked_interconnect_attachments/update.y
 lib/surface/network_connectivity/spokes/linked_router_appliances/__init__.py
 lib/surface/network_connectivity/spokes/linked_router_appliances/create.yaml
 lib/surface/network_connectivity/spokes/linked_router_appliances/update.yaml
+lib/surface/network_connectivity/spokes/linked_vpc_network/__init__.py
+lib/surface/network_connectivity/spokes/linked_vpc_network/create.py
 lib/surface/network_connectivity/spokes/linked_vpn_tunnels/__init__.py
 lib/surface/network_connectivity/spokes/linked_vpn_tunnels/create.yaml
 lib/surface/network_connectivity/spokes/linked_vpn_tunnels/update.yaml
+lib/surface/network_connectivity/spokes/list.py
 lib/surface/network_connectivity/spokes/list.yaml
 lib/surface/network_connectivity/spokes/update.yaml
 lib/surface/network_management/__init__.py
@@ -9001,8 +9038,6 @@ lib/surface/resource_config/terraform/__init__.py
 lib/surface/resource_config/terraform/generate_import.py
 lib/surface/resource_config/terraform/init_provider.py
 lib/surface/resource_config/terraform/templates/main_tf.tpl
-lib/surface/resource_config/validate/__init__.py
-lib/surface/resource_config/validate/terraform.py
 lib/surface/resource_manager/__init__.py
 lib/surface/resource_manager/folders/__init__.py
 lib/surface/resource_manager/folders/add_iam_policy_binding.yaml
@@ -9106,6 +9141,7 @@ lib/surface/run/jobs/executions/tasks/list.py
 lib/surface/run/jobs/get_iam_policy.yaml
 lib/surface/run/jobs/list.py
 lib/surface/run/jobs/remove_iam_policy_binding.yaml
+lib/surface/run/jobs/replace.py
 lib/surface/run/jobs/set_iam_policy.yaml
 lib/surface/run/jobs/update.py
 lib/surface/run/regions/__init__.py
@@ -9408,6 +9444,12 @@ lib/surface/spanner/rows/__init__.py
 lib/surface/spanner/rows/delete.py
 lib/surface/spanner/rows/insert.py
 lib/surface/spanner/rows/update.py
+lib/surface/spanner/samples/__init__.py
+lib/surface/spanner/samples/backend.py
+lib/surface/spanner/samples/init.py
+lib/surface/spanner/samples/list.py
+lib/surface/spanner/samples/run.py
+lib/surface/spanner/samples/workload.py
 lib/surface/sql/__init__.py
 lib/surface/sql/backups/__init__.py
 lib/surface/sql/backups/create.py

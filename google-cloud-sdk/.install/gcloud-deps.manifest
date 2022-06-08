@@ -2752,7 +2752,9 @@ lib/third_party/packaging/specifiers.py
 lib/third_party/packaging/utils.py
 lib/third_party/packaging/version.py
 lib/third_party/pkg_resources/__init__.py
+lib/third_party/portpicker/LICENSE
 lib/third_party/portpicker/__init__.py
+lib/third_party/prompt_toolkit/LICENSE
 lib/third_party/prompt_toolkit/__init__.py
 lib/third_party/prompt_toolkit/application.py
 lib/third_party/prompt_toolkit/auto_suggest.py

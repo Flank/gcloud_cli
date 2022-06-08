@@ -194,6 +194,10 @@ def AddDescribeWorkloadFlags(parser):
   AddWorkloadResourceArgToParser(parser, verb='describe')
 
 
+def AddDescribeViolationFlags(parser):
+  AddViolationResourceArgToParser(parser, verb='describe')
+
+
 def AddUpdateWorkloadFlags(parser):
   AddWorkloadResourceArgToParser(parser, verb='update')
   parser.add_argument(
@@ -228,3 +232,21 @@ def AddWorkloadResourceArgToParser(parser, verb):
       resource_args.GetWorkloadResourceSpec(),
       ('The Assured Workloads environment resource to {}.'.format(verb)),
       required=True).AddToParser(parser)
+
+
+def AddViolationResourceArgToParser(parser, verb):
+  concept_parsers.ConceptParser.ForResource(
+      'violation',
+      resource_args.GetViolationResourceSpec(),
+      ('The Assured Workloads violation resource to {}.'.format(verb)),
+      required=True).AddToParser(parser)
+
+
+def AddListViolationsFlags(parser):
+  """Method to add list violations flags."""
+  AddListWorkloadsFlags(parser)
+  parser.add_argument(
+      '--workload',
+      required=True,
+      help=('The parent workload of the Assured Workloads violations, '
+            'provided as workload ID.'))

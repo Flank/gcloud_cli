@@ -18,11 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import encryption_util
 from googlecloudsdk.command_lib.storage import flags
 from googlecloudsdk.command_lib.storage import name_expansion
+from googlecloudsdk.command_lib.storage import stdin_iterator
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import user_request_args_factory
 from googlecloudsdk.command_lib.storage.tasks import task_executor
@@ -158,7 +160,7 @@ class Cp(base.Command):
 
   @staticmethod
   def Args(parser):
-    parser.add_argument('source', nargs='+', help='The source path(s) to copy.')
+    parser.add_argument('source', nargs='*', help='The source path(s) to copy.')
     parser.add_argument('destination', help='The destination path.')
     parser.add_argument(
         '-A',
@@ -190,13 +192,6 @@ class Cp(base.Command):
         ' Skipped items will be printed. This option performs an additional GET'
         ' request for cloud objects before attempting an upload.')
     parser.add_argument(
-        '-a',
-        '--canned-acl',
-        '--predefined-acl',
-        help='Applies predefined, or "canned," ACLs to a copied object. See'
-        ' docs for a list of predefined ACL constants: https://cloud.google.com'
-        '/storage/docs/access-control/lists#predefined-acl')
-    parser.add_argument(
         '-P',
         '--preserve-posix',
         action='store_true',
@@ -206,6 +201,15 @@ class Cp(base.Command):
         '--print-created-message',
         action='store_true',
         help='Prints the version-specific URL for each copied object.')
+    parser.add_argument(
+        '--read-paths-from-stdin',
+        '-I',
+        action='store_true',
+        help='Read the list of resources to copy from stdin. No need to enter'
+        ' a source argument if this flag is present.\nExample:'
+        ' "storage cp -I gs://bucket/destination"\n'
+        ' Note: To copy the contents of one file directly from stdin, use "-"'
+        ' as the source argument without the "-I" flag.')
     parser.add_argument(
         '-U',
         '--skip-unsupported',
@@ -220,6 +224,25 @@ class Cp(base.Command):
         ' specified, the default storage class of the destination bucket is'
         ' used. This option is not valid for copying to non-cloud destinations.'
     )
+
+    acl_flags_group = parser.add_group(mutex=True)
+    acl_flags_group.add_argument(
+        '-a',
+        '--predefined-acl',
+        '--canned-acl',
+        help='Applies predefined, or "canned," ACLs to a copied object. See'
+        ' docs for a list of predefined ACL constants: https://cloud.google.com'
+        '/storage/docs/access-control/lists#predefined-acl')
+    acl_flags_group.add_argument(
+        '-p',
+        '--preserve-acl',
+        action='store_true',
+        help='Preserves ACLs when copying in the cloud. This option is Google'
+        ' Cloud Storage-only, and you need OWNER access to all copied objects.'
+        ' If all objects in the destination bucket should have the same ACL,'
+        ' you can also set a default object ACL on that bucket instead of using'
+        ' this flag.')
+
     gzip_flags_group = parser.add_group(mutex=True)
     gzip_flags_group.add_argument(
         '-J',
@@ -243,6 +266,7 @@ class Cp(base.Command):
         metavar='FILE_EXTENSIONS',
         type=arg_parsers.ArgList(),
         help=_GZIP_LOCAL_EXTENSIONS_HELP_TEXT)
+
     flags.add_continue_on_error_flag(parser)
     flags.add_precondition_flags(parser)
     flags.add_object_metadata_flags(parser)
@@ -255,11 +279,17 @@ class Cp(base.Command):
 
     encryption_util.initialize_key_store(args)
 
+    if args.preserve_acl:
+      fields_scope = cloud_api.FieldsScope.FULL
+    else:
+      fields_scope = cloud_api.FieldsScope.NO_ACL
     source_expansion_iterator = name_expansion.NameExpansionIterator(
-        args.source,
+        stdin_iterator.get_urls_iterable(args.source,
+                                         args.read_paths_from_stdin),
         all_versions=args.all_versions,
-        recursion_requested=args.recursive,
-        ignore_symlinks=args.ignore_symlinks)
+        fields_scope=fields_scope,
+        ignore_symlinks=args.ignore_symlinks,
+        recursion_requested=args.recursive)
     task_status_queue = task_graph_executor.multiprocessing_context.Queue()
 
     raw_destination_url = storage_url.storage_url_from_string(args.destination)

@@ -53,6 +53,7 @@ class Update(base.Command):
   _support_autoscaling = True
   _support_maintenance_window = False
   _support_environment_size = True
+  _support_airflow_database_retention = False
 
   @staticmethod
   def Args(parser, release_track=base.ReleaseTrack.GA):
@@ -76,9 +77,11 @@ class Update(base.Command):
 
     flags.AddAutoscalingUpdateFlagsToGroup(Update.update_type_group,
                                            release_track)
-    if release_track != base.ReleaseTrack.GA:
-      flags.AddMasterAuthorizedNetworksUpdateFlagsToGroup(
-          Update.update_type_group)
+    flags.AddMasterAuthorizedNetworksUpdateFlagsToGroup(
+        Update.update_type_group)
+    if release_track == base.ReleaseTrack.ALPHA:
+      flags.AIRFLOW_DATABASE_RETENTION_DAYS.AddToParser(
+          Update.update_type_group.add_argument_group(hidden=True))
 
   def _ConstructPatch(self, env_ref, args, support_environment_upgrades=False):
     env_obj = environments_api_util.Get(
@@ -174,25 +177,27 @@ class Update(base.Command):
       params['maintenance_window_end'] = args.maintenance_window_end
       params[
           'maintenance_window_recurrence'] = args.maintenance_window_recurrence
-    if self.ReleaseTrack() != base.ReleaseTrack.GA:
-      if args.enable_master_authorized_networks and args.disable_master_authorized_networks:
-        raise command_util.InvalidUserInputError(
-            'Cannot specify --enable-master-authorized-networks with --disable-master-authorized-networks'
-        )
-      if args.disable_master_authorized_networks and args.master_authorized_networks:
-        raise command_util.InvalidUserInputError(
-            'Cannot specify --disable-master-authorized-networks with --master-authorized-networks'
-        )
-      if args.enable_master_authorized_networks is None and args.master_authorized_networks:
-        raise command_util.InvalidUserInputError(
-            'Cannot specify --master-authorized-networks without --enable-master-authorized-networks'
-        )
-      if args.enable_master_authorized_networks or args.disable_master_authorized_networks:
-        params[
-            'master_authorized_networks_enabled'] = True if args.enable_master_authorized_networks else False
-      command_util.ValidateMasterAuthorizedNetworks(
-          args.master_authorized_networks)
-      params['master_authorized_networks'] = args.master_authorized_networks
+    if self._support_airflow_database_retention:
+      params[
+          'airflow_database_retention_days'] = args.airflow_database_retention_days
+    if args.enable_master_authorized_networks and args.disable_master_authorized_networks:
+      raise command_util.InvalidUserInputError(
+          'Cannot specify --enable-master-authorized-networks with --disable-master-authorized-networks'
+      )
+    if args.disable_master_authorized_networks and args.master_authorized_networks:
+      raise command_util.InvalidUserInputError(
+          'Cannot specify --disable-master-authorized-networks with --master-authorized-networks'
+      )
+    if args.enable_master_authorized_networks is None and args.master_authorized_networks:
+      raise command_util.InvalidUserInputError(
+          'Cannot specify --master-authorized-networks without --enable-master-authorized-networks'
+      )
+    if args.enable_master_authorized_networks or args.disable_master_authorized_networks:
+      params[
+          'master_authorized_networks_enabled'] = True if args.enable_master_authorized_networks else False
+    command_util.ValidateMasterAuthorizedNetworks(
+        args.master_authorized_networks)
+    params['master_authorized_networks'] = args.master_authorized_networks
     return patch_util.ConstructPatch(**params)
 
   def Run(self, args):
@@ -268,6 +273,7 @@ class UpdateAlpha(UpdateBeta):
   """Update properties of a Cloud Composer environment."""
 
   _support_autoscaling = True
+  _support_airflow_database_retention = True
 
   @staticmethod
   def Args(parser):

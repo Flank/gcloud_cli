@@ -17,8 +17,8 @@
 import enum
 
 
-BASE_URL = 'https://alloydb.googleapis.com/v1alpha1/'
-DOCS_URL = 'https://cloud.google.com/alloydb/'
+BASE_URL = 'https://batch.googleapis.com/v1/'
+DOCS_URL = ''
 
 
 class Collections(enum.Enum):
@@ -33,54 +33,36 @@ class Collections(enum.Enum):
   )
   PROJECTS_LOCATIONS = (
       'projects.locations',
+      'projects/{projectsId}/locations/{locationsId}',
+      {},
+      ['projectsId', 'locationsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_JOBS = (
+      'projects.locations.jobs',
       '{+name}',
       {
           '':
-              'projects/{projectsId}/locations/{locationsId}',
+              'projects/{projectsId}/locations/{locationsId}/jobs/{jobsId}',
       },
       ['name'],
       True
   )
-  PROJECTS_LOCATIONS_BACKUPS = (
-      'projects.locations.backups',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/backups/'
-              '{backupsId}',
-      },
-      ['name'],
+  PROJECTS_LOCATIONS_JOBS_TASKGROUPS = (
+      'projects.locations.jobs.taskGroups',
+      'projects/{projectsId}/locations/{locationsId}/jobs/{jobsId}/'
+      'taskGroups/{taskGroupsId}',
+      {},
+      ['projectsId', 'locationsId', 'jobsId', 'taskGroupsId'],
       True
   )
-  PROJECTS_LOCATIONS_CLUSTERS = (
-      'projects.locations.clusters',
+  PROJECTS_LOCATIONS_JOBS_TASKGROUPS_TASKS = (
+      'projects.locations.jobs.taskGroups.tasks',
       '{+name}',
       {
           '':
-              'projects/{projectsId}/locations/{locationsId}/clusters/'
-              '{clustersId}',
-      },
-      ['name'],
-      True
-  )
-  PROJECTS_LOCATIONS_CLUSTERS_INSTANCES = (
-      'projects.locations.clusters.instances',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/clusters/'
-              '{clustersId}/instances/{instancesId}',
-      },
-      ['name'],
-      True
-  )
-  PROJECTS_LOCATIONS_OPERATIONS = (
-      'projects.locations.operations',
-      '{+name}',
-      {
-          '':
-              'projects/{projectsId}/locations/{locationsId}/operations/'
-              '{operationsId}',
+              'projects/{projectsId}/locations/{locationsId}/jobs/{jobsId}/'
+              'taskGroups/{taskGroupsId}/tasks/{tasksId}',
       },
       ['name'],
       True

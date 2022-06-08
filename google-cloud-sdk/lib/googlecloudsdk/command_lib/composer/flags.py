@@ -637,6 +637,15 @@ ENVIRONMENT_SIZE_ALPHA = arg_utils.ChoiceEnumMapper(
     .EnvironmentSizeValueValuesEnum,
     custom_mappings=_ENVIRONMENT_SIZE_MAPPING)
 
+AIRFLOW_DATABASE_RETENTION_DAYS = base.Argument(
+    '--airflow-database-retention-days',
+    type=int,
+    default=None,
+    help="""\
+    The number of retention
+      days for airflow database retention mechanism.
+    """)
+
 
 def _IsValidIpv4CidrBlock(ipv4_cidr_block):
   """Validates that IPV4 CIDR block arg has valid format.
@@ -688,8 +697,12 @@ ENABLE_IP_MASQ_AGENT_FLAG = base.Argument(
     default=None,
     action='store_true',
     help="""\
-    When enabled the IP Masq Agent is deployed to the cluster with configuration
-    to masquarade all traffic except between pods.
+    When enabled, the IP Masquarade Agent
+    (https://cloud.google.com/composer/docs/enable-ip-masquerade-agent)
+    is deployed to your environment's cluster.
+    It performs many-to-one IP address translations to hide a pod's IP address
+    behind the cluster node's IP address. This is done when sending traffic to
+    destinations outside the cluster's pod CIDR range.
 
     Cannot be specified unless `--enable-ip-alias` is also specified.
     """)
@@ -1136,6 +1149,8 @@ def AddIpAliasEnvironmentFlags(update_type_group, support_max_pods_per_node):
   SERVICES_IPV4_CIDR_FLAG.AddToParser(group)
   CLUSTER_SECONDARY_RANGE_NAME_FLAG.AddToParser(group)
   SERVICES_SECONDARY_RANGE_NAME_FLAG.AddToParser(group)
+  ENABLE_IP_MASQ_AGENT_FLAG.AddToParser(group)
+
   if support_max_pods_per_node:
     MAX_PODS_PER_NODE.AddToParser(group)
 

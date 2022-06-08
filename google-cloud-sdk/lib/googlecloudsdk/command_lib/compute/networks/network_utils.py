@@ -91,8 +91,9 @@ def AddMtuArg(parser):
       type=int,
       help="""Maximum transmission unit (MTU) is the size of the largest
               IP packet that can be transmitted on this network. Default value
-              is 1460 bytes, and the maximum is 1500 bytes. The MTU advertised
-              via DHCP to all instances attached to this network.""")
+              is 1460 bytes. The minimum value is 1300 bytes and the maximum
+              value is 8896 bytes. The MTU advertised via DHCP to all instances
+              attached to this network.""")
 
 
 def AddEnableUlaInternalIpv6Arg(parser):
@@ -123,7 +124,6 @@ def AddNetworkFirewallPolicyEnforcementOrderArg(parser):
       '--network-firewall-policy-enforcement-order',
       choices=_NETWORK_FIREWALL_POLICY_ENFORCEMENT_ORDER_CHOICES,
       metavar='NETWORK_FIREWALL_POLICY_ENFORCEMENT_ORDER',
-      hidden=True,
       help="""The Network Firewall Policy enforcement order of this network. If
               not specified, defaults to AFTER_CLASSIC_FIREWALL.""")
 
@@ -161,12 +161,13 @@ def AddUpdateArgs(parser):
   AddInternalIpv6RangeArg(parser)
   AddEnableUlaInternalIpv6Arg(parser)
 
+  AddNetworkFirewallPolicyEnforcementOrderArg(parser)
+
 
 def AddUpdateArgsAlpha(parser):
   """Adds alpha arguments for updating a network."""
 
   AddUpdateArgs(parser)
-  AddNetworkFirewallPolicyEnforcementOrderArg(parser)
 
 
 def CheckRangeLegacyModeOrRaise(args):
