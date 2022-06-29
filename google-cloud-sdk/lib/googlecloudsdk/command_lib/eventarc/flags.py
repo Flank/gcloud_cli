@@ -39,17 +39,17 @@ def LocationAttributeConfig(required=True):
                "either ``global'' or one of the supported regions. "
                'Alternatively, set the [eventarc/location] property.')
   if not required:
-    fallthroughs_list.append(deps.Fallthrough(
-        googlecloudsdk.command_lib.eventarc.flags.SetLocation,
-        'use \'-\' location to aggregate results for all Eventarc locations'))
+    fallthroughs_list.append(
+        deps.Fallthrough(
+            googlecloudsdk.command_lib.eventarc.flags.SetLocation,
+            'use \'-\' location to aggregate results for all Eventarc locations'
+        ))
     help_text = ('The location for the Eventarc {resource}, which should be '
                  "either ``global'' or one of the supported regions. "
                  "Use ``-'' to aggregate results for all Eventarc locations. "
                  'Alternatively, set the [eventarc/location] property.')
   return concepts.ResourceParameterAttributeConfig(
-      name='location',
-      fallthroughs=fallthroughs_list,
-      help_text=help_text)
+      name='location', fallthroughs=fallthroughs_list, help_text=help_text)
 
 
 def SetLocation():
@@ -159,7 +159,8 @@ def AddProjectResourceArg(parser):
       resource_name='project',
       projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG)
   concept_parser = concept_parsers.ConceptParser.ForResource(
-      '--project', resource_spec,
+      '--project',
+      resource_spec,
       'Project ID of the Google Cloud project for the {resource}.',
       required=True)
   concept_parser.AddToParser(parser)
@@ -348,6 +349,7 @@ def AddCreateDestinationArgs(parser, release_track, required=False):
   if release_track == base.ReleaseTrack.GA:
     _AddCreateGKEDestinationArgs(dest_group)
     _AddCreateWorkflowDestinationArgs(dest_group, hidden=True)
+    _AddCreateFunctionDestinationArgs(dest_group, hidden=True)
 
 
 def _AddCreateCloudRunDestinationArgs(parser, release_track, required=False):
@@ -389,6 +391,16 @@ def _AddCreateWorkflowDestinationArgs(parser, required=False, hidden=False):
   _AddDestinationWorkflowLocationArg(workflow_group)
 
 
+def _AddCreateFunctionDestinationArgs(parser, required=False, hidden=False):
+  """Adds arguments related to trigger's Function destination for create operation."""
+  function_group = parser.add_group(
+      required=required,
+      hidden=hidden,
+      help='Flags for specifying a Function destination.')
+  _AddDestinationFunctionArg(function_group, required=True)
+  _AddDestinationFunctionLocationArg(function_group)
+
+
 def AddUpdateDestinationArgs(parser, release_track, required=False):
   """Adds arguments related to trigger's destination for update operations."""
   dest_group = parser.add_mutually_exclusive_group(
@@ -398,6 +410,7 @@ def AddUpdateDestinationArgs(parser, release_track, required=False):
   if release_track == base.ReleaseTrack.GA:
     _AddUpdateGKEDestinationArgs(dest_group)
     _AddUpdateWorkflowDestinationArgs(dest_group, hidden=True)
+    _AddUpdateFunctionDestinationArgs(dest_group, hidden=True)
 
 
 def _AddUpdateCloudRunDestinationArgs(parser, release_track, required=False):
@@ -438,6 +451,16 @@ def _AddUpdateWorkflowDestinationArgs(parser, required=False, hidden=False):
       help='Flags for updating a Workflow destination.')
   _AddDestinationWorkflowArg(workflow_group)
   _AddDestinationWorkflowLocationArg(workflow_group)
+
+
+def _AddUpdateFunctionDestinationArgs(parser, required=False, hidden=False):
+  """Adds arguments related to trigger's Function destination for update operations."""
+  function_group = parser.add_group(
+      required=required,
+      hidden=hidden,
+      help='Flags for updating a Function destination.')
+  _AddDestinationFunctionArg(function_group)
+  _AddDestinationFunctionLocationArg(function_group)
 
 
 def AddDestinationRunServiceArg(parser):
@@ -545,6 +568,25 @@ def _AddDestinationWorkflowLocationArg(parser, required=False):
       'location as the trigger.')
 
 
+def _AddDestinationFunctionArg(parser, required=False):
+  """Adds an argument for the trigger's destination Function."""
+  parser.add_argument(
+      '--destination-function',
+      required=required,
+      help='ID of the Function that receives the events for the trigger. '
+      'The Function must be in the same project as the trigger.')
+
+
+def _AddDestinationFunctionLocationArg(parser, required=False):
+  """Adds an argument for the trigger's destination Function location."""
+  parser.add_argument(
+      '--destination-function-location',
+      required=required,
+      help='Location that the destination Function is running in. '
+      'If not specified, it is assumed that the Function is in the same '
+      'location as the trigger.')
+
+
 def AddClearServiceAccountArg(parser):
   """Adds an argument for clearing the trigger's service account."""
   parser.add_argument(
@@ -601,10 +643,37 @@ def AddCreateChannelArg(parser):
               '--provider',
               ProviderResourceSpec(),
               'Provider to use for the channel.',
-              flag_name_overrides={'location': ''})
+              flag_name_overrides={'location': ''}),
       ],
       # This configures the fallthrough from the provider's location to the
       # primary flag for the channel's location
       command_level_fallthroughs={
           '--provider.location': ['channel.location']
       }).AddToParser(parser)
+
+
+def AddCryptoKeyArg(parser, required=False, hidden=False, with_clear=True):
+  """Adds an argument for the crypto key used for CMEK."""
+  policy_group = parser
+  if with_clear:
+    policy_group = parser.add_mutually_exclusive_group(hidden=hidden)
+    AddClearCryptoNameArg(policy_group, required, hidden)
+  policy_group.add_argument(
+      '--crypto-key',
+      required=required,
+      hidden=hidden,
+      help='The fully qualified name of the crypto key to use for '
+      'customer-managed encryption. If this is unspecified, Google-managed '
+      'keys will be used for encryption.')
+
+
+def AddClearCryptoNameArg(parser, required=False, hidden=False):
+  """Adds an argument for the crypto key used for CMEK."""
+  parser.add_argument(
+      '--clear-crypto-key',
+      required=required,
+      hidden=hidden,
+      default=False,
+      action='store_true',
+      help='Remove the previously configured crypto key. The channel will'
+      ' continue to be encrypted using Google-managed keys.')

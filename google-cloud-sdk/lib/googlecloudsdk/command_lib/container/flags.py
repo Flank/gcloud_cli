@@ -704,22 +704,22 @@ https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
   )
   upgrade_option_enablement_group = upgrade_settings_group.add_argument_group(
       'Flag group to choose the top level upgrade option:',
-      hidden=True,
+      hidden=hidden,
       mutex=True,
   )
   upgrade_option_enablement_group.add_argument(
-      '--enable-autoprovisioning-rolling-update',
+      '--enable-autoprovisioning-surge-upgrade',
       action='store_true',
-      hidden=True,
+      hidden=hidden,
       help="""\
-Whether to use rolling (surge) update for the autoprovisioned node pool.
+Whether to use surge upgrade for the autoprovisioned node pool.
 """)
   upgrade_option_enablement_group.add_argument(
-      '--enable-autoprovisioning-blue-green-update',
+      '--enable-autoprovisioning-blue-green-upgrade',
       action='store_true',
-      hidden=True,
+      hidden=hidden,
       help="""\
-Whether to use blue/green update for the autoprovisioned node pool.
+Whether to use blue-green upgrade for the autoprovisioned node pool.
 """)
   upgrade_settings_group.add_argument(
       '--autoprovisioning-max-surge-upgrade',
@@ -746,11 +746,11 @@ upgrade of an autoprovisioned node pool.
       '--autoprovisioning-standard-rollout-policy',
       metavar='batch-node-count=BATCH_NODE_COUNT,batch-percent=BATCH_NODE_PERCENTAGE,batch-soak-duration=BATCH_SOAK_DURATION',
       type=arg_parsers.ArgDict(spec=spec),
-      hidden=True,
+      hidden=hidden,
       help="""\
-Standard rollout policy options for Blue Green Update.
+Standard rollout policy options for blue-green upgrade.
 This argument should be used in conjunction with
-`--enable-autoprovisioning-blue-green-update` to take effect.
+`--enable-autoprovisioning-blue-green-upgrade` to take effect.
 
 Batch sizes are specfied by one of, batch-node-count or batch-percent.
 The duration between batches is specified by batch-soak-duration.
@@ -762,12 +762,12 @@ Example:
   upgrade_settings_group.add_argument(
       '--autoprovisioning-node-pool-soak-duration',
       type=str,
-      hidden=True,
+      hidden=hidden,
       help="""\
-Time in seconds to be spent waiting during blue green update before
+Time in seconds to be spent waiting during blue-green upgrade before
 deleting the blue pool and completing the update.
 This argument should be used in conjunction with
-`--enable-autoprovisioning-blue-green-update` to take effect.
+`--enable-autoprovisioning-blue-green-upgrade` to take effect.
 """)
   management_settings_group = from_flags_group.add_argument_group(
       'Flags to specify node management settings for autoprovisioned nodes:',
@@ -1745,7 +1745,7 @@ def AddNetworkPerformanceConfigFlags(parser, hidden=True):
       is going to internal IP or external IP destinations.
       The following tier values are allowed: [{tier_values}]
 
-      """.format(tier_values=','.join(['DEFAULT', 'TIER_1']))
+      """.format(tier_values=','.join(['TIER_UNSPECIFIED', 'TIER_1']))
 
   spec = {'total-egress-bandwidth-tier': str}
 
@@ -3298,7 +3298,6 @@ def AddStackTypeFlag(parser):
   parser.add_argument(
       '--stack-type',
       help=help_text,
-      hidden=True,
       choices=['ipv4', 'ipv4-ipv6'])
 
 
@@ -3312,7 +3311,6 @@ def AddIpv6AccessTypeFlag(parser):
   parser.add_argument(
       '--ipv6-access-type',
       help=help_text,
-      hidden=True,
       choices=['external', 'internal'])
 
 
@@ -3758,7 +3756,7 @@ Must be used in conjunction with '--max-surge-upgrade'.
       hidden=False)
 
 
-def AddRespectPodDisruptionBudgetFlag(parser, hidden=True):
+def AddRespectPodDisruptionBudgetFlag(parser, hidden=False):
   """Adds --respect-pdb flag to the parser."""
 
   respect_pdb_help = """\
@@ -3769,40 +3767,40 @@ Indicates whether node pool rollbacks should respect pod disruption budgets.
       '--respect-pdb', type=bool, help=respect_pdb_help, hidden=hidden)
 
 
-def AddEnableRollingUpdateFlag(parser, hidden=True):
-  """Adds --enable-rolling-update flag to the parser."""
+def AddEnableSurgeUpgradeFlag(parser, hidden=False):
+  """Adds --enable-surge-upgrade flag to the parser."""
 
-  enable_rolling_update_help = """\
-Changes node pool update strategy to Rolling Update.
+  enable_surge_upgrade_help = """\
+Changes node pool upgrade strategy to surge upgrade.
 """
 
   parser.add_argument(
-      '--enable-rolling-update',
+      '--enable-surge-upgrade',
       action='store_true',
-      help=enable_rolling_update_help,
+      help=enable_surge_upgrade_help,
       hidden=hidden)
 
 
-def AddEnableBlueGreenUpdateFlag(parser, hidden=True):
-  """Adds --enable-blue-green-update flag to the parser."""
+def AddEnableBlueGreenUpgradeFlag(parser, hidden=False):
+  """Adds --enable-blue-green-upgrade flag to the parser."""
 
-  blue_green_update_help = """\
-Changes node pool update strategy to Blue Green Update.
+  blue_green_upgrade_help = """\
+Changes node pool upgrade strategy to blue-green upgrade.
 """
 
   parser.add_argument(
-      '--enable-blue-green-update',
+      '--enable-blue-green-upgrade',
       action='store_true',
-      help=blue_green_update_help,
+      help=blue_green_upgrade_help,
       hidden=hidden)
 
 
-def AddNodePoolSoakDurationFlag(parser, for_node_pool=False, hidden=True):
+def AddNodePoolSoakDurationFlag(parser, for_node_pool=False, hidden=False):
   """Adds --node-pool-soak-duration flag to the parser."""
 
   node_pool_soak_duration_help = """\
-Time in seconds to be spent waiting during Blue Green Update before
-deleting the Blue pool and completing the update.
+Time in seconds to be spent waiting during blue-green upgrade before
+deleting the blue pool and completing the upgrade.
 
 """
 
@@ -3824,11 +3822,11 @@ deleting the Blue pool and completing the update.
       hidden=hidden)
 
 
-def AddStandardRolloutPolicyFlag(parser, for_node_pool=False, hidden=True):
+def AddStandardRolloutPolicyFlag(parser, for_node_pool=False, hidden=False):
   """Adds --standard-rollout-policy flag to the parser."""
 
   standard_rollout_policy_help = """\
-Standard rollout policy options for Blue Green Update.
+Standard rollout policy options for blue-green upgrade.
 
 Batch sizes are specfied by one of, batch-node-count or batch-percent.
 The duration between batches is specified by batch-soak-duration.
@@ -4089,10 +4087,10 @@ namespace and label in your billing data exported to BigQuery
   if is_update:
     help_text += """\
 
-Use --no-enable-cost-management to disable this feature.
+Use --no-enable-cost-allocation to disable this feature.
 """
   parser.add_argument(
-      '--enable-cost-management',
+      '--enable-cost-allocation',
       action='store_true',
       default=None,
       help=help_text)
@@ -4576,6 +4574,20 @@ def VerifyGetCredentialsFlags(args):
       args.IsSpecified('cross_connect_subnetwork') +
       args.IsSpecified('private_endpoint_fqdn')) > 1:
     raise util.Error(constants.CONFLICTING_GET_CREDS_FLAGS_ERROR_MSG)
+
+
+def AddEnablePrivateEndpoint(parser, hidden=True):
+  """Adds a --enable-private-endpoint flag to the given parser."""
+  help_text = """\
+  Enables cluster's control plane to be accessible using private IP
+  address only.
+  """
+  parser.add_argument(
+      '--enable-private-endpoint',
+      help=help_text,
+      hidden=hidden,
+      default=None,
+      action='store_true')
 
 
 def AddEnableGoogleCloudAccess(parser, hidden=True):

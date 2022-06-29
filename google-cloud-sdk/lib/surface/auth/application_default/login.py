@@ -28,7 +28,6 @@ from googlecloudsdk.calliope import exceptions as c_exc
 from googlecloudsdk.command_lib.auth import auth_util as command_auth_util
 from googlecloudsdk.command_lib.auth import flags
 from googlecloudsdk.core import config
-from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import gce as c_gce
@@ -50,8 +49,8 @@ class Login(base.Command):
   command in your local development. This command tries to find a quota
   project from gcloud's context and write it to ADC so that Google client
   libraries can use it for billing and quota. Alternatively, you can use
-  the `--client-id-file` flag. In this case, the project owning the client id
-  will be used for billing and quota. You can create the client-id-file
+  the `--client-id-file` flag. In this case, the project owning the client ID
+  will be used for billing and quota. You can create the client ID file
   at https://console.cloud.google.com/apis/credentials.
 
   This command has no effect on the user account(s) set up by the
@@ -87,6 +86,7 @@ class Login(base.Command):
     parser.add_argument(
         '--scopes',
         type=arg_parsers.ArgList(min_length=1),
+        metavar='SCOPE',
         help='The names of the scopes to authorize for. By default '
         '{0} scopes are used. '
         'The list of possible scopes can be found at: '
@@ -99,16 +99,6 @@ class Login(base.Command):
 
   def Run(self, args):
     """Run the authentication command."""
-    if not args.launch_browser:
-      log.warning(
-          'The login flow that you are using with the '
-          '--no-launch-browser flag will be updated by July 12, 2022 to '
-          'address a security issue. No immediate action is required '
-          'to continue using this flag, but be sure to upgrade your '
-          'gcloud installation by running `gcloud components update` '
-          'between July 12, 2022 and August 2, 2022.\n'
-      )
-
     # TODO(b/203102970): Remove this condition check after the bug is resolved
     if properties.VALUES.auth.access_token_file.Get():
       raise c_store.FlowError(
@@ -141,6 +131,7 @@ class Login(base.Command):
       )
     # This reauth scope is only used here and when refreshing the access token.
     scopes = (args.scopes or auth_util.DEFAULT_SCOPES) + [config.REAUTH_SCOPE]
+    redirect_uri = 'https://sdk.cloud.google.com/applicationdefaultauthcode.html' if not args.launch_browser else None
     properties.VALUES.auth.client_id.Set(
         auth_util.DEFAULT_CREDENTIALS_DEFAULT_CLIENT_ID)
     properties.VALUES.auth.client_secret.Set(
@@ -150,7 +141,9 @@ class Login(base.Command):
         client_id_file=args.client_id_file,
         no_launch_browser=not args.launch_browser,
         no_browser=args.no_browser,
-        remote_bootstrap=args.remote_bootstrap)
+        remote_bootstrap=args.remote_bootstrap,
+        redirect_uri=redirect_uri
+    )
     if not creds:
       return
 

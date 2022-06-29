@@ -167,6 +167,8 @@ class Login(base.Command):
     $ {command} --cred-file=/path/to/workload/configuration/file
   """
 
+  _remote_login_with_auth_proxy = False
+
   @staticmethod
   def Args(parser):
     """Set args for gcloud auth."""
@@ -221,16 +223,6 @@ class Login(base.Command):
 
   def Run(self, args):
     """Run the authentication command."""
-    if not args.launch_browser:
-      log.warning(
-          'The login flow that you are using with the '
-          '--no-launch-browser flag will be updated by July 12, 2022 to '
-          'address a security issue. No immediate action is required '
-          'to continue using this flag, but be sure to upgrade your '
-          'gcloud installation by running `gcloud components update` '
-          'between July 12, 2022 and August 2, 2022.\n'
-      )
-
     if args.cred_file:
       cred_config = auth_util.GetCredentialsConfigFromFile(args.cred_file)
     else:
@@ -252,12 +244,14 @@ class Login(base.Command):
       return LoginAs(args.account, creds, args.project, args.activate,
                      args.brief, args.update_adc, args.add_quota_project_to_adc)
 
+    redirect_uri = 'https://sdk.cloud.google.com/authcode.html' if not args.launch_browser else None
     # No valid creds, do the web flow.
     creds = auth_util.DoInstalledAppBrowserFlowGoogleAuth(
         scopes,
         no_launch_browser=not args.launch_browser,
         no_browser=args.no_browser,
-        remote_bootstrap=args.remote_bootstrap)
+        remote_bootstrap=args.remote_bootstrap,
+        redirect_uri=redirect_uri)
     if not creds:
       return
     account = ExtractAndValidateAccount(args.account, creds)

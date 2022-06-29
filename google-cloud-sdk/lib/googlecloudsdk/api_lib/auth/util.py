@@ -126,9 +126,10 @@ class FlowRunner(six.with_metaclass(abc.ABCMeta, object)):
 
   _FLOW_ERROR_HELP_MSG = 'There was a problem with web authentication.'
 
-  def __init__(self, scopes, client_config):
+  def __init__(self, scopes, client_config, redirect_uri=None):
     self._scopes = scopes
     self._client_config = client_config
+    self._redirect_uri = redirect_uri
     self._flow = self._CreateFlow()
 
   @abc.abstractmethod
@@ -163,6 +164,18 @@ class NoBrowserFlowRunner(FlowRunner):
         self._scopes,
         autogenerate_code_verifier=not properties.VALUES.auth
         .disable_code_verifier.GetBool())
+
+
+class RemoteLoginWithAuthProxyFlowRunner(FlowRunner):
+  """A flow runner to run RemoteLoginWithAuthProxyFlow."""
+
+  def _CreateFlow(self):
+    return c_flow.RemoteLoginWithAuthProxyFlow.from_client_config(
+        self._client_config,
+        self._scopes,
+        autogenerate_code_verifier=not properties.VALUES.auth
+        .disable_code_verifier.GetBool(),
+        redirect_uri=self._redirect_uri)
 
 
 class NoBrowserHelperRunner(FlowRunner):
@@ -266,7 +279,8 @@ def DoInstalledAppBrowserFlowGoogleAuth(scopes,
                                         client_id_file=None,
                                         no_launch_browser=False,
                                         no_browser=False,
-                                        remote_bootstrap=None):
+                                        remote_bootstrap=None,
+                                        redirect_uri=None):
   """Launches a 3LO oauth2 flow to get google-auth credentials.
 
   Args:
@@ -281,6 +295,8 @@ def DoInstalledAppBrowserFlowGoogleAuth(scopes,
     remote_bootstrap: str, The auth parameters specified by --remote-bootstrap
       flag. Once used, it means the command is to help authorize another
       gcloud (i.e. gcloud without access to browser).
+    redirect_uri: str, The uri where OAuth service will redirect the user to
+      once the authentication is complete.
   Returns:
     core.credentials.google_auth_credentials.Credentials, The credentials
       obtained from the flow.
@@ -300,7 +316,8 @@ def DoInstalledAppBrowserFlowGoogleAuth(scopes,
     user_creds = NoBrowserHelperRunner(
         scopes, client_config).Run(partial_auth_url=remote_bootstrap)
   elif no_launch_browser:
-    user_creds = OobFlowRunner(scopes, client_config).Run()
+    user_creds = RemoteLoginWithAuthProxyFlowRunner(scopes, client_config,
+                                                    redirect_uri).Run()
   elif not can_launch_browser:
     user_creds = NoBrowserFlowRunner(scopes, client_config).Run()
   else:
