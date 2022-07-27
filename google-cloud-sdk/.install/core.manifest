@@ -1182,6 +1182,9 @@ lib/googlecloudsdk/command_lib/compute/instance_templates/flags.py
 lib/googlecloudsdk/command_lib/compute/instance_templates/mesh_util.py
 lib/googlecloudsdk/command_lib/compute/instance_templates/service_proxy_aux_data.py
 lib/googlecloudsdk/command_lib/compute/instances/__init__.py
+lib/googlecloudsdk/command_lib/compute/instances/bulk/__init__.py
+lib/googlecloudsdk/command_lib/compute/instances/bulk/flags.py
+lib/googlecloudsdk/command_lib/compute/instances/bulk/util.py
 lib/googlecloudsdk/command_lib/compute/instances/exceptions.py
 lib/googlecloudsdk/command_lib/compute/instances/flags.py
 lib/googlecloudsdk/command_lib/compute/instances/ops_agents/__init__.py
@@ -1248,6 +1251,7 @@ lib/googlecloudsdk/command_lib/compute/os_config/resources.yaml
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/__init__.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/agent_freshness.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/metadata_setup.py
+lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/network_config.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/service_account.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/service_enablement.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/utils.py
@@ -2603,6 +2607,9 @@ lib/googlecloudsdk/core/yaml.py
 lib/googlecloudsdk/core/yaml_location_value.py
 lib/googlecloudsdk/core/yaml_validator.py
 lib/googlecloudsdk/gcloud_main.py
+lib/googlecloudsdk/schemas/certificatemanager/v1/CertificateAuthorityConfig.yaml
+lib/googlecloudsdk/schemas/certificatemanager/v1/CertificateAuthorityServiceConfig.yaml
+lib/googlecloudsdk/schemas/certificatemanager/v1/CertificateIssuanceConfig.yaml
 lib/googlecloudsdk/schemas/certificatemanager/v1/IntermediateCA.yaml
 lib/googlecloudsdk/schemas/certificatemanager/v1/LabelsValue.yaml
 lib/googlecloudsdk/schemas/certificatemanager/v1/TrustAnchor.yaml
@@ -3153,6 +3160,12 @@ lib/googlecloudsdk/third_party/apis/anthosevents/v1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/anthosevents_v1.json
 lib/googlecloudsdk/third_party/apis/anthosevents_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/anthosevents_v1beta1.json
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa/__init__.py
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa/v1alpha/__init__.py
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa/v1alpha/anthospolicycontrollerstatus_pa_v1alpha_client.py
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa/v1alpha/anthospolicycontrollerstatus_pa_v1alpha_messages.py
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa/v1alpha/resources.py
+lib/googlecloudsdk/third_party/apis/anthospolicycontrollerstatus_pa_v1alpha.json
 lib/googlecloudsdk/third_party/apis/apigateway/__init__.py
 lib/googlecloudsdk/third_party/apis/apigateway/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/apigateway/v1/apigateway_v1_client.py
@@ -4283,11 +4296,16 @@ lib/googlecloudsdk/third_party/apis/policysimulator/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1/policysimulator_v1_client.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1/policysimulator_v1_messages.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1/resources.py
+lib/googlecloudsdk/third_party/apis/policysimulator/v1alpha/__init__.py
+lib/googlecloudsdk/third_party/apis/policysimulator/v1alpha/policysimulator_v1alpha_client.py
+lib/googlecloudsdk/third_party/apis/policysimulator/v1alpha/policysimulator_v1alpha_messages.py
+lib/googlecloudsdk/third_party/apis/policysimulator/v1alpha/resources.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1beta1/__init__.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1beta1/policysimulator_v1beta1_client.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1beta1/policysimulator_v1beta1_messages.py
 lib/googlecloudsdk/third_party/apis/policysimulator/v1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/policysimulator_v1.json
+lib/googlecloudsdk/third_party/apis/policysimulator_v1alpha.json
 lib/googlecloudsdk/third_party/apis/policysimulator_v1beta1.json
 lib/googlecloudsdk/third_party/apis/policytroubleshooter/__init__.py
 lib/googlecloudsdk/third_party/apis/policytroubleshooter/v1/__init__.py
@@ -4444,6 +4462,12 @@ lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/resources.py
 lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/securedlandingzone_v1beta_client.py
 lib/googlecloudsdk/third_party/apis/securedlandingzone/v1beta/securedlandingzone_v1beta_messages.py
 lib/googlecloudsdk/third_party/apis/securedlandingzone_v1beta.json
+lib/googlecloudsdk/third_party/apis/securesourcemanager/__init__.py
+lib/googlecloudsdk/third_party/apis/securesourcemanager/v1/__init__.py
+lib/googlecloudsdk/third_party/apis/securesourcemanager/v1/resources.py
+lib/googlecloudsdk/third_party/apis/securesourcemanager/v1/securesourcemanager_v1_client.py
+lib/googlecloudsdk/third_party/apis/securesourcemanager/v1/securesourcemanager_v1_messages.py
+lib/googlecloudsdk/third_party/apis/securesourcemanager_v1.json
 lib/googlecloudsdk/third_party/apis/securitycenter/__init__.py
 lib/googlecloudsdk/third_party/apis/securitycenter/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/securitycenter/v1/resources.py
@@ -5292,6 +5316,7 @@ lib/surface/artifacts/operations/__init__.py
 lib/surface/artifacts/operations/describe.yaml
 lib/surface/artifacts/packages/__init__.py
 lib/surface/artifacts/packages/delete.yaml
+lib/surface/artifacts/packages/describe.yaml
 lib/surface/artifacts/packages/list.yaml
 lib/surface/artifacts/print_settings/__init__.py
 lib/surface/artifacts/print_settings/apt.py
@@ -5603,6 +5628,8 @@ lib/surface/builds/connections/create/github_enterprise.yaml
 lib/surface/builds/connections/delete.yaml
 lib/surface/builds/connections/describe.yaml
 lib/surface/builds/connections/list.yaml
+lib/surface/builds/connections/update/__init__.py
+lib/surface/builds/connections/update/github.yaml
 lib/surface/builds/deploy/__init__.py
 lib/surface/builds/deploy/configure/__init__.py
 lib/surface/builds/deploy/configure/gke.py
@@ -5685,6 +5712,12 @@ lib/surface/certificate_manager/dns_authorizations/delete.yaml
 lib/surface/certificate_manager/dns_authorizations/describe.yaml
 lib/surface/certificate_manager/dns_authorizations/list.yaml
 lib/surface/certificate_manager/dns_authorizations/update.yaml
+lib/surface/certificate_manager/issuance_configs/__init__.py
+lib/surface/certificate_manager/issuance_configs/create.yaml
+lib/surface/certificate_manager/issuance_configs/delete.yaml
+lib/surface/certificate_manager/issuance_configs/describe.yaml
+lib/surface/certificate_manager/issuance_configs/list.yaml
+lib/surface/certificate_manager/issuance_configs/update.yaml
 lib/surface/certificate_manager/maps/__init__.py
 lib/surface/certificate_manager/maps/create.py
 lib/surface/certificate_manager/maps/delete.py
@@ -6338,6 +6371,7 @@ lib/surface/compute/public_delegated_prefixes/list.py
 lib/surface/compute/public_delegated_prefixes/update.py
 lib/surface/compute/queued_resources/__init__.py
 lib/surface/compute/queued_resources/cancel.py
+lib/surface/compute/queued_resources/create.py
 lib/surface/compute/queued_resources/delete.py
 lib/surface/compute/queued_resources/describe.py
 lib/surface/compute/queued_resources/list.py
@@ -7504,7 +7538,9 @@ lib/surface/domains/registrations/describe.py
 lib/surface/domains/registrations/export.py
 lib/surface/domains/registrations/get_register_parameters.py
 lib/surface/domains/registrations/get_transfer_parameters.py
+lib/surface/domains/registrations/import.py
 lib/surface/domains/registrations/list.py
+lib/surface/domains/registrations/list_importable_domains.py
 lib/surface/domains/registrations/operations/__init__.py
 lib/surface/domains/registrations/operations/describe.py
 lib/surface/domains/registrations/operations/list.py
@@ -9315,6 +9351,8 @@ lib/surface/scc/bqexports/list.yaml
 lib/surface/scc/bqexports/update.yaml
 lib/surface/scc/custom_modules/__init__.py
 lib/surface/scc/custom_modules/sha/__init__.py
+lib/surface/scc/custom_modules/sha/get.yaml
+lib/surface/scc/custom_modules/sha/get_effective.yaml
 lib/surface/scc/custom_modules/sha/list.yaml
 lib/surface/scc/custom_modules/sha/list_descendant.yaml
 lib/surface/scc/custom_modules/sha/list_effective.yaml
