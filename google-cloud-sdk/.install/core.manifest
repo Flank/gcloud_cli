@@ -39,6 +39,8 @@ lib/googlecloudsdk/api_lib/active_directory/exceptions.py
 lib/googlecloudsdk/api_lib/ai/__init__.py
 lib/googlecloudsdk/api_lib/ai/custom_jobs/__init__.py
 lib/googlecloudsdk/api_lib/ai/custom_jobs/client.py
+lib/googlecloudsdk/api_lib/ai/deployment_resource_pools/__init__.py
+lib/googlecloudsdk/api_lib/ai/deployment_resource_pools/client.py
 lib/googlecloudsdk/api_lib/ai/endpoints/__init__.py
 lib/googlecloudsdk/api_lib/ai/endpoints/client.py
 lib/googlecloudsdk/api_lib/ai/hp_tuning_jobs/__init__.py
@@ -613,6 +615,8 @@ lib/googlecloudsdk/api_lib/metastore/federations_util.py
 lib/googlecloudsdk/api_lib/metastore/operations_util.py
 lib/googlecloudsdk/api_lib/metastore/services_util.py
 lib/googlecloudsdk/api_lib/metastore/util.py
+lib/googlecloudsdk/api_lib/microservices/__init__.py
+lib/googlecloudsdk/api_lib/microservices/util.py
 lib/googlecloudsdk/api_lib/ml/__init__.py
 lib/googlecloudsdk/api_lib/ml/vision/__init__.py
 lib/googlecloudsdk/api_lib/ml/vision/api_utils.py
@@ -904,6 +908,7 @@ lib/googlecloudsdk/command_lib/ai/custom_jobs/custom_jobs_util.py
 lib/googlecloudsdk/command_lib/ai/custom_jobs/flags.py
 lib/googlecloudsdk/command_lib/ai/custom_jobs/local_util.py
 lib/googlecloudsdk/command_lib/ai/custom_jobs/validation.py
+lib/googlecloudsdk/command_lib/ai/deployment_resource_pools_util.py
 lib/googlecloudsdk/command_lib/ai/docker/__init__.py
 lib/googlecloudsdk/command_lib/ai/docker/build.py
 lib/googlecloudsdk/command_lib/ai/docker/run.py
@@ -997,6 +1002,7 @@ lib/googlecloudsdk/command_lib/artifacts/print_settings/yum.py
 lib/googlecloudsdk/command_lib/artifacts/requests.py
 lib/googlecloudsdk/command_lib/artifacts/resources.yaml
 lib/googlecloudsdk/command_lib/artifacts/util.py
+lib/googlecloudsdk/command_lib/artifacts/version_util.py
 lib/googlecloudsdk/command_lib/asset/__init__.py
 lib/googlecloudsdk/command_lib/asset/asset_query_printer.py
 lib/googlecloudsdk/command_lib/asset/flags.py
@@ -1253,6 +1259,7 @@ lib/googlecloudsdk/command_lib/compute/os_config/resource_args.py
 lib/googlecloudsdk/command_lib/compute/os_config/resources.yaml
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/__init__.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/agent_freshness.py
+lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/log_analysis.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/metadata_setup.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/network_config.py
 lib/googlecloudsdk/command_lib/compute/os_config/troubleshoot/service_account.py
@@ -1400,6 +1407,9 @@ lib/googlecloudsdk/command_lib/config/flags.py
 lib/googlecloudsdk/command_lib/config/virtualenv/__init__.py
 lib/googlecloudsdk/command_lib/config/virtualenv/util.py
 lib/googlecloudsdk/command_lib/container/__init__.py
+lib/googlecloudsdk/command_lib/container/attached/__init__.py
+lib/googlecloudsdk/command_lib/container/attached/flags.py
+lib/googlecloudsdk/command_lib/container/attached/resource_args.py
 lib/googlecloudsdk/command_lib/container/aws/__init__.py
 lib/googlecloudsdk/command_lib/container/aws/flags.py
 lib/googlecloudsdk/command_lib/container/aws/resource_args.py
@@ -2267,11 +2277,11 @@ lib/googlecloudsdk/command_lib/storage/resources/full_resource_formatter.py
 lib/googlecloudsdk/command_lib/storage/resources/gcloud_full_resource_formatter.py
 lib/googlecloudsdk/command_lib/storage/resources/gcs_resource_reference.py
 lib/googlecloudsdk/command_lib/storage/resources/gsutil_full_resource_formatter.py
-lib/googlecloudsdk/command_lib/storage/resources/resource_formatter_util.py
 lib/googlecloudsdk/command_lib/storage/resources/resource_reference.py
 lib/googlecloudsdk/command_lib/storage/resources/resource_util.py
 lib/googlecloudsdk/command_lib/storage/resources/resources.yaml
 lib/googlecloudsdk/command_lib/storage/resources/s3_resource_reference.py
+lib/googlecloudsdk/command_lib/storage/resources/shim_format_util.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
 lib/googlecloudsdk/command_lib/storage/storage_parallel.py
 lib/googlecloudsdk/command_lib/storage/storage_url.py
@@ -4997,6 +5007,8 @@ lib/surface/ai/custom_jobs/describe.py
 lib/surface/ai/custom_jobs/list.py
 lib/surface/ai/custom_jobs/local_run.py
 lib/surface/ai/custom_jobs/stream_logs.py
+lib/surface/ai/deployment_resource_pools/__init__.py
+lib/surface/ai/deployment_resource_pools/create.py
 lib/surface/ai/endpoints/__init__.py
 lib/surface/ai/endpoints/create.py
 lib/surface/ai/endpoints/delete.py
@@ -5364,6 +5376,7 @@ lib/surface/artifacts/tags/list.yaml
 lib/surface/artifacts/tags/update.yaml
 lib/surface/artifacts/versions/__init__.py
 lib/surface/artifacts/versions/delete.yaml
+lib/surface/artifacts/versions/describe.yaml
 lib/surface/artifacts/versions/list.yaml
 lib/surface/artifacts/yum/__init__.py
 lib/surface/artifacts/yum/import.py
@@ -5641,11 +5654,13 @@ lib/surface/builds/__init__.py
 lib/surface/builds/approve.yaml
 lib/surface/builds/cancel.py
 lib/surface/builds/connections/__init__.py
+lib/surface/builds/connections/add_iam_policy_binding.yaml
 lib/surface/builds/connections/create/__init__.py
 lib/surface/builds/connections/create/github.yaml
 lib/surface/builds/connections/create/github_enterprise.yaml
 lib/surface/builds/connections/delete.yaml
 lib/surface/builds/connections/describe.yaml
+lib/surface/builds/connections/get_iam_policy.yaml
 lib/surface/builds/connections/list.yaml
 lib/surface/builds/connections/set_iam_policy.yaml
 lib/surface/builds/connections/update/__init__.py
@@ -7243,6 +7258,7 @@ lib/surface/dataproc/clusters/gke/__init__.py
 lib/surface/dataproc/clusters/gke/create.py
 lib/surface/dataproc/clusters/import.py
 lib/surface/dataproc/clusters/list.py
+lib/surface/dataproc/clusters/repair.py
 lib/surface/dataproc/clusters/set_iam_policy.py
 lib/surface/dataproc/clusters/start.py
 lib/surface/dataproc/clusters/stop.py
@@ -8634,6 +8650,10 @@ lib/surface/metastore/services/remove_iam_policy_binding.yaml
 lib/surface/metastore/services/restore.yaml
 lib/surface/metastore/services/set_iam_policy.yaml
 lib/surface/metastore/services/update.yaml
+lib/surface/microservices/__init__.py
+lib/surface/microservices/features/__init__.py
+lib/surface/microservices/features/disable.py
+lib/surface/microservices/features/enable.py
 lib/surface/ml/__init__.py
 lib/surface/ml/language/__init__.py
 lib/surface/ml/language/__init__.yaml
@@ -8744,6 +8764,11 @@ lib/surface/monitoring/policies/describe.yaml
 lib/surface/monitoring/policies/list.yaml
 lib/surface/monitoring/policies/update.py
 lib/surface/network_actions/__init__.py
+lib/surface/network_actions/wasm_actions/__init__.py
+lib/surface/network_actions/wasm_actions/create.py
+lib/surface/network_actions/wasm_actions/delete.yaml
+lib/surface/network_actions/wasm_actions/describe.yaml
+lib/surface/network_actions/wasm_actions/list.yaml
 lib/surface/network_actions/wasm_plugin_versions/__init__.py
 lib/surface/network_actions/wasm_plugin_versions/create.yaml
 lib/surface/network_actions/wasm_plugin_versions/delete.yaml
