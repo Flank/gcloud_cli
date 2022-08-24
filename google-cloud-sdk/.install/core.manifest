@@ -4,7 +4,6 @@ RELEASE_NOTES
 VERSION
 bin/bootstrapping/__init__.py
 bin/bootstrapping/bootstrapping.py
-bin/bootstrapping/dataflow_sql.py
 bin/bootstrapping/install.py
 bin/bootstrapping/java_dev_appserver.py
 bin/bootstrapping/setup.py
@@ -644,6 +643,7 @@ lib/googlecloudsdk/api_lib/notebooks/__init__.py
 lib/googlecloudsdk/api_lib/notebooks/environments.py
 lib/googlecloudsdk/api_lib/notebooks/instances.py
 lib/googlecloudsdk/api_lib/notebooks/locations.py
+lib/googlecloudsdk/api_lib/notebooks/runtimes.py
 lib/googlecloudsdk/api_lib/notebooks/util.py
 lib/googlecloudsdk/api_lib/ondemandscanning/__init__.py
 lib/googlecloudsdk/api_lib/ondemandscanning/util.py
@@ -735,6 +735,8 @@ lib/googlecloudsdk/api_lib/scheduler/jobs.py
 lib/googlecloudsdk/api_lib/scheduler/locations.py
 lib/googlecloudsdk/api_lib/secrets/__init__.py
 lib/googlecloudsdk/api_lib/secrets/api.py
+lib/googlecloudsdk/api_lib/securesourcemanager/__init__.py
+lib/googlecloudsdk/api_lib/securesourcemanager/instances.py
 lib/googlecloudsdk/api_lib/service_directory/__init__.py
 lib/googlecloudsdk/api_lib/service_directory/base.py
 lib/googlecloudsdk/api_lib/service_directory/endpoints.py
@@ -2149,6 +2151,7 @@ lib/googlecloudsdk/command_lib/run/integrations/run_apps_operations.py
 lib/googlecloudsdk/command_lib/run/integrations/stages.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/base.py
+lib/googlecloudsdk/command_lib/run/integrations/typekits/cloudsql_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/custom_domain_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/domain_routing_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/redis_typekit.py
@@ -2237,6 +2240,9 @@ lib/googlecloudsdk/command_lib/source/flags.py
 lib/googlecloudsdk/command_lib/source/resource_args.py
 lib/googlecloudsdk/command_lib/source/resources.yaml
 lib/googlecloudsdk/command_lib/source/util.py
+lib/googlecloudsdk/command_lib/source_manager/__init__.py
+lib/googlecloudsdk/command_lib/source_manager/flags.py
+lib/googlecloudsdk/command_lib/source_manager/resource_args.py
 lib/googlecloudsdk/command_lib/source_manager/resources.yaml
 lib/googlecloudsdk/command_lib/spanner/__init__.py
 lib/googlecloudsdk/command_lib/spanner/ddl_parser.py
@@ -2264,6 +2270,7 @@ lib/googlecloudsdk/command_lib/storage/__init__.py
 lib/googlecloudsdk/command_lib/storage/buffered_upload_stream.py
 lib/googlecloudsdk/command_lib/storage/component_stream.py
 lib/googlecloudsdk/command_lib/storage/copying.py
+lib/googlecloudsdk/command_lib/storage/cp_command_util.py
 lib/googlecloudsdk/command_lib/storage/encryption_util.py
 lib/googlecloudsdk/command_lib/storage/errors.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
@@ -2689,6 +2696,8 @@ lib/googlecloudsdk/schemas/compute/alpha/ConnectionDraining.yaml
 lib/googlecloudsdk/schemas/compute/alpha/ConsistentHashLoadBalancerSettings.yaml
 lib/googlecloudsdk/schemas/compute/alpha/ConsistentHashLoadBalancerSettingsHttpCookie.yaml
 lib/googlecloudsdk/schemas/compute/alpha/CorsPolicy.yaml
+lib/googlecloudsdk/schemas/compute/alpha/CustomErrorResponsePolicy.yaml
+lib/googlecloudsdk/schemas/compute/alpha/CustomErrorResponsePolicyCustomErrorResponseRule.yaml
 lib/googlecloudsdk/schemas/compute/alpha/CustomerEncryptionKey.yaml
 lib/googlecloudsdk/schemas/compute/alpha/DataValueListEntry.yaml
 lib/googlecloudsdk/schemas/compute/alpha/DisplayDevice.yaml
@@ -2972,6 +2981,8 @@ lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProvider.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProviderInstance.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/ClientTlsPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/Destination.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1alpha1/GatewaySecurityPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1alpha1/GatewaySecurityPolicyRule.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/GoogleCloudNetworksecurityV1alpha1CertificateProvider.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/GoogleCloudNetworksecurityV1alpha1GrpcEndpoint.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/GrpcEndpoint.yaml
@@ -2983,6 +2994,7 @@ lib/googlecloudsdk/schemas/networksecurity/v1alpha1/ServerTlsPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/Source.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/TlsCertificateFiles.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/TlsCertificatePaths.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1alpha1/UrlList.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/ValidationCA.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1beta1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1beta1/CertificateProviderInstance.yaml
@@ -3060,6 +3072,11 @@ lib/googlecloudsdk/schemas/networkservices/v1/TcpRouteRouteDestination.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/TcpRouteRouteMatch.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/TcpRouteRouteRule.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/Timeout.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TlsRoute.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TlsRouteRouteAction.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TlsRouteRouteDestination.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TlsRouteRouteMatch.yaml
+lib/googlecloudsdk/schemas/networkservices/v1/TlsRouteRouteRule.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/TrafficPortSelector.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRedirect.yaml
 lib/googlecloudsdk/schemas/networkservices/v1/UrlRewrite.yaml
@@ -5448,6 +5465,7 @@ lib/surface/asset/feeds/delete.py
 lib/surface/asset/feeds/describe.py
 lib/surface/asset/feeds/list.py
 lib/surface/asset/feeds/update.py
+lib/surface/asset/get_effective_iam_policy.py
 lib/surface/asset/get_history.py
 lib/surface/asset/list.py
 lib/surface/asset/operations/__init__.py
@@ -6480,6 +6498,7 @@ lib/surface/compute/reservations/update.py
 lib/surface/compute/reset_windows_password.py
 lib/surface/compute/resource_policies/__init__.py
 lib/surface/compute/resource_policies/create/__init__.py
+lib/surface/compute/resource_policies/create/disk_consistency_group.py
 lib/surface/compute/resource_policies/create/group_placement.py
 lib/surface/compute/resource_policies/create/instance_schedule.py
 lib/surface/compute/resource_policies/create/snapshot_schedule.py
@@ -7012,6 +7031,8 @@ lib/surface/container/fleet/policycontroller/__init__.py
 lib/surface/container/fleet/policycontroller/disable.py
 lib/surface/container/fleet/policycontroller/enable.py
 lib/surface/container/fleet/policycontroller/update.py
+lib/surface/container/fleet/policycontroller/violations/__init__.py
+lib/surface/container/fleet/policycontroller/violations/list.py
 lib/surface/container/fleet/service_directory/__init__.py
 lib/surface/container/fleet/service_directory/describe.py
 lib/surface/container/fleet/service_directory/disable.py
@@ -7456,6 +7477,9 @@ lib/surface/deploy/delivery_pipelines/get_iam_policy.yaml
 lib/surface/deploy/delivery_pipelines/list.yaml
 lib/surface/deploy/delivery_pipelines/remove_iam_policy_binding.yaml
 lib/surface/deploy/delivery_pipelines/set_iam_policy.yaml
+lib/surface/deploy/job_runs/__init__.py
+lib/surface/deploy/job_runs/describe.yaml
+lib/surface/deploy/job_runs/list.yaml
 lib/surface/deploy/releases/__init__.py
 lib/surface/deploy/releases/abandon.py
 lib/surface/deploy/releases/create.py
@@ -7467,6 +7491,7 @@ lib/surface/deploy/rollouts/approve.py
 lib/surface/deploy/rollouts/describe.yaml
 lib/surface/deploy/rollouts/list.yaml
 lib/surface/deploy/rollouts/reject.py
+lib/surface/deploy/rollouts/retry_job.py
 lib/surface/deploy/targets/__init__.py
 lib/surface/deploy/targets/add_iam_policy_binding.yaml
 lib/surface/deploy/targets/delete.py
@@ -8919,6 +8944,16 @@ lib/surface/network_security/client_tls_policies/delete.yaml
 lib/surface/network_security/client_tls_policies/export.yaml
 lib/surface/network_security/client_tls_policies/import.yaml
 lib/surface/network_security/client_tls_policies/list.yaml
+lib/surface/network_security/gateway_security_policies/__init__.py
+lib/surface/network_security/gateway_security_policies/delete.yaml
+lib/surface/network_security/gateway_security_policies/export.yaml
+lib/surface/network_security/gateway_security_policies/import.yaml
+lib/surface/network_security/gateway_security_policies/list.yaml
+lib/surface/network_security/gateway_security_policies/rules/__init__.py
+lib/surface/network_security/gateway_security_policies/rules/delete.yaml
+lib/surface/network_security/gateway_security_policies/rules/export.yaml
+lib/surface/network_security/gateway_security_policies/rules/import.yaml
+lib/surface/network_security/gateway_security_policies/rules/list.yaml
 lib/surface/network_security/org_address_groups/__init__.py
 lib/surface/network_security/org_address_groups/add_items.yaml
 lib/surface/network_security/org_address_groups/clone_items.yaml
@@ -8934,6 +8969,11 @@ lib/surface/network_security/server_tls_policies/delete.yaml
 lib/surface/network_security/server_tls_policies/export.yaml
 lib/surface/network_security/server_tls_policies/import.yaml
 lib/surface/network_security/server_tls_policies/list.yaml
+lib/surface/network_security/url_lists/__init__.py
+lib/surface/network_security/url_lists/delete.yaml
+lib/surface/network_security/url_lists/export.yaml
+lib/surface/network_security/url_lists/import.yaml
+lib/surface/network_security/url_lists/list.yaml
 lib/surface/network_services/__init__.py
 lib/surface/network_services/endpoint_policies/__init__.py
 lib/surface/network_services/endpoint_policies/delete.yaml
@@ -9020,6 +9060,15 @@ lib/surface/notebooks/instances/update.py
 lib/surface/notebooks/instances/upgrade.py
 lib/surface/notebooks/locations/__init__.py
 lib/surface/notebooks/locations/list.py
+lib/surface/notebooks/runtimes/__init__.py
+lib/surface/notebooks/runtimes/create.py
+lib/surface/notebooks/runtimes/delete.py
+lib/surface/notebooks/runtimes/describe.py
+lib/surface/notebooks/runtimes/list.py
+lib/surface/notebooks/runtimes/reset.py
+lib/surface/notebooks/runtimes/start.py
+lib/surface/notebooks/runtimes/stop.py
+lib/surface/notebooks/runtimes/switch.py
 lib/surface/org_policies/__init__.py
 lib/surface/org_policies/allow.py
 lib/surface/org_policies/delete.py
@@ -9400,6 +9449,7 @@ lib/surface/run/jobs/delete.py
 lib/surface/run/jobs/describe.py
 lib/surface/run/jobs/execute.py
 lib/surface/run/jobs/executions/__init__.py
+lib/surface/run/jobs/executions/cancel.py
 lib/surface/run/jobs/executions/delete.py
 lib/surface/run/jobs/executions/describe.py
 lib/surface/run/jobs/executions/list.py
@@ -9669,9 +9719,13 @@ lib/surface/source/repos/update.py
 lib/surface/source_manager/__init__.py
 lib/surface/source_manager/instances/__init__.py
 lib/surface/source_manager/instances/add_iam_policy_binding.yaml
+lib/surface/source_manager/instances/create.py
+lib/surface/source_manager/instances/delete.py
 lib/surface/source_manager/instances/describe.yaml
+lib/surface/source_manager/instances/get_iam_policy.yaml
 lib/surface/source_manager/instances/list.yaml
 lib/surface/source_manager/instances/remove_iam_policy_binding.yaml
+lib/surface/source_manager/instances/set_iam_policy.yaml
 lib/surface/source_manager/locations/__init__.py
 lib/surface/source_manager/locations/list.yaml
 lib/surface/spanner/__init__.py
