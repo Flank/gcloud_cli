@@ -333,6 +333,7 @@ platform/bq/third_party/requests/exceptions.py
 platform/bq/third_party/requests/help.py
 platform/bq/third_party/requests/hooks.py
 platform/bq/third_party/requests/models.py
+platform/bq/third_party/requests/packages.py
 platform/bq/third_party/requests/packages/__init__.py
 platform/bq/third_party/requests/sessions.py
 platform/bq/third_party/requests/status_codes.py
@@ -366,6 +367,7 @@ platform/bq/third_party/uritemplate/template.py
 platform/bq/third_party/uritemplate/variable.py
 platform/bq/third_party/urllib3/__init__.py
 platform/bq/third_party/urllib3/_collections.py
+platform/bq/third_party/urllib3/_version.py
 platform/bq/third_party/urllib3/connection.py
 platform/bq/third_party/urllib3/connectionpool.py
 platform/bq/third_party/urllib3/contrib/__init__.py
@@ -391,11 +393,14 @@ platform/bq/third_party/urllib3/request.py
 platform/bq/third_party/urllib3/response.py
 platform/bq/third_party/urllib3/util/__init__.py
 platform/bq/third_party/urllib3/util/connection.py
+platform/bq/third_party/urllib3/util/proxy.py
 platform/bq/third_party/urllib3/util/queue.py
 platform/bq/third_party/urllib3/util/request.py
 platform/bq/third_party/urllib3/util/response.py
 platform/bq/third_party/urllib3/util/retry.py
 platform/bq/third_party/urllib3/util/ssl_.py
+platform/bq/third_party/urllib3/util/ssl_match_hostname.py
+platform/bq/third_party/urllib3/util/ssltransport.py
 platform/bq/third_party/urllib3/util/timeout.py
 platform/bq/third_party/urllib3/util/url.py
 platform/bq/third_party/urllib3/util/wait.py

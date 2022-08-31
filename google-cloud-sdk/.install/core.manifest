@@ -345,6 +345,7 @@ lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_adapter.py
 lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_util.py
 lib/googlecloudsdk/api_lib/container/fleet/util.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/__init__.py
+lib/googlecloudsdk/api_lib/container/gkemulticloud/attached.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/aws.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/azure.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/client.py
@@ -742,6 +743,7 @@ lib/googlecloudsdk/api_lib/service_directory/base.py
 lib/googlecloudsdk/api_lib/service_directory/endpoints.py
 lib/googlecloudsdk/api_lib/service_directory/locations.py
 lib/googlecloudsdk/api_lib/service_directory/namespaces.py
+lib/googlecloudsdk/api_lib/service_directory/registration_policies.py
 lib/googlecloudsdk/api_lib/service_directory/services.py
 lib/googlecloudsdk/api_lib/services/__init__.py
 lib/googlecloudsdk/api_lib/services/apikeys.py
@@ -759,6 +761,7 @@ lib/googlecloudsdk/api_lib/spanner/__init__.py
 lib/googlecloudsdk/api_lib/spanner/backup_operations.py
 lib/googlecloudsdk/api_lib/spanner/backups.py
 lib/googlecloudsdk/api_lib/spanner/database_operations.py
+lib/googlecloudsdk/api_lib/spanner/database_roles.py
 lib/googlecloudsdk/api_lib/spanner/database_sessions.py
 lib/googlecloudsdk/api_lib/spanner/databases.py
 lib/googlecloudsdk/api_lib/spanner/instance_config_operations.py
@@ -1478,6 +1481,7 @@ lib/googlecloudsdk/command_lib/container/images/resources.yaml
 lib/googlecloudsdk/command_lib/container/resources.yaml
 lib/googlecloudsdk/command_lib/container/vmware/__init__.py
 lib/googlecloudsdk/command_lib/container/vmware/command_util.py
+lib/googlecloudsdk/command_lib/container/vmware/constants.py
 lib/googlecloudsdk/command_lib/container/vmware/flags.py
 lib/googlecloudsdk/command_lib/crash_handling.py
 lib/googlecloudsdk/command_lib/data_catalog/__init__.py
@@ -2029,6 +2033,7 @@ lib/googlecloudsdk/command_lib/network_management/util.py
 lib/googlecloudsdk/command_lib/network_security/__init__.py
 lib/googlecloudsdk/command_lib/network_security/completers.py
 lib/googlecloudsdk/command_lib/network_security/flags.py
+lib/googlecloudsdk/command_lib/network_security/hooks.py
 lib/googlecloudsdk/command_lib/network_security/resources.yaml
 lib/googlecloudsdk/command_lib/network_security/util.py
 lib/googlecloudsdk/command_lib/network_services/__init__.py
@@ -4643,8 +4648,13 @@ lib/googlecloudsdk/third_party/apis/speech/v1p1beta1/__init__.py
 lib/googlecloudsdk/third_party/apis/speech/v1p1beta1/resources.py
 lib/googlecloudsdk/third_party/apis/speech/v1p1beta1/speech_v1p1beta1_client.py
 lib/googlecloudsdk/third_party/apis/speech/v1p1beta1/speech_v1p1beta1_messages.py
+lib/googlecloudsdk/third_party/apis/speech/v2/__init__.py
+lib/googlecloudsdk/third_party/apis/speech/v2/resources.py
+lib/googlecloudsdk/third_party/apis/speech/v2/speech_v2_client.py
+lib/googlecloudsdk/third_party/apis/speech/v2/speech_v2_messages.py
 lib/googlecloudsdk/third_party/apis/speech_v1.json
 lib/googlecloudsdk/third_party/apis/speech_v1p1beta1.json
+lib/googlecloudsdk/third_party/apis/speech_v2.json
 lib/googlecloudsdk/third_party/apis/sqladmin/__init__.py
 lib/googlecloudsdk/third_party/apis/sqladmin/v1beta4/__init__.py
 lib/googlecloudsdk/third_party/apis/sqladmin/v1beta4/resources.py
@@ -4808,7 +4818,12 @@ lib/googlecloudsdk/third_party/apis/workstations/v1alpha1/__init__.py
 lib/googlecloudsdk/third_party/apis/workstations/v1alpha1/resources.py
 lib/googlecloudsdk/third_party/apis/workstations/v1alpha1/workstations_v1alpha1_client.py
 lib/googlecloudsdk/third_party/apis/workstations/v1alpha1/workstations_v1alpha1_messages.py
+lib/googlecloudsdk/third_party/apis/workstations/v1beta/__init__.py
+lib/googlecloudsdk/third_party/apis/workstations/v1beta/resources.py
+lib/googlecloudsdk/third_party/apis/workstations/v1beta/workstations_v1beta_client.py
+lib/googlecloudsdk/third_party/apis/workstations/v1beta/workstations_v1beta_messages.py
 lib/googlecloudsdk/third_party/apis/workstations_v1alpha1.json
+lib/googlecloudsdk/third_party/apis/workstations_v1beta.json
 lib/googlecloudsdk/third_party/appengine/__init__.py
 lib/googlecloudsdk/third_party/appengine/_internal/__init__.py
 lib/googlecloudsdk/third_party/appengine/_internal/six_subset/__init__.py
@@ -5606,6 +5621,7 @@ lib/surface/bigtable/instances/tables/add_iam_policy_binding.yaml
 lib/surface/bigtable/instances/tables/config/__init__.py
 lib/surface/bigtable/instances/tables/config/export.yaml
 lib/surface/bigtable/instances/tables/create.yaml
+lib/surface/bigtable/instances/tables/delete.yaml
 lib/surface/bigtable/instances/tables/describe.yaml
 lib/surface/bigtable/instances/tables/get_iam_policy.yaml
 lib/surface/bigtable/instances/tables/list.py
@@ -6599,6 +6615,7 @@ lib/surface/compute/sole_tenancy/node_groups/list.py
 lib/surface/compute/sole_tenancy/node_groups/list_nodes.py
 lib/surface/compute/sole_tenancy/node_groups/remove_iam_policy_binding.yaml
 lib/surface/compute/sole_tenancy/node_groups/set_iam_policy.yaml
+lib/surface/compute/sole_tenancy/node_groups/simulate_maintenance_event.py
 lib/surface/compute/sole_tenancy/node_groups/update.py
 lib/surface/compute/sole_tenancy/node_templates/__init__.py
 lib/surface/compute/sole_tenancy/node_templates/add_iam_policy_binding.yaml
@@ -6815,6 +6832,13 @@ lib/surface/config/virtualenv/disable.py
 lib/surface/config/virtualenv/enable.py
 lib/surface/config/virtualenv/update.py
 lib/surface/container/__init__.py
+lib/surface/container/attached/__init__.py
+lib/surface/container/attached/clusters/__init__.py
+lib/surface/container/attached/clusters/create.py
+lib/surface/container/attached/clusters/delete.py
+lib/surface/container/attached/clusters/describe.py
+lib/surface/container/attached/clusters/list.py
+lib/surface/container/attached/clusters/update.py
 lib/surface/container/aws/__init__.py
 lib/surface/container/aws/clusters/__init__.py
 lib/surface/container/aws/clusters/create.py
@@ -7028,6 +7052,8 @@ lib/surface/container/fleet/namespaces/describe.py
 lib/surface/container/fleet/namespaces/list.py
 lib/surface/container/fleet/namespaces/update.py
 lib/surface/container/fleet/policycontroller/__init__.py
+lib/surface/container/fleet/policycontroller/constraints/__init__.py
+lib/surface/container/fleet/policycontroller/constraints/list.py
 lib/surface/container/fleet/policycontroller/disable.py
 lib/surface/container/fleet/policycontroller/enable.py
 lib/surface/container/fleet/policycontroller/update.py
@@ -7077,6 +7103,7 @@ lib/surface/container/vmware/clusters/enroll.py
 lib/surface/container/vmware/clusters/list.py
 lib/surface/container/vmware/clusters/unenroll.py
 lib/surface/container/vmware/node_pools/__init__.py
+lib/surface/container/vmware/node_pools/create.py
 lib/surface/container/vmware/node_pools/delete.py
 lib/surface/container/vmware/node_pools/describe.py
 lib/surface/container/vmware/node_pools/list.py
@@ -7760,6 +7787,7 @@ lib/surface/edge_cloud/networking/routers/get_status.py
 lib/surface/edge_cloud/networking/routers/list.yaml
 lib/surface/edge_cloud/networking/routers/remove_bgp_peer.py
 lib/surface/edge_cloud/networking/routers/remove_interface.py
+lib/surface/edge_cloud/networking/routers/update.py
 lib/surface/edge_cloud/networking/routes/__init__.py
 lib/surface/edge_cloud/networking/routes/create.yaml
 lib/surface/edge_cloud/networking/routes/delete.yaml
@@ -9653,6 +9681,12 @@ lib/surface/service_directory/namespaces/list.py
 lib/surface/service_directory/namespaces/remove_iam_policy_binding.py
 lib/surface/service_directory/namespaces/set_iam_policy.py
 lib/surface/service_directory/namespaces/update.py
+lib/surface/service_directory/registration_policies/__init__.py
+lib/surface/service_directory/registration_policies/create.py
+lib/surface/service_directory/registration_policies/delete.py
+lib/surface/service_directory/registration_policies/describe.py
+lib/surface/service_directory/registration_policies/list.py
+lib/surface/service_directory/registration_policies/update.py
 lib/surface/service_directory/services/__init__.py
 lib/surface/service_directory/services/add_iam_policy_binding.py
 lib/surface/service_directory/services/create.py
@@ -9728,6 +9762,9 @@ lib/surface/source_manager/instances/remove_iam_policy_binding.yaml
 lib/surface/source_manager/instances/set_iam_policy.yaml
 lib/surface/source_manager/locations/__init__.py
 lib/surface/source_manager/locations/list.yaml
+lib/surface/source_manager/operations/__init__.py
+lib/surface/source_manager/operations/describe.yaml
+lib/surface/source_manager/operations/list.yaml
 lib/surface/spanner/__init__.py
 lib/surface/spanner/backups/__init__.py
 lib/surface/spanner/backups/add_iam_policy_binding.yaml
@@ -9756,6 +9793,8 @@ lib/surface/spanner/databases/get_iam_policy.yaml
 lib/surface/spanner/databases/list.py
 lib/surface/spanner/databases/remove_iam_policy_binding.yaml
 lib/surface/spanner/databases/restore.py
+lib/surface/spanner/databases/roles/__init__.py
+lib/surface/spanner/databases/roles/list.py
 lib/surface/spanner/databases/sessions/__init__.py
 lib/surface/spanner/databases/sessions/delete.py
 lib/surface/spanner/databases/sessions/list.py
