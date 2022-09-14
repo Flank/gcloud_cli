@@ -3,7 +3,6 @@
     {
       "dependencies": [
         "gcloud-crc32c-darwin-arm",
-        "gcloud-crc32c-darwin-x86",
         "gcloud-crc32c-darwin-x86_64",
         "gcloud-crc32c-linux-arm",
         "gcloud-crc32c-linux-x86",
@@ -38,11 +37,11 @@
       }
     }
   ],
-  "revision": 20220826172526,
+  "revision": 20220912133630,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "400.0.0"
+  "version": "402.0.0"
 }

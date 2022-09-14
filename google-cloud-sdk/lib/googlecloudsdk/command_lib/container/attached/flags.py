@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import arg_parsers
+
 
 def AddPlatformVersion(parser, required=True):
   parser.add_argument(
@@ -28,3 +30,78 @@ def AddPlatformVersion(parser, required=True):
 
 def GetPlatformVersion(args):
   return getattr(args, 'platform_version', None)
+
+
+def AddIssuerUrl(parser, required=False):
+  parser.add_argument(
+      '--issuer-url',
+      required=required,
+      help=('Issuer url of the cluster to attach.'))
+
+
+def GetIssuerUrl(args):
+  return getattr(args, 'issuer_url', None)
+
+
+def AddOidcJwks(parser):
+  parser.add_argument(
+      '--oidc-jwks',
+      help=('OIDC JWKS of the cluster to attach.'))
+
+
+def GetOidcJwks(args):
+  return getattr(args, 'oidc_jwks', None)
+
+
+def AddAuthority(parser):
+  """Adds Authority flags.
+
+  Args:
+    parser: The argparse.parser to add the arguments to.
+  """
+
+  group = parser.add_group('Authority', required=True)
+  AddIssuerUrl(group, required=True)
+  AddOidcJwks(group)
+
+
+def AddDistribution(parser, required=False):
+  help_text = """
+Set the base platform type of the cluster to attach.
+
+Examples:
+
+  $ {command} --distribution=aks
+  $ {command} --distribution=eks
+"""
+  parser.add_argument(
+      '--distribution',
+      required=required,
+      help=help_text)
+
+
+def GetDistribution(args):
+  return getattr(args, 'distribution', None)
+
+
+def AddAdminUsers(parser):
+  help_txt = """
+Users that can perform operations as a cluster administrator.
+
+There is no way to completely remove admin users after setting.
+"""
+
+  parser.add_argument(
+      '--admin-users',
+      type=arg_parsers.ArgList(),
+      metavar='USER',
+      required=False,
+      help=help_txt)
+
+
+def GetAdminUsers(args):
+  if not hasattr(args, 'admin_users'):
+    return None
+  if args.admin_users:
+    return args.admin_users
+  return None

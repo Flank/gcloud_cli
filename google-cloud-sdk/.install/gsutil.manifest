@@ -21,6 +21,7 @@ platform/gsutil/gslib/addlhelp/metadata.py
 platform/gsutil/gslib/addlhelp/naming.py
 platform/gsutil/gslib/addlhelp/prod.py
 platform/gsutil/gslib/addlhelp/security.py
+platform/gsutil/gslib/addlhelp/shim.py
 platform/gsutil/gslib/addlhelp/support.py
 platform/gsutil/gslib/addlhelp/versions.py
 platform/gsutil/gslib/addlhelp/wildcards.py

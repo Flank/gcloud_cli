@@ -1298,6 +1298,8 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
     dockerNetwork: Whether dockerNetwork can be used or what network modes are
       allowed. E.g. one may allow `off` value only via `allowed_values`.
     dockerPrivileged: Whether dockerPrivileged can be used.
+    dockerRunAsContainerProvidedUser: Whether dockerRunAsContainerProvidedUser
+      can be used.
     dockerRunAsRoot: Whether dockerRunAsRoot can be used.
     dockerRuntime: Whether dockerRuntime is allowed to be set or what runtimes
       are allowed. Note linux_isolation takes precedence, and if set,
@@ -1328,10 +1330,11 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
   dockerChrootPath = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 3)
   dockerNetwork = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 4)
   dockerPrivileged = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 5)
-  dockerRunAsRoot = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 6)
-  dockerRuntime = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 7)
-  dockerSiblingContainers = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 8)
-  linuxIsolation = _messages.EnumField('LinuxIsolationValueValuesEnum', 9)
+  dockerRunAsContainerProvidedUser = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 6)
+  dockerRunAsRoot = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 7)
+  dockerRuntime = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 8)
+  dockerSiblingContainers = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 9)
+  linuxIsolation = _messages.EnumField('LinuxIsolationValueValuesEnum', 10)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature(_messages.Message):
@@ -1643,6 +1646,7 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerPool(_messages.Message
   Fields:
     autoscale: The autoscale policy to apply on a pool.
     channel: Channel specifies the release channel of the pool.
+    hostOs: HostOS specifies the OS version of the image for the worker VMs.
     name: WorkerPool resource name formatted as:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]/workerpools/[POOL_ID]`.
       name should not be populated when creating a worker pool since it is
@@ -1681,10 +1685,11 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerPool(_messages.Message
 
   autoscale = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaAutoscale', 1)
   channel = _messages.StringField(2)
-  name = _messages.StringField(3)
-  state = _messages.EnumField('StateValueValuesEnum', 4)
-  workerConfig = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig', 5)
-  workerCount = _messages.IntegerField(6)
+  hostOs = _messages.StringField(3)
+  name = _messages.StringField(4)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
+  workerConfig = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig', 6)
+  workerCount = _messages.IntegerField(7)
 
 
 class GoogleDevtoolsRemoteworkersV1test2AdminTemp(_messages.Message):

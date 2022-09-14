@@ -1395,6 +1395,7 @@ lib/third_party/google/auth/iam.py
 lib/third_party/google/auth/identity_pool.py
 lib/third_party/google/auth/impersonated_credentials.py
 lib/third_party/google/auth/jwt.py
+lib/third_party/google/auth/pluggable.py
 lib/third_party/google/auth/transport/__init__.py
 lib/third_party/google/auth/transport/_aiohttp_requests.py
 lib/third_party/google/auth/transport/_custom_tls_signer.py
@@ -1672,6 +1673,7 @@ lib/third_party/google/oauth2/_reauth_async.py
 lib/third_party/google/oauth2/_service_account_async.py
 lib/third_party/google/oauth2/challenges.py
 lib/third_party/google/oauth2/credentials.py
+lib/third_party/google/oauth2/gdch_credentials.py
 lib/third_party/google/oauth2/id_token.py
 lib/third_party/google/oauth2/reauth.py
 lib/third_party/google/oauth2/service_account.py
@@ -3862,6 +3864,7 @@ lib/third_party/pyu2f/hidtransport.py
 lib/third_party/pyu2f/model.py
 lib/third_party/pyu2f/u2f.py
 lib/third_party/requests/LICENSE
+lib/third_party/requests/NOTICE
 lib/third_party/requests/__init__.py
 lib/third_party/requests/__version__.py
 lib/third_party/requests/_internal_utils.py
@@ -3875,7 +3878,7 @@ lib/third_party/requests/exceptions.py
 lib/third_party/requests/help.py
 lib/third_party/requests/hooks.py
 lib/third_party/requests/models.py
-lib/third_party/requests/packages/__init__.py
+lib/third_party/requests/packages.py
 lib/third_party/requests/sessions.py
 lib/third_party/requests/status_codes.py
 lib/third_party/requests/structures.py
@@ -4042,6 +4045,7 @@ lib/third_party/uritemplate/variable.py
 lib/third_party/urllib3/LICENSE
 lib/third_party/urllib3/__init__.py
 lib/third_party/urllib3/_collections.py
+lib/third_party/urllib3/_version.py
 lib/third_party/urllib3/connection.py
 lib/third_party/urllib3/connectionpool.py
 lib/third_party/urllib3/contrib/__init__.py
@@ -4061,18 +4065,19 @@ lib/third_party/urllib3/packages/__init__.py
 lib/third_party/urllib3/packages/backports/__init__.py
 lib/third_party/urllib3/packages/backports/makefile.py
 lib/third_party/urllib3/packages/six.py
-lib/third_party/urllib3/packages/ssl_match_hostname/__init__.py
-lib/third_party/urllib3/packages/ssl_match_hostname/_implementation.py
 lib/third_party/urllib3/poolmanager.py
 lib/third_party/urllib3/request.py
 lib/third_party/urllib3/response.py
 lib/third_party/urllib3/util/__init__.py
 lib/third_party/urllib3/util/connection.py
+lib/third_party/urllib3/util/proxy.py
 lib/third_party/urllib3/util/queue.py
 lib/third_party/urllib3/util/request.py
 lib/third_party/urllib3/util/response.py
 lib/third_party/urllib3/util/retry.py
 lib/third_party/urllib3/util/ssl_.py
+lib/third_party/urllib3/util/ssl_match_hostname.py
+lib/third_party/urllib3/util/ssltransport.py
 lib/third_party/urllib3/util/timeout.py
 lib/third_party/urllib3/util/url.py
 lib/third_party/urllib3/util/wait.py
