@@ -343,6 +343,8 @@ lib/googlecloudsdk/api_lib/container/fleet/__init__.py
 lib/googlecloudsdk/api_lib/container/fleet/client.py
 lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_adapter.py
 lib/googlecloudsdk/api_lib/container/fleet/gkehub_api_util.py
+lib/googlecloudsdk/api_lib/container/fleet/policycontroller/__init__.py
+lib/googlecloudsdk/api_lib/container/fleet/policycontroller/status_api_utils.py
 lib/googlecloudsdk/api_lib/container/fleet/util.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/__init__.py
 lib/googlecloudsdk/api_lib/container/gkemulticloud/attached.py
@@ -673,6 +675,7 @@ lib/googlecloudsdk/api_lib/publicca/base.py
 lib/googlecloudsdk/api_lib/pubsub/__init__.py
 lib/googlecloudsdk/api_lib/pubsub/lite_subscriptions.py
 lib/googlecloudsdk/api_lib/pubsub/lite_topics.py
+lib/googlecloudsdk/api_lib/pubsub/schemas.py
 lib/googlecloudsdk/api_lib/pubsub/snapshots.py
 lib/googlecloudsdk/api_lib/pubsub/subscriptions.py
 lib/googlecloudsdk/api_lib/pubsub/topics.py
@@ -2145,6 +2148,7 @@ lib/googlecloudsdk/command_lib/run/deletion.py
 lib/googlecloudsdk/command_lib/run/exceptions.py
 lib/googlecloudsdk/command_lib/run/flags.py
 lib/googlecloudsdk/command_lib/run/integrations/__init__.py
+lib/googlecloudsdk/command_lib/run/integrations/deployment_states.py
 lib/googlecloudsdk/command_lib/run/integrations/flags.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/base_formatter.py
@@ -2153,6 +2157,7 @@ lib/googlecloudsdk/command_lib/run/integrations/formatters/domain_routing_format
 lib/googlecloudsdk/command_lib/run/integrations/formatters/fallback_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/redis_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/states.py
+lib/googlecloudsdk/command_lib/run/integrations/integration_list_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/messages_util.py
 lib/googlecloudsdk/command_lib/run/integrations/run_apps_operations.py
@@ -3165,6 +3170,8 @@ lib/googlecloudsdk/schemas/networkservices/v1alpha1/RouterProxySettings.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/Routing.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/Secret.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/ServiceGraph.yaml
+lib/googlecloudsdk/schemas/networkservices/v1alpha1/ServiceLbPolicy.yaml
+lib/googlecloudsdk/schemas/networkservices/v1alpha1/ServiceLbPolicyAutoCapacityDrain.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/SetValue.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/TcpRoute.yaml
 lib/googlecloudsdk/schemas/networkservices/v1alpha1/TcpRouteRouteAction.yaml
@@ -4685,6 +4692,12 @@ lib/googlecloudsdk/third_party/apis/storage/v1/resources.py
 lib/googlecloudsdk/third_party/apis/storage/v1/storage_v1_client.py
 lib/googlecloudsdk/third_party/apis/storage/v1/storage_v1_messages.py
 lib/googlecloudsdk/third_party/apis/storage_v1.json
+lib/googlecloudsdk/third_party/apis/storageinsights/__init__.py
+lib/googlecloudsdk/third_party/apis/storageinsights/v1alpha1/__init__.py
+lib/googlecloudsdk/third_party/apis/storageinsights/v1alpha1/resources.py
+lib/googlecloudsdk/third_party/apis/storageinsights/v1alpha1/storageinsights_v1alpha1_client.py
+lib/googlecloudsdk/third_party/apis/storageinsights/v1alpha1/storageinsights_v1alpha1_messages.py
+lib/googlecloudsdk/third_party/apis/storageinsights_v1alpha1.json
 lib/googlecloudsdk/third_party/apis/storagetransfer/__init__.py
 lib/googlecloudsdk/third_party/apis/storagetransfer/v1/__init__.py
 lib/googlecloudsdk/third_party/apis/storagetransfer/v1/resources.py
@@ -5232,6 +5245,7 @@ lib/surface/alloydb/backups/describe.py
 lib/surface/alloydb/backups/list.py
 lib/surface/alloydb/clusters/__init__.py
 lib/surface/alloydb/clusters/create.py
+lib/surface/alloydb/clusters/create_secondary.py
 lib/surface/alloydb/clusters/delete.py
 lib/surface/alloydb/clusters/describe.py
 lib/surface/alloydb/clusters/list.py
@@ -5471,7 +5485,6 @@ lib/surface/artifacts/settings/__init__.py
 lib/surface/artifacts/settings/describe.yaml
 lib/surface/artifacts/settings/disable_upgrade_redirection.yaml
 lib/surface/artifacts/settings/enable_upgrade_redirection.yaml
-lib/surface/artifacts/settings/finalize_upgrade_redirection.yaml
 lib/surface/artifacts/tags/__init__.py
 lib/surface/artifacts/tags/create.yaml
 lib/surface/artifacts/tags/delete.yaml
@@ -5647,6 +5660,7 @@ lib/surface/bigtable/instances/tables/remove_iam_policy_binding.yaml
 lib/surface/bigtable/instances/tables/restore.py
 lib/surface/bigtable/instances/tables/set_iam_policy.yaml
 lib/surface/bigtable/instances/tables/undelete.yaml
+lib/surface/bigtable/instances/tables/update.yaml
 lib/surface/bigtable/instances/update.py
 lib/surface/bigtable/instances/upgrade.py
 lib/surface/bigtable/operations/__init__.py
@@ -5700,6 +5714,7 @@ lib/surface/bms/networks/list.py
 lib/surface/bms/networks/list_ip_reservations.py
 lib/surface/bms/networks/update.py
 lib/surface/bms/nfs_shares/__init__.py
+lib/surface/bms/nfs_shares/create.py
 lib/surface/bms/nfs_shares/delete.py
 lib/surface/bms/nfs_shares/describe.py
 lib/surface/bms/nfs_shares/list.py
@@ -6859,6 +6874,7 @@ lib/surface/container/attached/clusters/create.py
 lib/surface/container/attached/clusters/delete.py
 lib/surface/container/attached/clusters/describe.py
 lib/surface/container/attached/clusters/generate_install_manifest.py
+lib/surface/container/attached/clusters/import.py
 lib/surface/container/attached/clusters/list.py
 lib/surface/container/attached/clusters/update.py
 lib/surface/container/attached/get_server_config.py
@@ -6988,6 +7004,7 @@ lib/surface/container/binauthz/policy/remove_iam_policy_binding.yaml
 lib/surface/container/binauthz/policy/set_iam_policy.py
 lib/surface/container/binauthz/policy/update.py
 lib/surface/container/clusters/__init__.py
+lib/surface/container/clusters/check_autopilot_compatibility.py
 lib/surface/container/clusters/config/__init__.py
 lib/surface/container/clusters/config/export.yaml
 lib/surface/container/clusters/create.py
@@ -7085,6 +7102,7 @@ lib/surface/container/fleet/policycontroller/templates/describe.py
 lib/surface/container/fleet/policycontroller/templates/list.py
 lib/surface/container/fleet/policycontroller/update.py
 lib/surface/container/fleet/policycontroller/violations/__init__.py
+lib/surface/container/fleet/policycontroller/violations/describe.py
 lib/surface/container/fleet/policycontroller/violations/list.py
 lib/surface/container/fleet/service_directory/__init__.py
 lib/surface/container/fleet/service_directory/describe.py
@@ -9096,6 +9114,12 @@ lib/surface/network_services/service_bindings/create.yaml
 lib/surface/network_services/service_bindings/delete.yaml
 lib/surface/network_services/service_bindings/describe.yaml
 lib/surface/network_services/service_bindings/list.yaml
+lib/surface/network_services/service_lb_policies/__init__.py
+lib/surface/network_services/service_lb_policies/delete.yaml
+lib/surface/network_services/service_lb_policies/describe.yaml
+lib/surface/network_services/service_lb_policies/export.yaml
+lib/surface/network_services/service_lb_policies/import.yaml
+lib/surface/network_services/service_lb_policies/list.yaml
 lib/surface/network_services/tcp_routes/__init__.py
 lib/surface/network_services/tcp_routes/delete.yaml
 lib/surface/network_services/tcp_routes/describe.yaml
@@ -9289,10 +9313,14 @@ lib/surface/pubsub/lite_topics/list_subscriptions.yaml
 lib/surface/pubsub/lite_topics/publish.py
 lib/surface/pubsub/lite_topics/update.yaml
 lib/surface/pubsub/schemas/__init__.py
+lib/surface/pubsub/schemas/commit.py
 lib/surface/pubsub/schemas/create.yaml
 lib/surface/pubsub/schemas/delete.yaml
+lib/surface/pubsub/schemas/delete_revision.py
 lib/surface/pubsub/schemas/describe.yaml
 lib/surface/pubsub/schemas/list.yaml
+lib/surface/pubsub/schemas/list_revisions.yaml
+lib/surface/pubsub/schemas/rollback.py
 lib/surface/pubsub/schemas/validate_message.yaml
 lib/surface/pubsub/schemas/validate_schema.yaml
 lib/surface/pubsub/snapshots/__init__.py

@@ -2,11 +2,12 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "8f1c24d273122da4020ac2106e439187e5d1d2769c75ccff72359fd4e892746f",
+        "contents_checksum": "5ab83e0028ef523ae3eab59b05b6f2f3d340be750385dc66bd1127c75d7a6d4b",
         "source": "",
         "type": "tar"
       },
       "dependencies": [
+        "bundled-python3-unix",
         "core",
         "gcloud-deps",
         "ssh-tools"
@@ -29,16 +30,16 @@
       },
       "platform_required": false,
       "version": {
-        "build_number": 20220912133630,
-        "version_string": "2022.09.12"
+        "build_number": 20220920185015,
+        "version_string": "2022.09.20"
       }
     }
   ],
-  "revision": 20220912133630,
+  "revision": 20220920185015,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "402.0.0"
+  "version": "403.0.0"
 }
