@@ -146,6 +146,7 @@ platform/bq/third_party/google/auth/external_account.py
 platform/bq/third_party/google/auth/identity_pool.py
 platform/bq/third_party/google/auth/impersonated_credentials.py
 platform/bq/third_party/google/auth/jwt.py
+platform/bq/third_party/google/auth/pluggable.py
 platform/bq/third_party/google/auth/transport/__init__.py
 platform/bq/third_party/google/auth/transport/_http_client.py
 platform/bq/third_party/google/auth/transport/_mtls_helper.py

@@ -799,6 +799,9 @@ lib/googlecloudsdk/api_lib/storage/gcs_error_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_field_converters.py
 lib/googlecloudsdk/api_lib/storage/gcs_metadata_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_upload.py
+lib/googlecloudsdk/api_lib/storage/insights/__init__.py
+lib/googlecloudsdk/api_lib/storage/insights/inventory_reports/__init__.py
+lib/googlecloudsdk/api_lib/storage/insights/inventory_reports/insights_api.py
 lib/googlecloudsdk/api_lib/storage/metadata_util.py
 lib/googlecloudsdk/api_lib/storage/patch_gcs_messages.py
 lib/googlecloudsdk/api_lib/storage/request_config_factory.py
@@ -850,6 +853,8 @@ lib/googlecloudsdk/api_lib/vmware/networkpolicies.py
 lib/googlecloudsdk/api_lib/vmware/networks.py
 lib/googlecloudsdk/api_lib/vmware/nodetypes.py
 lib/googlecloudsdk/api_lib/vmware/operations.py
+lib/googlecloudsdk/api_lib/vmware/private_clouds/__init__.py
+lib/googlecloudsdk/api_lib/vmware/private_clouds/subnets.py
 lib/googlecloudsdk/api_lib/vmware/privateclouds.py
 lib/googlecloudsdk/api_lib/vmware/sddc/__init__.py
 lib/googlecloudsdk/api_lib/vmware/sddc/clusters.py
@@ -909,6 +914,7 @@ lib/googlecloudsdk/command_lib/active_directory/__init__.py
 lib/googlecloudsdk/command_lib/active_directory/backup_util.py
 lib/googlecloudsdk/command_lib/active_directory/domains_update_util.py
 lib/googlecloudsdk/command_lib/active_directory/flags.py
+lib/googlecloudsdk/command_lib/active_directory/migration_util.py
 lib/googlecloudsdk/command_lib/active_directory/peering_util.py
 lib/googlecloudsdk/command_lib/active_directory/resources.yaml
 lib/googlecloudsdk/command_lib/active_directory/trust_create_util.py
@@ -2112,6 +2118,7 @@ lib/googlecloudsdk/command_lib/recommender/__init__.py
 lib/googlecloudsdk/command_lib/recommender/flags.py
 lib/googlecloudsdk/command_lib/recommender/resources.yaml
 lib/googlecloudsdk/command_lib/redis/__init__.py
+lib/googlecloudsdk/command_lib/redis/clusters_update_util.py
 lib/googlecloudsdk/command_lib/redis/instances_create_util.py
 lib/googlecloudsdk/command_lib/redis/instances_describe_util.py
 lib/googlecloudsdk/command_lib/redis/instances_reschedule_util.py
@@ -2152,7 +2159,6 @@ lib/googlecloudsdk/command_lib/run/integrations/deployment_states.py
 lib/googlecloudsdk/command_lib/run/integrations/flags.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/base_formatter.py
-lib/googlecloudsdk/command_lib/run/integrations/formatters/custom_domain_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/domain_routing_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/fallback_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/redis_formatter.py
@@ -2165,7 +2171,6 @@ lib/googlecloudsdk/command_lib/run/integrations/stages.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/base.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/cloudsql_typekit.py
-lib/googlecloudsdk/command_lib/run/integrations/typekits/custom_domain_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/domain_routing_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/redis_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits_util.py
@@ -5084,6 +5089,10 @@ lib/surface/active_directory/domains/describe_ldaps_settings.yaml
 lib/surface/active_directory/domains/extend_schema.yaml
 lib/surface/active_directory/domains/get_iam_policy.yaml
 lib/surface/active_directory/domains/list.yaml
+lib/surface/active_directory/domains/migration/__init__.py
+lib/surface/active_directory/domains/migration/check_permissions.yaml
+lib/surface/active_directory/domains/migration/disable.yaml
+lib/surface/active_directory/domains/migration/enable.yaml
 lib/surface/active_directory/domains/reset_admin_password.yaml
 lib/surface/active_directory/domains/restore.yaml
 lib/surface/active_directory/domains/set_iam_policy.yaml
@@ -5517,6 +5526,12 @@ lib/surface/asset/list.py
 lib/surface/asset/operations/__init__.py
 lib/surface/asset/operations/describe.py
 lib/surface/asset/query.py
+lib/surface/asset/saved_queries/__init__.py
+lib/surface/asset/saved_queries/create.py
+lib/surface/asset/saved_queries/delete.py
+lib/surface/asset/saved_queries/describe.py
+lib/surface/asset/saved_queries/list.py
+lib/surface/asset/saved_queries/update.py
 lib/surface/asset/search_all_iam_policies.py
 lib/surface/asset/search_all_resources.py
 lib/surface/assured/__init__.py
@@ -5530,6 +5545,7 @@ lib/surface/assured/workloads/describe.py
 lib/surface/assured/workloads/list.py
 lib/surface/assured/workloads/update.py
 lib/surface/assured/workloads/violations/__init__.py
+lib/surface/assured/workloads/violations/acknowledge.py
 lib/surface/assured/workloads/violations/describe.py
 lib/surface/assured/workloads/violations/list.py
 lib/surface/auth/__init__.py
@@ -6876,6 +6892,7 @@ lib/surface/container/attached/clusters/describe.py
 lib/surface/container/attached/clusters/generate_install_manifest.py
 lib/surface/container/attached/clusters/import.py
 lib/surface/container/attached/clusters/list.py
+lib/surface/container/attached/clusters/register.py
 lib/surface/container/attached/clusters/update.py
 lib/surface/container/attached/get_server_config.py
 lib/surface/container/aws/__init__.py
@@ -7095,6 +7112,7 @@ lib/surface/container/fleet/policycontroller/__init__.py
 lib/surface/container/fleet/policycontroller/constraints/__init__.py
 lib/surface/container/fleet/policycontroller/constraints/describe.py
 lib/surface/container/fleet/policycontroller/constraints/list.py
+lib/surface/container/fleet/policycontroller/describe.py
 lib/surface/container/fleet/policycontroller/disable.py
 lib/surface/container/fleet/policycontroller/enable.py
 lib/surface/container/fleet/policycontroller/templates/__init__.py
@@ -7413,6 +7431,7 @@ lib/surface/dataproc/clusters/start.py
 lib/surface/dataproc/clusters/stop.py
 lib/surface/dataproc/clusters/update.py
 lib/surface/dataproc/gce_node_pools/__init__.py
+lib/surface/dataproc/gce_node_pools/describe.py
 lib/surface/dataproc/gce_node_pools/resize.py
 lib/surface/dataproc/jobs/__init__.py
 lib/surface/dataproc/jobs/delete.py
@@ -8819,6 +8838,7 @@ lib/surface/microservices/__init__.py
 lib/surface/microservices/features/__init__.py
 lib/surface/microservices/features/disable.py
 lib/surface/microservices/features/enable.py
+lib/surface/microservices/features/list.py
 lib/surface/ml/__init__.py
 lib/surface/ml/language/__init__.py
 lib/surface/ml/language/__init__.yaml
@@ -9409,6 +9429,7 @@ lib/surface/redis/clusters/create.yaml
 lib/surface/redis/clusters/delete.yaml
 lib/surface/redis/clusters/describe.yaml
 lib/surface/redis/clusters/list.yaml
+lib/surface/redis/clusters/update.yaml
 lib/surface/redis/instances/__init__.py
 lib/surface/redis/instances/config/__init__.py
 lib/surface/redis/instances/config/export.yaml
@@ -10007,6 +10028,17 @@ lib/surface/storage/hmac/create.py
 lib/surface/storage/hmac/delete.py
 lib/surface/storage/hmac/list.py
 lib/surface/storage/hmac/update.py
+lib/surface/storage/insights/__init__.py
+lib/surface/storage/insights/inventory_reports/__init__.py
+lib/surface/storage/insights/inventory_reports/create.py
+lib/surface/storage/insights/inventory_reports/delete.py
+lib/surface/storage/insights/inventory_reports/describe.py
+lib/surface/storage/insights/inventory_reports/details/__init__.py
+lib/surface/storage/insights/inventory_reports/details/copy.py
+lib/surface/storage/insights/inventory_reports/details/describe.py
+lib/surface/storage/insights/inventory_reports/details/list.py
+lib/surface/storage/insights/inventory_reports/list.py
+lib/surface/storage/insights/inventory_reports/update.py
 lib/surface/storage/list.py
 lib/surface/storage/ls.py
 lib/surface/storage/mv.py
@@ -10183,6 +10215,8 @@ lib/surface/vmware/private_clouds/create.py
 lib/surface/vmware/private_clouds/delete.py
 lib/surface/vmware/private_clouds/describe.py
 lib/surface/vmware/private_clouds/list.py
+lib/surface/vmware/private_clouds/subnets/__init__.py
+lib/surface/vmware/private_clouds/subnets/list.py
 lib/surface/vmware/private_clouds/undelete.py
 lib/surface/vmware/private_clouds/update.py
 lib/surface/vmware/sddc/__init__.py
