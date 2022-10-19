@@ -1370,6 +1370,7 @@ lib/third_party/google/auth/_cloud_sdk.py
 lib/third_party/google/auth/_credentials_async.py
 lib/third_party/google/auth/_default.py
 lib/third_party/google/auth/_default_async.py
+lib/third_party/google/auth/_exponential_backoff.py
 lib/third_party/google/auth/_helpers.py
 lib/third_party/google/auth/_jwt_async.py
 lib/third_party/google/auth/_oauth2client.py
