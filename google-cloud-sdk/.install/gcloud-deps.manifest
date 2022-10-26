@@ -1392,6 +1392,7 @@ lib/third_party/google/auth/downscoped.py
 lib/third_party/google/auth/environment_vars.py
 lib/third_party/google/auth/exceptions.py
 lib/third_party/google/auth/external_account.py
+lib/third_party/google/auth/external_account_authorized_user.py
 lib/third_party/google/auth/iam.py
 lib/third_party/google/auth/identity_pool.py
 lib/third_party/google/auth/impersonated_credentials.py
