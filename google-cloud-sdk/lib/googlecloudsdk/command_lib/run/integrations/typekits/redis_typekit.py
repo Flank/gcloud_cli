@@ -26,6 +26,9 @@ from googlecloudsdk.command_lib.run.integrations.typekits import base
 class RedisTypeKit(base.TypeKit):
   """The redis integration typekit."""
 
+  def GetDeployMessage(self, create=False):
+    return 'This might take up to 10 minutes.'
+
   def UpdateResourceConfig(self, parameters, resource_config):
     """Updates the resource config according to the parameters.
 
@@ -40,22 +43,16 @@ class RedisTypeKit(base.TypeKit):
       if param in parameters:
         instance[param] = parameters[param]
 
-  def GetCreateSelectors(self,
-                         integration_name,
-                         add_service_name,
-                         remove_service_name=None):
+  def GetCreateSelectors(self, integration_name):
     """Returns create selectors for given integration and service.
 
     Args:
       integration_name: str, name of integration.
-      add_service_name: str, name of the service being added.
-      remove_service_name: str, name of the service being removed.
 
     Returns:
       list of dict typed names.
     """
-    selectors = super(RedisTypeKit, self).GetCreateSelectors(
-        integration_name, add_service_name, remove_service_name)
+    selectors = super(RedisTypeKit, self).GetCreateSelectors(integration_name)
     selectors.append({'type': 'vpc', 'name': '*'})
     return selectors
 

@@ -35,7 +35,9 @@ from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.managed_instance_groups import auto_healing_utils
+from googlecloudsdk.command_lib.compute.managed_instance_groups import update_instances_utils
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -365,11 +367,13 @@ def AddScheduledAutoscaling(parser, patch_args):
           a scaling schedule that is currently active, the deleted scaling
           schedule stops being effective immediately after it is deleted.
           If there is no need to maintain capacity, the autoscaler starts
-          removing instances after a 10-minute stabilization period and (if
-          configured) following scale-in controls. This ensures you don't
-          accidentally lose capacity immediately after the scaling schedule
-          ends.
-          """)
+          removing instances after the usual stabilization period and after
+          scale-in controls (if configured). For more information, see
+          [Delays in scaling in](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#delays_in_scaling_in) and [Scale-in controls](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#scale-in_controls).
+          This ensures you don't accidentally lose capacity immediately after
+          the scaling schedule ends.
+          """,
+    )
     arg_group.add_argument(
         '--enable-schedule',
         metavar='SCHEDULE_NAME',
@@ -390,11 +394,13 @@ def AddScheduledAutoscaling(parser, patch_args):
           schedule stops being effective immediately after it moves into
           DISABLED state.
           If there is no need to maintain capacity, the autoscaler starts
-          removing instances after a 10-minute stabilization period and (if
-          configured) following scale-in controls. This ensures you don't
-          accidentally lose capacity immediately after the scaling schedule
-          ends.
-          """)
+          removing instances after the usual stabilization period and after
+          scale-in controls (if configured). For more information, see
+          [Delays in scaling in](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#delays_in_scaling_in) and [Scale-in controls](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#scale-in_controls).
+          This ensures you don't accidentally lose capacity immediately after
+          the scaling schedule ends.
+          """,
+    )
     AddScheduledAutoscalingConfigurationArguments(arg_group_config)
   else:
     arg_group = parser
@@ -432,9 +438,13 @@ def AddScheduledAutoscalingConfigurationArguments(arg_group):
         autoscaler scales the group to have at least as many VMs as defined by
         the minimum required instances. After the configured duration, if there
         is no need to maintain capacity, the autoscaler starts removing
-        instances after a 10-minute stabilization period and (if configured)
-        following scale-in controls.
-        """)
+        instances after the usual stabilization period and after scale-in
+        controls (if configured). For more information, see
+        [Delays in scaling in](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#delays_in_scaling_in) and [Scale-in controls](https://cloud.google.com/compute/docs/autoscaler/understanding-autoscaler-decisions#scale-in_controls).
+        This ensures you don't accidentally lose capacity immediately after
+        the scaling schedule ends.
+        """,
+  )
   arg_group.add_argument(
       '--schedule-min-required-replicas',
       metavar='MIN_REQUIRED_REPLICAS',
@@ -1458,7 +1468,10 @@ def _ComputeInstanceGroupSize(items, client, resources):
 def GetHealthCheckUri(resources, args):
   """Creates health check reference from args."""
   if args.health_check:
-    ref = auto_healing_utils.HEALTH_CHECK_ARG.ResolveAsResource(args, resources)
+    ref = auto_healing_utils.HEALTH_CHECK_ARG.ResolveAsResource(
+        args,
+        resources,
+        default_scope=compute_flags.compute_scope.ScopeEnum.GLOBAL)
     return ref.SelfLink()
   if args.http_health_check:
     return resources.Parse(
@@ -1549,16 +1562,57 @@ def IsAutoscalerNew(autoscaler):
   return getattr(autoscaler, 'name', None) is None
 
 
-def ApplyInstanceRedistributionTypeToUpdatePolicy(
-    client, instance_redistribution_type, update_policy):
-  if instance_redistribution_type:
-    if update_policy is None:
-      update_policy = client.messages.InstanceGroupManagerUpdatePolicy()
+def PatchUpdatePolicy(client, args, update_policy):
+  """Returns an update_policy with attributes from args applied."""
+  result = None
+  if update_policy is None:
+    update_policy = client.messages.InstanceGroupManagerUpdatePolicy()
+  if args.IsSpecified('instance_redistribution_type'):
     update_policy.instanceRedistributionType = (
-        client.messages.InstanceGroupManagerUpdatePolicy.
-        InstanceRedistributionTypeValueValuesEnum)(
-            instance_redistribution_type.upper())
-  return update_policy
+        client.messages.InstanceGroupManagerUpdatePolicy
+        .InstanceRedistributionTypeValueValuesEnum)(
+            args.instance_redistribution_type.upper())
+    result = update_policy
+  if args.IsSpecified('update_policy_type'):
+    update_policy.type = update_instances_utils.ParseUpdatePolicyType(
+        '--update-policy-update-type', args.update_policy_type, client.messages)
+    result = update_policy
+  if args.IsSpecified('update_policy_max_surge'):
+    update_policy.maxSurge = update_instances_utils.ParseFixedOrPercent(
+        '--update-policy-max-surge', 'max-surge', args.update_policy_max_surge,
+        client.messages)
+    result = update_policy
+  if args.IsSpecified('update_policy_max_unavailable'):
+    update_policy.maxUnavailable = update_instances_utils.ParseFixedOrPercent(
+        '--update-policy-max-unavailable', 'max-unavailable',
+        args.update_policy_max_unavailable, client.messages)
+    result = update_policy
+  if args.IsSpecified('update_policy_minimal_action'):
+    update_policy.minimalAction = (
+        update_instances_utils.ParseInstanceActionFlag)(
+            '--update-policy-minimal-action', args.update_policy_minimal_action,
+            client.messages.InstanceGroupManagerUpdatePolicy
+            .MinimalActionValueValuesEnum)
+    result = update_policy
+  if args.IsSpecified('update_policy_most_disruptive_action'):
+    update_policy.mostDisruptiveAllowedAction = (
+        update_instances_utils.ParseInstanceActionFlag)(
+            '--update-policy-most-disruptive-action',
+            args.update_policy_most_disruptive_action,
+            client.messages.InstanceGroupManagerUpdatePolicy
+            .MostDisruptiveAllowedActionValueValuesEnum)
+    result = update_policy
+  if args.IsSpecified('update_policy_replacement_method'):
+    replacement_method = update_instances_utils.ParseReplacementMethod(
+        args.update_policy_replacement_method, client.messages)
+    update_policy.replacementMethod = replacement_method
+    result = update_policy
+  # min_ready is available in alpha and beta APIs only
+  if hasattr(args, 'update_policy_min_ready') and args.IsSpecified(
+      'update_policy_min_ready'):
+    update_policy.minReadySec = args.update_policy_min_ready
+    result = update_policy
+  return result
 
 
 def ListPerInstanceConfigs(client, igm_ref):

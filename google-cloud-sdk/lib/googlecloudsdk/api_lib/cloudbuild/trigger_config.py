@@ -29,12 +29,13 @@ _UPDATE_FILE_DESC = ('A file that contains updates to the configuration for '
                      'the WorkerPool.')
 
 
-def AddTriggerArgs(parser, add_region_flag=True):
+def AddTriggerArgs(parser, add_region_flag=True, add_name=True):
   """Set up the generic argparse flags for creating or updating a build trigger.
 
   Args:
     parser: An argparse.ArgumentParser-like object.
     add_region_flag: If true, the default region flag is added.
+    add_name: If true, the trigger name is added.
 
   Returns:
     An empty parser group to be populated with flags specific to a trigger-type.
@@ -56,8 +57,8 @@ def AddTriggerArgs(parser, add_region_flag=True):
   flag_config = trigger_config.add_argument_group(
       help='Flag based trigger configuration')
   if add_region_flag:
-    build_flags.AddRegionFlag(flag_config, hidden=True, required=False)
-  AddFlagConfigArgs(flag_config)
+    build_flags.AddRegionFlag(flag_config, hidden=False, required=False)
+  AddFlagConfigArgs(flag_config, add_name)
 
   return flag_config
 
@@ -87,21 +88,23 @@ def AddGitLabEnterpriseTriggerArgs(parser):
   # Trigger configuration
   flag_config = trigger_config.add_argument_group(
       help='Flag based trigger configuration')
-  build_flags.AddRegionFlag(flag_config, hidden=False, required=True)
+  build_flags.AddRegionFlag(flag_config, hidden=False, required=False)
   AddFlagConfigArgs(flag_config)
 
   return flag_config
 
 
-def AddFlagConfigArgs(flag_config):
+def AddFlagConfigArgs(flag_config, add_name=True):
   """Adds additional argparse flags related to flag config.
 
   Args:
     flag_config: argparse argument group. Additional flags will be added to this
       group to cover common flag configuration settings.
+    add_name: If true, the trigger name is added.
   """
 
-  flag_config.add_argument('--name', help='Build trigger name.')
+  if add_name:
+    flag_config.add_argument('--name', help='Build trigger name.')
   flag_config.add_argument('--description', help='Build trigger description.')
   flag_config.add_argument(
       '--service-account',
@@ -130,7 +133,8 @@ def AddTriggerConfigFilePathArg(trigger_config):
       '--trigger-config',
       help=(
           'Path to Build Trigger config file (JSON or YAML format). For more '
-          'details, see https://cloud.google.com/cloud-build/docs/api/reference/rest/v1/projects.triggers#BuildTrigger'
+          'details, see https://cloud.google.com/cloud-build/docs/api/'
+          'reference/rest/v1/projects.triggers#BuildTrigger'
       ),
       metavar='PATH',
   )
@@ -163,6 +167,32 @@ def ParseTriggerArgs(args, messages):
   return trigger, False
 
 
+def ParseTriggerArgsForUpdate(trigger_args, messages):
+  """Parses flags generic to all triggers.
+
+  Args:
+    trigger_args: An argparse arguments object.
+    messages: A Cloud Build messages module
+
+  Returns:
+    A partially populated build trigger and a boolean indicating whether or not
+    the full trigger was loaded from a file.
+  """
+  if trigger_args.trigger_config:
+    trigger = cloudbuild_util.LoadMessageFromPath(
+        path=trigger_args.trigger_config,
+        msg_type=messages.BuildTrigger,
+        msg_friendly_name='build trigger config',
+        skip_camel_case=['substitutions'])
+    return trigger, True
+
+  trigger = messages.BuildTrigger()
+  trigger.description = trigger_args.description
+  trigger.serviceAccount = trigger_args.service_account
+  ParseRequireApproval(trigger, trigger_args, messages)
+  return trigger, False
+
+
 def AddIncludeLogsArgs(flag_config):
   """Add flag related to including logs for GitHub checkrun summary page.
 
@@ -189,13 +219,18 @@ def AddRepoEventArgs(flag_config):
 
   flag_config.add_argument(
       '--included-files',
-      help='Glob filter. Changes affecting at least one included file will trigger builds.',
+      help=(
+          'Glob filter. Changes affecting at least one included file will'
+          ' trigger builds.'
+      ),
       type=arg_parsers.ArgList(),
       metavar='GLOB',
   )
   flag_config.add_argument(
       '--ignored-files',
-      help='Glob filter. Changes only affecting ignored files won\'t trigger builds.',
+      help=("""\
+ Glob filter. Changes only affecting ignored files won't trigger builds.
+"""),
       type=arg_parsers.ArgList(),
       metavar='GLOB',
   )
@@ -210,8 +245,10 @@ def AddFilterArg(flag_config):
   """
   flag_config.add_argument(
       '--subscription-filter',
-      help='CEL filter expression for the trigger. See https://cloud.google.com/build/docs/filter-build-events-using-cel for more details.',
-  )
+      help="""\
+CEL filter expression for the trigger.
+See https://cloud.google.com/build/docs/filter-build-events-using-cel for more details.
+""")
 
 
 def AddSubstitutions(argument_group):
@@ -248,6 +285,53 @@ https://cloud.google.com/cloud-build/docs/api/build-requests#substitutions
 """)
 
 
+def AddSubstitutionUpdatingFlags(argument_group):
+  """Adds substitution updating flags to the given argument group.
+
+  Args:
+    argument_group: argparse argument group to which the substitution updating
+      flags flag will be added.
+  """
+
+  argument_group.add_argument(
+      '--update-substitutions',
+      metavar='KEY=VALUE',
+      type=arg_parsers.ArgDict(),
+      help="""\
+Update or add to existing substitutions.
+Substitutions are parameters to be substituted or add in the build specification.
+
+For example (using some nonsensical substitution keys; all keys must begin with
+an underscore):
+
+  $ gcloud builds triggers update ...
+      --update-substitutions _FAVORITE_COLOR=blue,_NUM_CANDIES=10
+
+This will add the provided substitutions to the existing substitutions and
+results in a build where every occurrence of ```${_FAVORITE_COLOR}```
+in certain fields is replaced by "blue", and similarly for ```${_NUM_CANDIES}```
+and "10".
+
+Only the following built-in variables can be specified with the
+`--substitutions` flag: REPO_NAME, BRANCH_NAME, TAG_NAME, REVISION_ID,
+COMMIT_SHA, SHORT_SHA.
+
+For more details, see:
+https://cloud.google.com/build/docs/build-config-file-schema#substitutions
+""")
+
+  argument_group.add_argument(
+      '--clear-substitutions',
+      action='store_true',
+      help='Clear existing substitutions.')
+
+  argument_group.add_argument(
+      '--remove-substitutions',
+      metavar='KEY',
+      type=arg_parsers.ArgList(),
+      help='Remove existing substitutions if present.')
+
+
 def AddBuildConfigArgs(flag_config, add_docker_args=True):
   """Adds additional argparse flags to a group for build configuration options.
 
@@ -264,10 +348,18 @@ def AddBuildConfigArgs(flag_config, add_docker_args=True):
   # groups so we have to have one flag outside of the config argument group.
   AddSubstitutions(flag_config)
 
-  build_config = AddBuildFileConfigArgs(flag_config)
+  build_config = flag_config.add_mutually_exclusive_group(required=True)
 
-  inline = build_config.add_argument_group(help='Build configuration file')
-  inline.add_argument(
+  build_config.add_argument(
+      '--build-config',
+      metavar='PATH',
+      help="""\
+Path to a YAML or JSON file containing the build configuration in the repository.
+
+For more details, see: https://cloud.google.com/cloud-build/docs/build-config
+""")
+
+  build_config.add_argument(
       '--inline-config',
       metavar='PATH',
       help="""\
@@ -277,38 +369,6 @@ def AddBuildConfigArgs(flag_config, add_docker_args=True):
   if add_docker_args:
     AddBuildDockerArgs(build_config)
   return build_config
-
-
-def AddGitLabEnterpriseBuildConfigArgs(flag_config):
-  """Adds additional argparse flags to a group for build configuration options for GitLab Enterprise.
-
-  Args:
-    flag_config: argparse argument group. Additional flags will be added to this
-      group to cover common build configuration settings.
-  """
-
-  # Build config and inline config support substitutions whereas dockerfile
-  # does not. We can't have a flag with the same name in two separate
-  # groups so we have to have one flag outside of the config argument group.
-  AddSubstitutions(flag_config)
-
-  build_config = flag_config.add_mutually_exclusive_group(required=True)
-  build_config.add_argument(
-      '--build-config',
-      metavar='PATH',
-      help="""\
-Path to a YAML or JSON file containing the build configuration in the repository.
-
-For more details, see: https://cloud.google.com/cloud-build/docs/build-config
-""")
-  build_config.add_argument(
-      '--inline-config',
-      metavar='PATH',
-      help="""\
-      Local path to a YAML or JSON file containing a build configuration.
-    """)
-
-  AddBuildDockerArgs(build_config)
 
 
 def AddBuildDockerArgs(argument_group, require_docker_image=False):
@@ -323,6 +383,7 @@ def AddBuildDockerArgs(argument_group, require_docker_image=False):
       help='Dockerfile build configuration flags')
   docker.add_argument(
       '--dockerfile',
+      required=True,
       help="""\
 Path of Dockerfile to use for builds in the repository.
 
@@ -355,28 +416,46 @@ Use a build configuration (cloudbuild.yaml) file for building multiple images in
       help=docker_image_help_text)
 
 
-def AddBuildFileConfigArgs(flag_config):
-  """Adds additional argparse flags to a group for build configuration options.
+def AddBuildConfigArgsForUpdate(flag_config,
+                                has_build_config=False):
+  """Adds additional argparse flags to a group for build configuration options for update command.
 
   Args:
-    flag_config: argparse argument group. Additional flags will be added to this
+    flag_config: Argparse argument group. Additional flags will be added to this
       group to cover common build configuration settings.
+    has_build_config: Whether it is possible for the trigger to have
+      filename.
 
   Returns:
-    build_config: a build config.
+    build_config: A build config.
   """
 
-  build_config = flag_config.add_mutually_exclusive_group(required=True)
-  build_file_config = build_config.add_argument_group(
-      help='Build file configuration flags')
-  build_file_config.add_argument(
-      '--build-config',
+  # Build config and inline config support substitutions whereas Dockerfile
+  # does not. Cloud Build cannot have a flag with the same name in two separate
+  # groups. You must add a flag outside of the config argument group.
+  substitutions = flag_config.add_argument_group()
+  AddSubstitutionUpdatingFlags(substitutions)
+
+  build_config = flag_config.add_mutually_exclusive_group()
+
+  if has_build_config:
+    build_config.add_argument(
+        '--build-config',
+        metavar='PATH',
+        help="""\
+  Path to a YAML or JSON file containing the build configuration in the repository.
+
+  For more details, see: https://cloud.google.com/cloud-build/docs/build-config
+  """)
+
+  build_config.add_argument(
+      '--inline-config',
       metavar='PATH',
       help="""\
-Path to a YAML or JSON file containing the build configuration in the repository.
+      Local path to a YAML or JSON file containing a build configuration.
+    """)
 
-For more details, see: https://cloud.google.com/cloud-build/docs/build-config
-""")
+  AddBuildDockerArgs(build_config, require_docker_image=True)
 
   return build_config
 
@@ -445,6 +524,66 @@ def ParseBuildConfigArgs(trigger,
     ParseGitRepoSource(trigger, args, messages, required=required)
 
 
+def ParseBuildConfigArgsForUpdate(trigger,
+                                  old_trigger,
+                                  args,
+                                  messages,
+                                  has_build_config=False):
+  """Parses build-config flags for update command.
+
+  Args:
+    trigger: The trigger to populate.
+    old_trigger: The existing trigger to be updated.
+    args: An argparse arguments object.
+    messages: A Cloud Build messages module.
+    has_build_config: Whether it is possible for the trigger to have
+      filename.
+  """
+  if has_build_config:
+    trigger.filename = args.build_config
+
+  if args.dockerfile:
+    if args.update_substitutions:
+      raise c_exceptions.ConflictingArgumentsException(
+          'Dockerfile and substitutions',
+          'Substitutions are not supported with a Dockerfile configuration.')
+
+    if args.dockerfile_dir:
+      dockerfile_dir = args.dockerfile_dir
+    elif old_trigger.build and old_trigger.build.steps:
+      dockerfile_dir = old_trigger.steps[0].dir
+    else:
+      dockerfile_dir = '/'
+
+    trigger.build = messages.Build(steps=[
+        messages.BuildStep(
+            name='gcr.io/cloud-builders/docker',
+            dir=dockerfile_dir,
+            args=[
+                'build', '-t', args.dockerfile_image, '-f', args.dockerfile, '.'
+            ],
+        )
+    ])
+  if args.inline_config:
+    trigger.build = cloudbuild_util.LoadMessageFromPath(args.inline_config,
+                                                        messages.Build,
+                                                        'inline build config',
+                                                        ['substitutions'])
+
+  if args.update_substitutions:
+    trigger.substitutions = cloudbuild_util.EncodeUpdatedTriggerSubstitutions(
+        old_trigger.substitutions, args.update_substitutions, messages)
+
+  if args.clear_substitutions:
+    trigger.substitutions = cloudbuild_util.EncodeEmptyTriggerSubstitutions(
+        messages)
+
+  if args.remove_substitutions:
+    trigger.substitutions = cloudbuild_util.RemoveTriggerSubstitutions(
+        old_trigger.substitutions, args.remove_substitutions, messages
+    )
+
+
 def AddBranchPattern(parser):
   parser.add_argument(
       '--branch-pattern',
@@ -452,7 +591,7 @@ def AddBranchPattern(parser):
       help="""\
 A regular expression specifying which git branches to match.
 
-This pattern is used as a regex search for any incoming pushes.
+This pattern is used as a regular expression search for any incoming pushes.
 For example, --branch-pattern=foo will match "foo", "foobar", and "barfoo".
 Events on a branch that does not match will be ignored.
 
@@ -468,7 +607,7 @@ def AddTagPattern(parser):
       help="""\
 A regular expression specifying which git tags to match.
 
-This pattern is used as a regex search for any incoming pushes.
+This pattern is used as a regular expression search for any incoming pushes.
 For example, --tag-pattern=foo will match "foo", "foobar", and "barfoo".
 Events on a tag that does not match will be ignored.
 
@@ -484,17 +623,31 @@ def AddGitRepoSource(flag_config):
     flag_config: argparse argument group. Git repo source flags will be added to
       this group.
   """
+  flag_config.add_argument(
+      '--github-enterprise-config',
+      help="""\
+The resource name of the GitHub Enterprise config that should be applied to
+this source.
+Format: projects/{project}/locations/{location}/githubEnterpriseConfigs/{id}
+or projects/{project}/githubEnterpriseConfigs/{id}
+""")
   repo_config = flag_config.add_argument_group(
       help='Flags for repository information')
   repo_config.add_argument(
       '--repo',
       required=True,
-      help='URI of the repository. Currently only HTTP URIs for GitHub and Cloud Source Repositories are supported.'
+      help=(
+          'URI of the repository. Currently only HTTP URIs for GitHub and Cloud'
+          ' Source Repositories are supported.'
+      ),
   )
   repo_config.add_argument(
       '--repo-type',
       required=True,
-      help='Type of the repository. Currently only GitHub and Cloud Source Repository types are supported.'
+      help=(
+          'Type of the repository. Currently only GitHub and Cloud Source'
+          ' Repository types are supported.'
+      ),
   )
 
   ref_config = repo_config.add_mutually_exclusive_group(required=True)
@@ -538,14 +691,16 @@ def ParseGitRepoSource(trigger, args, messages, required=False):
   trigger.sourceToBuild = messages.GitRepoSource(
       uri=args.repo,
       ref=ref,
-      repoType=messages.GitRepoSource.RepoTypeValueValuesEnum(args.repo_type))
+      repoType=messages.GitRepoSource.RepoTypeValueValuesEnum(args.repo_type),
+      githubEnterpriseConfig=args.github_enterprise_config)
 
   if args.build_config:
     trigger.gitFileSource = messages.GitFileSource(
         path=args.build_config,
         uri=args.repo,
         revision=ref,
-        repoType=messages.GitFileSource.RepoTypeValueValuesEnum(args.repo_type))
+        repoType=messages.GitFileSource.RepoTypeValueValuesEnum(args.repo_type),
+        githubEnterpriseConfig=args.github_enterprise_config)
 
 
 def ParseRequireApproval(trigger, args, messages):

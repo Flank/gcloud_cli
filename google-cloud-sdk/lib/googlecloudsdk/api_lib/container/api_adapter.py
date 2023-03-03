@@ -463,182 +463,188 @@ def ExpandScopeURIs(scopes):
 class CreateClusterOptions(object):
   """Options to pass to CreateCluster."""
 
-  def __init__(self,
-               node_machine_type=None,
-               node_source_image=None,
-               node_disk_size_gb=None,
-               scopes=None,
-               num_nodes=None,
-               additional_zones=None,
-               node_locations=None,
-               user=None,
-               password=None,
-               cluster_version=None,
-               node_version=None,
-               network=None,
-               cluster_ipv4_cidr=None,
-               enable_cloud_logging=None,
-               enable_cloud_monitoring=None,
-               enable_stackdriver_kubernetes=None,
-               enable_logging_monitoring_system_only=None,
-               enable_workload_monitoring_eap=None,
-               subnetwork=None,
-               addons=None,
-               istio_config=None,
-               cloud_run_config=None,
-               local_ssd_count=None,
-               local_ssd_volume_configs=None,
-               ephemeral_storage=None,
-               boot_disk_kms_key=None,
-               node_pool_name=None,
-               tags=None,
-               autoprovisioning_network_tags=None,
-               node_labels=None,
-               node_taints=None,
-               enable_autoscaling=None,
-               min_nodes=None,
-               max_nodes=None,
-               total_min_nodes=None,
-               total_max_nodes=None,
-               location_policy=None,
-               image_type=None,
-               image=None,
-               image_project=None,
-               image_family=None,
-               issue_client_certificate=None,
-               max_nodes_per_pool=None,
-               enable_kubernetes_alpha=None,
-               enable_cloud_run_alpha=None,
-               preemptible=None,
-               spot=None,
-               placement_type=None,
-               enable_autorepair=None,
-               enable_autoupgrade=None,
-               service_account=None,
-               enable_master_authorized_networks=None,
-               master_authorized_networks=None,
-               enable_legacy_authorization=None,
-               labels=None,
-               disk_type=None,
-               enable_network_policy=None,
-               enable_l4_ilb_subsetting=None,
-               services_ipv4_cidr=None,
-               enable_ip_alias=None,
-               create_subnetwork=None,
-               cluster_secondary_range_name=None,
-               services_secondary_range_name=None,
-               accelerators=None,
-               enable_binauthz=None,
-               binauthz_evaluation_mode=None,
-               binauthz_policy=None,
-               min_cpu_platform=None,
-               workload_metadata=None,
-               workload_metadata_from_node=None,
-               maintenance_window=None,
-               enable_pod_security_policy=None,
-               allow_route_overlap=None,
-               private_cluster=None,
-               enable_private_nodes=None,
-               enable_private_endpoint=None,
-               master_ipv4_cidr=None,
-               tpu_ipv4_cidr=None,
-               enable_tpu=None,
-               enable_tpu_service_networking=None,
-               default_max_pods_per_node=None,
-               max_pods_per_node=None,
-               resource_usage_bigquery_dataset=None,
-               security_group=None,
-               enable_private_ipv6_access=None,
-               enable_intra_node_visibility=None,
-               enable_vertical_pod_autoscaling=None,
-               enable_experimental_vertical_pod_autoscaling=None,
-               security_profile=None,
-               security_profile_runtime_rules=None,
-               autoscaling_profile=None,
-               database_encryption_key=None,
-               metadata=None,
-               enable_network_egress_metering=None,
-               enable_resource_consumption_metering=None,
-               workload_pool=None,
-               identity_provider=None,
-               enable_workload_certificates=None,
-               enable_mesh_certificates=None,
-               enable_alts=None,
-               enable_gke_oidc=None,
-               enable_identity_service=None,
-               enable_shielded_nodes=None,
-               linux_sysctls=None,
-               disable_default_snat=None,
-               dataplane_v2=None,
-               shielded_secure_boot=None,
-               shielded_integrity_monitoring=None,
-               system_config_from_file=None,
-               maintenance_window_start=None,
-               maintenance_window_end=None,
-               maintenance_window_recurrence=None,
-               enable_cost_allocation=None,
-               max_surge_upgrade=None,
-               max_unavailable_upgrade=None,
-               enable_autoprovisioning=None,
-               autoprovisioning_config_file=None,
-               autoprovisioning_service_account=None,
-               autoprovisioning_scopes=None,
-               autoprovisioning_locations=None,
-               min_cpu=None,
-               max_cpu=None,
-               min_memory=None,
-               max_memory=None,
-               min_accelerator=None,
-               max_accelerator=None,
-               autoprovisioning_image_type=None,
-               autoprovisioning_max_surge_upgrade=None,
-               autoprovisioning_max_unavailable_upgrade=None,
-               enable_autoprovisioning_autoupgrade=None,
-               enable_autoprovisioning_autorepair=None,
-               reservation_affinity=None,
-               reservation=None,
-               autoprovisioning_min_cpu_platform=None,
-               enable_master_global_access=None,
-               gvnic=None,
-               enable_master_metrics=None,
-               master_logs=None,
-               release_channel=None,
-               notification_config=None,
-               autopilot=None,
-               private_ipv6_google_access_type=None,
-               enable_confidential_nodes=None,
-               cluster_dns=None,
-               cluster_dns_scope=None,
-               cluster_dns_domain=None,
-               kubernetes_objects_changes_target=None,
-               kubernetes_objects_snapshots_target=None,
-               enable_gcfs=None,
-               enable_image_streaming=None,
-               private_endpoint_subnetwork=None,
-               cross_connect_subnetworks=None,
-               enable_service_externalips=None,
-               threads_per_core=None,
-               logging=None,
-               monitoring=None,
-               enable_managed_prometheus=None,
-               maintenance_interval=None,
-               disable_pod_cidr_overprovision=None,
-               stack_type=None,
-               ipv6_access_type=None,
-               enable_workload_config_audit=None,
-               pod_autoscaling_direct_metrics_opt_in=None,
-               enable_workload_vulnerability_scanning=None,
-               enable_autoprovisioning_surge_upgrade=None,
-               enable_autoprovisioning_blue_green_upgrade=None,
-               autoprovisioning_standard_rollout_policy=None,
-               autoprovisioning_node_pool_soak_duration=None,
-               enable_google_cloud_access=None,
-               managed_config=None,
-               fleet_project=None,
-               gateway_api=None,
-               logging_variant=None,
-               enable_multi_networking=None,
-               ):
+  def __init__(
+      self,
+      node_machine_type=None,
+      node_source_image=None,
+      node_disk_size_gb=None,
+      scopes=None,
+      num_nodes=None,
+      additional_zones=None,
+      node_locations=None,
+      user=None,
+      password=None,
+      cluster_version=None,
+      node_version=None,
+      network=None,
+      cluster_ipv4_cidr=None,
+      enable_cloud_logging=None,
+      enable_cloud_monitoring=None,
+      enable_stackdriver_kubernetes=None,
+      enable_logging_monitoring_system_only=None,
+      enable_workload_monitoring_eap=None,
+      subnetwork=None,
+      addons=None,
+      istio_config=None,
+      cloud_run_config=None,
+      local_ssd_count=None,
+      local_ssd_volume_configs=None,
+      local_nvme_ssd_block=None,
+      ephemeral_storage=None,
+      ephemeral_storage_local_ssd=None,
+      boot_disk_kms_key=None,
+      node_pool_name=None,
+      tags=None,
+      autoprovisioning_network_tags=None,
+      node_labels=None,
+      node_taints=None,
+      enable_autoscaling=None,
+      min_nodes=None,
+      max_nodes=None,
+      total_min_nodes=None,
+      total_max_nodes=None,
+      location_policy=None,
+      image_type=None,
+      image=None,
+      image_project=None,
+      image_family=None,
+      issue_client_certificate=None,
+      max_nodes_per_pool=None,
+      enable_kubernetes_alpha=None,
+      enable_cloud_run_alpha=None,
+      preemptible=None,
+      spot=None,
+      placement_type=None,
+      enable_queued_provisioning=None,
+      enable_autorepair=None,
+      enable_autoupgrade=None,
+      service_account=None,
+      enable_master_authorized_networks=None,
+      master_authorized_networks=None,
+      enable_legacy_authorization=None,
+      labels=None,
+      disk_type=None,
+      enable_network_policy=None,
+      enable_l4_ilb_subsetting=None,
+      services_ipv4_cidr=None,
+      enable_ip_alias=None,
+      create_subnetwork=None,
+      cluster_secondary_range_name=None,
+      services_secondary_range_name=None,
+      accelerators=None,
+      enable_binauthz=None,
+      binauthz_evaluation_mode=None,
+      binauthz_policy=None,
+      min_cpu_platform=None,
+      workload_metadata=None,
+      workload_metadata_from_node=None,
+      maintenance_window=None,
+      enable_pod_security_policy=None,
+      allow_route_overlap=None,
+      private_cluster=None,
+      enable_private_nodes=None,
+      enable_private_endpoint=None,
+      master_ipv4_cidr=None,
+      tpu_ipv4_cidr=None,
+      enable_tpu=None,
+      enable_tpu_service_networking=None,
+      default_max_pods_per_node=None,
+      max_pods_per_node=None,
+      resource_usage_bigquery_dataset=None,
+      security_group=None,
+      enable_private_ipv6_access=None,
+      enable_intra_node_visibility=None,
+      enable_vertical_pod_autoscaling=None,
+      enable_experimental_vertical_pod_autoscaling=None,
+      security_profile=None,
+      security_profile_runtime_rules=None,
+      autoscaling_profile=None,
+      database_encryption_key=None,
+      metadata=None,
+      enable_network_egress_metering=None,
+      enable_resource_consumption_metering=None,
+      workload_pool=None,
+      identity_provider=None,
+      enable_workload_certificates=None,
+      enable_mesh_certificates=None,
+      enable_alts=None,
+      enable_gke_oidc=None,
+      enable_identity_service=None,
+      enable_shielded_nodes=None,
+      linux_sysctls=None,
+      disable_default_snat=None,
+      dataplane_v2=None,
+      shielded_secure_boot=None,
+      shielded_integrity_monitoring=None,
+      system_config_from_file=None,
+      maintenance_window_start=None,
+      maintenance_window_end=None,
+      maintenance_window_recurrence=None,
+      enable_cost_allocation=None,
+      max_surge_upgrade=None,
+      max_unavailable_upgrade=None,
+      enable_autoprovisioning=None,
+      autoprovisioning_config_file=None,
+      autoprovisioning_service_account=None,
+      autoprovisioning_scopes=None,
+      autoprovisioning_locations=None,
+      min_cpu=None,
+      max_cpu=None,
+      min_memory=None,
+      max_memory=None,
+      min_accelerator=None,
+      max_accelerator=None,
+      autoprovisioning_image_type=None,
+      autoprovisioning_max_surge_upgrade=None,
+      autoprovisioning_max_unavailable_upgrade=None,
+      enable_autoprovisioning_autoupgrade=None,
+      enable_autoprovisioning_autorepair=None,
+      reservation_affinity=None,
+      reservation=None,
+      autoprovisioning_min_cpu_platform=None,
+      enable_master_global_access=None,
+      gvnic=None,
+      enable_master_metrics=None,
+      master_logs=None,
+      release_channel=None,
+      notification_config=None,
+      autopilot=None,
+      private_ipv6_google_access_type=None,
+      enable_confidential_nodes=None,
+      cluster_dns=None,
+      cluster_dns_scope=None,
+      cluster_dns_domain=None,
+      kubernetes_objects_changes_target=None,
+      kubernetes_objects_snapshots_target=None,
+      enable_gcfs=None,
+      enable_image_streaming=None,
+      private_endpoint_subnetwork=None,
+      cross_connect_subnetworks=None,
+      enable_service_externalips=None,
+      threads_per_core=None,
+      logging=None,
+      monitoring=None,
+      enable_managed_prometheus=None,
+      maintenance_interval=None,
+      disable_pod_cidr_overprovision=None,
+      stack_type=None,
+      ipv6_access_type=None,
+      enable_workload_config_audit=None,
+      pod_autoscaling_direct_metrics_opt_in=None,
+      enable_workload_vulnerability_scanning=None,
+      enable_autoprovisioning_surge_upgrade=None,
+      enable_autoprovisioning_blue_green_upgrade=None,
+      autoprovisioning_standard_rollout_policy=None,
+      autoprovisioning_node_pool_soak_duration=None,
+      enable_google_cloud_access=None,
+      managed_config=None,
+      fleet_project=None,
+      enable_fleet=None,
+      gateway_api=None,
+      logging_variant=None,
+      enable_multi_networking=None,
+      enable_security_posture=None,
+  ):
     self.node_machine_type = node_machine_type
     self.node_source_image = node_source_image
     self.node_disk_size_gb = node_disk_size_gb
@@ -664,6 +670,8 @@ class CreateClusterOptions(object):
     self.local_ssd_count = local_ssd_count
     self.local_ssd_volume_configs = local_ssd_volume_configs
     self.ephemeral_storage = ephemeral_storage
+    self.ephemeral_storage_local_ssd = ephemeral_storage_local_ssd
+    self.local_nvme_ssd_block = local_nvme_ssd_block
     self.boot_disk_kms_key = boot_disk_kms_key
     self.node_pool_name = node_pool_name
     self.tags = tags
@@ -686,6 +694,7 @@ class CreateClusterOptions(object):
     self.preemptible = preemptible
     self.spot = spot
     self.placement_type = placement_type
+    self.enable_queued_provisioning = enable_queued_provisioning
     self.enable_autorepair = enable_autorepair
     self.enable_autoupgrade = enable_autoupgrade
     self.service_account = service_account
@@ -810,9 +819,11 @@ class CreateClusterOptions(object):
     self.enable_google_cloud_access = enable_google_cloud_access
     self.managed_config = managed_config
     self.fleet_project = fleet_project
+    self.enable_fleet = enable_fleet
     self.gateway_api = gateway_api
     self.logging_variant = logging_variant
     self.enable_multi_networking = enable_multi_networking
+    self.enable_security_posture = enable_security_posture
 
 
 class UpdateClusterOptions(object):
@@ -931,7 +942,9 @@ class UpdateClusterOptions(object):
       additional_pod_ipv4_ranges=None,
       removed_additional_pod_ipv4_ranges=None,
       fleet_project=None,
+      enable_fleet=None,
       clear_fleet_project=None,
+      enable_security_posture=None,
   ):
     self.version = version
     self.update_master = bool(update_master)
@@ -1045,7 +1058,9 @@ class UpdateClusterOptions(object):
     self.additional_pod_ipv4_ranges = additional_pod_ipv4_ranges
     self.removed_additional_pod_ipv4_ranges = removed_additional_pod_ipv4_ranges
     self.fleet_project = fleet_project
+    self.enable_fleet = enable_fleet
     self.clear_fleet_project = clear_fleet_project
+    self.enable_security_posture = enable_security_posture
 
 
 class SetMasterAuthOptions(object):
@@ -1079,6 +1094,8 @@ class CreateNodePoolOptions(object):
                local_ssd_count=None,
                local_ssd_volume_configs=None,
                ephemeral_storage=None,
+               local_nvme_ssd_block=None,
+               ephemeral_storage_local_ssd=None,
                boot_disk_kms_key=None,
                tags=None,
                node_labels=None,
@@ -1098,6 +1115,8 @@ class CreateNodePoolOptions(object):
                preemptible=None,
                spot=None,
                placement_type=None,
+               tpu_topology=None,
+               enable_queued_provisioning=None,
                enable_autorepair=None,
                enable_autoupgrade=None,
                service_account=None,
@@ -1147,6 +1166,8 @@ class CreateNodePoolOptions(object):
     self.local_ssd_count = local_ssd_count
     self.local_ssd_volume_configs = local_ssd_volume_configs
     self.ephemeral_storage = ephemeral_storage
+    self.ephemeral_storage_local_ssd = ephemeral_storage_local_ssd
+    self.local_nvme_ssd_block = local_nvme_ssd_block
     self.boot_disk_kms_key = boot_disk_kms_key
     self.tags = tags
     self.labels = labels
@@ -1166,6 +1187,8 @@ class CreateNodePoolOptions(object):
     self.preemptible = preemptible
     self.spot = spot
     self.placement_type = placement_type
+    self.tpu_topology = tpu_topology
+    self.enable_queued_provisioning = enable_queued_provisioning
     self.enable_autorepair = enable_autorepair
     self.enable_autoupgrade = enable_autoupgrade
     self.service_account = service_account
@@ -1296,9 +1319,9 @@ class UpdateNodePoolOptions(object):
             self.max_surge_upgrade is not None or
             self.max_unavailable_upgrade is not None or
             self.system_config_from_file is not None or
-            self.labels is not None or
-            self.node_labels is not None or self.node_taints is not None or
-            self.tags is not None or self.enable_private_nodes is not None or
+            self.labels is not None or self.node_labels is not None or
+            self.node_taints is not None or self.tags is not None or
+            self.enable_private_nodes is not None or
             self.enable_gcfs is not None or self.gvnic is not None or
             self.enable_image_streaming is not None or
             self.enable_surge_upgrade is not None or
@@ -1898,6 +1921,11 @@ class APIAdapter(object):
             MANGED_CONFIG_TYPE_NOT_SUPPORTED.format(
                 type=options.managed_config))
 
+    if options.enable_fleet:
+      if cluster.fleet is None:
+        cluster.fleet = self.messages.Fleet()
+      cluster.fleet.project = cluster_ref.projectId
+
     if options.fleet_project:
       if cluster.fleet is None:
         cluster.fleet = self.messages.Fleet()
@@ -1928,6 +1956,18 @@ class APIAdapter(object):
       else:
         cluster.networkConfig.enableMultiNetworking = options.enable_multi_networking
 
+    if options.enable_security_posture is not None:
+      if cluster.securityPostureConfig is None:
+        cluster.securityPostureConfig = self.messages.SecurityPostureConfig()
+      if options.enable_security_posture:
+        cluster.securityPostureConfig.mode = (
+            self.messages.SecurityPostureConfig.ModeValueValuesEnum.BASIC
+        )
+      else:
+        cluster.securityPostureConfig.mode = (
+            self.messages.SecurityPostureConfig.ModeValueValuesEnum.DISABLED
+        )
+
     return cluster
 
   def ParseNodeConfig(self, options):
@@ -1948,6 +1988,8 @@ class APIAdapter(object):
       node_config.localSsdCount = options.local_ssd_count
     self._AddLocalSSDVolumeConfigsToNodeConfig(node_config, options)
     self._AddEphemeralStorageToNodeConfig(node_config, options)
+    self._AddEphemeralStorageLocalSsdToNodeConfig(node_config, options)
+    self._AddLocalNvmeSsdBlockToNodeConfig(node_config, options)
 
     if options.tags:
       node_config.tags = options.tags
@@ -2058,6 +2100,9 @@ class APIAdapter(object):
       if options.placement_type == 'COMPACT':
         pool.placementPolicy = self.messages.PlacementPolicy()
         pool.placementPolicy.type = self.messages.PlacementPolicy.TypeValueValuesEnum.COMPACT
+      if options.enable_queued_provisioning:
+        pool.queuedProvisioning = self.messages.QueuedPolicy()
+        pool.queuedProvisioning.enabled = True
       pools.append(pool)
       to_add -= nodes
     return pools
@@ -2171,11 +2216,10 @@ class APIAdapter(object):
         policy.tpuIpv4CidrBlock = options.tpu_ipv4_cidr
       if options.stack_type is not None:
         policy.stackType = util.GetCreateStackTypeMapper(
-            self.messages, hidden=True).GetEnumForChoice(options.stack_type)
+            self.messages).GetEnumForChoice(options.stack_type)
       if options.ipv6_access_type is not None:
         policy.ipv6AccessType = util.GetIpv6AccessTypeMapper(
-            self.messages,
-            hidden=True).GetEnumForChoice(options.ipv6_access_type)
+            self.messages).GetEnumForChoice(options.ipv6_access_type)
 
       cluster.clusterIpv4Cidr = None
       cluster.ipAllocationPolicy = policy
@@ -2997,31 +3041,41 @@ class APIAdapter(object):
     if options.logging_variant is not None:
       logging_config = self.messages.NodePoolLoggingConfig()
       logging_config.variantConfig = self.messages.LoggingVariantConfig(
-          variant=VariantConfigEnumFromString(self.messages,
-                                              options.logging_variant))
+          variant=VariantConfigEnumFromString(
+              self.messages, options.logging_variant
+          )
+      )
       update = self.messages.ClusterUpdate(
-          desiredNodePoolLoggingConfig=logging_config)
+          desiredNodePoolLoggingConfig=logging_config
+      )
 
-    if options.additional_pod_ipv4_ranges:
-      additional_pod_ranges = self.messages.AdditionalPodRangesConfig(
-          podRangeNames=options.additional_pod_ipv4_ranges)
-      update = self.messages.ClusterUpdate(
-          additionalPodRangesConfig=additional_pod_ranges)
-    if options.removed_additional_pod_ipv4_ranges:
-      removed_additional_pod_ranges = self.messages.AdditionalPodRangesConfig(
-          podRangeNames=options.removed_additional_pod_ipv4_ranges)
-      update = self.messages.ClusterUpdate(
-          removedAdditionalPodRangesConfig=removed_additional_pod_ranges)
+    if (
+        options.additional_pod_ipv4_ranges
+        or options.removed_additional_pod_ipv4_ranges
+    ):
+      update = self.messages.ClusterUpdate()
+      if options.additional_pod_ipv4_ranges:
+        update.additionalPodRangesConfig = (
+            self.messages.AdditionalPodRangesConfig(
+                podRangeNames=options.additional_pod_ipv4_ranges))
+      if options.removed_additional_pod_ipv4_ranges:
+        update.removedAdditionalPodRangesConfig = (
+            self.messages.AdditionalPodRangesConfig(
+                podRangeNames=options.removed_additional_pod_ipv4_ranges))
 
     if options.stack_type is not None:
       update = self.messages.ClusterUpdate(
           desiredStackType=util.GetUpdateStackTypeMapper(
-              self.messages, hidden=True).GetEnumForChoice(options.stack_type))
+              self.messages).GetEnumForChoice(options.stack_type))
 
     if options.enable_cost_allocation is not None:
       update = self.messages.ClusterUpdate(
           desiredCostManagementConfig=self.messages.CostManagementConfig(
               enabled=options.enable_cost_allocation))
+
+    if options.enable_fleet:
+      update = self.messages.ClusterUpdate(
+          desiredFleet=self.messages.Fleet(project=cluster_ref.projectId))
 
     if options.fleet_project:
       update = self.messages.ClusterUpdate(
@@ -3030,6 +3084,19 @@ class APIAdapter(object):
     if options.clear_fleet_project:
       update = self.messages.ClusterUpdate(
           desiredFleet=self.messages.Fleet(project=''))
+
+    if options.enable_security_posture is not None:
+      security_posture_config = self.messages.SecurityPostureConfig()
+      if options.enable_security_posture:
+        security_posture_config.mode = (
+            self.messages.SecurityPostureConfig.ModeValueValuesEnum.BASIC
+        )
+      else:
+        security_posture_config.mode = (
+            self.messages.SecurityPostureConfig.ModeValueValuesEnum.DISABLED
+        )
+      update = self.messages.ClusterUpdate(
+          desiredSecurityPostureConfig=security_posture_config)
 
     return update
 
@@ -3192,6 +3259,20 @@ class APIAdapter(object):
     config = options.ephemeral_storage
     node_config.ephemeralStorageConfig = self.messages.EphemeralStorageConfig(
         localSsdCount=config['local-ssd-count'])
+
+  def _AddEphemeralStorageLocalSsdToNodeConfig(self, node_config, options):
+    if not options.ephemeral_storage_local_ssd:
+      return
+    config = options.ephemeral_storage_local_ssd
+    node_config.ephemeralStorageLocalSsdConfig = self.messages.EphemeralStorageLocalSsdConfig(
+        localSsdCount=config['count'])
+
+  def _AddLocalNvmeSsdBlockToNodeConfig(self, node_config, options):
+    if not options.local_nvme_ssd_block:
+      return
+    config = options.local_nvme_ssd_block
+    node_config.localNvmeSsdBlockConfig = self.messages.LocalNvmeSsdBlockConfig(
+        localSsdCount=config['count'])
 
   def _AddNodeTaintsToNodeConfig(self, node_config, options):
     """Add nodeTaints to nodeConfig."""
@@ -3417,6 +3498,8 @@ class APIAdapter(object):
       node_config.localSsdCount = options.local_ssd_count
     self._AddLocalSSDVolumeConfigsToNodeConfig(node_config, options)
     self._AddEphemeralStorageToNodeConfig(node_config, options)
+    self._AddEphemeralStorageLocalSsdToNodeConfig(node_config, options)
+    self._AddLocalNvmeSsdBlockToNodeConfig(node_config, options)
     if options.boot_disk_kms_key:
       node_config.bootDiskKmsKey = options.boot_disk_kms_key
     if options.tags:
@@ -3443,11 +3526,11 @@ class APIAdapter(object):
     if options.node_group is not None:
       node_config.nodeGroup = options.node_group
 
-    if options.enable_gcfs:
+    if options.enable_gcfs is not None:
       gcfs_config = self.messages.GcfsConfig(enabled=options.enable_gcfs)
       node_config.gcfsConfig = gcfs_config
 
-    if options.enable_image_streaming:
+    if options.enable_image_streaming is not None:
       gcfs_config = self.messages.GcfsConfig(
           enabled=options.enable_image_streaming)
       node_config.gcfsConfig = gcfs_config
@@ -3536,6 +3619,17 @@ class APIAdapter(object):
     if options.placement_type == 'COMPACT':
       pool.placementPolicy = self.messages.PlacementPolicy()
       pool.placementPolicy.type = self.messages.PlacementPolicy.TypeValueValuesEnum.COMPACT
+
+    if options.tpu_topology:
+      if options.placement_type is None or options.placement_type != 'COMPACT':
+        raise util.Error(
+            'Please specify --placement-type=COMPACT for --tpu-topology'
+        )
+      pool.placementPolicy.tpuTopology = options.tpu_topology
+
+    if options.enable_queued_provisioning:
+      pool.queuedProvisioning = self.messages.QueuedProvisioning()
+      pool.queuedProvisioning.enabled = True
 
     return pool
 
@@ -4355,14 +4449,8 @@ class APIAdapter(object):
       binary_authorization = self.messages.BinaryAuthorization()
 
     if enable_binauthz is not None:
-      if enable_binauthz and binary_authorization.evaluationMode not in set([
-          self.messages.BinaryAuthorization.EvaluationModeValueValuesEnum(
-              'EVALUATION_MODE_UNSPECIFIED'),
-          self.messages.BinaryAuthorization.EvaluationModeValueValuesEnum(
-              'DISABLED'),
-          self.messages.BinaryAuthorization.EvaluationModeValueValuesEnum(
-              'PROJECT_SINGLETON_POLICY_ENFORCE'),
-      ]):
+      if enable_binauthz and IsEvaluationModeMonitoring(
+          self.messages, binary_authorization.evaluationMode):
         console_io.PromptContinue(
             message='This will cause the current version of Binary Authorization to be downgraded (not recommended).',
             cancel_on_no=True)
@@ -4372,6 +4460,11 @@ class APIAdapter(object):
       if binauthz_evaluation_mode is not None:
         binary_authorization.evaluationMode = self.messages.BinaryAuthorization.EvaluationModeValueValuesEnum(
             binauthz_evaluation_mode)
+        # Clear the binauthz.policy field if the updated evaluation mode flag is
+        # non-monitoring (and therefore does not require a policy).
+        if not IsEvaluationModeMonitoring(self.messages,
+                                          binary_authorization.evaluationMode):
+          binary_authorization.policy = None
       if binauthz_policy is not None:
         binary_authorization.policy = binauthz_policy
     update = self.messages.ClusterUpdate(
@@ -4534,11 +4627,10 @@ class V1Beta1Adapter(V1Adapter):
 
     if options.stack_type is not None:
       cluster.ipAllocationPolicy.stackType = util.GetCreateStackTypeMapper(
-          self.messages, hidden=False).GetEnumForChoice(options.stack_type)
+          self.messages).GetEnumForChoice(options.stack_type)
     if options.ipv6_access_type is not None:
       cluster.ipAllocationPolicy.ipv6AccessType = util.GetIpv6AccessTypeMapper(
-          self.messages,
-          hidden=False).GetEnumForChoice(options.ipv6_access_type)
+          self.messages).GetEnumForChoice(options.ipv6_access_type)
     req = self.messages.CreateClusterRequest(
         parent=ProjectLocation(cluster_ref.projectId, cluster_ref.zone),
         cluster=cluster)
@@ -5054,12 +5146,11 @@ class V1Alpha1Adapter(V1Beta1Adapter):
 
     if options.stack_type is not None:
       cluster.ipAllocationPolicy.stackType = util.GetCreateStackTypeMapper(
-          self.messages, hidden=False).GetEnumForChoice(options.stack_type)
+          self.messages).GetEnumForChoice(options.stack_type)
 
     if options.ipv6_access_type is not None:
       cluster.ipAllocationPolicy.ipv6AccessType = util.GetIpv6AccessTypeMapper(
-          self.messages,
-          hidden=False).GetEnumForChoice(options.ipv6_access_type)
+          self.messages).GetEnumForChoice(options.ipv6_access_type)
 
     cluster.master = _GetMasterForClusterCreate(options, self.messages)
 
@@ -5410,6 +5501,9 @@ class V1Alpha1Adapter(V1Beta1Adapter):
       if options.placement_type == 'COMPACT':
         pool.placementPolicy = self.messages.PlacementPolicy()
         pool.placementPolicy.type = self.messages.PlacementPolicy.TypeValueValuesEnum.COMPACT
+      if options.enable_queued_provisioning:
+        pool.queuedProvisioning = self.messages.QueuedPolicy()
+        pool.queuedProvisioning.enabled = True
       pools.append(pool)
       to_add -= nodes
     return pools
@@ -5485,7 +5579,7 @@ def _AddLinuxNodeConfigToNodeConfig(node_config, options, messages):
 
 
 def _AddWindowsNodeConfigToNodeConfig(node_config, options, messages):
-  """"Adds WindowsNodeConfig to NodeConfig."""
+  """ "Adds WindowsNodeConfig to NodeConfig."""
 
   if options.windows_os_version is not None:
     if node_config.windowsNodeConfig is None:
@@ -5904,11 +5998,25 @@ def ProjectLocationOperation(project, location, operation):
   return ProjectLocation(project, location) + '/operations/' + operation
 
 
-def GetBinauthzEvaluationModeOptions(messages):
+def GetBinauthzEvaluationModeOptions(messages, release_track):
+  """Returns all valid options for --binauthz-evaluation-mode."""
   options = list(
       messages.BinaryAuthorization.EvaluationModeValueValuesEnum.to_dict())
   options.remove('EVALUATION_MODE_UNSPECIFIED')
+  # Only expose MONITORING* evaluation modes in the alpha and beta tracks.
+  if release_track == base.ReleaseTrack.GA:
+    options.remove('MONITORING')
+    options.remove('MONITORING_AND_PROJECT_SINGLETON_POLICY_ENFORCE')
   return sorted(options)
+
+
+def IsEvaluationModeMonitoring(messages, evaluation_mode):
+  evaluation_mode_enum = messages.BinaryAuthorization.EvaluationModeValueValuesEnum
+  if evaluation_mode in (evaluation_mode_enum.EVALUATION_MODE_UNSPECIFIED,
+                         evaluation_mode_enum.DISABLED,
+                         evaluation_mode_enum.PROJECT_SINGLETON_POLICY_ENFORCE):
+    return False
+  return True
 
 
 def VariantConfigEnumFromString(messages, variant):

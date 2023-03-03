@@ -34,12 +34,13 @@ DETAILED_HELP = {
         up, maintain, manage, and administer your Alloydb databases in
         the cloud.
 
-        More information on AlloyDB can be found here at go/alloydb
+        More information on AlloyDB can be found at https://cloud.google.com/alloydb
         """,
 }
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class AlloyDB(base.Group):
   """Create and manage AlloyDB databases."""
 

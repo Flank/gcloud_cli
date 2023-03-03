@@ -9,7 +9,6 @@ import warnings
 
 from cryptography import utils
 from cryptography.hazmat._oid import ObjectIdentifier
-from cryptography.hazmat.backends import _get_backend
 from cryptography.hazmat.primitives import _serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import (
     AsymmetricSignatureContext,
@@ -104,7 +103,7 @@ class EllipticCurvePrivateKey(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def sign(
         self,
-        data,
+        data: bytes,
         signature_algorithm: EllipticCurveSignatureAlgorithm,
     ) -> bytes:
         """
@@ -326,23 +325,34 @@ _CURVE_TYPES: typing.Dict[str, typing.Type[EllipticCurve]] = {
 
 
 class ECDSA(EllipticCurveSignatureAlgorithm):
-    def __init__(self, algorithm):
+    def __init__(
+        self,
+        algorithm: typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm],
+    ):
         self._algorithm = algorithm
 
-    algorithm = utils.read_only_property("_algorithm")
+    @property
+    def algorithm(
+        self,
+    ) -> typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm]:
+        return self._algorithm
 
 
 def generate_private_key(
-    curve: EllipticCurve, backend=None
+    curve: EllipticCurve, backend: typing.Any = None
 ) -> EllipticCurvePrivateKey:
-    backend = _get_backend(backend)
-    return backend.generate_elliptic_curve_private_key(curve)
+    from cryptography.hazmat.backends.openssl.backend import backend as ossl
+
+    return ossl.generate_elliptic_curve_private_key(curve)
 
 
 def derive_private_key(
-    private_value: int, curve: EllipticCurve, backend=None
+    private_value: int,
+    curve: EllipticCurve,
+    backend: typing.Any = None,
 ) -> EllipticCurvePrivateKey:
-    backend = _get_backend(backend)
+    from cryptography.hazmat.backends.openssl.backend import backend as ossl
+
     if not isinstance(private_value, int):
         raise TypeError("private_value must be an integer type.")
 
@@ -352,7 +362,7 @@ def derive_private_key(
     if not isinstance(curve, EllipticCurve):
         raise TypeError("curve must provide the EllipticCurve interface.")
 
-    return backend.derive_elliptic_curve_private_key(private_value, curve)
+    return ossl.derive_elliptic_curve_private_key(private_value, curve)
 
 
 class EllipticCurvePublicNumbers(object):
@@ -367,9 +377,12 @@ class EllipticCurvePublicNumbers(object):
         self._x = x
         self._curve = curve
 
-    def public_key(self, backend=None) -> EllipticCurvePublicKey:
-        backend = _get_backend(backend)
-        return backend.load_elliptic_curve_public_numbers(self)
+    def public_key(self, backend: typing.Any = None) -> EllipticCurvePublicKey:
+        from cryptography.hazmat.backends.openssl.backend import (
+            backend as ossl,
+        )
+
+        return ossl.load_elliptic_curve_public_numbers(self)
 
     def encode_point(self) -> bytes:
         warnings.warn(
@@ -415,9 +428,9 @@ class EllipticCurvePublicNumbers(object):
         else:
             raise ValueError("Unsupported elliptic curve point type")
 
-    curve = utils.read_only_property("_curve")
-    x = utils.read_only_property("_x")
-    y = utils.read_only_property("_y")
+    curve = property(lambda self: self._curve)
+    x = property(lambda self: self._x)
+    y = property(lambda self: self._y)
 
     def __eq__(self, other):
         if not isinstance(other, EllipticCurvePublicNumbers):
@@ -459,12 +472,17 @@ class EllipticCurvePrivateNumbers(object):
         self._private_value = private_value
         self._public_numbers = public_numbers
 
-    def private_key(self, backend=None) -> EllipticCurvePrivateKey:
-        backend = _get_backend(backend)
-        return backend.load_elliptic_curve_private_numbers(self)
+    def private_key(
+        self, backend: typing.Any = None
+    ) -> EllipticCurvePrivateKey:
+        from cryptography.hazmat.backends.openssl.backend import (
+            backend as ossl,
+        )
 
-    private_value = utils.read_only_property("_private_value")
-    public_numbers = utils.read_only_property("_public_numbers")
+        return ossl.load_elliptic_curve_private_numbers(self)
+
+    private_value = property(lambda self: self._private_value)
+    public_numbers = property(lambda self: self._public_numbers)
 
     def __eq__(self, other):
         if not isinstance(other, EllipticCurvePrivateNumbers):

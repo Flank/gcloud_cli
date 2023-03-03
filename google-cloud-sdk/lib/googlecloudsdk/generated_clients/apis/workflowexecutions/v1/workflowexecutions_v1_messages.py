@@ -41,6 +41,14 @@ class Execution(_messages.Message):
       execution.
     StateValueValuesEnum: Output only. Current state of the execution.
 
+  Messages:
+    LabelsValue: Labels associated with this execution. Labels can contain at
+      most 64 entries. Keys and values can be no longer than 63 characters and
+      can only contain lowercase letters, numeric characters, underscores, and
+      dashes. Label keys must start with a letter. International characters
+      are allowed. By default, labels are inherited from the workflow but are
+      overridden by any labels associated with the execution.
+
   Fields:
     argument: Input parameters of the execution represented as a JSON string.
       The size limit is 32KB. *Note*: If you are using the REST API directly
@@ -48,10 +56,17 @@ class Execution(_messages.Message):
       `argument`. Example:
       `'{"argument":"{\"firstName\":\"FIRST\",\"lastName\":\"LAST\"}"}'`
     callLogLevel: The call logging level associated to this execution.
+    duration: Output only. Measures the duration of the execution.
     endTime: Output only. Marks the end of execution, successful or not.
     error: Output only. The error which caused the execution to finish
       prematurely. The value is only present if the execution's state is
       `FAILED` or `CANCELLED`.
+    labels: Labels associated with this execution. Labels can contain at most
+      64 entries. Keys and values can be no longer than 63 characters and can
+      only contain lowercase letters, numeric characters, underscores, and
+      dashes. Label keys must start with a letter. International characters
+      are allowed. By default, labels are inherited from the workflow but are
+      overridden by any labels associated with the execution.
     name: Output only. The resource name of the execution. Format: projects/{p
       roject}/locations/{location}/workflows/{workflow}/executions/{execution}
     result: Output only. Output of the execution represented as a JSON string.
@@ -59,15 +74,7 @@ class Execution(_messages.Message):
     startTime: Output only. Marks the beginning of execution.
     state: Output only. Current state of the execution.
     status: Output only. Status tracks the current steps and progress data of
-      this execution. > **Preview:** This field is covered by the > [Pre-GA
-      Offerings Terms](https://cloud.google.com/terms/service-terms) of > the
-      Google Cloud Terms of Service. Pre-GA features might have limited >
-      support, and changes to pre-GA features might not be compatible with >
-      other pre-GA versions. For more information, see the > [launch stage
-      descriptions](https://cloud.google.com/products#product-launch-stages).
-      > This field is usable only if your project has access. See the >
-      [access request page](https://docs.google.com/forms/d/e/1FAIpQLSdgwrSV8Y
-      4xZv_tvI6X2JEGX1-ty9yizv3_EAOVHWVKXvDLEA/viewform).
+      this execution.
     workflowRevisionId: Output only. Revision of the workflow this execution
       is using.
   """
@@ -76,7 +83,7 @@ class Execution(_messages.Message):
     r"""The call logging level associated to this execution.
 
     Values:
-      CALL_LOG_LEVEL_UNSPECIFIED: No call logging specified.
+      CALL_LOG_LEVEL_UNSPECIFIED: No call logging level specified.
       LOG_ALL_CALLS: Log all call steps within workflows, all call returns,
         and all exceptions raised.
       LOG_ERRORS_ONLY: Log only exceptions that are raised from call steps
@@ -102,16 +109,47 @@ class Execution(_messages.Message):
     FAILED = 3
     CANCELLED = 4
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels associated with this execution. Labels can contain at most 64
+    entries. Keys and values can be no longer than 63 characters and can only
+    contain lowercase letters, numeric characters, underscores, and dashes.
+    Label keys must start with a letter. International characters are allowed.
+    By default, labels are inherited from the workflow but are overridden by
+    any labels associated with the execution.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   argument = _messages.StringField(1)
   callLogLevel = _messages.EnumField('CallLogLevelValueValuesEnum', 2)
-  endTime = _messages.StringField(3)
-  error = _messages.MessageField('Error', 4)
-  name = _messages.StringField(5)
-  result = _messages.StringField(6)
-  startTime = _messages.StringField(7)
-  state = _messages.EnumField('StateValueValuesEnum', 8)
-  status = _messages.MessageField('Status', 9)
-  workflowRevisionId = _messages.StringField(10)
+  duration = _messages.StringField(3)
+  endTime = _messages.StringField(4)
+  error = _messages.MessageField('Error', 5)
+  labels = _messages.MessageField('LabelsValue', 6)
+  name = _messages.StringField(7)
+  result = _messages.StringField(8)
+  startTime = _messages.StringField(9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+  status = _messages.MessageField('Status', 11)
+  workflowRevisionId = _messages.StringField(12)
 
 
 class ListExecutionsResponse(_messages.Message):
@@ -306,16 +344,7 @@ class StandardQueryParameters(_messages.Message):
 
 
 class Status(_messages.Message):
-  r"""> **Preview:** This field is covered by the > [Pre-GA Offerings
-  Terms](https://cloud.google.com/terms/service-terms) of > the Google Cloud
-  Terms of Service. Pre-GA features might have limited > support, and changes
-  to pre-GA features might not be compatible with > other pre-GA versions. For
-  more information, see the > [launch stage
-  descriptions](https://cloud.google.com/products#product-launch-stages). >
-  This field is usable only if your project has access. See the > [access
-  request page](https://docs.google.com/forms/d/e/1FAIpQLSdgwrSV8Y4xZv_tvI6X2J
-  EGX1-ty9yizv3_EAOVHWVKXvDLEA/viewform). Represents the current status of
-  this execution.
+  r"""Represents the current status of this execution.
 
   Fields:
     currentSteps: A list of currently executing or last executed step names
@@ -411,8 +440,8 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsGetRequest(_messages
 
     Values:
       EXECUTION_VIEW_UNSPECIFIED: The default / unset value.
-      BASIC: Includes only basic metadata about the execution. Following
-        fields are returned: name, start_time, end_time, state and
+      BASIC: Includes only basic metadata about the execution. The following
+        fields are returned: name, start_time, end_time, duration, state, and
         workflow_revision_id.
       FULL: Includes all data.
     """
@@ -434,6 +463,14 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
       view.
 
   Fields:
+    filter: Optional. Filters applied to the [Executions.ListExecutions]
+      results. The following fields are supported for filtering: executionID,
+      state, startTime, endTime, duration, workflowRevisionID, stepName, and
+      label.
+    orderBy: Optional. The ordering applied to the [Executions.ListExecutions]
+      results. By default the ordering is based on descending start time. The
+      following fields are supported for order by: executionID, startTime,
+      endTime, duration, state, and workflowRevisionID.
     pageSize: Maximum number of executions to return per call. Max supported
       value depends on the selected Execution view: it's 1000 for BASIC and
       100 for FULL. The default value used if the field is not specified is
@@ -442,7 +479,8 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
     pageToken: A page token, received from a previous `ListExecutions` call.
       Provide this to retrieve the subsequent page. When paginating, all other
       parameters provided to `ListExecutions` must match the call that
-      provided the page token.
+      provided the page token. Note that pagination is applied to dynamic
+      data. The list of executions returned can change between page requests.
     parent: Required. Name of the workflow for which the executions should be
       listed. Format:
       projects/{project}/locations/{location}/workflows/{workflow}
@@ -456,8 +494,8 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
 
     Values:
       EXECUTION_VIEW_UNSPECIFIED: The default / unset value.
-      BASIC: Includes only basic metadata about the execution. Following
-        fields are returned: name, start_time, end_time, state and
+      BASIC: Includes only basic metadata about the execution. The following
+        fields are returned: name, start_time, end_time, duration, state, and
         workflow_revision_id.
       FULL: Includes all data.
     """
@@ -465,10 +503,12 @@ class WorkflowexecutionsProjectsLocationsWorkflowsExecutionsListRequest(_message
     BASIC = 1
     FULL = 2
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
-  view = _messages.EnumField('ViewValueValuesEnum', 4)
+  filter = _messages.StringField(1)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 6)
 
 
 class WorkflowexecutionsProjectsLocationsWorkflowsTriggerPubsubExecutionRequest(_messages.Message):

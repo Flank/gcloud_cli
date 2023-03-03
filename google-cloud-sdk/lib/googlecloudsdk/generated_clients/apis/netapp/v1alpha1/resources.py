@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://netapp.googleapis.com/v1alpha1/'
-DOCS_URL = 'go/netappfiles:high-level-design'
+DOCS_URL = 'https://cloud.google.com/netapp/'
 
 
 class Collections(enum.Enum):
@@ -42,12 +42,12 @@ class Collections(enum.Enum):
       True
   )
   PROJECTS_LOCATIONS_ACTIVEDIRECTORIES = (
-      'projects.locations.activedirectories',
+      'projects.locations.activeDirectories',
       '{+name}',
       {
           '':
               'projects/{projectsId}/locations/{locationsId}/'
-              'activedirectories/{activedirectoriesId}',
+              'activeDirectories/{activeDirectoriesId}',
       },
       ['name'],
       True
@@ -64,12 +64,12 @@ class Collections(enum.Enum):
       True
   )
   PROJECTS_LOCATIONS_STORAGEPOOLS = (
-      'projects.locations.storagepools',
+      'projects.locations.storagePools',
       '{+name}',
       {
           '':
-              'projects/{projectsId}/locations/{locationsId}/storagepools/'
-              '{storagepoolsId}',
+              'projects/{projectsId}/locations/{locationsId}/storagePools/'
+              '{storagePoolsId}',
       },
       ['name'],
       True

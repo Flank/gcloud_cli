@@ -123,8 +123,11 @@ def _SourceArgs(parser,
     disks_flags.SOURCE_INSTANT_SNAPSHOT_ARG.AddArgument(source_group)
   disks_flags.SOURCE_DISK_ARG.AddArgument(parser, mutex_group=source_group)
   if support_async_pd:
+    async_pd_category = 'ASYNC PD'
     disks_flags.ASYNC_PRIMARY_DISK_ARG.AddArgument(
-        parser, mutex_group=source_group)
+        parser, mutex_group=source_group, category=async_pd_category
+    )
+    disks_flags.AddPrimaryDiskProject(parser, async_pd_category)
 
   disks_flags.AddLocationHintArg(parser)
 
@@ -195,7 +198,7 @@ def _CommonArgs(messages,
 
   _SourceArgs(parser, source_instant_snapshot_enabled, support_async_pd)
 
-  disks_flags.AddProvisionedIopsFlag(parser, arg_parsers, constants)
+  disks_flags.AddProvisionedIopsFlag(parser, arg_parsers)
   disks_flags.AddArchitectureFlag(parser, messages)
 
   if support_provisioned_throughput:
@@ -390,8 +393,10 @@ class Create(base.Command):
   def GetAsyncPrimaryDiskUri(self, args, compute_holder):
     primary_disk_ref = None
     if args.primary_disk:
+      primary_disk_project = getattr(args, 'primary_disk_project', None)
       primary_disk_ref = disks_flags.ASYNC_PRIMARY_DISK_ARG.ResolveAsResource(
-          args, compute_holder.resources)
+          args, compute_holder.resources, source_project=primary_disk_project
+      )
       if primary_disk_ref:
         return primary_disk_ref.SelfLink()
     return None
@@ -594,6 +599,9 @@ class Create(base.Command):
 
       if support_user_licenses and args.IsSpecified('user_licenses'):
         disk.userLicenses = args.user_licenses
+
+      if args.IsSpecified('location_hint'):
+        disk.locationHint = args.location_hint
 
       if disk_ref.Collection() == 'compute.disks':
         request = client.messages.ComputeDisksInsertRequest(

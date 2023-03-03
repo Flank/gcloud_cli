@@ -1022,7 +1022,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1167,7 +1167,7 @@
           }
         },
         "encryptionInfo": {
-          "description": "Output only. Output only. The encryption information for the backup. .",
+          "description": "Output only. The encryption information for the backup.",
           "readOnly": true,
           "$ref": "EncryptionInfo"
         },
@@ -1238,7 +1238,7 @@
             "Unspecified. Do not use.",
             "This is the default option for CopyBackup when encryption_config is not specified. For example, if the source backup is using `Customer_Managed_Encryption`, the backup will be using the same Cloud KMS key as the source backup.",
             "Use Google default encryption.",
-            "Use customer managed encryption. If specified, `kms_key_name` must contain a valid Cloud KMS key."
+            "Use customer managed encryption. If specified, either `kms_key_name` or `kms_key_names` must contain valid Cloud KMS key(s)."
           ],
           "enum": [
             "ENCRYPTION_TYPE_UNSPECIFIED",
@@ -1960,6 +1960,10 @@
         "requestOptions": {
           "description": "Common options for this request.",
           "$ref": "RequestOptions"
+        },
+        "directedReadOptions": {
+          "description": "Directed read options for this request.",
+          "$ref": "DirectedReadOptions"
         }
       }
     },
@@ -2208,6 +2212,78 @@
         "transactionTag": {
           "description": "A tag used for statistics collection about this transaction. Both request_tag and transaction_tag can be specified for a read or query that belongs to a transaction. The value of transaction_tag should be the same for all requests belonging to the same transaction. If this request doesn't belong to any transaction, transaction_tag will be ignored. Legal characters for `transaction_tag` values are all printable characters (ASCII 32 - 126) and the length of a transaction_tag is limited to 50 characters. Values that exceed this limit are truncated. Any leading underscore (_) characters will be removed from the string.",
           "type": "string"
+        }
+      }
+    },
+    "DirectedReadOptions": {
+      "id": "DirectedReadOptions",
+      "description": "The DirectedReadOptions can be used to indicate which replicas or regions should be used for non-transactional reads or queries. DirectedReadOptions may only be specified for a read-only transaction, otherwise the API will return an `INVALID_ARGUMENT` error.",
+      "type": "object",
+      "properties": {
+        "includeReplicas": {
+          "description": "Include_replicas indicates the order of replicas (as they appear in this list) to process the request. If auto_failover_disabled is set to true and all replicas are exhausted without finding a healthy replica, Spanner will wait for a replica in the list to become available, requests may fail due to `DEADLINE_EXCEEDED` errors.",
+          "$ref": "IncludeReplicas"
+        },
+        "excludeReplicas": {
+          "description": "Exclude_replicas indicates that should be excluded from serving requests. Spanner will not route requests to the replicas in this list.",
+          "$ref": "ExcludeReplicas"
+        }
+      }
+    },
+    "IncludeReplicas": {
+      "id": "IncludeReplicas",
+      "description": "An IncludeReplicas contains a repeated set of ReplicaSelection which indicates the order in which replicas should be considered.",
+      "type": "object",
+      "properties": {
+        "replicaSelections": {
+          "description": "The directed read replica selector.",
+          "type": "array",
+          "items": {
+            "$ref": "ReplicaSelection"
+          }
+        },
+        "autoFailoverDisabled": {
+          "description": "If true, Spanner will not route requests to a replica outside the include_replicas list when all of the specified replicas are unavailable or unhealthy. Default value is `false`.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ReplicaSelection": {
+      "id": "ReplicaSelection",
+      "description": "The directed read replica selector. Callers must provide one or more of the following fields for replica selection: * `location` - The location must be one of the regions within the multi-region configuration of your database. * `type` - The type of the replica. Some examples of using replica_selectors are: * `location:us-east1` --> The \"us-east1\" replica(s) of any available type will be used to process the request. * `type:READ_ONLY` --> The \"READ_ONLY\" type replica(s) in nearest . available location will be used to process the request. * `location:us-east1 type:READ_ONLY` --> The \"READ_ONLY\" type replica(s) in location \"us-east1\" will be used to process the request.",
+      "type": "object",
+      "properties": {
+        "location": {
+          "description": "The location or region of the serving requests, e.g. \"us-east1\".",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of replica.",
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Read-write replicas support both reads and writes.",
+            "Read-only replicas only support reads (not writes)."
+          ],
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "READ_WRITE",
+            "READ_ONLY"
+          ]
+        }
+      }
+    },
+    "ExcludeReplicas": {
+      "id": "ExcludeReplicas",
+      "description": "An ExcludeReplicas contains a repeated set of ReplicaSelection that should be excluded from serving requests.",
+      "type": "object",
+      "properties": {
+        "replicaSelections": {
+          "description": "The directed read replica selector.",
+          "type": "array",
+          "items": {
+            "$ref": "ReplicaSelection"
+          }
         }
       }
     },
@@ -2559,6 +2635,10 @@
         "requestOptions": {
           "description": "Common options for this request.",
           "$ref": "RequestOptions"
+        },
+        "directedReadOptions": {
+          "description": "Directed read options for this request.",
+          "$ref": "DirectedReadOptions"
         }
       }
     },
@@ -5195,7 +5275,7 @@
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/spanner.admin"
                   ],
-                  "description": "Starts copying a Cloud Spanner Backup. The returned backup long-running operation will have a name of the format `projects\/\/instances\/\/backups\/\/operations\/` and can be used to track copying of the backup. The operation is associated with the destination backup. The metadata field type is CopyBackupMetadata. The response field type is Backup, if successful. Cancelling the returned operation will stop the copying and delete the backup. Concurrent CopyBackup requests can run on the same source backup."
+                  "description": "Starts copying a Cloud Spanner Backup. The returned backup long-running operation will have a name of the format `projects\/\/instances\/\/backups\/\/operations\/` and can be used to track copying of the backup. The operation is associated with the destination backup. The metadata field type is CopyBackupMetadata. The response field type is Backup, if successful. Cancelling the returned operation will stop the copying and delete the destination backup. Concurrent CopyBackup requests can run on the same source backup."
                 },
                 "get": {
                   "id": "spanner.projects.instances.backups.get",

@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import ast
+
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.operations import poller
 from googlecloudsdk.api_lib.util import waiter
@@ -48,6 +50,12 @@ DETAILED_HELP = {
         To suspend an instance named ``test-instance'', run:
 
           $ {command} test-instance
+
+        To suspend an instance named `test-instance` that has a Local SSD, run:
+
+          $ {command} test-instance --discard-local-ssd=True
+
+        Using '--discard-local-ssd' without a value defaults to True.
       """
 }
 
@@ -74,26 +82,23 @@ class Suspend(base.SilentCommand):
   @classmethod
   def Args(cls, parser):
     flags.INSTANCES_ARG.AddArgument(parser)
-    if cls.ReleaseTrack() != base.ReleaseTrack.GA:
-      parser.add_argument(
-          '--discard-local-ssd',
-          action='store_true',
-          help=('If provided, local SSD data is discarded.'))
-    # TODO(b/36057354): consider adding detailed help.
+    parser.add_argument(
+        '--discard-local-ssd',
+        nargs='?',
+        default=None,
+        const=True,
+        # If absent, the flag is evaluated to None.
+        # If present without a value, defaults to True.
+        type=lambda x: ast.literal_eval(x.lower().capitalize()),
+        help=('If set to true, local SSD data is discarded.'))
     base.ASYNC_FLAG.AddToParser(parser)
 
   def _CreateSuspendRequest(self, client, instance_ref, discard_local_ssd):
-    if self.ReleaseTrack() == base.ReleaseTrack.GA:
-      return client.messages.ComputeInstancesSuspendRequest(
-          instance=instance_ref.Name(),
-          project=instance_ref.project,
-          zone=instance_ref.zone)
-    else:
-      return client.messages.ComputeInstancesSuspendRequest(
-          discardLocalSsd=discard_local_ssd,
-          instance=instance_ref.Name(),
-          project=instance_ref.project,
-          zone=instance_ref.zone)
+    return client.messages.ComputeInstancesSuspendRequest(
+        discardLocalSsd=discard_local_ssd,
+        instance=instance_ref.Name(),
+        project=instance_ref.project,
+        zone=instance_ref.zone)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -106,12 +111,9 @@ class Suspend(base.SilentCommand):
 
     requests = []
     for instance_ref in instance_refs:
-      discard_local_ssd = None
-      if self.ReleaseTrack() != base.ReleaseTrack.GA:
-        discard_local_ssd = args.discard_local_ssd
       requests.append((client.apitools_client.instances, 'Suspend',
                        self._CreateSuspendRequest(client, instance_ref,
-                                                  discard_local_ssd)))
+                                                  args.discard_local_ssd)))
 
     errors_to_collect = []
     responses = client.BatchRequests(requests, errors_to_collect)
@@ -126,12 +128,12 @@ class Suspend(base.SilentCommand):
             operation_ref.SelfLink()))
       log.status.Print(
           'Use [gcloud compute operations describe URI] command to check the '
-          'status of the operation(s).'
-      )
+          'status of the operation(s).')
       return responses
 
-    operation_poller = poller.BatchPoller(
-        client, client.apitools_client.instances, instance_refs)
+    operation_poller = poller.BatchPoller(client,
+                                          client.apitools_client.instances,
+                                          instance_refs)
 
     result = waiter.WaitFor(
         operation_poller,

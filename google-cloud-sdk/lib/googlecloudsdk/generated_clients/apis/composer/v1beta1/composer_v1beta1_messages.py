@@ -43,9 +43,9 @@ class CheckUpgradeRequest(_messages.Message):
     imageVersion: The version of the software running in the environment. This
       encapsulates both the version of Cloud Composer functionality and the
       version of Apache Airflow. It must match the regular expression `compose
-      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-9]+(
-      \.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks if
-      the provided version is supported and denies the request for an
+      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-
+      9]+(\.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks
+      if the provided version is supported and denies the request for an
       unsupported version. The Cloud Composer portion of the image version is
       a full [semantic version](https://semver.org), or an alias in the form
       of major version number or `latest`. When an alias is provided, the
@@ -187,6 +187,21 @@ class ComposerProjectsLocationsEnvironmentsCreateRequest(_messages.Message):
   parent = _messages.StringField(2, required=True)
 
 
+class ComposerProjectsLocationsEnvironmentsDatabaseFailoverRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsEnvironmentsDatabaseFailoverRequest object.
+
+  Fields:
+    databaseFailoverRequest: A DatabaseFailoverRequest resource to be passed
+      as the request body.
+    environment: Target environment:
+      "projects/{projectId}/locations/{locationId}/environments/{environmentId
+      }"
+  """
+
+  databaseFailoverRequest = _messages.MessageField('DatabaseFailoverRequest', 1)
+  environment = _messages.StringField(2, required=True)
+
+
 class ComposerProjectsLocationsEnvironmentsDeleteRequest(_messages.Message):
   r"""A ComposerProjectsLocationsEnvironmentsDeleteRequest object.
 
@@ -197,6 +212,21 @@ class ComposerProjectsLocationsEnvironmentsDeleteRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class ComposerProjectsLocationsEnvironmentsExecuteAirflowCommandRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsEnvironmentsExecuteAirflowCommandRequest
+  object.
+
+  Fields:
+    environment: The resource name of the environment in the form: "projects/{
+      projectId}/locations/{locationId}/environments/{environmentId}".
+    executeAirflowCommandRequest: A ExecuteAirflowCommandRequest resource to
+      be passed as the request body.
+  """
+
+  environment = _messages.StringField(1, required=True)
+  executeAirflowCommandRequest = _messages.MessageField('ExecuteAirflowCommandRequest', 2)
 
 
 class ComposerProjectsLocationsEnvironmentsGetRequest(_messages.Message):
@@ -352,6 +382,21 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
   updateMask = _messages.StringField(3)
 
 
+class ComposerProjectsLocationsEnvironmentsPollAirflowCommandRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsEnvironmentsPollAirflowCommandRequest object.
+
+  Fields:
+    environment: The resource name of the environment in the form:
+      "projects/{projectId}/locations/{locationId}/environments/{environmentId
+      }"
+    pollAirflowCommandRequest: A PollAirflowCommandRequest resource to be
+      passed as the request body.
+  """
+
+  environment = _messages.StringField(1, required=True)
+  pollAirflowCommandRequest = _messages.MessageField('PollAirflowCommandRequest', 2)
+
+
 class ComposerProjectsLocationsEnvironmentsRestartWebServerRequest(_messages.Message):
   r"""A ComposerProjectsLocationsEnvironmentsRestartWebServerRequest object.
 
@@ -463,6 +508,8 @@ class DataRetentionConfig(_messages.Message):
       how long to store event-based records in airflow database. If the
       retention mechanism is enabled this value must be a positive integer
       otherwise, value should be set to 0.
+    taskLogsRetentionConfig: Optional. The configuration settings for task
+      logs retention
     taskLogsRetentionDays: Optional. The number of days to retain task logs in
       the Cloud Logging bucket
     taskLogsStorageMode: Optional. The mode of storage for Airflow workers
@@ -486,8 +533,9 @@ class DataRetentionConfig(_messages.Message):
     CLOUD_LOGGING_ONLY = 2
 
   airflowDatabaseRetentionDays = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  taskLogsRetentionDays = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  taskLogsStorageMode = _messages.EnumField('TaskLogsStorageModeValueValuesEnum', 3)
+  taskLogsRetentionConfig = _messages.MessageField('TaskLogsRetentionConfig', 2)
+  taskLogsRetentionDays = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  taskLogsStorageMode = _messages.EnumField('TaskLogsStorageModeValueValuesEnum', 4)
 
 
 class DatabaseConfig(_messages.Message):
@@ -495,10 +543,6 @@ class DatabaseConfig(_messages.Message):
   Airflow software.
 
   Fields:
-    highAvailability: Optional. Creates the Airflow Database in High
-      Availability mode. This option can only be set during environment
-      creation. Supported for Cloud Composer environments in versions
-      composer-2.*.*-airflow-*.*.*.
     machineType: Optional. Cloud SQL machine type used by Airflow database. It
       has to be one of: db-n1-standard-2, db-n1-standard-4, db-n1-standard-8
       or db-n1-standard-16. If not specified, db-n1-standard-2 will be used.
@@ -511,9 +555,19 @@ class DatabaseConfig(_messages.Message):
       Cloud Composer environments in versions composer-2.*.*-airflow-*.*.*.
   """
 
-  highAvailability = _messages.BooleanField(1)
-  machineType = _messages.StringField(2)
-  zone = _messages.StringField(3)
+  machineType = _messages.StringField(1)
+  zone = _messages.StringField(2)
+
+
+class DatabaseFailoverRequest(_messages.Message):
+  r"""Request to trigger database failover (only for highly resilient
+  environments).
+  """
+
+
+
+class DatabaseFailoverResponse(_messages.Message):
+  r"""Response for DatabaseFailoverRequest."""
 
 
 class Date(_messages.Message):
@@ -667,8 +721,15 @@ class EnvironmentConfig(_messages.Message):
     EnvironmentSizeValueValuesEnum: Optional. The size of the Cloud Composer
       environment. This field is supported for Cloud Composer environments in
       versions composer-2.*.*-airflow-*.*.* and newer.
+    ResilienceModeValueValuesEnum: Optional. Resilience mode of the Cloud
+      Composer Environment. This field is supported for Cloud Composer
+      environments in versions composer-2.0.32-airflow-*.*.* and newer.
 
   Fields:
+    airflowByoidUri: Output only. The 'bring your own identity' variant of the
+      URI of the Apache Airflow Web UI hosted within this environment, to be
+      accessed with third-party identity credentials (see [Airflow web
+      interface](/composer/docs/how-to/accessing/airflow-web-interface)).
     airflowUri: Output only. The URI of the Apache Airflow Web UI hosted
       within this environment (see [Airflow web interface](/composer/docs/how-
       to/accessing/airflow-web-interface)).
@@ -711,6 +772,9 @@ class EnvironmentConfig(_messages.Message):
     recoveryConfig: Optional. The Recovery settings configuration of an
       environment. This field is supported for Cloud Composer environments in
       versions composer-2.*.*-airflow-*.*.* and newer.
+    resilienceMode: Optional. Resilience mode of the Cloud Composer
+      Environment. This field is supported for Cloud Composer environments in
+      versions composer-2.0.32-airflow-*.*.* and newer.
     softwareConfig: The configuration settings for software inside the
       environment.
     webServerConfig: Optional. The configuration settings for the Airflow web
@@ -743,23 +807,83 @@ class EnvironmentConfig(_messages.Message):
     ENVIRONMENT_SIZE_MEDIUM = 2
     ENVIRONMENT_SIZE_LARGE = 3
 
-  airflowUri = _messages.StringField(1)
-  dagGcsPrefix = _messages.StringField(2)
-  dataRetentionConfig = _messages.MessageField('DataRetentionConfig', 3)
-  databaseConfig = _messages.MessageField('DatabaseConfig', 4)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 5)
-  environmentSize = _messages.EnumField('EnvironmentSizeValueValuesEnum', 6)
-  gkeCluster = _messages.StringField(7)
-  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 8)
-  masterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 9)
-  nodeConfig = _messages.MessageField('NodeConfig', 10)
-  nodeCount = _messages.IntegerField(11, variant=_messages.Variant.INT32)
-  privateEnvironmentConfig = _messages.MessageField('PrivateEnvironmentConfig', 12)
-  recoveryConfig = _messages.MessageField('RecoveryConfig', 13)
-  softwareConfig = _messages.MessageField('SoftwareConfig', 14)
-  webServerConfig = _messages.MessageField('WebServerConfig', 15)
-  webServerNetworkAccessControl = _messages.MessageField('WebServerNetworkAccessControl', 16)
-  workloadsConfig = _messages.MessageField('WorkloadsConfig', 17)
+  class ResilienceModeValueValuesEnum(_messages.Enum):
+    r"""Optional. Resilience mode of the Cloud Composer Environment. This
+    field is supported for Cloud Composer environments in versions
+    composer-2.0.32-airflow-*.*.* and newer.
+
+    Values:
+      RESILIENCE_MODE_UNSPECIFIED: Default mode doesn't change environment
+        parameters.
+      HIGH_RESILIENCE: Enabled High Resilience mode, including Cloud SQL HA.
+    """
+    RESILIENCE_MODE_UNSPECIFIED = 0
+    HIGH_RESILIENCE = 1
+
+  airflowByoidUri = _messages.StringField(1)
+  airflowUri = _messages.StringField(2)
+  dagGcsPrefix = _messages.StringField(3)
+  dataRetentionConfig = _messages.MessageField('DataRetentionConfig', 4)
+  databaseConfig = _messages.MessageField('DatabaseConfig', 5)
+  encryptionConfig = _messages.MessageField('EncryptionConfig', 6)
+  environmentSize = _messages.EnumField('EnvironmentSizeValueValuesEnum', 7)
+  gkeCluster = _messages.StringField(8)
+  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 9)
+  masterAuthorizedNetworksConfig = _messages.MessageField('MasterAuthorizedNetworksConfig', 10)
+  nodeConfig = _messages.MessageField('NodeConfig', 11)
+  nodeCount = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  privateEnvironmentConfig = _messages.MessageField('PrivateEnvironmentConfig', 13)
+  recoveryConfig = _messages.MessageField('RecoveryConfig', 14)
+  resilienceMode = _messages.EnumField('ResilienceModeValueValuesEnum', 15)
+  softwareConfig = _messages.MessageField('SoftwareConfig', 16)
+  webServerConfig = _messages.MessageField('WebServerConfig', 17)
+  webServerNetworkAccessControl = _messages.MessageField('WebServerNetworkAccessControl', 18)
+  workloadsConfig = _messages.MessageField('WorkloadsConfig', 19)
+
+
+class ExecuteAirflowCommandRequest(_messages.Message):
+  r"""Execute Airflow Command request.
+
+  Fields:
+    command: Airflow command.
+    parameters: Parameters for the Airflow command/subcommand as an array of
+      arguments. It may contain positional arguments like `["my-dag-id"]`,
+      key-value parameters like `["--foo=bar"]` or `["--foo","bar"]`, or other
+      flags like `["-f"]`.
+    subcommand: Airflow subcommand.
+  """
+
+  command = _messages.StringField(1)
+  parameters = _messages.StringField(2, repeated=True)
+  subcommand = _messages.StringField(3)
+
+
+class ExecuteAirflowCommandResponse(_messages.Message):
+  r"""Response to ExecuteAirflowCommandRequest.
+
+  Fields:
+    error: Error message. Empty if there was no error.
+    executionId: The unique ID of the command execution for polling.
+    pod: The name of the pod where the command is executed.
+    podNamespace: The namespace of the pod where the command is executed.
+  """
+
+  error = _messages.StringField(1)
+  executionId = _messages.StringField(2)
+  pod = _messages.StringField(3)
+  podNamespace = _messages.StringField(4)
+
+
+class ExitInfo(_messages.Message):
+  r"""Information about how a command ended.
+
+  Fields:
+    error: Error message. Empty if there was no error.
+    exitCode: The exit code from the command execution.
+  """
+
+  error = _messages.StringField(1)
+  exitCode = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class IPAllocationPolicy(_messages.Message):
@@ -836,6 +960,18 @@ class ImageVersion(_messages.Message):
   releaseDate = _messages.MessageField('Date', 4)
   supportedPythonVersions = _messages.StringField(5, repeated=True)
   upgradeDisabled = _messages.BooleanField(6)
+
+
+class Line(_messages.Message):
+  r"""Contains information about a single line from logs.
+
+  Fields:
+    content: Text content of the log line.
+    lineNumber: Number of the line.
+  """
+
+  content = _messages.StringField(1)
+  lineNumber = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class ListEnvironmentsResponse(_messages.Message):
@@ -1067,9 +1203,7 @@ class NodeConfig(_messages.Message):
     tags: Optional. The list of instance tags applied to all node VMs. Tags
       are used to identify valid sources or targets for network firewalls.
       Each tag within the list must comply with
-      [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Cannot be updated. This
-      field is supported for Cloud Composer environments in versions
-      composer-1.*.*-airflow-*.*.*.
+      [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Cannot be updated.
   """
 
   diskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1224,6 +1358,8 @@ class OperationMetadata(_messages.Message):
       CHECK: A resource check operation.
       SAVE_SNAPSHOT: Saves snapshot of the resource operation.
       LOAD_SNAPSHOT: Loads snapshot of the resource operation.
+      DATABASE_FAILOVER: Triggers failover of environment's Cloud SQL instance
+        (only for highly resilient environments).
     """
     TYPE_UNSPECIFIED = 0
     CREATE = 1
@@ -1232,6 +1368,7 @@ class OperationMetadata(_messages.Message):
     CHECK = 4
     SAVE_SNAPSHOT = 5
     LOAD_SNAPSHOT = 6
+    DATABASE_FAILOVER = 7
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current operation state.
@@ -1255,6 +1392,38 @@ class OperationMetadata(_messages.Message):
   resource = _messages.StringField(4)
   resourceUuid = _messages.StringField(5)
   state = _messages.EnumField('StateValueValuesEnum', 6)
+
+
+class PollAirflowCommandRequest(_messages.Message):
+  r"""Poll Airflow Command request.
+
+  Fields:
+    executionId: The unique ID of the command execution.
+    nextLineNumber: Line number from which new logs should be fetched.
+    pod: The name of the pod where the command is executed.
+    podNamespace: The namespace of the pod where the command is executed.
+  """
+
+  executionId = _messages.StringField(1)
+  nextLineNumber = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pod = _messages.StringField(3)
+  podNamespace = _messages.StringField(4)
+
+
+class PollAirflowCommandResponse(_messages.Message):
+  r"""Response to PollAirflowCommandRequest.
+
+  Fields:
+    exitInfo: The result exit status of the command.
+    output: Output from the command execution. It may not contain the full
+      output and the caller may need to poll for more lines.
+    outputEnd: Whether the command execution has finished and there is no more
+      output.
+  """
+
+  exitInfo = _messages.MessageField('ExitInfo', 1)
+  output = _messages.MessageField('Line', 2, repeated=True)
+  outputEnd = _messages.BooleanField(3)
 
 
 class PrivateClusterConfig(_messages.Message):
@@ -1476,9 +1645,9 @@ class SoftwareConfig(_messages.Message):
     imageVersion: The version of the software running in the environment. This
       encapsulates both the version of Cloud Composer functionality and the
       version of Apache Airflow. It must match the regular expression `compose
-      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-9]+(
-      \.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks if
-      the provided version is supported and denies the request for an
+      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-
+      9]+(\.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks
+      if the provided version is supported and denies the request for an
       unsupported version. The Cloud Composer portion of the image version is
       a full [semantic version](https://semver.org), or an alias in the form
       of major version number or `latest`. When an alias is provided, the
@@ -1734,6 +1903,41 @@ class Status(_messages.Message):
   message = _messages.StringField(3)
 
 
+class TaskLogsRetentionConfig(_messages.Message):
+  r"""The configuration setting for Task Logs.
+
+  Enums:
+    StorageModeValueValuesEnum: Optional. The mode of storage for Airflow
+      workers task logs. For details, see go/composer-store-task-logs-in-
+      cloud-logging-only-design-doc
+
+  Fields:
+    retentionDays: Optional. The number of days to retain task logs in the
+      Cloud Logging bucket
+    storageMode: Optional. The mode of storage for Airflow workers task logs.
+      For details, see go/composer-store-task-logs-in-cloud-logging-only-
+      design-doc
+  """
+
+  class StorageModeValueValuesEnum(_messages.Enum):
+    r"""Optional. The mode of storage for Airflow workers task logs. For
+    details, see go/composer-store-task-logs-in-cloud-logging-only-design-doc
+
+    Values:
+      TASK_LOGS_STORAGE_MODE_UNSPECIFIED: This configuration is not specified
+        by the user.
+      CLOUD_LOGGING_AND_CLOUD_STORAGE: Store task logs in Cloud Logging and in
+        the environment's Cloud Storage bucket.
+      CLOUD_LOGGING_ONLY: Store task logs in Cloud Logging only.
+    """
+    TASK_LOGS_STORAGE_MODE_UNSPECIFIED = 0
+    CLOUD_LOGGING_AND_CLOUD_STORAGE = 1
+    CLOUD_LOGGING_ONLY = 2
+
+  retentionDays = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  storageMode = _messages.EnumField('StorageModeValueValuesEnum', 2)
+
+
 class TriggererResource(_messages.Message):
   r"""Configuration for resources used by Airflow triggerers.
 
@@ -1781,15 +1985,18 @@ class WebServerResource(_messages.Message):
   r"""Configuration for resources used by Airflow web server.
 
   Fields:
+    count: Optional. The number of web server instances. If not provided or
+      set to 0, a single web server instance will be created.
     cpu: Optional. CPU request and limit for Airflow web server.
     memoryGb: Optional. Memory (GB) request and limit for Airflow web server.
     storageGb: Optional. Storage (GB) request and limit for Airflow web
       server.
   """
 
-  cpu = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  memoryGb = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
-  storageGb = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
+  count = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  cpu = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
+  memoryGb = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
+  storageGb = _messages.FloatField(4, variant=_messages.Variant.FLOAT)
 
 
 class WorkerResource(_messages.Message):

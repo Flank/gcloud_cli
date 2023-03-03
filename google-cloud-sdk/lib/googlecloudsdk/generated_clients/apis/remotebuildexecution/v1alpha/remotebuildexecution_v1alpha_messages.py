@@ -58,9 +58,16 @@ class BuildBazelRemoteExecutionV2Action(_messages.Message):
       should continue as long as the server will let it. The server SHOULD
       impose a timeout if the client does not specify one, however, if the
       client does specify a timeout that is longer than the server's maximum
-      timeout, the server MUST reject the request. The timeout is a part of
-      the Action message, and therefore two `Actions` with different timeouts
-      are different, even if they are otherwise identical. This is because, if
+      timeout, the server MUST reject the request. The timeout is only
+      intended to cover the "execution" of the specified action and not time
+      in queue nor any overheads before or after execution such as marshalling
+      inputs/outputs. The server SHOULD avoid including time spent the client
+      doesn't have control over, and MAY extend or reduce the timeout to
+      account for delays or speedups that occur during execution itself (e.g.,
+      lazily loading data from the Content Addressable Storage, live migration
+      of virtual machines, emulation overhead). The timeout is a part of the
+      Action message, and therefore two `Actions` with different timeouts are
+      different, even if they are otherwise identical. This is because, if
       they were not, running an `Action` with a lower timeout than is required
       might result in a cache hit from an execution run with a longer timeout,
       hiding the fact that the timeout is too short. By encoding it directly
@@ -169,14 +176,16 @@ class BuildBazelRemoteExecutionV2ActionResult(_messages.Message):
       inline stderr unless requested by the client in the
       GetActionResultRequest message. The server MAY omit inlining, even if
       requested, and MUST do so if inlining would cause the response to exceed
-      message size limits.
+      message size limits. Clients SHOULD NOT populate this field when
+      uploading to the cache.
     stdoutDigest: The digest for a blob containing the standard output of the
       action, which can be retrieved from the ContentAddressableStorage.
     stdoutRaw: The standard output buffer of the action. The server SHOULD NOT
       inline stdout unless requested by the client in the
       GetActionResultRequest message. The server MAY omit inlining, even if
       requested, and MUST do so if inlining would cause the response to exceed
-      message size limits.
+      message size limits. Clients SHOULD NOT populate this field when
+      uploading to the cache.
   """
 
   executionMetadata = _messages.MessageField('BuildBazelRemoteExecutionV2ExecutedActionMetadata', 1)
@@ -200,10 +209,19 @@ class BuildBazelRemoteExecutionV2Command(_messages.Message):
   implementation of the remote execution API.
 
   Fields:
-    arguments: The arguments to the command. The first argument must be the
-      path to the executable, which must be either a relative path, in which
-      case it is evaluated with respect to the input root, or an absolute
-      path.
+    arguments: The arguments to the command. The first argument specifies the
+      command to run, which may be either an absolute path, a path relative to
+      the working directory, or an unqualified path (without path separators)
+      which will be resolved using the operating system's equivalent of the
+      PATH environment variable. Path separators native to the operating
+      system running on the worker SHOULD be used. If the
+      `environment_variables` list contains an entry for the PATH environment
+      variable, it SHOULD be respected. If not, the resolution process is
+      implementation-defined. Changed in v2.3. v2.2 and older require that no
+      PATH lookups are performed, and that relative paths are resolved
+      relative to the input root. This behavior can, however, not be relied
+      upon, as most implementations already followed the rules described
+      above.
     environmentVariables: The environment variables to set when running the
       program. The worker may provide its own default environment variables;
       these defaults can be overridden using this field. Additional variables
@@ -261,9 +279,9 @@ class BuildBazelRemoteExecutionV2Command(_messages.Message):
       retrieve from the action. Only the listed paths will be returned to the
       client as output. The type of the output (file or directory) is not
       specified, and will be determined by the server after action execution.
-      If the resulting path is a file, it will be returned in an OutputFile)
+      If the resulting path is a file, it will be returned in an OutputFile
       typed field. If the path is a directory, the entire directory structure
-      will be returned as a Tree message digest, see OutputDirectory) Other
+      will be returned as a Tree message digest, see OutputDirectory Other
       files or directories that may be created during command execution are
       discarded. The paths are relative to the working directory of the action
       execution. The paths are specified using a single forward slash (`/`) as
@@ -541,6 +559,20 @@ class BuildBazelRemoteExecutionV2ExecutedActionMetadata(_messages.Message):
     outputUploadStartTimestamp: When the worker started uploading action
       outputs.
     queuedTimestamp: When was the action added to the queue.
+    virtualExecutionDuration: New in v2.3: the amount of time the worker spent
+      executing the action command, potentially computed using a worker-
+      specific virtual clock. The virtual execution duration is only intended
+      to cover the "execution" of the specified action and not time in queue
+      nor any overheads before or after execution such as marshalling
+      inputs/outputs. The server SHOULD avoid including time spent the client
+      doesn't have control over, and MAY extend or reduce the execution
+      duration to account for delays or speedups that occur during execution
+      itself (e.g., lazily loading data from the Content Addressable Storage,
+      live migration of virtual machines, emulation overhead). The method of
+      timekeeping used to compute the virtual execution duration MUST be
+      consistent with what is used to enforce the Action's `timeout`. There is
+      no relationship between the virtual execution duration and the values of
+      `execution_start_timestamp` and `execution_completed_timestamp`.
     worker: The name of the worker which ran the execution.
     workerCompletedTimestamp: When the worker completed the action, including
       all stages.
@@ -581,9 +613,10 @@ class BuildBazelRemoteExecutionV2ExecutedActionMetadata(_messages.Message):
   outputUploadCompletedTimestamp = _messages.StringField(6)
   outputUploadStartTimestamp = _messages.StringField(7)
   queuedTimestamp = _messages.StringField(8)
-  worker = _messages.StringField(9)
-  workerCompletedTimestamp = _messages.StringField(10)
-  workerStartTimestamp = _messages.StringField(11)
+  virtualExecutionDuration = _messages.StringField(9)
+  worker = _messages.StringField(10)
+  workerCompletedTimestamp = _messages.StringField(11)
+  workerStartTimestamp = _messages.StringField(12)
 
 
 class BuildBazelRemoteExecutionV2FileNode(_messages.Message):
@@ -652,6 +685,31 @@ class BuildBazelRemoteExecutionV2OutputDirectory(_messages.Message):
   a directory's full contents rather than a single file.
 
   Fields:
+    isTopologicallySorted: If set, consumers MAY make the following
+      assumptions about the directories contained in the the Tree, so that it
+      may be instantiated on a local file system by scanning through it
+      sequentially: - All directories with the same binary representation are
+      stored exactly once. - All directories, apart from the root directory,
+      are referenced by at least one parent directory. - Directories are
+      stored in topological order, with parents being stored before the child.
+      The root directory is thus the first to be stored. Additionally, the
+      Tree MUST be encoded as a stream of records, where each record has the
+      following format: - A tag byte, having one of the following two values:
+      - (1 << 3) | 2 == 0x0a: First record (the root directory). - (2 << 3) |
+      2 == 0x12: Any subsequent records (child directories). - The size of the
+      directory, encoded as a base 128 varint. - The contents of the
+      directory, encoded as a binary serialized Protobuf message. This
+      encoding is a subset of the Protobuf wire format of the Tree message. As
+      it is only permitted to store data associated with field numbers 1 and
+      2, the tag MUST be encoded as a single byte. More details on the
+      Protobuf wire format can be found here:
+      https://developers.google.com/protocol-buffers/docs/encoding It is
+      recommended that implementations using this feature construct Tree
+      objects manually using the specification given above, as opposed to
+      using a Protobuf library to marshal a full Tree message. As individual
+      Directory messages already need to be marshaled to compute their
+      digests, constructing the Tree object manually avoids redundant
+      marshaling.
     path: The full path of the directory relative to the working directory.
       The path separator is a forward slash `/`. Since this is a relative
       path, it MUST NOT begin with a leading forward slash. The empty string
@@ -660,8 +718,9 @@ class BuildBazelRemoteExecutionV2OutputDirectory(_messages.Message):
       directory's contents.
   """
 
-  path = _messages.StringField(1)
-  treeDigest = _messages.MessageField('BuildBazelRemoteExecutionV2Digest', 2)
+  isTopologicallySorted = _messages.BooleanField(1)
+  path = _messages.StringField(2)
+  treeDigest = _messages.MessageField('BuildBazelRemoteExecutionV2Digest', 3)
 
 
 class BuildBazelRemoteExecutionV2OutputFile(_messages.Message):
@@ -673,7 +732,8 @@ class BuildBazelRemoteExecutionV2OutputFile(_messages.Message):
       SHOULD NOT inline file contents unless requested by the client in the
       GetActionResultRequest message. The server MAY omit inlining, even if
       requested, and MUST do so if inlining would cause the response to exceed
-      message size limits.
+      message size limits. Clients SHOULD NOT populate this field when
+      uploading to the cache.
     digest: The digest of the file's content.
     isExecutable: True if file is executable, false otherwise.
     nodeProperties: A BuildBazelRemoteExecutionV2NodeProperties attribute.
@@ -842,7 +902,10 @@ class BuildBazelRemoteExecutionV2Tree(_messages.Message):
     children: All the child directories: the directories referred to by the
       root and, recursively, all its children. In order to reconstruct the
       directory tree, the client must take the digests of each of the child
-      directories and then build up a tree starting from the `root`.
+      directories and then build up a tree starting from the `root`. Servers
+      SHOULD ensure that these are ordered consistently such that two actions
+      producing equivalent output directories on the same server
+      implementation also produce Tree messages with matching digests.
     root: The root directory in the tree.
   """
 
@@ -1083,6 +1146,8 @@ class GoogleDevtoolsRemotebuildbotCommandStatus(_messages.Message):
         layerchain json was invalid (see b/234782336).
       INCOMPATIBLE_CUDA_VERSION: Docker failed to create OCI runtime because
         of incompatible cuda version.
+      LOCAL_WORKER_MANAGER_NOT_RUNNING: The local Worker Manager is not
+        running.
     """
     OK = 0
     INVALID_ARGUMENT = 1
@@ -1133,6 +1198,7 @@ class GoogleDevtoolsRemotebuildbotCommandStatus(_messages.Message):
     DOCKER_START_RUNTIME_FILE_NOT_FOUND = 46
     DOCKER_CREATE_INVALID_LAYERCHAIN_JSON = 47
     INCOMPATIBLE_CUDA_VERSION = 48
+    LOCAL_WORKER_MANAGER_NOT_RUNNING = 49
 
   code = _messages.EnumField('CodeValueValuesEnum', 1)
   message = _messages.StringField(2)
@@ -1218,14 +1284,14 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest(_messa
   r"""The request used for `CreateInstance`.
 
   Fields:
-    instance: Specifies the instance to create. The name in the instance, if
-      specified in the instance, is ignored.
-    instanceId: ID of the created instance. A valid `instance_id` must: be
-      6-50 characters long, contain only lowercase letters, digits, hyphens
-      and underscores, start with a lowercase letter, and end with a lowercase
-      letter or a digit.
-    parent: Resource name of the project containing the instance. Format:
-      `projects/[PROJECT_ID]`.
+    instance: Required. Specifies the instance to create. The name in the
+      instance, if specified in the instance, is ignored.
+    instanceId: Required. ID of the created instance. A valid `instance_id`
+      must: be 6-50 characters long, contain only lowercase letters, digits,
+      hyphens and underscores, start with a lowercase letter, and end with a
+      lowercase letter or a digit.
+    parent: Required. Resource name of the project containing the instance.
+      Format: `projects/[PROJECT_ID]`.
   """
 
   instance = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaInstance', 1)
@@ -1256,7 +1322,7 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaDeleteInstanceRequest(_messa
   r"""The request used for `DeleteInstance`.
 
   Fields:
-    name: Name of the instance to delete. Format:
+    name: Required. Name of the instance to delete. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
@@ -1280,12 +1346,26 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
   opt-out at usage time.
 
   Enums:
+    ActionHermeticityValueValuesEnum: Defines the hermeticity policy for
+      actions on this instance. DO NOT USE: Experimental / unlaunched feature.
+    ActionIsolationValueValuesEnum: Defines the isolation policy for actions
+      on this instance. DO NOT USE: Experimental / unlaunched feature.
+    LinuxExecutionValueValuesEnum: Defines how Linux actions are allowed to
+      execute. DO NOT USE: Experimental / unlaunched feature.
     LinuxIsolationValueValuesEnum: linux_isolation allows overriding the
       docker runtime used for containers started on Linux.
+    MacExecutionValueValuesEnum: Defines how Windows actions are allowed to
+      execute. DO NOT USE: Experimental / unlaunched feature.
     VmVerificationValueValuesEnum: Whether to verify CreateBotSession and
       UpdateBotSession from the bot.
+    WindowsExecutionValueValuesEnum: Defines how Windows actions are allowed
+      to execute. DO NOT USE: Experimental / unlaunched feature.
 
   Fields:
+    actionHermeticity: Defines the hermeticity policy for actions on this
+      instance. DO NOT USE: Experimental / unlaunched feature.
+    actionIsolation: Defines the isolation policy for actions on this
+      instance. DO NOT USE: Experimental / unlaunched feature.
     containerImageSources: Which container image sources are allowed.
       Currently only RBE-supported registry (gcr.io) is allowed. One can allow
       all repositories under a project or one specific repository only. E.g.
@@ -1308,11 +1388,85 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
       docker_runtime values may be rejected if they are incompatible with the
       selected isolation.
     dockerSiblingContainers: Whether dockerSiblingContainers can be used.
+    linuxExecution: Defines how Linux actions are allowed to execute. DO NOT
+      USE: Experimental / unlaunched feature.
     linuxIsolation: linux_isolation allows overriding the docker runtime used
       for containers started on Linux.
+    macExecution: Defines how Windows actions are allowed to execute. DO NOT
+      USE: Experimental / unlaunched feature.
     vmVerification: Whether to verify CreateBotSession and UpdateBotSession
       from the bot.
+    windowsExecution: Defines how Windows actions are allowed to execute. DO
+      NOT USE: Experimental / unlaunched feature.
   """
+
+  class ActionHermeticityValueValuesEnum(_messages.Enum):
+    r"""Defines the hermeticity policy for actions on this instance. DO NOT
+    USE: Experimental / unlaunched feature.
+
+    Values:
+      ACTION_HERMETICITY_UNSPECIFIED: Default value, if not explicitly set.
+        Equivalent to OFF.
+      ACTION_HERMETICITY_OFF: Disables enforcing feature policies that
+        guarantee action hermeticity.
+      ACTION_HERMETICITY_ENFORCED: Enforces hermeticity of actions by
+        requiring feature policies to be set that prevent actions from gaining
+        network access. The enforcement mechanism has been reviewed by ISE.
+      ACTION_HERMETICITY_BEST_EFFORT: Requires feature policies to be set that
+        provide best effort hermeticity for actions. Best effort hermeticity
+        means network access will be disabled and not trivial to bypass.
+        However, a determined and malicious action may still find a way to
+        gain network access.
+    """
+    ACTION_HERMETICITY_UNSPECIFIED = 0
+    ACTION_HERMETICITY_OFF = 1
+    ACTION_HERMETICITY_ENFORCED = 2
+    ACTION_HERMETICITY_BEST_EFFORT = 3
+
+  class ActionIsolationValueValuesEnum(_messages.Enum):
+    r"""Defines the isolation policy for actions on this instance. DO NOT USE:
+    Experimental / unlaunched feature.
+
+    Values:
+      ACTION_ISOLATION_UNSPECIFIED: Default value, if not explicitly set.
+        Equivalent to OFF.
+      ACTION_ISOLATION_OFF: Disables enforcing feature policies that guarantee
+        action isolation.
+      ACTION_ISOLATION_ENFORCED: Enforces setting feature policies that
+        ensures actions within the RBE Instance are isolated from each other
+        in a way deemed sufficient by ISE reviewers.
+    """
+    ACTION_ISOLATION_UNSPECIFIED = 0
+    ACTION_ISOLATION_OFF = 1
+    ACTION_ISOLATION_ENFORCED = 2
+
+  class LinuxExecutionValueValuesEnum(_messages.Enum):
+    r"""Defines how Linux actions are allowed to execute. DO NOT USE:
+    Experimental / unlaunched feature.
+
+    Values:
+      LINUX_EXECUTION_UNSPECIFIED: Default value, if not explicitly set.
+        Equivalent to FORBIDDEN.
+      LINUX_EXECUTION_FORBIDDEN: Linux actions and worker pools are forbidden.
+      LINUX_EXECUTION_UNRESTRICTED: No restrictions on execution of Linux
+        actions.
+      LINUX_EXECUTION_HARDENED_GVISOR: Linux actions will be hardened using
+        gVisor. Actions that specify a configuration incompatible with gVisor
+        hardening will be rejected. Example per-action platform properties
+        that are incompatible with gVisor hardening are: 1. dockerRuntime is
+        set to a value other than "runsc". Leaving dockerRuntime unspecified
+        *is* compatible with gVisor. 2. dockerPrivileged is set to "true".
+        etc.
+      LINUX_EXECUTION_HARDENED_GVISOR_OR_TERMINAL: Linux actions will be
+        hardened using gVisor if their configuration is compatible with gVisor
+        hardening. Otherwise, the action will be terminal, i.e., the worker VM
+        that runs the action will be terminated after the action finishes.
+    """
+    LINUX_EXECUTION_UNSPECIFIED = 0
+    LINUX_EXECUTION_FORBIDDEN = 1
+    LINUX_EXECUTION_UNRESTRICTED = 2
+    LINUX_EXECUTION_HARDENED_GVISOR = 3
+    LINUX_EXECUTION_HARDENED_GVISOR_OR_TERMINAL = 4
 
   class LinuxIsolationValueValuesEnum(_messages.Enum):
     r"""linux_isolation allows overriding the docker runtime used for
@@ -1329,6 +1483,18 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
     GVISOR = 1
     OFF = 2
 
+  class MacExecutionValueValuesEnum(_messages.Enum):
+    r"""Defines how Windows actions are allowed to execute. DO NOT USE:
+    Experimental / unlaunched feature.
+
+    Values:
+      MAC_EXECUTION_UNSPECIFIED: Default value, if not explicitly set.
+        Equivalent to FORBIDDEN.
+      MAC_EXECUTION_FORBIDDEN: Mac actions and worker pools are forbidden.
+    """
+    MAC_EXECUTION_UNSPECIFIED = 0
+    MAC_EXECUTION_FORBIDDEN = 1
+
   class VmVerificationValueValuesEnum(_messages.Enum):
     r"""Whether to verify CreateBotSession and UpdateBotSession from the bot.
 
@@ -1342,17 +1508,41 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicy(_messages.Mess
     VM_VERIFICATION_GCP_TOKEN = 1
     VM_VERIFICATION_OFF = 2
 
-  containerImageSources = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 1)
-  dockerAddCapabilities = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 2)
-  dockerChrootPath = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 3)
-  dockerNetwork = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 4)
-  dockerPrivileged = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 5)
-  dockerRunAsContainerProvidedUser = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 6)
-  dockerRunAsRoot = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 7)
-  dockerRuntime = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 8)
-  dockerSiblingContainers = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 9)
-  linuxIsolation = _messages.EnumField('LinuxIsolationValueValuesEnum', 10)
-  vmVerification = _messages.EnumField('VmVerificationValueValuesEnum', 11)
+  class WindowsExecutionValueValuesEnum(_messages.Enum):
+    r"""Defines how Windows actions are allowed to execute. DO NOT USE:
+    Experimental / unlaunched feature.
+
+    Values:
+      WINDOWS_EXECUTION_UNSPECIFIED: Default value, if not explicitly set.
+        Equivalent to FORBIDDEN.
+      WINDOWS_EXECUTION_FORBIDDEN: Windows actions and worker pools are
+        forbidden.
+      WINDOWS_EXECUTION_UNRESTRICTED: No restrictions on execution of Windows
+        actions.
+      WINDOWS_EXECUTION_TERMINAL: Windows actions will always result in the
+        worker VM being terminated after the action completes.
+    """
+    WINDOWS_EXECUTION_UNSPECIFIED = 0
+    WINDOWS_EXECUTION_FORBIDDEN = 1
+    WINDOWS_EXECUTION_UNRESTRICTED = 2
+    WINDOWS_EXECUTION_TERMINAL = 3
+
+  actionHermeticity = _messages.EnumField('ActionHermeticityValueValuesEnum', 1)
+  actionIsolation = _messages.EnumField('ActionIsolationValueValuesEnum', 2)
+  containerImageSources = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 3)
+  dockerAddCapabilities = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 4)
+  dockerChrootPath = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 5)
+  dockerNetwork = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 6)
+  dockerPrivileged = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 7)
+  dockerRunAsContainerProvidedUser = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 8)
+  dockerRunAsRoot = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 9)
+  dockerRuntime = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 10)
+  dockerSiblingContainers = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature', 11)
+  linuxExecution = _messages.EnumField('LinuxExecutionValueValuesEnum', 12)
+  linuxIsolation = _messages.EnumField('LinuxIsolationValueValuesEnum', 13)
+  macExecution = _messages.EnumField('MacExecutionValueValuesEnum', 14)
+  vmVerification = _messages.EnumField('VmVerificationValueValuesEnum', 15)
+  windowsExecution = _messages.EnumField('WindowsExecutionValueValuesEnum', 16)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaFeaturePolicyFeature(_messages.Message):
@@ -1393,7 +1583,7 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaGetInstanceRequest(_messages
   r"""The request used for `GetInstance`.
 
   Fields:
-    name: Name of the instance to retrieve. Format:
+    name: Required. Name of the instance to retrieve. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
@@ -1432,6 +1622,9 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaInstance(_messages.Message):
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`. Name should not be
       populated when creating an instance since it is provided in the
       `instance_id` field.
+    schedulerNotificationConfig: The instance's configuration for scheduler
+      notifications. Absence implies that this feature is not enabled for this
+      instance.
     state: Output only. State of the instance.
   """
 
@@ -1457,23 +1650,23 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaInstance(_messages.Message):
   location = _messages.StringField(2)
   loggingEnabled = _messages.BooleanField(3)
   name = _messages.StringField(4)
-  state = _messages.EnumField('StateValueValuesEnum', 5)
+  schedulerNotificationConfig = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaSchedulerNotificationConfig', 5)
+  state = _messages.EnumField('StateValueValuesEnum', 6)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaListInstancesRequest(_messages.Message):
-  r"""A GoogleDevtoolsRemotebuildexecutionAdminV1alphaListInstancesRequest
-  object.
+  r"""The request used for `ListInstances`.
 
   Fields:
-    parent: Resource name of the project. Format: `projects/[PROJECT_ID]`.
+    parent: Required. Resource name of the project. Format:
+      `projects/[PROJECT_ID]`.
   """
 
   parent = _messages.StringField(1)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaListInstancesResponse(_messages.Message):
-  r"""A GoogleDevtoolsRemotebuildexecutionAdminV1alphaListInstancesResponse
-  object.
+  r"""The response used for `ListInstances`.
 
   Fields:
     instances: The list of instances in a given project.
@@ -1522,6 +1715,20 @@ class GoogleDevtoolsRemotebuildexecutionAdminV1alphaListWorkerPoolsResponse(_mes
   """
 
   workerPools = _messages.MessageField('GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerPool', 1, repeated=True)
+
+
+class GoogleDevtoolsRemotebuildexecutionAdminV1alphaSchedulerNotificationConfig(_messages.Message):
+  r"""Defines configurations for an instance's scheduler notifications, where
+  a target Pub/Sub topic will be notified whenever a task (e.g. an action or
+  reservation) completes on this instance.
+
+  Fields:
+    topic: The Pub/Sub topic resource name to issue notifications to. Note
+      that the topic does not need to be owned by the same project as this
+      instance. Format: `projects//topics/`.
+  """
+
+  topic = _messages.StringField(1)
 
 
 class GoogleDevtoolsRemotebuildexecutionAdminV1alphaTestNotifyInstanceRequest(_messages.Message):
@@ -2227,7 +2434,7 @@ class RemotebuildexecutionProjectsInstancesDeleteRequest(_messages.Message):
   r"""A RemotebuildexecutionProjectsInstancesDeleteRequest object.
 
   Fields:
-    name: Name of the instance to delete. Format:
+    name: Required. Name of the instance to delete. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
@@ -2238,7 +2445,7 @@ class RemotebuildexecutionProjectsInstancesGetRequest(_messages.Message):
   r"""A RemotebuildexecutionProjectsInstancesGetRequest object.
 
   Fields:
-    name: Name of the instance to retrieve. Format:
+    name: Required. Name of the instance to retrieve. Format:
       `projects/[PROJECT_ID]/instances/[INSTANCE_ID]`.
   """
 
@@ -2249,7 +2456,8 @@ class RemotebuildexecutionProjectsInstancesListRequest(_messages.Message):
   r"""A RemotebuildexecutionProjectsInstancesListRequest object.
 
   Fields:
-    parent: Resource name of the project. Format: `projects/[PROJECT_ID]`.
+    parent: Required. Resource name of the project. Format:
+      `projects/[PROJECT_ID]`.
   """
 
   parent = _messages.StringField(1, required=True)

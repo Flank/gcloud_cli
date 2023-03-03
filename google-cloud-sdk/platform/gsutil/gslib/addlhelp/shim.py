@@ -49,6 +49,21 @@ _DETAILED_HELP_TEXT = ("""
   is a list of commands supported by the shim with any differences in behavior
   noted.
 
+  acl
+  ------------------------
+
+  - The ``ch`` subcommand is not supported.
+
+  autoclass
+  ------------------------
+
+  - Works as expected.
+
+  bucketpolicyonly
+  ------------------------
+
+  - Works as expected.
+
   cat
   ------------------------
 
@@ -59,6 +74,12 @@ _DETAILED_HELP_TEXT = ("""
 
   - Works as expected.
 
+  cors
+  ------------------------
+
+  - ``get`` subcommand prints "[]" instead of "gs://[bucket name] has no CORS
+    configuration".
+
   cp
   ------------------------
 
@@ -68,10 +89,29 @@ _DETAILED_HELP_TEXT = ("""
   - The all-version flag (``-A``) silently enables sequential execution rather
     than raising an error.
 
+  defacl
+  ------------------------
+
+  - The ``ch`` subcommand is not supported.
+
   defstorageclass
   ------------------------
 
   - Works as expected.
+
+  hash
+  ------------------------
+
+  - In gsutil, the ``-m`` and ``-c`` flags that affect which hashes are displayed
+    are ignored for cloud objects. This behavior is fixed for the shim and gcloud
+    storage.
+
+  iam
+  ------------------------
+
+  - The ``ch`` subcommand is not supported.
+  - The ``-f`` flag will continue on any error, not just API errors.
+
 
   kms
   ------------------------
@@ -80,6 +120,16 @@ _DETAILED_HELP_TEXT = ("""
     format.
   - The encryption subcommand returns informational messages in a different
     format.
+
+  labels
+  ------------------------
+  - ``get`` subcommand prints "[]" instead of "gs://[bucket name] has no labels
+    configuration."
+
+  lifecycle
+  ------------------------
+
+  - Works as expected.
 
   logging
   ------------------------
@@ -133,6 +183,11 @@ _DETAILED_HELP_TEXT = ("""
 
   - ``$folder$`` delete markers are not supported.
 
+  rpo
+  ------------------------
+
+  - Works as expected.
+
   setmeta
   ------------------------
 
@@ -142,6 +197,11 @@ _DETAILED_HELP_TEXT = ("""
   ------------------------
 
   - Includes a field "Storage class update time:" which may throw off tabbing.
+
+  ubla
+  ------------------------
+
+  - Works as expected.
 
   versioning
   ------------------------

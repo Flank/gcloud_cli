@@ -14,6 +14,24 @@ from apitools.base.py import extra_types
 package = 'tpu'
 
 
+class AbstractTrafficShape(_messages.Message):
+  r"""Represents an abstract traffic shape in the traffic matrix. By "traffic
+  shape", we mean a list of coordinates and the directed edges of traffic that
+  flow between them. By "abstract", we mean that each traffic shape is defined
+  relative to 0-indexed coordinates. These abstract coordinates are converted
+  to absolute coordinates when instantiated in `traffic_shape_instantiation`.
+
+  Fields:
+    allToAllTraffic: All to all traffic shape.
+    nToMTraffic: N to m traffic shape
+    ringTraffic: Ring traffic shape.
+  """
+
+  allToAllTraffic = _messages.MessageField('AllToAllTraffic', 1)
+  nToMTraffic = _messages.MessageField('NToMTraffic', 2)
+  ringTraffic = _messages.MessageField('RingTraffic', 3)
+
+
 class AcceleratorConfig(_messages.Message):
   r"""A TPU accelerator configuration.
 
@@ -47,12 +65,14 @@ class AcceleratorType(_messages.Message):
   r"""A accelerator type that a Node can be configured with.
 
   Fields:
+    acceleratorConfigs: The accelerator config.
     name: The resource name.
-    type: the accelerator type.
+    type: The accelerator type.
   """
 
-  name = _messages.StringField(1)
-  type = _messages.StringField(2)
+  acceleratorConfigs = _messages.MessageField('AcceleratorConfig', 1, repeated=True)
+  name = _messages.StringField(2)
+  type = _messages.StringField(3)
 
 
 class AcceptedData(_messages.Message):
@@ -72,6 +92,17 @@ class AccessConfig(_messages.Message):
 
 class ActiveData(_messages.Message):
   r"""Further data for the active state."""
+
+
+class AllToAllTraffic(_messages.Message):
+  r"""Predefined traffic shape in which each `group` member sends traffic to
+  each other `group` member (except self).
+
+  Fields:
+    group: List of coordinates participating in the AllToAll traffic exchange.
+  """
+
+  group = _messages.MessageField('CoordinateList', 1)
 
 
 class AttachedDisk(_messages.Message):
@@ -112,12 +143,95 @@ class BestEffort(_messages.Message):
   r"""BestEffort tier definition."""
 
 
+class ChipCoordinate(_messages.Message):
+  r"""Represents a single chip in a logical traffic matrix.
+
+  Fields:
+    sliceCoordinate: Coordinate of slice that chip is in.
+    xCoordinate: X coordinate of chip.
+    yCoordinate: Y coordinate of chip.
+    zCoordinate: Z coordinate of chip.
+  """
+
+  sliceCoordinate = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  xCoordinate = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  yCoordinate = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  zCoordinate = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
+class ChipCoordinateList(_messages.Message):
+  r"""Represents a list of individually defined chip coordinates.
+
+  Fields:
+    coordinates: List of chip coordinates.
+  """
+
+  coordinates = _messages.MessageField('ChipCoordinate', 1, repeated=True)
+
+
+class ChipCoordinateRangeGenerator(_messages.Message):
+  r"""Compactly represents a list of Chip coordinates as the cross-product of
+  each term. For example: * slice_coordinates: { 0, 1, 2, 3 } * x_coordinates:
+  { 0 } * y_coordinates: { 0, 1 } Represents all the chips in the first column
+  (x) and first 2 rows (y) of the first 4 slices.
+
+  Fields:
+    sliceCoordinates: Slice coordinates for chip coordinate range
+    xCoordinates: X coordinates for chip coordinate range.
+    yCoordinates: Y coordinates for chip coordinate range.
+    zCoordinates: If specifying 2D coordinates, z_coordinate may be omitted.
+  """
+
+  sliceCoordinates = _messages.MessageField('Range', 1)
+  xCoordinates = _messages.MessageField('Range', 2)
+  yCoordinates = _messages.MessageField('Range', 3)
+  zCoordinates = _messages.MessageField('Range', 4)
+
+
+class CoordinateList(_messages.Message):
+  r"""Defines a list of related `src` and/or `dst` coordinates in the traffic
+  matrix.
+
+  Fields:
+    chipCoordinate: A list of individually defined chip coordinates.
+    chipCoordinateRangeGenerator: A list of chip coordinates represented by
+      the provided range generator.
+  """
+
+  chipCoordinate = _messages.MessageField('ChipCoordinateList', 1)
+  chipCoordinateRangeGenerator = _messages.MessageField('ChipCoordinateRangeGenerator', 2)
+
+
 class CreatingData(_messages.Message):
   r"""Further data for the creating state."""
 
 
+class CustomTrafficMatrix(_messages.Message):
+  r"""Represents a custom traffic matrix passed directly by the calling
+  client.
+
+  Fields:
+    shapeGeneratedEntry: List of distinct shape generators that describe the
+      traffic matrix.
+  """
+
+  shapeGeneratedEntry = _messages.MessageField('ShapeGeneratedEntry', 1, repeated=True)
+
+
 class DeletingData(_messages.Message):
   r"""Further data for the deleting state."""
+
+
+class DstSliceTraffic(_messages.Message):
+  r"""A single edge of traffic directed towards a dst `slice_coord`.
+
+  Fields:
+    sliceCoord: Dst slice coordinate.
+    traffic: Traffic directed towards this slice.
+  """
+
+  sliceCoord = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  traffic = _messages.MessageField('Traffic', 2)
 
 
 class Empty(_messages.Message):
@@ -409,6 +523,30 @@ class Location(_messages.Message):
   name = _messages.StringField(5)
 
 
+class LogicalTrafficMatrix(_messages.Message):
+  r"""Describes the anticipated network traffic pattern between nodes
+  (henceforth referred to as "coordinates") participating in a distributed
+  computation. We note the following conventions for coordinates: - Slice
+  coordinates are 0-indexed and contiguous with respect to their owning
+  traffic matrix. - Chip coordinates are 0-indexed and contiguous relative to
+  their owning-slice. Chip coordinates map 1:1 to the physical TPU chips
+  deployed in their owning slice.
+
+  Fields:
+    customTrafficMatrix: Custom generator syntax used to represent chip-chip
+      granularity traffic matrix (TM) that is too large to be reasonably
+      represented as a simple adjacency list.
+    sliceToSliceAdjacencyList: Adjacency list representation of a slice->slice
+      granularity TM. Slice-to-slice encoding assumes traffic flows out of
+      each slice uniformly. This assumption is inconsequential for superblock
+      (SB) Network Aware Scheduling (NAS) of slices that fit within a SB (e.g.
+      VLP).
+  """
+
+  customTrafficMatrix = _messages.MessageField('CustomTrafficMatrix', 1)
+  sliceToSliceAdjacencyList = _messages.MessageField('SliceToSliceAdjacencyList', 2)
+
+
 class MultiNodeParams(_messages.Message):
   r"""Parameters to specify for multi-node QueuedResource requests. This field
   must be populated in case of multi-node requests instead of node_id. It's an
@@ -419,7 +557,7 @@ class MultiNodeParams(_messages.Message):
       attempt to provison "node_count" nodes as part of the request. This
       needs to be > 1.
     nodeIdPrefix: Prefix of node_ids in case of multi-node request Should
-      follow the ^[A-Za-z0-9_.~+%-]+$ regex format. If node_count = 3 and
+      follow the `^[A-Za-z0-9_.~+%-]+$` regex format. If node_count = 3 and
       node_id_prefix = "np", node ids of nodes created will be "np-0", "np-1",
       "np-2". If this field is not provided we use queued_resource_id as the
       node_id_prefix.
@@ -427,6 +565,48 @@ class MultiNodeParams(_messages.Message):
 
   nodeCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   nodeIdPrefix = _messages.StringField(2)
+
+
+class NToMTraffic(_messages.Message):
+  r"""Predefined traffic shape in which each `src_group` member sends traffic
+  to each `dst_group` member. For example: * 1 entry in `src` and many entries
+  in `dst` represent `One to Many` traffic. * 1 entry in `dst` and many
+  entries in `src` represent `Many to One` traffic.
+
+  Enums:
+    TrafficDirectionValueValuesEnum: If UNSPECIFIED or UNIDIRECTIONAL, each
+      `src_group` member sends traffic to each `dst_group` member. If
+      BIDIRECTIONAL, each `dst_group` member additionally sends traffic to
+      each `src_group` member.
+
+  Fields:
+    dstGroup: `dst` coordinates receiving data from all coordinates in
+      `src_group`.
+    srcGroup: `src` coordinates sending data to all coordinates in
+      `dst_group`.
+    trafficDirection: If UNSPECIFIED or UNIDIRECTIONAL, each `src_group`
+      member sends traffic to each `dst_group` member. If BIDIRECTIONAL, each
+      `dst_group` member additionally sends traffic to each `src_group`
+      member.
+  """
+
+  class TrafficDirectionValueValuesEnum(_messages.Enum):
+    r"""If UNSPECIFIED or UNIDIRECTIONAL, each `src_group` member sends
+    traffic to each `dst_group` member. If BIDIRECTIONAL, each `dst_group`
+    member additionally sends traffic to each `src_group` member.
+
+    Values:
+      TRAFFIC_DIRECTION_UNSPECIFIED: Traffic direction is not specified
+      TRAFFIC_DIRECTION_UNIDIRECTIONAL: Traffic is sent in one direction.
+      TRAFFIC_DIRECTION_BIDIRECTIONAL: Traffic is sent in both directions.
+    """
+    TRAFFIC_DIRECTION_UNSPECIFIED = 0
+    TRAFFIC_DIRECTION_UNIDIRECTIONAL = 1
+    TRAFFIC_DIRECTION_BIDIRECTIONAL = 2
+
+  dstGroup = _messages.MessageField('CoordinateList', 1)
+  srcGroup = _messages.MessageField('CoordinateList', 2)
+  trafficDirection = _messages.EnumField('TrafficDirectionValueValuesEnum', 3)
 
 
 class NetworkConfig(_messages.Message):
@@ -567,7 +747,7 @@ class Node(_messages.Message):
       REIMAGING: TPU node is undergoing reimaging.
       DELETING: TPU node is being deleted.
       REPAIRING: TPU node is being repaired and may be unusable. Details can
-        be found in the `help_description` field.
+        be found in the 'help_description' field.
       STOPPED: TPU node is stopped.
       STOPPING: TPU node is currently stopping.
       STARTING: TPU node is currently starting.
@@ -678,7 +858,7 @@ class NodeSpec(_messages.Message):
     multiNodeParams: Fields to specify in case of multi-node request.
     node: Required. The node.
     nodeId: The unqualified resource name. Should follow the
-      ^[A-Za-z0-9_.~+%-]+$ regex format. This is only specified when
+      `^[A-Za-z0-9_.~+%-]+$` regex format. This is only specified when
       requesting a single node. In case of multi-node requests,
       multi_node_params must be populated instead. It's an error to specify
       both node_id and multi_node_params.
@@ -823,6 +1003,16 @@ class OperationMetadata(_messages.Message):
   verb = _messages.StringField(7)
 
 
+class PeakTraffic(_messages.Message):
+  r"""Expected peak traffic between two coordinates.
+
+  Fields:
+    peakTrafficGbps: Gigabits per second.
+  """
+
+  peakTrafficGbps = _messages.FloatField(1)
+
+
 class ProvisioningData(_messages.Message):
   r"""Further data for the provisioning state."""
 
@@ -836,7 +1026,10 @@ class QueuedResource(_messages.Message):
     guaranteed: The Guaranteed tier
     name: Output only. Immutable. The name of the QueuedResource.
     queueingPolicy: The queueing policy of the QueuedRequest.
-    state: Output only. State of the QueuedResource request
+    reservationName: Name of the reservation in which the resource should be
+      provisioned. Format:
+      projects/{project}/locations/{zone}/reservations/{reservation}
+    state: Output only. State of the QueuedResource request.
     tpu: Defines a TPU resource.
     trafficConfig: Network traffic configuration.
   """
@@ -845,9 +1038,10 @@ class QueuedResource(_messages.Message):
   guaranteed = _messages.MessageField('Guaranteed', 2)
   name = _messages.StringField(3)
   queueingPolicy = _messages.MessageField('QueueingPolicy', 4)
-  state = _messages.MessageField('QueuedResourceState', 5)
-  tpu = _messages.MessageField('Tpu', 6)
-  trafficConfig = _messages.MessageField('TrafficConfig', 7)
+  reservationName = _messages.StringField(5)
+  state = _messages.MessageField('QueuedResourceState', 6)
+  tpu = _messages.MessageField('Tpu', 7)
+  trafficConfig = _messages.MessageField('TrafficConfig', 8)
 
 
 class QueuedResourceState(_messages.Message):
@@ -937,6 +1131,63 @@ class QueueingPolicy(_messages.Message):
   validUntilTime = _messages.StringField(5)
 
 
+class Range(_messages.Message):
+  r"""Compactly represents a range of numbers. The parameters take inspiration
+  from Python's "range(start, stop, step)" function and can be described with
+  the following pseudocode: `for (int i = start; i < end; i += step) { add i
+  to list }` E.g. { start: 0, end: 10, step: 2 } can be used to describe the
+  even numbers between 0 and 9.
+
+  Fields:
+    end: End of the range (exclusive). Required.
+    start: Start of the range. Required.
+    step: Describes the distance between elements for sparse ranges. Optional
+      term defaulted to `1` if absent.
+  """
+
+  end = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  start = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  step = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
+class RingTraffic(_messages.Message):
+  r"""Predefined traffic shape in which each (i_th) `group` member sends
+  traffic to the subsequent (i_th+1) `group` member, looping around at the
+  end.
+
+  Enums:
+    TrafficDirectionValueValuesEnum: If UNSPECIFIED or UNIDIRECTIONAL, the
+      i_th member sends traffic to the i+1_th member, looping at the end. If
+      BIDIRECTIONAL, the i_th member additionally sends traffic to the i-1_th
+      member, looping at the start.
+
+  Fields:
+    group: Sorted list of coordinates participating in the Ring Traffic
+      exchange.
+    trafficDirection: If UNSPECIFIED or UNIDIRECTIONAL, the i_th member sends
+      traffic to the i+1_th member, looping at the end. If BIDIRECTIONAL, the
+      i_th member additionally sends traffic to the i-1_th member, looping at
+      the start.
+  """
+
+  class TrafficDirectionValueValuesEnum(_messages.Enum):
+    r"""If UNSPECIFIED or UNIDIRECTIONAL, the i_th member sends traffic to the
+    i+1_th member, looping at the end. If BIDIRECTIONAL, the i_th member
+    additionally sends traffic to the i-1_th member, looping at the start.
+
+    Values:
+      TRAFFIC_DIRECTION_UNSPECIFIED: Traffic direction is not specified
+      TRAFFIC_DIRECTION_UNIDIRECTIONAL: Traffic is sent in one direction.
+      TRAFFIC_DIRECTION_BIDIRECTIONAL: Traffic is sent in both directions.
+    """
+    TRAFFIC_DIRECTION_UNSPECIFIED = 0
+    TRAFFIC_DIRECTION_UNIDIRECTIONAL = 1
+    TRAFFIC_DIRECTION_BIDIRECTIONAL = 2
+
+  group = _messages.MessageField('CoordinateList', 1)
+  trafficDirection = _messages.EnumField('TrafficDirectionValueValuesEnum', 2)
+
+
 class RuntimeVersion(_messages.Message):
   r"""A runtime version that a Node can be configured with.
 
@@ -985,6 +1236,29 @@ class ServiceIdentity(_messages.Message):
   email = _messages.StringField(1)
 
 
+class ShapeGeneratedEntry(_messages.Message):
+  r"""Shape-based generator that efficiently encodes uniform traffic shapes
+  (e.g. "horizontal ring traffic between all chips in two neighboring
+  slices"). A single entry represents all the instantiations of a unique
+  traffic shape in the traffic matrix.
+
+  Fields:
+    abstractTrafficShape: 0-indexed "abstract" traffic shape. See the
+      definition of `AbstractTrafficShape` for details.
+    traffic: Anticipated traffic across each edge in the concrete traffic
+      shape defined above.
+    trafficShapeInstantiation: List of coordinates in which we instantiate
+      copies of `abstract_traffic_shape`. Conceptually, each coordinate in
+      `traffic_shape_instantiation` represents an offset that converts a
+      0-indexed "abstract" traffic shape into a concrete traffic shape with
+      absolute coordinates in the traffic matrix.
+  """
+
+  abstractTrafficShape = _messages.MessageField('AbstractTrafficShape', 1)
+  traffic = _messages.MessageField('Traffic', 2)
+  trafficShapeInstantiation = _messages.MessageField('CoordinateList', 3)
+
+
 class ShieldedInstanceConfig(_messages.Message):
   r"""A set of Shielded Instance options.
 
@@ -1006,6 +1280,29 @@ class SimulateMaintenanceEventRequest(_messages.Message):
   """
 
   workerIds = _messages.StringField(1, repeated=True)
+
+
+class SliceToSliceAdjacencyList(_messages.Message):
+  r"""Adjacency list representation of a slice-to-slice traffic matrix.
+
+  Fields:
+    srcTraffic: One entry per slice containing the traffic leaving that slice.
+  """
+
+  srcTraffic = _messages.MessageField('SrcSliceTraffic', 1, repeated=True)
+
+
+class SrcSliceTraffic(_messages.Message):
+  r"""All the non-zero edges of traffic leaving a src `slice_coord` directed
+  towards dst slices.
+
+  Fields:
+    dstTraffic: List of traffic edges directed towards dst slices.
+    sliceCoord: Src slice coordinate.
+  """
+
+  dstTraffic = _messages.MessageField('DstSliceTraffic', 1, repeated=True)
+  sliceCoord = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -1361,7 +1658,7 @@ class TpuProjectsLocationsNodesStartRequest(_messages.Message):
   r"""A TpuProjectsLocationsNodesStartRequest object.
 
   Fields:
-    name: The resource name.
+    name: Required. The resource name.
     startNodeRequest: A StartNodeRequest resource to be passed as the request
       body.
   """
@@ -1374,7 +1671,7 @@ class TpuProjectsLocationsNodesStopRequest(_messages.Message):
   r"""A TpuProjectsLocationsNodesStopRequest object.
 
   Fields:
-    name: The resource name.
+    name: Required. The resource name.
     stopNodeRequest: A StopNodeRequest resource to be passed as the request
       body.
   """
@@ -1513,8 +1810,24 @@ class TpuProjectsLocationsRuntimeVersionsListRequest(_messages.Message):
   parent = _messages.StringField(5, required=True)
 
 
+class Traffic(_messages.Message):
+  r"""Expected traffic between two coordinates.
+
+  Fields:
+    peakTraffic: Expected peak traffic.
+  """
+
+  peakTraffic = _messages.MessageField('PeakTraffic', 1)
+
+
 class TrafficConfig(_messages.Message):
-  r"""Network traffic configuration."""
+  r"""Network traffic configuration.
+
+  Fields:
+    anticipatedTrafficMatrix: Traffic Matrix for anticipated network traffic
+  """
+
+  anticipatedTrafficMatrix = _messages.MessageField('LogicalTrafficMatrix', 1)
 
 
 encoding.AddCustomJsonFieldMapping(

@@ -57,6 +57,13 @@ RB_LIST_FORMAT = """
       role.predefinedRole:label=ROLE
     )
 """
+B_LIST_FORMAT = """
+    table(
+      name.segment(7):sort=1:label=NAME,
+      scope:sort=2:label=SCOPE,
+      fleet:sort=2:label=FLEET
+    )
+"""
 
 
 def DefaultFleetID():
@@ -242,7 +249,7 @@ def APIEndpoint():
   """
   endpoint_overrides = properties.VALUES.api_endpoint_overrides.AllValues()
   hub_endpoint_override = endpoint_overrides.get('gkehub', '')
-  if not hub_endpoint_override:
+  if not hub_endpoint_override or 'gkehub.googleapis.com' in hub_endpoint_override:
     return PROD_API
   elif 'staging-gkehub' in hub_endpoint_override:
     return STAGING_API

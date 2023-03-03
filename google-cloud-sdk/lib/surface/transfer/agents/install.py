@@ -24,22 +24,17 @@ import socket
 import subprocess
 import sys
 
-from googlecloudsdk.api_lib.auth import util as login_util
 from googlecloudsdk.api_lib.transfer import agent_pools_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.auth import auth_util
 from googlecloudsdk.command_lib.transfer import creds_util
-from googlecloudsdk.core import config
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import platforms
 
 from oauth2client import client as oauth2_client
 
-_AUTH_PROXY_REDIRECT_URI = (
-    'https://sdk.cloud.google.com/transfer-agents-install-authcode.html')
 COUNT_FLAG_HELP_TEXT = """
 Specify the number of agents to install on your current machine.
 System requirements: 8 GB of memory and 4 CPUs per agent.
@@ -82,6 +77,14 @@ double-wrapping requests in TLS encryption. Double-wrapped requests prevent the
 proxy server from sending valid outbound requests.
 """
 
+MISSING_CREDENTIALS_ERROR_TEXT = """
+Credentials file not found at {creds_file_path}.
+
+{fix_suggestion}.
+
+Afterwards, re-run {executed_command}.
+"""
+
 DOCKER_NOT_FOUND_HELP_TEXT_BASE_FORMAT = """
 The agent runs inside a Docker container, so you'll need
 to install Docker before finishing agent installation.
@@ -95,14 +98,14 @@ For most Linux operating systems, you can copy and run the piped installation
 commands below:
 
 curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh &&
-sudo systemctl enable docker && gcloud {gcloud_args}
+sudo systemctl enable docker && {executed_command}
 """))
 
 DOCKER_NOT_FOUND_HELP_TEXT_NON_LINUX_FORMAT = (
     DOCKER_NOT_FOUND_HELP_TEXT_BASE_FORMAT.format(os_instructions="""
 See the installation instructions at
 https://docs.docker.com/engine/install/binaries/ and re-run
-'gcloud {gcloud_args}' after Docker installation.
+'{executed_command}' after Docker installation.
 """))
 
 CHECK_AGENT_CONNECTED_HELP_TEXT_FORMAT = """
@@ -140,6 +143,15 @@ def _expand_path(path):
   return os.path.abspath(os.path.expanduser(path))
 
 
+def _get_executed_command():
+  """Returns the run command. Does not include environment variables."""
+  return ' '.join(sys.argv)
+
+
+def _log_created_agent(docker_command):
+  log.info('Created agent with command:\n{}'.format(' '.join(docker_command)))
+
+
 def _authenticate_and_get_creds_file_path(existing_creds_file=None):
   """Ensures agent will be able to authenticate and returns creds."""
   # Can't disable near "else" (https://github.com/PyCQA/pylint/issues/872).
@@ -147,19 +159,24 @@ def _authenticate_and_get_creds_file_path(existing_creds_file=None):
   if existing_creds_file:
     creds_file_path = _expand_path(existing_creds_file)
     if not os.path.exists(creds_file_path):
+      fix_suggestion = (
+          'Check for typos and ensure a creds file exists at the path')
       raise OSError(
-          'Credentials file not found at {}. Check for typos and ensure a'
-          ' creds file exists at the path, then re-run the command.'.format(
-              creds_file_path))
+          MISSING_CREDENTIALS_ERROR_TEXT.format(
+              creds_file_path=creds_file_path,
+              fix_suggestion=fix_suggestion,
+              executed_command=_get_executed_command()))
   else:
     creds_file_path = oauth2_client._get_well_known_file()
     # pylint:enable=protected-access
     if not os.path.exists(creds_file_path):
-      creds = login_util.DoInstalledAppBrowserFlowGoogleAuth(
-          scopes=(login_util.DEFAULT_SCOPES + [config.REAUTH_SCOPE]),
-          auth_proxy_redirect_uri=_AUTH_PROXY_REDIRECT_URI,
-      )
-      auth_util.DumpADCOptionalQuotaProject(creds)
+      fix_suggestion = ('To generate a credentials file, please run'
+                        ' `gcloud auth application-default login`')
+      raise OSError(
+          MISSING_CREDENTIALS_ERROR_TEXT.format(
+              creds_file_path=creds_file_path,
+              fix_suggestion=fix_suggestion,
+              executed_command=_get_executed_command()))
 
   return creds_file_path
 
@@ -173,7 +190,7 @@ def _check_if_docker_installed():
     else:
       error_format = DOCKER_NOT_FOUND_HELP_TEXT_NON_LINUX_FORMAT
 
-    raise OSError(error_format.format(gcloud_args=' '.join(sys.argv[1:])))
+    raise OSError(error_format.format(executed_command=_get_executed_command()))
 
 
 def _get_docker_command(args, project, creds_file_path):
@@ -228,8 +245,12 @@ def _get_docker_command(args, project, creds_file_path):
       '--log-dir={}'.format(expanded_logs_directory_path),
       '--project-id={}'.format(project),
   ]
-  if args.enable_multipart:
-    agent_args.append('--enable-multipart')
+  if args.enable_multipart is not None:
+    agent_args.append('--enable-multipart={}'.format(args.enable_multipart))
+  if getattr(args, 'max_concurrent_small_file_uploads', None):
+    # Flag is in alpha, so it may not always exist on args object.
+    agent_args.append('--entirefile-fr-parallelism={}'.format(
+        args.max_concurrent_small_file_uploads))
   if not args.mount_directories:
     # Needed to mount entire filesystem.
     agent_args.append('--enable-mount-directory')
@@ -259,9 +280,12 @@ def _execute_and_return_docker_command(args, project, creds_file_path):
     if sudo_completed_process.returncode != 0:
       raise OSError('Error executing Docker command:\n{}'.format(
           ' '.join(full_docker_command)))
-    return sudo_full_docker_command
+    executed_docker_command = sudo_full_docker_command
+  else:
+    executed_docker_command = full_docker_command
 
-  return full_docker_command
+  _log_created_agent(executed_docker_command)
+  return executed_docker_command
 
 
 def _create_additional_agents(agent_count, agent_id_prefix, docker_command):
@@ -278,8 +302,10 @@ def _create_additional_agents(agent_count, agent_id_prefix, docker_command):
 
     # Less error handling than before. Just propogate any process errors.
     subprocess.run(docker_command_to_run, check=True)
+    _log_created_agent(docker_command_to_run)
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Install(base.Command):
   """Install Transfer Service agents."""
 
@@ -292,15 +318,21 @@ class Install(base.Command):
       """,
       'EXAMPLES':
           """\
+      To create an agent pool for your agent, see the
+      `gcloud transfer agent-pools create` command.
+
       To install an agent that authenticates with your user account credentials
       and has default agent parameters, run:
 
-        $ {command}
+        $ {command} --pool=AGENT_POOL
+
+      You will be prompted to run a command to generate a credentials file if
+      one does not already exist.
 
       To install an agent that authenticates with a service account with
       credentials stored at '/example/path.json', run:
 
-        $ {command} --creds-file=/example/path.json
+        $ {command} --creds-file=/example/path.json --pool=AGENT_POOL
 
       """
   }
@@ -317,11 +349,11 @@ class Install(base.Command):
     parser.add_argument('--creds-file', help=CREDS_FILE_FLAG_HELP_TEXT)
     parser.add_argument(
         '--enable-multipart',
-        action='store_true',
+        action=arg_parsers.StoreTrueFalseAction,
         help='Split up files and transfer the resulting chunks in parallel'
         ' before merging them at the destination. Can be used make transfers of'
         ' large files faster as long as the network and disk speed are not'
-        ' limiting factors.')
+        ' limiting factors. If unset, agent decides when to use the feature.')
     parser.add_argument(
         '--id-prefix',
         help='An optional prefix to add to the agent ID to help identify the'
@@ -377,3 +409,18 @@ class Install(base.Command):
     log.status.Print(
         CHECK_AGENT_CONNECTED_HELP_TEXT_FORMAT.format(
             pool=args.pool, project=project))
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class InstallAlpha(Install):
+  """Install Transfer Service agents."""
+
+  @staticmethod
+  def Args(parser):
+    Install.Args(parser)
+    parser.add_argument(
+        '--max-concurrent-small-file-uploads',
+        type=int,
+        help='Adjust the maximum number of files less than or equal to 32 MiB'
+        ' large that the agent can upload in parallel. Not recommended for'
+        " users unfamiliar with Google Cloud's rate limiting.")

@@ -24,6 +24,7 @@ from googlecloudsdk.api_lib.dns import record_types
 from googlecloudsdk.api_lib.dns import util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import resources
 
 
 class UnsupportedRecordType(exceptions.Error):
@@ -40,6 +41,10 @@ class HealthCheckWithoutForwardingRule(exceptions.Error):
 
 class ForwardingRuleNotFound(exceptions.Error):
   """Either the forwarding rule doesn't exist, or multiple forwarding rules present with the same name - across different regions."""
+
+
+class UnsupportedLoadBalancingScheme(exceptions.Error):
+  """Unsupported load balancing scheme."""
 
 
 def _TryParseRRTypeFromString(type_str):
@@ -73,6 +78,8 @@ def GetLoadBalancerTarget(forwarding_rule, api_version, project):
     ForwardingRuleNotFound: Either the forwarding rule doesn't exist, or
       multiple forwarding rules present with the same name - across different
       regions.
+    UnsupportedLoadBalancingScheme: The requested load balancer uses a load
+      balancing scheme that is not supported by Cloud DNS Policy Manager.
 
   Returns:
     LoadBalancerTarget, the load balancer target for the given forwarding rule.
@@ -96,31 +103,54 @@ def GetLoadBalancerTarget(forwarding_rule, api_version, project):
           "Either the forwarding rule doesn't exist, or multiple forwarding rules present with the same name - across different regions."
       )
   else:
-    regions = [
-        item.name for item in compute_client.regions.List(
-            compute_messages.ComputeRegionsListRequest(project=project)).items
-    ]
-    configs = []
-    for region in regions:
-      configs.extend(
-          compute_client.forwardingRules.List(
-              compute_messages.ComputeForwardingRulesListRequest(
-                  filter=('name = %s' % forwarding_rule),
-                  project=project,
-                  region=region)).items)
-    if not configs:
-      raise ForwardingRuleNotFound('The forwarding rule %s was not found.' %
-                                   forwarding_rule)
-    if len(configs) > 1:
-      raise ForwardingRuleNotFound(
-          'There are multiple forwarding rules present with the same name - across different regions. Specify the intended region along with the rule in the format: forwardingrulename@region.'
+    try:
+      resource = resources.REGISTRY.Parse(
+          forwarding_rule, collection='compute.forwardingRules'
+      ).AsDict()
+      load_balancer_target.region = resource['region']
+      config = compute_client.forwardingRules.Get(
+          compute_messages.ComputeForwardingRulesGetRequest(
+              project=resource['project'],
+              region=resource['region'],
+              forwardingRule=resource['forwardingRule'],
+          )
       )
-    config = configs[0]
-    region_url_split = config.region.split('/')
-    # region returned in the response is the url of the form:
-    # https://www.googleapis.com/compute/v1/projects/project/regions/region
-    load_balancer_target.region = region_url_split[
-        region_url_split.index('regions') + 1]
+    except resources.RequiredFieldOmittedException:
+      # This means the forwarding rule was specified as just a name.
+      regions = [
+          item.name for item in compute_client.regions.List(
+              compute_messages.ComputeRegionsListRequest(project=project)).items
+      ]
+      configs = []
+      for region in regions:
+        configs.extend(
+            compute_client.forwardingRules.List(
+                compute_messages.ComputeForwardingRulesListRequest(
+                    filter=('name = %s' % forwarding_rule),
+                    project=project,
+                    region=region)).items)
+      if not configs:
+        raise ForwardingRuleNotFound('The forwarding rule %s was not found.' %
+                                     forwarding_rule)
+      if len(configs) > 1:
+        raise ForwardingRuleNotFound(
+            'There are multiple forwarding rules present with the same name '
+            'across different regions. Specify the intended region along with '
+            'the rule in the format: forwardingrulename@region.'
+        )
+      config = configs[0]
+      region_url_split = config.region.split('/')
+      # region returned in the response is the url of the form:
+      # https://www.googleapis.com/compute/v1/projects/project/regions/region
+      load_balancer_target.region = region_url_split[
+          region_url_split.index('regions') + 1]
+  # L4 ILB forwarding rules will specify loadBalancingScheme=INTERNAL and a
+  # backend service. We check for backendService to filter out L7ILBs that
+  # specify loadBalancingScheme=INTERNAL and a target.
+  if config.loadBalancingScheme != compute_messages.ForwardingRule.LoadBalancingSchemeValueValuesEnum(
+      'INTERNAL') or not config.backendService:
+    raise UnsupportedLoadBalancingScheme(
+        'Only Regional L4 forwarding rules are supported at this time.')
   load_balancer_target.ipAddress = config.IPAddress
   if config.IPProtocol == compute_messages.ForwardingRule.IPProtocolValueValuesEnum(
       'TCP'):

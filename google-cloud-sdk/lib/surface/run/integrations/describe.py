@@ -28,7 +28,9 @@ from googlecloudsdk.command_lib.run.integrations import run_apps_operations
 from googlecloudsdk.core.resource import resource_printer
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(
+    base.ReleaseTrack.ALPHA,
+    base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe a Cloud Run Integration."""
 
@@ -63,21 +65,21 @@ class Describe(base.DescribeCommand):
 
   def Run(self, args):
     """Describe an integration type."""
+    release_track = self.ReleaseTrack()
     name = args.name
     conn_context = connection_context.GetConnectionContext(
-        args, run_flags.Product.RUN_APPS, self.ReleaseTrack())
-    with run_apps_operations.Connect(conn_context) as client:
+        args, run_flags.Product.RUN_APPS, release_track)
+    with run_apps_operations.Connect(conn_context, release_track) as client:
       resource_config = client.GetIntegration(name)
       latest_deployment = client.GetLatestDeployment(resource_config)
       resource_status = client.GetIntegrationStatus(name)
       integration_type = types_utils.GetIntegrationType(resource_config)
 
-      # TODO(b/244491059) Return a class to avoid hardcoded strings for keys.
-      return {
-          'name': name,
-          'region': conn_context.region,
-          'type': integration_type,
-          'config': resource_config,
-          'status': resource_status,
-          types_utils.LATEST_DEPLOYMENT_FIELD: latest_deployment,
-      }
+      return integration_printer.Record(
+          name=name,
+          region=conn_context.region,
+          integration_type=integration_type,
+          config=resource_config,
+          status=resource_status,
+          latest_deployment=latest_deployment,
+      )

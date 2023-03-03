@@ -21,6 +21,7 @@ import json
 
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
+from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import times
@@ -52,13 +53,18 @@ def ParseCleanupPolicy(path):
       if key not in policy:
         raise ar_exceptions.InvalidInputValueError(
             'Key "{}" not found in policy.'.format(key))
+    if 'type' not in policy['action']:
+      raise ar_exceptions.InvalidInputValueError(
+          'Key "type" not found in policy action.')
     condition = dict()
     if 'versionAge' in policy['condition']:
       seconds = times.ParseDuration(policy['condition']['versionAge'])
       condition['versionAge'] = six.text_type(seconds.total_seconds) + 's'
     policies[policy['name']] = {
         'id': policy['name'],
-        'condition': condition}
+        'condition': condition,
+        'action': policy['action']['type'],
+    }
   return policies
 
 
@@ -70,13 +76,26 @@ def SetDeleteCleanupPolicyUpdateMask(unused_ref, unused_args, request):
 
 def RepositoryToCleanupPoliciesResponse(response, unused_args):
   if not response.cleanupPolicies:
+    log.status.Print('No cleanup policies set.')
     return None
   return response.cleanupPolicies.additionalProperties
 
 
-def RepositoryToSetCleanupPolicyResponse(response, unused_args):
-  if not response.cleanupPolicies:
-    raise ar_exceptions.ArtifactRegistryError(
-        'Failed to set cleanup policy. Cleanup policies are currently in '
-        'private preview.')
-  return response.cleanupPolicies.additionalProperties
+def SetOverwriteMask(unused_ref, args, request):
+  if args.overwrite:
+    request.updateMask = None
+  else:
+    request.updateMask = 'cleanup_policies'
+  return request
+
+
+def DeleteCleanupPolicyFields(unused_ref, args, request):
+  removed_policies = args.policynames.split(',')
+  remaining_policies = []
+  if request.repository.cleanupPolicies:
+    for policy in request.repository.cleanupPolicies.additionalProperties:
+      if policy.key not in removed_policies:
+        remaining_policies.append(policy)
+  request.repository.cleanupPolicies.additionalProperties = remaining_policies
+  request.updateMask = None
+  return request

@@ -81,6 +81,33 @@ class AlloyDbSettings(_messages.Message):
   vpcNetwork = _messages.StringField(4)
 
 
+class ApplyConversionWorkspaceRequest(_messages.Message):
+  r"""Request message for 'ApplyConversionWorkspace' request.
+
+  Fields:
+    connectionProfile: Fully qualified (Uri) name of the destination
+      connection profile.
+    filter: Filter which entities to apply. Leaving this field empty will
+      apply all of the entities. Supports Google AIP 160 based filtering.
+  """
+
+  connectionProfile = _messages.StringField(1)
+  filter = _messages.StringField(2)
+
+
+class ApplyJobDetails(_messages.Message):
+  r"""Details regarding an Apply background job.
+
+  Fields:
+    connectionProfile: The connection profile which was used for the apply
+      job.
+    filter: AIP-160 based filter used to specify the entities to apply
+  """
+
+  connectionProfile = _messages.StringField(1)
+  filter = _messages.StringField(2)
+
+
 class AuditConfig(_messages.Message):
   r"""Specifies the audit configuration for a service. The configuration
   determines which permission types are logged, and what identities, if any,
@@ -144,6 +171,77 @@ class AuditLogConfig(_messages.Message):
   logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
 
 
+class BackgroundJobLogEntry(_messages.Message):
+  r"""Execution log of a background job.
+
+  Enums:
+    CompletionStateValueValuesEnum: Job completion state, i.e. the final state
+      after the job completed.
+    JobTypeValueValuesEnum: The type of job that was executed.
+
+  Fields:
+    applyJobDetails: Apply job details.
+    completionComment: Job completion comment, such as how many entities were
+      seeded, how many warnings were found during conversion, and similar
+      information.
+    completionState: Job completion state, i.e. the final state after the job
+      completed.
+    convertJobDetails: Convert job details.
+    finishTime: The timestamp when the background job was finished.
+    id: The background job log entry ID.
+    importRulesJobDetails: Import rules job details.
+    jobType: The type of job that was executed.
+    requestAutocommit: Whether the client requested the conversion workspace
+      to be committed after a successful completion of the job.
+    seedJobDetails: Seed job details.
+    startTime: The timestamp when the background job was started.
+  """
+
+  class CompletionStateValueValuesEnum(_messages.Enum):
+    r"""Job completion state, i.e. the final state after the job completed.
+
+    Values:
+      JOB_COMPLETION_STATE_UNSPECIFIED: The status is not specified. This
+        state is used when job is not yet finished.
+      SUCCEEDED: Success.
+      FAILED: Error.
+    """
+    JOB_COMPLETION_STATE_UNSPECIFIED = 0
+    SUCCEEDED = 1
+    FAILED = 2
+
+  class JobTypeValueValuesEnum(_messages.Enum):
+    r"""The type of job that was executed.
+
+    Values:
+      BACKGROUND_JOB_TYPE_UNSPECIFIED: Unspecified background job type.
+      BACKGROUND_JOB_TYPE_SOURCE_SEED: Job to seed from the source database.
+      BACKGROUND_JOB_TYPE_CONVERT: Job to convert the source database into a
+        draft of the destination database.
+      BACKGROUND_JOB_TYPE_APPLY_DESTINATION: Job to apply the draft tree onto
+        the destination.
+      BACKGROUND_JOB_TYPE_IMPORT_RULES_FILE: Job to import and convert mapping
+        rules from an external source such as an ora2pg config file.
+    """
+    BACKGROUND_JOB_TYPE_UNSPECIFIED = 0
+    BACKGROUND_JOB_TYPE_SOURCE_SEED = 1
+    BACKGROUND_JOB_TYPE_CONVERT = 2
+    BACKGROUND_JOB_TYPE_APPLY_DESTINATION = 3
+    BACKGROUND_JOB_TYPE_IMPORT_RULES_FILE = 4
+
+  applyJobDetails = _messages.MessageField('ApplyJobDetails', 1)
+  completionComment = _messages.StringField(2)
+  completionState = _messages.EnumField('CompletionStateValueValuesEnum', 3)
+  convertJobDetails = _messages.MessageField('ConvertJobDetails', 4)
+  finishTime = _messages.StringField(5)
+  id = _messages.StringField(6)
+  importRulesJobDetails = _messages.MessageField('ImportRulesJobDetails', 7)
+  jobType = _messages.EnumField('JobTypeValueValuesEnum', 8)
+  requestAutocommit = _messages.BooleanField(9)
+  seedJobDetails = _messages.MessageField('SeedJobDetails', 10)
+  startTime = _messages.StringField(11)
+
+
 class Binding(_messages.Message):
   r"""Associates `members`, or principals, with a `role`.
 
@@ -175,7 +273,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -192,9 +292,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -213,6 +311,9 @@ class CloudSqlConnectionProfile(_messages.Message):
   parameters required to create a Cloud SQL destination database instance.
 
   Fields:
+    additionalPublicIp: Output only. The Cloud SQL database instance's
+      additional (outgoing) public IP. Used when the Cloud SQL database
+      availability type is REGIONAL (i.e. multiple zones / highly available).
     cloudSqlId: Output only. The Cloud SQL instance ID that this connection
       profile is associated with.
     privateIp: Output only. The Cloud SQL database instance's private IP.
@@ -221,10 +322,11 @@ class CloudSqlConnectionProfile(_messages.Message):
       database.
   """
 
-  cloudSqlId = _messages.StringField(1)
-  privateIp = _messages.StringField(2)
-  publicIp = _messages.StringField(3)
-  settings = _messages.MessageField('CloudSqlSettings', 4)
+  additionalPublicIp = _messages.StringField(1)
+  cloudSqlId = _messages.StringField(2)
+  privateIp = _messages.StringField(3)
+  publicIp = _messages.StringField(4)
+  settings = _messages.MessageField('CloudSqlSettings', 5)
 
 
 class CloudSqlSettings(_messages.Message):
@@ -236,6 +338,10 @@ class CloudSqlSettings(_messages.Message):
       'RUNNABLE'. Valid values: 'ALWAYS': The instance is on, and remains so
       even in the absence of connection requests. `NEVER`: The instance is
       off; it is not activated, even if a connection request arrives.
+    AvailabilityTypeValueValuesEnum: Optional. Availability type. Potential
+      values: * `ZONAL`: The instance serves data from only one zone. Outages
+      in that zone affect data availability. * `REGIONAL`: The instance can
+      serve data from more than one zone in a region (it is highly available).
     DataDiskTypeValueValuesEnum: The type of storage: `PD_SSD` (default) or
       `PD_HDD`.
     DatabaseVersionValueValuesEnum: The database engine type and version.
@@ -261,6 +367,10 @@ class CloudSqlSettings(_messages.Message):
       storage capacity. If the available storage repeatedly falls below the
       threshold size, Cloud SQL continues to add storage until it reaches the
       maximum of 30 TB.
+    availabilityType: Optional. Availability type. Potential values: *
+      `ZONAL`: The instance serves data from only one zone. Outages in that
+      zone affect data availability. * `REGIONAL`: The instance can serve data
+      from more than one zone in a region (it is highly available).
     cmekKeyName: The KMS key name used for the csql instance.
     collation: The Cloud SQL default instance level collation.
     dataDiskSizeGb: The storage capacity available to the database, in GB. The
@@ -276,6 +386,9 @@ class CloudSqlSettings(_messages.Message):
     rootPassword: Input only. Initial root password.
     rootPasswordSet: Output only. Indicates If this connection profile root
       password is stored.
+    secondaryZone: Optional. The Google Cloud Platform zone where the failover
+      Cloud SQL database instance is located. Used when the Cloud SQL database
+      availability type is REGIONAL (i.e. multiple zones / highly available).
     sourceId: The Database Migration Service source connection profile ID, in
       the format: `projects/my_project_name/locations/us-
       central1/connectionProfiles/connection_profile_ID`
@@ -309,6 +422,21 @@ class CloudSqlSettings(_messages.Message):
     SQL_ACTIVATION_POLICY_UNSPECIFIED = 0
     ALWAYS = 1
     NEVER = 2
+
+  class AvailabilityTypeValueValuesEnum(_messages.Enum):
+    r"""Optional. Availability type. Potential values: * `ZONAL`: The instance
+    serves data from only one zone. Outages in that zone affect data
+    availability. * `REGIONAL`: The instance can serve data from more than one
+    zone in a region (it is highly available).
+
+    Values:
+      SQL_AVAILABILITY_TYPE_UNSPECIFIED: This is an unknown Availability type.
+      ZONAL: Zonal availablility instance.
+      REGIONAL: Regional availability instance.
+    """
+    SQL_AVAILABILITY_TYPE_UNSPECIFIED = 0
+    ZONAL = 1
+    REGIONAL = 2
 
   class DataDiskTypeValueValuesEnum(_messages.Enum):
     r"""The type of storage: `PD_SSD` (default) or `PD_HDD`.
@@ -404,20 +532,107 @@ class CloudSqlSettings(_messages.Message):
 
   activationPolicy = _messages.EnumField('ActivationPolicyValueValuesEnum', 1)
   autoStorageIncrease = _messages.BooleanField(2)
-  cmekKeyName = _messages.StringField(3)
-  collation = _messages.StringField(4)
-  dataDiskSizeGb = _messages.IntegerField(5)
-  dataDiskType = _messages.EnumField('DataDiskTypeValueValuesEnum', 6)
-  databaseFlags = _messages.MessageField('DatabaseFlagsValue', 7)
-  databaseVersion = _messages.EnumField('DatabaseVersionValueValuesEnum', 8)
-  ipConfig = _messages.MessageField('SqlIpConfig', 9)
-  rootPassword = _messages.StringField(10)
-  rootPasswordSet = _messages.BooleanField(11)
-  sourceId = _messages.StringField(12)
-  storageAutoResizeLimit = _messages.IntegerField(13)
-  tier = _messages.StringField(14)
-  userLabels = _messages.MessageField('UserLabelsValue', 15)
-  zone = _messages.StringField(16)
+  availabilityType = _messages.EnumField('AvailabilityTypeValueValuesEnum', 3)
+  cmekKeyName = _messages.StringField(4)
+  collation = _messages.StringField(5)
+  dataDiskSizeGb = _messages.IntegerField(6)
+  dataDiskType = _messages.EnumField('DataDiskTypeValueValuesEnum', 7)
+  databaseFlags = _messages.MessageField('DatabaseFlagsValue', 8)
+  databaseVersion = _messages.EnumField('DatabaseVersionValueValuesEnum', 9)
+  ipConfig = _messages.MessageField('SqlIpConfig', 10)
+  rootPassword = _messages.StringField(11)
+  rootPasswordSet = _messages.BooleanField(12)
+  secondaryZone = _messages.StringField(13)
+  sourceId = _messages.StringField(14)
+  storageAutoResizeLimit = _messages.IntegerField(15)
+  tier = _messages.StringField(16)
+  userLabels = _messages.MessageField('UserLabelsValue', 17)
+  zone = _messages.StringField(18)
+
+
+class ColumnEntity(_messages.Message):
+  r"""Column is not used as an independent entity, it is retrieved as part of
+  a Table entity.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    array: Is the column of array type.
+    arrayLength: If the column is array, of which length.
+    autoGenerated: Is the column auto-generated/identity.
+    charset: Charset override - instead of table level charset.
+    collation: Collation override - instead of table level collation.
+    comment: Comment associated with the column.
+    customFeatures: Custom engine specific features.
+    dataType: Column data type.
+    defaultValue: Default value of the column.
+    fractionalSecondsPrecision: Column fractional second precision - used for
+      timestamp based datatypes.
+    length: Column length - e.g. varchar (50).
+    name: Column name.
+    nullable: Is the column nullable.
+    ordinalPosition: Column order in the table.
+    precision: Column precision - when relevant.
+    scale: Column scale - when relevant.
+    setValues: Specifies the list of values allowed in the column. List is
+      empty if setValues is not required.
+    udt: Is the column a UDT.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  array = _messages.BooleanField(1)
+  arrayLength = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  autoGenerated = _messages.BooleanField(3)
+  charset = _messages.StringField(4)
+  collation = _messages.StringField(5)
+  comment = _messages.StringField(6)
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 7)
+  dataType = _messages.StringField(8)
+  defaultValue = _messages.StringField(9)
+  fractionalSecondsPrecision = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  length = _messages.IntegerField(11)
+  name = _messages.StringField(12)
+  nullable = _messages.BooleanField(13)
+  ordinalPosition = _messages.IntegerField(14, variant=_messages.Variant.INT32)
+  precision = _messages.IntegerField(15, variant=_messages.Variant.INT32)
+  scale = _messages.IntegerField(16, variant=_messages.Variant.INT32)
+  setValues = _messages.StringField(17, repeated=True)
+  udt = _messages.BooleanField(18)
+
+
+class CommitConversionWorkspaceRequest(_messages.Message):
+  r"""Request message for 'CommitConversionWorkspace' request.
+
+  Fields:
+    commitName: Optional. Optional name of the commit.
+  """
+
+  commitName = _messages.StringField(1)
 
 
 class ConnectionProfile(_messages.Message):
@@ -449,6 +664,7 @@ class ConnectionProfile(_messages.Message):
     mysql: A MySQL database connection profile.
     name: The name of this connection profile resource in the form of projects
       /{project}/locations/{location}/connectionProfiles/{connectionProfile}.
+    oracle: An Oracle database connection profile.
     postgresql: A PostgreSQL database connection profile.
     provider: The database provider.
     state: The current connection profile state (e.g. DRAFT, READY, or
@@ -531,10 +747,310 @@ class ConnectionProfile(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 6)
   mysql = _messages.MessageField('MySqlConnectionProfile', 7)
   name = _messages.StringField(8)
-  postgresql = _messages.MessageField('PostgreSqlConnectionProfile', 9)
-  provider = _messages.EnumField('ProviderValueValuesEnum', 10)
-  state = _messages.EnumField('StateValueValuesEnum', 11)
-  updateTime = _messages.StringField(12)
+  oracle = _messages.MessageField('OracleConnectionProfile', 9)
+  postgresql = _messages.MessageField('PostgreSqlConnectionProfile', 10)
+  provider = _messages.EnumField('ProviderValueValuesEnum', 11)
+  state = _messages.EnumField('StateValueValuesEnum', 12)
+  updateTime = _messages.StringField(13)
+
+
+class ConstraintEntity(_messages.Message):
+  r"""Constraint is not used as an independent entity, it is retrieved as part
+  of another entity such as Table or View.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    name: The name of the table constraint.
+    referenceColumns: Reference columns which may be associated with the
+      constraint. For example, if the constraint is a FOREIGN_KEY, this
+      represents the list of full names of referenced columns by the foreign
+      key.
+    referenceTable: Reference table which may be associated with the
+      constraint. For example, if the constraint is a FOREIGN_KEY, this
+      represents the list of full name of the referenced table by the foreign
+      key.
+    tableColumns: Table columns used as part of the Constraint, for example
+      primary key constraint should list the columns which constitutes the
+      key.
+    tableName: Table which is associated with the constraint. In case the
+      constraint is defined on a table, this field is left empty as this
+      information is stored in parent_name. However, if constraint is defined
+      on a view, this field stores the table name on which the view is
+      defined.
+    type: Type of constraint, for example unique, primary key, foreign key
+      (currently only primary key is supported).
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  name = _messages.StringField(2)
+  referenceColumns = _messages.StringField(3, repeated=True)
+  referenceTable = _messages.StringField(4)
+  tableColumns = _messages.StringField(5, repeated=True)
+  tableName = _messages.StringField(6)
+  type = _messages.StringField(7)
+
+
+class ConversionWorkspace(_messages.Message):
+  r"""The main conversion workspace resource entity.
+
+  Messages:
+    GlobalSettingsValue: A generic list of settings for the workspace. The
+      settings are database pair dependant and can indicate default behavior
+      for the mapping rules engine or turn on or off specific features. Such
+      examples can be: convert_foreign_key_to_interleave=true,
+      skip_triggers=false, ignore_non_table_synonyms=true
+
+  Fields:
+    createTime: Output only. The timestamp when the workspace resource was
+      created.
+    destination: Required. The destination engine details.
+    displayName: The display name for the workspace.
+    globalSettings: A generic list of settings for the workspace. The settings
+      are database pair dependant and can indicate default behavior for the
+      mapping rules engine or turn on or off specific features. Such examples
+      can be: convert_foreign_key_to_interleave=true, skip_triggers=false,
+      ignore_non_table_synonyms=true
+    hasUncommittedChanges: Output only. Whether the workspace has uncommitted
+      changes (changes which were made after the workspace was committed).
+    latestCommitId: Output only. The latest commit ID.
+    latestCommitTime: Output only. The timestamp when the workspace was
+      committed.
+    name: Full name of the workspace resource, in the form of: projects/{proje
+      ct}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    source: Required. The source engine details.
+    updateTime: Output only. The timestamp when the workspace resource was
+      last updated.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class GlobalSettingsValue(_messages.Message):
+    r"""A generic list of settings for the workspace. The settings are
+    database pair dependant and can indicate default behavior for the mapping
+    rules engine or turn on or off specific features. Such examples can be:
+    convert_foreign_key_to_interleave=true, skip_triggers=false,
+    ignore_non_table_synonyms=true
+
+    Messages:
+      AdditionalProperty: An additional property for a GlobalSettingsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type GlobalSettingsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a GlobalSettingsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  destination = _messages.MessageField('DatabaseEngineInfo', 2)
+  displayName = _messages.StringField(3)
+  globalSettings = _messages.MessageField('GlobalSettingsValue', 4)
+  hasUncommittedChanges = _messages.BooleanField(5)
+  latestCommitId = _messages.StringField(6)
+  latestCommitTime = _messages.StringField(7)
+  name = _messages.StringField(8)
+  source = _messages.MessageField('DatabaseEngineInfo', 9)
+  updateTime = _messages.StringField(10)
+
+
+class ConversionWorkspaceInfo(_messages.Message):
+  r"""A conversion workspace's version.
+
+  Fields:
+    commitId: The commit ID of the conversion workspace.
+    name: The resource name (URI) of the conversion workspace.
+  """
+
+  commitId = _messages.StringField(1)
+  name = _messages.StringField(2)
+
+
+class ConvertConversionWorkspaceRequest(_messages.Message):
+  r"""Request message for 'ConvertConversionWorkspace' request.
+
+  Fields:
+    autoCommit: Specifies whether the conversion workspace is to be committed
+      automatically after the conversion.
+    filter: Filter the entities to convert. Leaving this field empty will
+      convert all of the entities. Supports Google AIP-160 style filtering.
+  """
+
+  autoCommit = _messages.BooleanField(1)
+  filter = _messages.StringField(2)
+
+
+class ConvertJobDetails(_messages.Message):
+  r"""Details regarding a Convert background job.
+
+  Fields:
+    filter: AIP-160 based filter used to specify the entities to convert
+  """
+
+  filter = _messages.StringField(1)
+
+
+class DatabaseEngineInfo(_messages.Message):
+  r"""The type and version of a source or destination database.
+
+  Enums:
+    EngineValueValuesEnum: Required. Engine type.
+
+  Fields:
+    engine: Required. Engine type.
+    version: Required. Engine named version, for example 12.c.1.
+  """
+
+  class EngineValueValuesEnum(_messages.Enum):
+    r"""Required. Engine type.
+
+    Values:
+      DATABASE_ENGINE_UNSPECIFIED: The source database engine of the migration
+        job is unknown.
+      MYSQL: The source engine is MySQL.
+      POSTGRESQL: The source engine is PostgreSQL.
+      ORACLE: The source engine is Oracle.
+    """
+    DATABASE_ENGINE_UNSPECIFIED = 0
+    MYSQL = 1
+    POSTGRESQL = 2
+    ORACLE = 3
+
+  engine = _messages.EnumField('EngineValueValuesEnum', 1)
+  version = _messages.StringField(2)
+
+
+class DatabaseEntity(_messages.Message):
+  r"""The base entity type for all the database related entities. The message
+  contains the entity name, the name of its parent, the entity type, and the
+  specific details per entity type.
+
+  Enums:
+    EntityTypeValueValuesEnum: The type of the database entity (table, view,
+      index, ...).
+    TreeValueValuesEnum: The type of tree the entity belongs to.
+
+  Fields:
+    databaseFunction: Function.
+    databasePackage: Package.
+    entityType: The type of the database entity (table, view, index, ...).
+    mappings: Details about entity mappings. For source tree entities, this
+      holds the draft entities which were generated by the mapping rules. For
+      draft tree entities, this holds the source entities which were converted
+      to form the draft entity. Destination entities will have no mapping
+      details.
+    parentEntity: The full name of the parent entity (e.g. schema name).
+    schema: Schema.
+    sequence: Sequence.
+    shortName: The short name (e.g. table name) of the entity.
+    storedProcedure: Stored procedure.
+    synonym: Synonym.
+    table: Table.
+    tree: The type of tree the entity belongs to.
+    view: View.
+  """
+
+  class EntityTypeValueValuesEnum(_messages.Enum):
+    r"""The type of the database entity (table, view, index, ...).
+
+    Values:
+      DATABASE_ENTITY_TYPE_UNSPECIFIED: Unspecified database entity type.
+      DATABASE_ENTITY_TYPE_SCHEMA: Schema.
+      DATABASE_ENTITY_TYPE_TABLE: Table.
+      DATABASE_ENTITY_TYPE_COLUMN: Column.
+      DATABASE_ENTITY_TYPE_CONSTRAINT: Constraint.
+      DATABASE_ENTITY_TYPE_INDEX: Index.
+      DATABASE_ENTITY_TYPE_TRIGGER: Trigger.
+      DATABASE_ENTITY_TYPE_VIEW: View.
+      DATABASE_ENTITY_TYPE_SEQUENCE: Sequence.
+      DATABASE_ENTITY_TYPE_STORED_PROCEDURE: Stored Procedure.
+      DATABASE_ENTITY_TYPE_FUNCTION: Function.
+      DATABASE_ENTITY_TYPE_SYNONYM: Synonym.
+      DATABASE_ENTITY_TYPE_DATABASE_PACKAGE: Package.
+      DATABASE_ENTITY_TYPE_UDT: UDT.
+      DATABASE_ENTITY_TYPE_MATERIAL_VIEW: Material View.
+    """
+    DATABASE_ENTITY_TYPE_UNSPECIFIED = 0
+    DATABASE_ENTITY_TYPE_SCHEMA = 1
+    DATABASE_ENTITY_TYPE_TABLE = 2
+    DATABASE_ENTITY_TYPE_COLUMN = 3
+    DATABASE_ENTITY_TYPE_CONSTRAINT = 4
+    DATABASE_ENTITY_TYPE_INDEX = 5
+    DATABASE_ENTITY_TYPE_TRIGGER = 6
+    DATABASE_ENTITY_TYPE_VIEW = 7
+    DATABASE_ENTITY_TYPE_SEQUENCE = 8
+    DATABASE_ENTITY_TYPE_STORED_PROCEDURE = 9
+    DATABASE_ENTITY_TYPE_FUNCTION = 10
+    DATABASE_ENTITY_TYPE_SYNONYM = 11
+    DATABASE_ENTITY_TYPE_DATABASE_PACKAGE = 12
+    DATABASE_ENTITY_TYPE_UDT = 13
+    DATABASE_ENTITY_TYPE_MATERIAL_VIEW = 14
+
+  class TreeValueValuesEnum(_messages.Enum):
+    r"""The type of tree the entity belongs to.
+
+    Values:
+      TREE_TYPE_UNSPECIFIED: Tree type unspecified.
+      SOURCE: Tree of entities loaded from a source database.
+      DRAFT: Tree of entities converted from the source tree using the mapping
+        rules.
+      DESTINATION: Tree of entities observed on the destination database.
+    """
+    TREE_TYPE_UNSPECIFIED = 0
+    SOURCE = 1
+    DRAFT = 2
+    DESTINATION = 3
+
+  databaseFunction = _messages.MessageField('FunctionEntity', 1)
+  databasePackage = _messages.MessageField('PackageEntity', 2)
+  entityType = _messages.EnumField('EntityTypeValueValuesEnum', 3)
+  mappings = _messages.MessageField('EntityMapping', 4, repeated=True)
+  parentEntity = _messages.StringField(5)
+  schema = _messages.MessageField('SchemaEntity', 6)
+  sequence = _messages.MessageField('SequenceEntity', 7)
+  shortName = _messages.StringField(8)
+  storedProcedure = _messages.MessageField('StoredProcedureEntity', 9)
+  synonym = _messages.MessageField('SynonymEntity', 10)
+  table = _messages.MessageField('TableEntity', 11)
+  tree = _messages.EnumField('TreeValueValuesEnum', 12)
+  view = _messages.MessageField('ViewEntity', 13)
 
 
 class DatabaseType(_messages.Message):
@@ -557,10 +1073,12 @@ class DatabaseType(_messages.Message):
         job is unknown.
       MYSQL: The source engine is MySQL.
       POSTGRESQL: The source engine is PostgreSQL.
+      ORACLE: The source engine is Oracle.
     """
     DATABASE_ENGINE_UNSPECIFIED = 0
     MYSQL = 1
     POSTGRESQL = 2
+    ORACLE = 3
 
   class ProviderValueValuesEnum(_messages.Enum):
     r"""The database provider.
@@ -589,19 +1107,26 @@ class DatamigrationProjectsLocationsConnectionProfilesCreateRequest(_messages.Me
     connectionProfile: A ConnectionProfile resource to be passed as the
       request body.
     connectionProfileId: Required. The connection profile identifier.
-    parent: Required. The parent, which owns this collection of connection
+    parent: Required. The parent which owns this collection of connection
       profiles.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    requestId: Optional. A unique ID used to identify the request. If the
+      server receives two requests with the same ID, then the second request
+      is ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
+    skipValidation: Optional. Create the connection profile without validating
+      it. The default is false. Only supported for Oracle connection profiles.
+    validateOnly: Optional. Only validate the connection profile, but don't
+      create any resources. The default is false. Only supported for Oracle
+      connection profiles.
   """
 
   connectionProfile = _messages.MessageField('ConnectionProfile', 1)
   connectionProfileId = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
   requestId = _messages.StringField(4)
+  skipValidation = _messages.BooleanField(5)
+  validateOnly = _messages.BooleanField(6)
 
 
 class DatamigrationProjectsLocationsConnectionProfilesDeleteRequest(_messages.Message):
@@ -611,9 +1136,9 @@ class DatamigrationProjectsLocationsConnectionProfilesDeleteRequest(_messages.Me
     force: In case of force delete, the CloudSQL replica database is also
       deleted (only for CloudSQL connection profile).
     name: Required. Name of the connection profile resource to delete.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
   """
@@ -678,12 +1203,12 @@ class DatamigrationProjectsLocationsConnectionProfilesListRequest(_messages.Mess
     pageSize: The maximum number of connection profiles to return. The service
       may return fewer than this value. If unspecified, at most 50 connection
       profiles will be returned. The maximum value is 1000; values above 1000
-      will be coerced to 1000.
+      are coerced to 1000.
     pageToken: A page token, received from a previous `ListConnectionProfiles`
       call. Provide this to retrieve the subsequent page. When paginating, all
       other parameters provided to `ListConnectionProfiles` must match the
       call that provided the page token.
-    parent: Required. The parent, which owns this collection of connection
+    parent: Required. The parent which owns this collection of connection
       profiles.
   """
 
@@ -702,19 +1227,26 @@ class DatamigrationProjectsLocationsConnectionProfilesPatchRequest(_messages.Mes
       request body.
     name: The name of this connection profile resource in the form of projects
       /{project}/locations/{location}/connectionProfiles/{connectionProfile}.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    requestId: Optional. A unique ID used to identify the request. If the
+      server receives two requests with the same ID, then the second request
+      is ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
+    skipValidation: Optional. Update the connection profile without validating
+      it. The default is false. Only supported for Oracle connection profiles.
     updateMask: Required. Field mask is used to specify the fields to be
-      overwritten in the connection profile resource by the update.
+      overwritten by the update in the conversion workspace resource.
+    validateOnly: Optional. Only validate the connection profile, but don't
+      update any resources. The default is false. Only supported for Oracle
+      connection profiles.
   """
 
   connectionProfile = _messages.MessageField('ConnectionProfile', 1)
   name = _messages.StringField(2, required=True)
   requestId = _messages.StringField(3)
-  updateMask = _messages.StringField(4)
+  skipValidation = _messages.BooleanField(4)
+  updateMask = _messages.StringField(5)
+  validateOnly = _messages.BooleanField(6)
 
 
 class DatamigrationProjectsLocationsConnectionProfilesSetIamPolicyRequest(_messages.Message):
@@ -750,6 +1282,369 @@ class DatamigrationProjectsLocationsConnectionProfilesTestIamPermissionsRequest(
 
   resource = _messages.StringField(1, required=True)
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesApplyRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesApplyRequest object.
+
+  Fields:
+    applyConversionWorkspaceRequest: A ApplyConversionWorkspaceRequest
+      resource to be passed as the request body.
+    name: Required. The name of the conversion workspace resource for which to
+      apply the draft tree. Must be in the form of: projects/{project}/locatio
+      ns/{location}/conversionWorkspaces/{conversion_workspace}.
+  """
+
+  applyConversionWorkspaceRequest = _messages.MessageField('ApplyConversionWorkspaceRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesCommitRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesCommitRequest
+  object.
+
+  Fields:
+    commitConversionWorkspaceRequest: A CommitConversionWorkspaceRequest
+      resource to be passed as the request body.
+    name: Required. Name of the conversion workspace resource to commit.
+  """
+
+  commitConversionWorkspaceRequest = _messages.MessageField('CommitConversionWorkspaceRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesConvertRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesConvertRequest
+  object.
+
+  Fields:
+    convertConversionWorkspaceRequest: A ConvertConversionWorkspaceRequest
+      resource to be passed as the request body.
+    name: Name of the conversion workspace resource to convert in the form of:
+      projects/{project}/locations/{location}/conversionWorkspaces/{conversion
+      _workspace}.
+  """
+
+  convertConversionWorkspaceRequest = _messages.MessageField('ConvertConversionWorkspaceRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesCreateRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesCreateRequest
+  object.
+
+  Fields:
+    conversionWorkspace: A ConversionWorkspace resource to be passed as the
+      request body.
+    conversionWorkspaceId: Required. The ID of the conversion workspace to
+      create.
+    parent: Required. The parent which owns this collection of conversion
+      workspaces.
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+  """
+
+  conversionWorkspace = _messages.MessageField('ConversionWorkspace', 1)
+  conversionWorkspaceId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesDeleteRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesDeleteRequest
+  object.
+
+  Fields:
+    name: Required. Name of the conversion workspace resource to delete.
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+  """
+
+  name = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesDescribeConversionWorkspaceRevisionsRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesDescribeConversionWo
+  rkspaceRevisionsRequest object.
+
+  Fields:
+    commitId: Optional. Optional filter to request a specific commit ID.
+    conversionWorkspace: Required. Name of the conversion workspace resource
+      whose revisions are listed. Must be in the form of: projects/{project}/l
+      ocations/{location}/conversionWorkspaces/{conversion_workspace}.
+  """
+
+  commitId = _messages.StringField(1)
+  conversionWorkspace = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesDescribeDatabaseEntitiesRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesDescribeDatabaseEnti
+  tiesRequest object.
+
+  Enums:
+    TreeValueValuesEnum: The tree to fetch.
+
+  Fields:
+    commitId: Request a specific commit ID. If not specified, the entities
+      from the latest commit are returned.
+    conversionWorkspace: Required. Name of the conversion workspace resource
+      whose database entities are described. Must be in the form of: projects/
+      {project}/locations/{location}/conversionWorkspaces/{conversion_workspac
+      e}.
+    filter: Filter the returned entities based on AIP-160 standard.
+    pageSize: The maximum number of entities to return. The service may return
+      fewer entities than the value specifies.
+    pageToken: The nextPageToken value received in the previous call to
+      conversionWorkspace.describeDatabaseEntities, used in the subsequent
+      request to retrieve the next page of results. On first call this should
+      be left blank. When paginating, all other parameters provided to
+      conversionWorkspace.describeDatabaseEntities must match the call that
+      provided the page token.
+    tree: The tree to fetch.
+    uncommitted: Whether to retrieve the latest committed version of the
+      entities or the latest version. This field is ignored if a specific
+      commit_id is specified.
+  """
+
+  class TreeValueValuesEnum(_messages.Enum):
+    r"""The tree to fetch.
+
+    Values:
+      DB_TREE_TYPE_UNSPECIFIED: Unspecified tree type.
+      SOURCE_TREE: The source database tree.
+      DRAFT_TREE: The draft database tree.
+      DESTINATION_TREE: The destination database tree.
+    """
+    DB_TREE_TYPE_UNSPECIFIED = 0
+    SOURCE_TREE = 1
+    DRAFT_TREE = 2
+    DESTINATION_TREE = 3
+
+  commitId = _messages.StringField(1)
+  conversionWorkspace = _messages.StringField(2, required=True)
+  filter = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  tree = _messages.EnumField('TreeValueValuesEnum', 6)
+  uncommitted = _messages.BooleanField(7)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesGetIamPolicyRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesGetIamPolicyRequest
+  object.
+
+  Fields:
+    options_requestedPolicyVersion: Optional. The maximum policy version that
+      will be used to format the policy. Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected. Requests for
+      policies with any conditional role bindings must specify version 3.
+      Policies with no conditional role bindings may specify any valid value
+      or leave the field unset. The policy in the response might use the
+      policy version that you specified, or it might use a lower policy
+      version. For example, if you specify version 3, but the policy has no
+      conditional role bindings, the response uses version 1. To learn which
+      resources support conditions in their IAM policies, see the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+  """
+
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesGetRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesGetRequest object.
+
+  Fields:
+    name: Required. Name of the conversion workspace resource to get.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesListRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesListRequest object.
+
+  Fields:
+    filter: A filter expression that filters conversion workspaces listed in
+      the response. The expression must specify the field name, a comparison
+      operator, and the value that you want to use for filtering. The value
+      must be a string, a number, or a boolean. The comparison operator must
+      be either =, !=, >, or <. For example, list conversion workspaces
+      created this year by specifying **createTime %gt;
+      2020-01-01T00:00:00.000000000Z.** You can also filter nested fields. For
+      example, you could specify **source.version = "12.c.1"** to select all
+      conversion workspaces with source database version equal to 12.c.1.
+    pageSize: The maximum number of conversion workspaces to return. The
+      service may return fewer than this value. If unspecified, at most 50
+      sets are returned.
+    pageToken: The nextPageToken value received in the previous call to
+      conversionWorkspaces.list, used in the subsequent request to retrieve
+      the next page of results. On first call this should be left blank. When
+      paginating, all other parameters provided to conversionWorkspaces.list
+      must match the call that provided the page token.
+    parent: Required. The parent which owns this collection of conversion
+      workspaces.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesMappingRulesImportRequest(_messages.Message):
+  r"""A
+  DatamigrationProjectsLocationsConversionWorkspacesMappingRulesImportRequest
+  object.
+
+  Fields:
+    importMappingRulesRequest: A ImportMappingRulesRequest resource to be
+      passed as the request body.
+    parent: Required. Name of the conversion workspace resource to import the
+      rules to in the form of: projects/{project}/locations/{location}/convers
+      ionWorkspaces/{conversion_workspace}.
+  """
+
+  importMappingRulesRequest = _messages.MessageField('ImportMappingRulesRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesPatchRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesPatchRequest object.
+
+  Fields:
+    conversionWorkspace: A ConversionWorkspace resource to be passed as the
+      request body.
+    name: Full name of the workspace resource, in the form of: projects/{proje
+      ct}/locations/{location}/conversionWorkspaces/{conversion_workspace}.
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+    updateMask: Required. Field mask is used to specify the fields to be
+      overwritten by the update in the conversion workspace resource.
+  """
+
+  conversionWorkspace = _messages.MessageField('ConversionWorkspace', 1)
+  name = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  updateMask = _messages.StringField(4)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesRollbackRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesRollbackRequest
+  object.
+
+  Fields:
+    name: Required. Name of the conversion workspace resource to roll back to.
+    rollbackConversionWorkspaceRequest: A RollbackConversionWorkspaceRequest
+      resource to be passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  rollbackConversionWorkspaceRequest = _messages.MessageField('RollbackConversionWorkspaceRequest', 2)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesSearchBackgroundJobsRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesSearchBackgroundJobs
+  Request object.
+
+  Fields:
+    completedUntilTime: Optional. If provided, only returns jobs that
+      completed until (not including) the given timestamp.
+    conversionWorkspace: Required. Name of the conversion workspace resource
+      whose jobs are listed, in the form of: projects/{project}/locations/{loc
+      ation}/conversionWorkspaces/{conversion_workspace}.
+    maxSize: Optional. The maximum number of jobs to return. The service may
+      return fewer than this value. If unspecified, at most 100 jobs are
+      returned. The maximum value is 100; values above 100 are coerced to 100.
+    returnMostRecentPerJobType: Optional. Whether or not to return just the
+      most recent job per job type,
+  """
+
+  completedUntilTime = _messages.StringField(1)
+  conversionWorkspace = _messages.StringField(2, required=True)
+  maxSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  returnMostRecentPerJobType = _messages.BooleanField(4)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesSeedRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesSeedRequest object.
+
+  Fields:
+    name: Name of the conversion workspace resource to seed with new database
+      structure, in the form of: projects/{project}/locations/{location}/conve
+      rsionWorkspaces/{conversion_workspace}.
+    seedConversionWorkspaceRequest: A SeedConversionWorkspaceRequest resource
+      to be passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  seedConversionWorkspaceRequest = _messages.MessageField('SeedConversionWorkspaceRequest', 2)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesSetIamPolicyRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsConversionWorkspacesSetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class DatamigrationProjectsLocationsConversionWorkspacesTestIamPermissionsRequest(_messages.Message):
+  r"""A
+  DatamigrationProjectsLocationsConversionWorkspacesTestIamPermissionsRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class DatamigrationProjectsLocationsFetchStaticIpsRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsFetchStaticIpsRequest object.
+
+  Fields:
+    name: Required. The resource name for the location for which static IPs
+      should be returned. Must be in the format `projects/*/locations/*`.
+    pageSize: Maximum number of IPs to return.
+    pageToken: A page token, received from a previous `FetchStaticIps` call.
+  """
+
+  name = _messages.StringField(1, required=True)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
 
 
 class DatamigrationProjectsLocationsGetRequest(_messages.Message):
@@ -788,11 +1683,10 @@ class DatamigrationProjectsLocationsMigrationJobsCreateRequest(_messages.Message
   Fields:
     migrationJob: A MigrationJob resource to be passed as the request body.
     migrationJobId: Required. The ID of the instance to create.
-    parent: Required. The parent, which owns this collection of migration
-      jobs.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    parent: Required. The parent which owns this collection of migration jobs.
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
   """
@@ -811,9 +1705,9 @@ class DatamigrationProjectsLocationsMigrationJobsDeleteRequest(_messages.Message
       the migration job. In case of force delete, the destination CloudSQL
       replica database is also deleted.
     name: Required. Name of the migration job resource to delete.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
   """
@@ -891,14 +1785,14 @@ class DatamigrationProjectsLocationsMigrationJobsListRequest(_messages.Message):
       are: "name", "name asc", and "name desc".
     pageSize: The maximum number of migration jobs to return. The service may
       return fewer than this value. If unspecified, at most 50 migration jobs
-      will be returned. The maximum value is 1000; values above 1000 will be
+      will be returned. The maximum value is 1000; values above 1000 are
       coerced to 1000.
     pageToken: The nextPageToken value received in the previous call to
       migrationJobs.list, used in the subsequent request to retrieve the next
       page of results. On first call this should be left blank. When
       paginating, all other parameters provided to migrationJobs.list must
       match the call that provided the page token.
-    parent: Required. The parent, which owns this collection of migrationJobs.
+    parent: Required. The parent which owns this collection of migrationJobs.
   """
 
   filter = _messages.StringField(1)
@@ -915,13 +1809,13 @@ class DatamigrationProjectsLocationsMigrationJobsPatchRequest(_messages.Message)
     migrationJob: A MigrationJob resource to be passed as the request body.
     name: The name (URI) of this migration job resource, in the form of:
       projects/{project}/locations/{location}/migrationJobs/{migrationJob}.
-    requestId: A unique id used to identify the request. If the server
-      receives two requests with the same id, then the second request will be
-      ignored. It is recommended to always set this value to a UUID. The id
+    requestId: A unique ID used to identify the request. If the server
+      receives two requests with the same ID, then the second request is
+      ignored. It is recommended to always set this value to a UUID. The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
     updateMask: Required. Field mask is used to specify the fields to be
-      overwritten in the migration job resource by the update.
+      overwritten by the update in the conversion workspace resource.
   """
 
   migrationJob = _messages.MessageField('MigrationJob', 1)
@@ -1090,6 +1984,110 @@ class DatamigrationProjectsLocationsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class DatamigrationProjectsLocationsPrivateConnectionsCreateRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsPrivateConnectionsCreateRequest object.
+
+  Fields:
+    parent: Required. The parent that owns the collection of
+      PrivateConnections.
+    privateConnection: A PrivateConnection resource to be passed as the
+      request body.
+    privateConnectionId: Required. The private connection identifier.
+    requestId: Optional. A unique ID used to identify the request. If the
+      server receives two requests with the same ID, then the second request
+      is ignored. It is recommended to always set this value to a UUID. The ID
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+    skipValidation: Optional. If set to true, will skip validations.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  privateConnection = _messages.MessageField('PrivateConnection', 2)
+  privateConnectionId = _messages.StringField(3)
+  requestId = _messages.StringField(4)
+  skipValidation = _messages.BooleanField(5)
+
+
+class DatamigrationProjectsLocationsPrivateConnectionsDeleteRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsPrivateConnectionsDeleteRequest object.
+
+  Fields:
+    name: Required. The name of the private connection to delete.
+    requestId: Optional. A unique ID used to identify the request. If the
+      server receives two requests with the same ID, then the second request
+      is ignored. It is recommended to always set this value to a UUID. The ID
+      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
+      and hyphens (-). The maximum length is 40 characters.
+  """
+
+  name = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+
+
+class DatamigrationProjectsLocationsPrivateConnectionsGetRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsPrivateConnectionsGetRequest object.
+
+  Fields:
+    name: Required. The name of the private connection to get.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DatamigrationProjectsLocationsPrivateConnectionsListRequest(_messages.Message):
+  r"""A DatamigrationProjectsLocationsPrivateConnectionsListRequest object.
+
+  Fields:
+    filter: A filter expression that filters private connections listed in the
+      response. The expression must specify the field name, a comparison
+      operator, and the value that you want to use for filtering. The value
+      must be a string, a number, or a boolean. The comparison operator must
+      be either =, !=, >, or <. For example, list private connections created
+      this year by specifying **createTime %gt;
+      2021-01-01T00:00:00.000000000Z**.
+    orderBy: Order by fields for the result.
+    pageSize: Maximum number of private connections to return. If unspecified,
+      at most 50 private connections that are returned. The maximum value is
+      1000; values above 1000 are coerced to 1000.
+    pageToken: Page token received from a previous `ListPrivateConnections`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListPrivateConnections` must match the
+      call that provided the page token.
+    parent: Required. The parent that owns the collection of private
+      connections.
+  """
+
+  filter = _messages.StringField(1)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+
+
+class DescribeConversionWorkspaceRevisionsResponse(_messages.Message):
+  r"""Response message for 'DescribeConversionWorkspaceRevisions' request.
+
+  Fields:
+    revisions: The list of conversion workspace revisions.
+  """
+
+  revisions = _messages.MessageField('ConversionWorkspace', 1, repeated=True)
+
+
+class DescribeDatabaseEntitiesResponse(_messages.Message):
+  r"""Response message for 'DescribeDatabaseEntities' request.
+
+  Fields:
+    databaseEntities: The list of database entities for the conversion
+      workspace.
+    nextPageToken: A token which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  databaseEntities = _messages.MessageField('DatabaseEntity', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class DumpFlag(_messages.Message):
   r"""Dump flag definition.
 
@@ -1119,6 +2117,42 @@ class Empty(_messages.Message):
   Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
   """
 
+
+
+class EntityMapping(_messages.Message):
+  r"""Details of the mappings of a database entity.
+
+  Fields:
+    draftEntity: Target entity full name. The draft entity can also include a
+      column, index or constraint using the same naming notation
+      schema.table.column.
+    mappingLog: Entity mapping log entries. Multiple rules can be effective
+      and contribute changes to a converted entity, such as a rule can handle
+      the entity name, another rule can handle an entity type. In addition,
+      rules which did not change the entity are also logged along with the
+      reason preventing them to do so.
+    sourceEntity: Source entity full name. The source entity can also be a
+      column, index or constraint using the same naming notation
+      schema.table.column.
+  """
+
+  draftEntity = _messages.StringField(1)
+  mappingLog = _messages.MessageField('EntityMappingLogEntry', 2, repeated=True)
+  sourceEntity = _messages.StringField(3)
+
+
+class EntityMappingLogEntry(_messages.Message):
+  r"""A single record of a rule which was used for a mapping.
+
+  Fields:
+    mappingComment: Comment.
+    ruleId: Which rule caused this log entry.
+    ruleRevisionId: Rule revision ID.
+  """
+
+  mappingComment = _messages.StringField(1)
+  ruleId = _messages.StringField(2)
+  ruleRevisionId = _messages.StringField(3)
 
 
 class Expr(_messages.Message):
@@ -1157,13 +2191,84 @@ class Expr(_messages.Message):
   title = _messages.StringField(4)
 
 
+class FetchStaticIpsResponse(_messages.Message):
+  r"""Response message for a 'FetchStaticIps' request.
+
+  Fields:
+    nextPageToken: A token that can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    staticIps: List of static IPs.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  staticIps = _messages.StringField(2, repeated=True)
+
+
+class ForwardSshTunnelConnectivity(_messages.Message):
+  r"""Forward SSH Tunnel connectivity.
+
+  Fields:
+    hostname: Required. Hostname for the SSH tunnel.
+    password: Input only. SSH password.
+    port: Port for the SSH tunnel, default value is 22.
+    privateKey: Input only. SSH private key.
+    username: Required. Username for the SSH tunnel.
+  """
+
+  hostname = _messages.StringField(1)
+  password = _messages.StringField(2)
+  port = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  privateKey = _messages.StringField(4)
+  username = _messages.StringField(5)
+
+
+class FunctionEntity(_messages.Message):
+  r"""Function's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    sqlCode: The SQL code which creates the function.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  sqlCode = _messages.StringField(2)
+
+
 class GenerateSshScriptRequest(_messages.Message):
   r"""Request message for 'GenerateSshScript' request.
 
   Fields:
     vm: Required. Bastion VM Instance name to use or to create.
     vmCreationConfig: The VM creation configuration
-    vmPort: The port that will be open on the bastion host
+    vmPort: The port that will be open on the bastion host.
     vmSelectionConfig: The VM selection configuration
   """
 
@@ -1200,17 +2305,139 @@ class GoogleCloudClouddmsV1OperationMetadata(_messages.Message):
   verb = _messages.StringField(7)
 
 
+class ImportMappingRulesRequest(_messages.Message):
+  r"""Request message for 'ImportMappingRules' request.
+
+  Enums:
+    RulesFormatValueValuesEnum: The format of the rules content file.
+
+  Fields:
+    autoCommit: Should the conversion workspace be committed automatically
+      after the import operation.
+    rulesFiles: One or more rules files.
+    rulesFormat: The format of the rules content file.
+  """
+
+  class RulesFormatValueValuesEnum(_messages.Enum):
+    r"""The format of the rules content file.
+
+    Values:
+      IMPORT_RULES_FILE_FORMAT_UNSPECIFIED: Unspecified rules format.
+      IMPORT_RULES_FILE_FORMAT_HARBOUR_BRIDGE_SESSION_FILE: HarbourBridge
+        session file.
+      IMPORT_RULES_FILE_FORMAT_ORATOPG_CONFIG_FILE: Ora2Pg configuration file.
+    """
+    IMPORT_RULES_FILE_FORMAT_UNSPECIFIED = 0
+    IMPORT_RULES_FILE_FORMAT_HARBOUR_BRIDGE_SESSION_FILE = 1
+    IMPORT_RULES_FILE_FORMAT_ORATOPG_CONFIG_FILE = 2
+
+  autoCommit = _messages.BooleanField(1)
+  rulesFiles = _messages.MessageField('RulesFile', 2, repeated=True)
+  rulesFormat = _messages.EnumField('RulesFormatValueValuesEnum', 3)
+
+
+class ImportRulesJobDetails(_messages.Message):
+  r"""Details regarding an Import Rules background job.
+
+  Enums:
+    FileFormatValueValuesEnum: The requested file format.
+
+  Fields:
+    fileFormat: The requested file format.
+    files: File names used for the import rules job.
+  """
+
+  class FileFormatValueValuesEnum(_messages.Enum):
+    r"""The requested file format.
+
+    Values:
+      IMPORT_RULES_FILE_FORMAT_UNSPECIFIED: Unspecified rules format.
+      IMPORT_RULES_FILE_FORMAT_HARBOUR_BRIDGE_SESSION_FILE: HarbourBridge
+        session file.
+      IMPORT_RULES_FILE_FORMAT_ORATOPG_CONFIG_FILE: Ora2Pg configuration file.
+    """
+    IMPORT_RULES_FILE_FORMAT_UNSPECIFIED = 0
+    IMPORT_RULES_FILE_FORMAT_HARBOUR_BRIDGE_SESSION_FILE = 1
+    IMPORT_RULES_FILE_FORMAT_ORATOPG_CONFIG_FILE = 2
+
+  fileFormat = _messages.EnumField('FileFormatValueValuesEnum', 1)
+  files = _messages.StringField(2, repeated=True)
+
+
+class IndexEntity(_messages.Message):
+  r"""Index is not used as an independent entity, it is retrieved as part of a
+  Table entity.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    name: The name of the index.
+    tableColumns: Table columns used as part of the Index, for example B-TREE
+      index should list the columns which constitutes the index.
+    type: Type of index, for example B-TREE.
+    unique: Boolean value indicating whether the index is unique.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  name = _messages.StringField(2)
+  tableColumns = _messages.StringField(3, repeated=True)
+  type = _messages.StringField(4)
+  unique = _messages.BooleanField(5)
+
+
 class ListConnectionProfilesResponse(_messages.Message):
   r"""Response message for 'ListConnectionProfiles' request.
 
   Fields:
     connectionProfiles: The response list of connection profiles.
-    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+    nextPageToken: A token which can be sent as `page_token` to retrieve the
       next page. If this field is omitted, there are no subsequent pages.
     unreachable: Locations that could not be reached.
   """
 
   connectionProfiles = _messages.MessageField('ConnectionProfile', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+  unreachable = _messages.StringField(3, repeated=True)
+
+
+class ListConversionWorkspacesResponse(_messages.Message):
+  r"""Response message for 'ListConversionWorkspaces' request.
+
+  Fields:
+    conversionWorkspaces: The list of conversion workspace objects.
+    nextPageToken: A token which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    unreachable: Locations that could not be reached.
+  """
+
+  conversionWorkspaces = _messages.MessageField('ConversionWorkspace', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
   unreachable = _messages.StringField(3, repeated=True)
 
@@ -1233,7 +2460,7 @@ class ListMigrationJobsResponse(_messages.Message):
 
   Fields:
     migrationJobs: The list of migration jobs objects.
-    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+    nextPageToken: A token which can be sent as `page_token` to retrieve the
       next page. If this field is omitted, there are no subsequent pages.
     unreachable: Locations that could not be reached.
   """
@@ -1254,6 +2481,21 @@ class ListOperationsResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   operations = _messages.MessageField('Operation', 2, repeated=True)
+
+
+class ListPrivateConnectionsResponse(_messages.Message):
+  r"""Response message for 'ListPrivateConnections' request.
+
+  Fields:
+    nextPageToken: A token which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    privateConnections: List of private connections.
+    unreachable: Locations that could not be reached.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  privateConnections = _messages.MessageField('PrivateConnection', 2, repeated=True)
+  unreachable = _messages.StringField(3, repeated=True)
 
 
 class Location(_messages.Message):
@@ -1361,6 +2603,7 @@ class MigrationJob(_messages.Message):
       "mass": "1.3kg", "count": "3" }`.
 
   Fields:
+    conversionWorkspace: The conversion workspace used by the migration.
     createTime: Output only. The timestamp when the migration job resource was
       created. A timestamp in RFC3339 UTC "Zulu" format, accurate to
       nanoseconds. Example: "2014-10-02T15:01:23.045123456Z".
@@ -1380,6 +2623,11 @@ class MigrationJob(_messages.Message):
     endTime: Output only. If the migration job is completed, the time when it
       was completed.
     error: Output only. The error details in case of state FAILED.
+    filter: This field can be used to select the entities to migrate as part
+      of the migration job. It uses AIP-160 notation to select a subset of the
+      entities configured on the associated conversion-workspace. This field
+      should not be set on migration-jobs that are not associated with a
+      conversion workspace.
     labels: The resource labels for migration job to use to annotate any
       related underlying resources such as Compute Engine VMs. An object
       containing a list of "key": "value" pairs. Example: `{ "name": "wrench",
@@ -1500,26 +2748,28 @@ class MigrationJob(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  destination = _messages.StringField(2)
-  destinationDatabase = _messages.MessageField('DatabaseType', 3)
-  displayName = _messages.StringField(4)
-  dumpFlags = _messages.MessageField('DumpFlags', 5)
-  dumpPath = _messages.StringField(6)
-  duration = _messages.StringField(7)
-  endTime = _messages.StringField(8)
-  error = _messages.MessageField('Status', 9)
-  labels = _messages.MessageField('LabelsValue', 10)
-  name = _messages.StringField(11)
-  phase = _messages.EnumField('PhaseValueValuesEnum', 12)
-  reverseSshConnectivity = _messages.MessageField('ReverseSshConnectivity', 13)
-  source = _messages.StringField(14)
-  sourceDatabase = _messages.MessageField('DatabaseType', 15)
-  state = _messages.EnumField('StateValueValuesEnum', 16)
-  staticIpConnectivity = _messages.MessageField('StaticIpConnectivity', 17)
-  type = _messages.EnumField('TypeValueValuesEnum', 18)
-  updateTime = _messages.StringField(19)
-  vpcPeeringConnectivity = _messages.MessageField('VpcPeeringConnectivity', 20)
+  conversionWorkspace = _messages.MessageField('ConversionWorkspaceInfo', 1)
+  createTime = _messages.StringField(2)
+  destination = _messages.StringField(3)
+  destinationDatabase = _messages.MessageField('DatabaseType', 4)
+  displayName = _messages.StringField(5)
+  dumpFlags = _messages.MessageField('DumpFlags', 6)
+  dumpPath = _messages.StringField(7)
+  duration = _messages.StringField(8)
+  endTime = _messages.StringField(9)
+  error = _messages.MessageField('Status', 10)
+  filter = _messages.StringField(11)
+  labels = _messages.MessageField('LabelsValue', 12)
+  name = _messages.StringField(13)
+  phase = _messages.EnumField('PhaseValueValuesEnum', 14)
+  reverseSshConnectivity = _messages.MessageField('ReverseSshConnectivity', 15)
+  source = _messages.StringField(16)
+  sourceDatabase = _messages.MessageField('DatabaseType', 17)
+  state = _messages.EnumField('StateValueValuesEnum', 18)
+  staticIpConnectivity = _messages.MessageField('StaticIpConnectivity', 19)
+  type = _messages.EnumField('TypeValueValuesEnum', 20)
+  updateTime = _messages.StringField(21)
+  vpcPeeringConnectivity = _messages.MessageField('VpcPeeringConnectivity', 22)
 
 
 class MigrationJobVerificationError(_messages.Message):
@@ -1748,6 +2998,83 @@ class Operation(_messages.Message):
   response = _messages.MessageField('ResponseValue', 5)
 
 
+class OracleConnectionProfile(_messages.Message):
+  r"""Specifies connection parameters required specifically for Oracle
+  databases.
+
+  Fields:
+    databaseService: Required. Database service for the Oracle connection.
+    forwardSshConnectivity: Forward SSH tunnel connectivity.
+    host: Required. The IP or hostname of the source Oracle database.
+    password: Required. Input only. The password for the user that Database
+      Migration Service will be using to connect to the database. This field
+      is not returned on request, and the value is encrypted when stored in
+      Database Migration Service.
+    passwordSet: Output only. Indicates whether a new password is included in
+      the request.
+    port: Required. The network port of the source Oracle database.
+    privateConnectivity: Private connectivity.
+    staticServiceIpConnectivity: Static Service IP connectivity.
+    username: Required. The username that Database Migration Service will use
+      to connect to the database. The value is encrypted when stored in
+      Database Migration Service.
+  """
+
+  databaseService = _messages.StringField(1)
+  forwardSshConnectivity = _messages.MessageField('ForwardSshTunnelConnectivity', 2)
+  host = _messages.StringField(3)
+  password = _messages.StringField(4)
+  passwordSet = _messages.BooleanField(5)
+  port = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  privateConnectivity = _messages.MessageField('PrivateConnectivity', 7)
+  staticServiceIpConnectivity = _messages.MessageField('StaticServiceIpConnectivity', 8)
+  username = _messages.StringField(9)
+
+
+class PackageEntity(_messages.Message):
+  r"""Package's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    packageBody: The SQL code which creates the package body. If the package
+      specification has cursors or subprograms, then the package body is
+      mandatory.
+    packageSqlCode: The SQL code which creates the package.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  packageBody = _messages.StringField(2)
+  packageSqlCode = _messages.StringField(3)
+
+
 class Policy(_messages.Message):
   r"""An Identity and Access Management (IAM) policy, which specifies access
   controls for Google Cloud resources. A `Policy` is a collection of
@@ -1848,8 +3175,11 @@ class PostgreSqlConnectionProfile(_messages.Message):
     passwordSet: Output only. Indicates If this connection profile password is
       stored.
     port: Required. The network port of the source PostgreSQL database.
+    privateServiceConnectConnectivity: Private service connect connectivity.
     ssl: SSL configuration for the destination to connect to the source
       database.
+    staticIpConnectivity: Static ip connectivity data (default, no additional
+      details needed).
     username: Required. The username that Database Migration Service will use
       to connect to the database. The value is encrypted when stored in
       Database Migration Service.
@@ -1876,8 +3206,10 @@ class PostgreSqlConnectionProfile(_messages.Message):
   password = _messages.StringField(4)
   passwordSet = _messages.BooleanField(5)
   port = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  ssl = _messages.MessageField('SslConfig', 7)
-  username = _messages.StringField(8)
+  privateServiceConnectConnectivity = _messages.MessageField('PrivateServiceConnectConnectivity', 7)
+  ssl = _messages.MessageField('SslConfig', 8)
+  staticIpConnectivity = _messages.MessageField('StaticIpConnectivity', 9)
+  username = _messages.StringField(10)
 
 
 class PrimaryInstanceSettings(_messages.Message):
@@ -1963,6 +3295,118 @@ class PrimaryInstanceSettings(_messages.Message):
   privateIp = _messages.StringField(5)
 
 
+class PrivateConnection(_messages.Message):
+  r"""The PrivateConnection resource is used to establish private connectivity
+  with the customer's network.
+
+  Enums:
+    StateValueValuesEnum: Output only. The state of the private connection.
+
+  Messages:
+    LabelsValue: The resource labels for private connections to use to
+      annotate any related underlying resources such as Compute Engine VMs. An
+      object containing a list of "key": "value" pairs. Example: `{ "name":
+      "wrench", "mass": "1.3kg", "count": "3" }`.
+
+  Fields:
+    createTime: Output only. The create time of the resource.
+    displayName: The private connection display name.
+    error: Output only. The error details in case of state FAILED.
+    labels: The resource labels for private connections to use to annotate any
+      related underlying resources such as Compute Engine VMs. An object
+      containing a list of "key": "value" pairs. Example: `{ "name": "wrench",
+      "mass": "1.3kg", "count": "3" }`.
+    name: The name of the resource.
+    state: Output only. The state of the private connection.
+    updateTime: Output only. The last update time of the resource.
+    vpcPeeringConfig: VPC peering configuration.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The state of the private connection.
+
+    Values:
+      STATE_UNSPECIFIED: <no description>
+      CREATING: The private connection is in creation state - creating
+        resources.
+      CREATED: The private connection has been created with all of its
+        resources.
+      FAILED: The private connection creation has failed.
+      DELETING: The private connection is being deleted.
+      FAILED_TO_DELETE: Delete request has failed, resource is in invalid
+        state.
+      DELETED: The private connection has been deleted.
+    """
+    STATE_UNSPECIFIED = 0
+    CREATING = 1
+    CREATED = 2
+    FAILED = 3
+    DELETING = 4
+    FAILED_TO_DELETE = 5
+    DELETED = 6
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""The resource labels for private connections to use to annotate any
+    related underlying resources such as Compute Engine VMs. An object
+    containing a list of "key": "value" pairs. Example: `{ "name": "wrench",
+    "mass": "1.3kg", "count": "3" }`.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  error = _messages.MessageField('Status', 3)
+  labels = _messages.MessageField('LabelsValue', 4)
+  name = _messages.StringField(5)
+  state = _messages.EnumField('StateValueValuesEnum', 6)
+  updateTime = _messages.StringField(7)
+  vpcPeeringConfig = _messages.MessageField('VpcPeeringConfig', 8)
+
+
+class PrivateConnectivity(_messages.Message):
+  r"""Private Connectivity.
+
+  Fields:
+    privateConnection: Required. The resource name (URI) of the private
+      connection.
+  """
+
+  privateConnection = _messages.StringField(1)
+
+
+class PrivateServiceConnectConnectivity(_messages.Message):
+  r"""Private Service Connect connectivity
+  (https://cloud.google.com/vpc/docs/private-service-connect#benefits-
+  services)
+
+  Fields:
+    serviceAttachment: Required. A service attachment that exposes a database,
+      and has the following format: projects/{project}/regions/{region}/servic
+      eAttachments/{service_attachment_name}
+  """
+
+  serviceAttachment = _messages.StringField(1)
+
+
 class PromoteMigrationJobRequest(_messages.Message):
   r"""Request message for 'PromoteMigrationJob' request."""
 
@@ -1997,6 +3441,156 @@ class ReverseSshConnectivity(_messages.Message):
   vmIp = _messages.StringField(2)
   vmPort = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   vpc = _messages.StringField(4)
+
+
+class RollbackConversionWorkspaceRequest(_messages.Message):
+  r"""Request message for 'RollbackConversionWorkspace' request."""
+
+
+class RulesFile(_messages.Message):
+  r"""Details of a single rules file.
+
+  Fields:
+    rulesContent: The text content of the rules that needs to be converted.
+    rulesSourceFilename: The filename of the rules that needs to be converted.
+      The filename is used mainly so that future logs of the import rules job
+      contain it, and can therefore be searched by it.
+  """
+
+  rulesContent = _messages.StringField(1)
+  rulesSourceFilename = _messages.StringField(2)
+
+
+class SchemaEntity(_messages.Message):
+  r"""Schema typically has no parent entity, but can have a parent entity
+  DatabaseInstance (for database engines which support it). For some database
+  engines, the terms schema and user can be used interchangeably when they
+  refer to a namespace or a collection of other database entities. Can store
+  additional information which is schema specific.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+
+
+class SearchBackgroundJobsResponse(_messages.Message):
+  r"""Response message for 'SearchBackgroundJobs' request.
+
+  Fields:
+    jobs: The list of conversion workspace mapping rules.
+  """
+
+  jobs = _messages.MessageField('BackgroundJobLogEntry', 1, repeated=True)
+
+
+class SeedConversionWorkspaceRequest(_messages.Message):
+  r"""Request message for 'SeedConversionWorkspace' request.
+
+  Fields:
+    autoCommit: Should the conversion workspace be committed automatically
+      after the seed operation.
+    destinationConnectionProfile: Fully qualified (Uri) name of the
+      destination connection profile.
+    sourceConnectionProfile: Fully qualified (Uri) name of the source
+      connection profile.
+  """
+
+  autoCommit = _messages.BooleanField(1)
+  destinationConnectionProfile = _messages.StringField(2)
+  sourceConnectionProfile = _messages.StringField(3)
+
+
+class SeedJobDetails(_messages.Message):
+  r"""Details regarding a Seed background job.
+
+  Fields:
+    connectionProfile: The connection profile which was used for the seed job.
+  """
+
+  connectionProfile = _messages.StringField(1)
+
+
+class SequenceEntity(_messages.Message):
+  r"""Sequence's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    cache: Indicates number of entries to cache / precreate.
+    customFeatures: Custom engine specific features.
+    cycle: Indicates whether the sequence value should cycle through.
+    increment: Increment value for the sequence.
+    maxValue: Maximum number for the sequence represented as bytes to
+      accommodate large. numbers
+    minValue: Minimum number for the sequence represented as bytes to
+      accommodate large. numbers
+    startValue: Start number for the sequence represented as bytes to
+      accommodate large. numbers
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  cache = _messages.IntegerField(1)
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 2)
+  cycle = _messages.BooleanField(3)
+  increment = _messages.IntegerField(4)
+  maxValue = _messages.BytesField(5)
+  minValue = _messages.BytesField(6)
+  startValue = _messages.BytesField(7)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -2176,12 +3770,16 @@ class StartMigrationJobRequest(_messages.Message):
 
 
 class StaticIpConnectivity(_messages.Message):
-  r"""The source database will allow incoming connections from the destination
-  database's public IP. You can retrieve the Cloud SQL instance's public IP
-  from the Cloud SQL console or using Cloud SQL APIs. No additional
+  r"""The source database will allow incoming connections from the public IP
+  of the destination database. You can retrieve the public IP of the Cloud SQL
+  instance from the Cloud SQL console or using Cloud SQL APIs. No additional
   configuration is required.
   """
 
+
+
+class StaticServiceIpConnectivity(_messages.Message):
+  r"""Static IP address connectivity configured on service project."""
 
 
 class Status(_messages.Message):
@@ -2239,6 +3837,179 @@ class StopMigrationJobRequest(_messages.Message):
   r"""Request message for 'StopMigrationJob' request."""
 
 
+class StoredProcedureEntity(_messages.Message):
+  r"""Stored procedure's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    sqlCode: The SQL code which creates the stored procedure.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  sqlCode = _messages.StringField(2)
+
+
+class SynonymEntity(_messages.Message):
+  r"""Synonym's parent is a schema.
+
+  Enums:
+    SourceTypeValueValuesEnum: The type of the entity for which the synonym is
+      being created (usually a table or a sequence).
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    sourceEntity: The name of the entity for which the synonym is being
+      created (the source).
+    sourceType: The type of the entity for which the synonym is being created
+      (usually a table or a sequence).
+  """
+
+  class SourceTypeValueValuesEnum(_messages.Enum):
+    r"""The type of the entity for which the synonym is being created (usually
+    a table or a sequence).
+
+    Values:
+      DATABASE_ENTITY_TYPE_UNSPECIFIED: Unspecified database entity type.
+      DATABASE_ENTITY_TYPE_SCHEMA: Schema.
+      DATABASE_ENTITY_TYPE_TABLE: Table.
+      DATABASE_ENTITY_TYPE_COLUMN: Column.
+      DATABASE_ENTITY_TYPE_CONSTRAINT: Constraint.
+      DATABASE_ENTITY_TYPE_INDEX: Index.
+      DATABASE_ENTITY_TYPE_TRIGGER: Trigger.
+      DATABASE_ENTITY_TYPE_VIEW: View.
+      DATABASE_ENTITY_TYPE_SEQUENCE: Sequence.
+      DATABASE_ENTITY_TYPE_STORED_PROCEDURE: Stored Procedure.
+      DATABASE_ENTITY_TYPE_FUNCTION: Function.
+      DATABASE_ENTITY_TYPE_SYNONYM: Synonym.
+      DATABASE_ENTITY_TYPE_DATABASE_PACKAGE: Package.
+      DATABASE_ENTITY_TYPE_UDT: UDT.
+      DATABASE_ENTITY_TYPE_MATERIAL_VIEW: Material View.
+    """
+    DATABASE_ENTITY_TYPE_UNSPECIFIED = 0
+    DATABASE_ENTITY_TYPE_SCHEMA = 1
+    DATABASE_ENTITY_TYPE_TABLE = 2
+    DATABASE_ENTITY_TYPE_COLUMN = 3
+    DATABASE_ENTITY_TYPE_CONSTRAINT = 4
+    DATABASE_ENTITY_TYPE_INDEX = 5
+    DATABASE_ENTITY_TYPE_TRIGGER = 6
+    DATABASE_ENTITY_TYPE_VIEW = 7
+    DATABASE_ENTITY_TYPE_SEQUENCE = 8
+    DATABASE_ENTITY_TYPE_STORED_PROCEDURE = 9
+    DATABASE_ENTITY_TYPE_FUNCTION = 10
+    DATABASE_ENTITY_TYPE_SYNONYM = 11
+    DATABASE_ENTITY_TYPE_DATABASE_PACKAGE = 12
+    DATABASE_ENTITY_TYPE_UDT = 13
+    DATABASE_ENTITY_TYPE_MATERIAL_VIEW = 14
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  sourceEntity = _messages.StringField(2)
+  sourceType = _messages.EnumField('SourceTypeValueValuesEnum', 3)
+
+
+class TableEntity(_messages.Message):
+  r"""Table's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    columns: Table columns.
+    comment: Comment associated with the table.
+    constraints: Table constraints.
+    customFeatures: Custom engine specific features.
+    indices: Table indices.
+    triggers: Table triggers.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  columns = _messages.MessageField('ColumnEntity', 1, repeated=True)
+  comment = _messages.StringField(2)
+  constraints = _messages.MessageField('ConstraintEntity', 3, repeated=True)
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 4)
+  indices = _messages.MessageField('IndexEntity', 5, repeated=True)
+  triggers = _messages.MessageField('TriggerEntity', 6, repeated=True)
+
+
 class TestIamPermissionsRequest(_messages.Message):
   r"""Request message for `TestIamPermissions` method.
 
@@ -2263,6 +4034,55 @@ class TestIamPermissionsResponse(_messages.Message):
   permissions = _messages.StringField(1, repeated=True)
 
 
+class TriggerEntity(_messages.Message):
+  r"""Trigger is not used as an independent entity, it is retrieved as part of
+  a Table entity.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    customFeatures: Custom engine specific features.
+    name: The name of the trigger.
+    sqlCode: The SQL code which creates the trigger.
+    triggerType: Indicates when the trigger fires, for example BEFORE
+      STATEMENT, AFTER EACH ROW.
+    triggeringEvents: The DML, DDL, or database events that fire the trigger,
+      for example INSERT, UPDATE.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 1)
+  name = _messages.StringField(2)
+  sqlCode = _messages.StringField(3)
+  triggerType = _messages.StringField(4)
+  triggeringEvents = _messages.StringField(5, repeated=True)
+
+
 class UserPassword(_messages.Message):
   r"""The username/password for a database user. Used for specifying initial
   users at cluster creation time.
@@ -2281,6 +4101,48 @@ class UserPassword(_messages.Message):
 
 class VerifyMigrationJobRequest(_messages.Message):
   r"""Request message for 'VerifyMigrationJob' request."""
+
+
+class ViewEntity(_messages.Message):
+  r"""View's parent is a schema.
+
+  Messages:
+    CustomFeaturesValue: Custom engine specific features.
+
+  Fields:
+    constraints: View constraints.
+    customFeatures: Custom engine specific features.
+    sqlCode: The SQL code which creates the view.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class CustomFeaturesValue(_messages.Message):
+    r"""Custom engine specific features.
+
+    Messages:
+      AdditionalProperty: An additional property for a CustomFeaturesValue
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a CustomFeaturesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  constraints = _messages.MessageField('ConstraintEntity', 1, repeated=True)
+  customFeatures = _messages.MessageField('CustomFeaturesValue', 2)
+  sqlCode = _messages.StringField(3)
 
 
 class VmCreationConfig(_messages.Message):
@@ -2305,6 +4167,20 @@ class VmSelectionConfig(_messages.Message):
   """
 
   vmZone = _messages.StringField(1)
+
+
+class VpcPeeringConfig(_messages.Message):
+  r"""The VPC peering configuration is used to create VPC peering with the
+  consumer's VPC.
+
+  Fields:
+    subnet: Required. A free subnet for peering. (CIDR of /29)
+    vpcName: Required. Fully qualified name of the VPC that Database Migration
+      Service will peer to.
+  """
+
+  subnet = _messages.StringField(1)
+  vpcName = _messages.StringField(2)
 
 
 class VpcPeeringConnectivity(_messages.Message):

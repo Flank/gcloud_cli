@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import collections
 import enum
 
 from googlecloudsdk.command_lib.storage import storage_url
@@ -44,25 +43,13 @@ class Capability(enum.Enum):
   DAISY_CHAIN_SEEKABLE_UPLOAD_STREAM = 'DAISY_CHAIN_SEEKABLE_UPLOAD_STREAM'
 
 
-# API-specific data made generic to pass back up to the task-level.
-#
-# Attributes:
-#   posix_attributes (posix_util.PosixAttributes|None): POSIX metadata that
-#     only API clients can extract from cloud resources. Needed so download
-#     tasks can set POSIX metadata on result files.
-#   server_reported_encoding (str|None): Useful for determining if an object's
-#     content-encoding changed in-flight (see if this value is different from
-#     the cloud resource's content-encoding). Currently relevant for only
-#     GCS gzip in-flight situations.
-DownloadApiClientReturnValue = collections.namedtuple(
-    'DownloadApiClientReturnValue',
-    ['posix_attributes', 'server_reported_encoding'],
-)
-
-
 class DownloadStrategy(enum.Enum):
   """Enum class for specifying download strategy."""
-  ONE_SHOT = 'oneshot'
+  ONE_SHOT = 'oneshot'  # No in-flight retries performed.
+  # Operations are retried on network errors.
+  RETRIABLE_IN_FLIGHT = 'retriable_in_flight'
+  # In addition to retrying on errors, operations can be resumed if halted.
+  # This option will write tracker files to track the downloads in progress.
   RESUMABLE = 'resumable'
 
 
@@ -94,6 +81,11 @@ class FieldsScope(enum.Enum):
   SHORT = 3
 
 
+class HmacKeyState(enum.Enum):
+  ACTIVE = 'ACTIVE'
+  INACTIVE = 'INACTIVE'
+
+
 DEFAULT_PROVIDER = storage_url.ProviderPrefix.GCS
 NUM_ITEMS_PER_LIST_PAGE = 1000
 
@@ -111,6 +103,11 @@ class CloudApi(object):
       API can be used to execute related logic in tasks.
   """
   capabilities = set()
+
+  # Some APIs limit the number of objects that can be composed in a single call.
+  # This field should be overidden by those APIs, and default to 1 for APIs
+  # that do not support compose_objects.
+  MAX_OBJECTS_PER_COMPOSE_CALL = 1
 
   def create_bucket(self, bucket_resource, request_config, fields_scope=None):
     """Creates a new bucket with the specified metadata.
@@ -167,25 +164,23 @@ class CloudApi(object):
     """
     raise NotImplementedError('get_bucket must be overridden.')
 
-  def patch_bucket(self, bucket_resource, request_config, fields_scope=None):
-    """Patches bucket metadata.
+  def get_bucket_iam_policy(self, bucket_name):
+    """Gets bucket IAM policy.
 
     Args:
-      bucket_resource (UnknownResource): The bucket to patch.
-      request_config (RequestConfig): Contains new metadata for the bucket.
-      fields_scope (FieldsScope): Determines the fields and projection
-        parameters of API call.
+      bucket_name (str): Name of the bucket.
 
     Returns:
-      resource_reference.BucketResource containing the bucket metadata.
+      Provider-specific data type. Currently, only available for GCS so returns
+        Apitools messages.Policy object. If supported for
+        more providers in the future, use a generic container.
 
     Raises:
       CloudApiError: API returned an error.
       NotImplementedError: This function was not implemented by a class using
-          this interface.
-      ValueError: Invalid fields_scope.
+        this interface.
     """
-    raise NotImplementedError('patch_bucket must be overridden.')
+    raise NotImplementedError('get_bucket_iam_policy must be overridden.')
 
   def list_buckets(self, fields_scope=None):
     """Lists bucket metadata for the given project.
@@ -204,110 +199,186 @@ class CloudApi(object):
     """
     raise NotImplementedError('list_buckets must be overridden.')
 
-  def list_objects(self,
-                   bucket_name,
-                   prefix=None,
-                   delimiter=None,
-                   all_versions=None,
-                   fields_scope=None):
-    """Lists objects (with metadata) and prefixes in a bucket.
+  def lock_bucket_retention_policy(self, bucket_resource, request_config):
+    """Locks a bucket's retention policy.
 
     Args:
-      bucket_name (str): Bucket containing the objects.
-      prefix (str): Prefix for directory-like behavior.
-      delimiter (str): Delimiter for directory-like behavior.
-      all_versions (boolean): If true, list all object versions.
-      fields_scope (FieldsScope): Determines the fields and projection
-        parameters of API call.
-
-    Yields:
-      Iterator over resource_reference.ObjectResource objects.
-
-    Raises:
-      NotImplementedError: This function was not implemented by a class using
-        this interface.
-      ValueError: Invalid fields_scope.
-    """
-    raise NotImplementedError('list_objects must be overridden.')
-
-  def delete_object(self, object_url, request_config):
-    """Deletes an object.
-
-    Args:
-      object_url (storage_url.CloudUrl): Url of object to delete.
+      bucket_resource (UnknownResource): The bucket with the policy to lock.
       request_config (RequestConfig): Object containing general API function
         arguments. Subclasses for specific cloud providers are available.
+
+    Returns:
+      resource_reference.BucketResource containing the bucket metadata.
 
     Raises:
       CloudApiError: API returned an error.
       NotImplementedError: This function was not implemented by a class using
           this interface.
     """
-    raise NotImplementedError('delete_object must be overridden.')
+    raise NotImplementedError(
+        'lock_bucket_retention_policy must be overridden.')
 
-  def get_object_metadata(self,
-                          bucket_name,
-                          object_name,
-                          request_config=None,
-                          generation=None,
-                          fields_scope=None):
-    """Gets object metadata.
-
-    If decryption is supported by the implementing class, this function will
-    read decryption keys from configuration and appropriately retry requests to
-    encrypted objects with the correct key.
+  def patch_bucket(self, bucket_resource, request_config, fields_scope=None):
+    """Patches bucket metadata.
 
     Args:
-      bucket_name (str): Bucket containing the object.
-      object_name (str): Object name.
-      request_config (RequestConfig): Contains API call arguments.
-      generation (string): Generation of the object to retrieve.
+      bucket_resource (BucketResource|UnknownResource): The bucket to patch.
+      request_config (RequestConfig): Contains new metadata for the bucket.
       fields_scope (FieldsScope): Determines the fields and projection
         parameters of API call.
 
     Returns:
-      resource_reference.ObjectResource with object metadata.
+      resource_reference.BucketResource containing the bucket metadata.
 
     Raises:
       CloudApiError: API returned an error.
-      NotFoundError: Raised if object does not exist.
       NotImplementedError: This function was not implemented by a class using
-        this interface.
+          this interface.
       ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('get_object_metadata must be overridden.')
+    raise NotImplementedError('patch_bucket must be overridden.')
 
-  def patch_object_metadata(self,
-                            bucket_name,
-                            object_name,
-                            object_resource,
-                            request_config,
-                            fields_scope=None,
-                            generation=None):
-    """Updates object metadata with patch semantics.
+  def set_bucket_iam_policy(self, bucket_name, policy):
+    """Sets bucket IAM policy.
 
     Args:
-      bucket_name (str): Bucket containing the object.
-      object_name (str): Object name.
-      object_resource (resource_reference.ObjectResource): Contains metadata
-        that will be used to update cloud object. May have different name than
-        object_name argument.
+      bucket_name (str): Name of the bucket.
+      policy (object): Provider-specific data type. Currently, only
+        available for GCS so Apitools messages.Policy object. If supported for
+        more providers in the future, use a generic container.
+
+    Returns:
+      Provider-specific data type. Currently, only available for GCS so returns
+        Apitools messages.Policy object. If supported for
+        more providers in the future, use a generic container.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('get_bucket_iam_policy must be overridden.')
+
+  def create_hmac_key(self, service_account_email):
+    """Creates an HMAC key.
+
+    Args:
+      service_account_email (str): The email of the service account to use.
+
+    Returns:
+      gcs_resource_reference.GcsHmacKeyResource. Provider-specific data type
+      is used for now because we currently support this feature only for the
+      JSON API.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('create_hmac_key must be overridden.')
+
+  def delete_hmac_key(self, access_id):
+    """Deletes an HMAC key.
+
+    Args:
+      access_id (str): The access ID corresponding to the HMAC key.
+
+    Returns:
+      None
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('delete_hmac_key must be overridden.')
+
+  def get_hmac_key(self, access_id):
+    """Gets an HMAC key.
+
+    Args:
+      access_id (str): The access ID corresponding to the HMAC key.
+
+    Returns:
+      gcs_resource_reference.GcsHmacKeyResource. Provider-specific data type
+      is used for now because we currently support this feature only for the
+      JSON API.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('get_hmac_key must be overridden.')
+
+  def list_hmac_keys(self, service_account_email=None, show_deleted_keys=False,
+                     fields_scope=None):
+    """Lists HMAC keys.
+
+    Args:
+      service_account_email (str): Return HMAC keys for the given service
+        account email.
+      show_deleted_keys (bool): If True, include keys in the DELETED state.
+      fields_scope (FieldsScope): Determines which metadata keys
+        the API should return for each key.
+
+    Yields:
+      Iterator over gcs_resource_reference.GcsHmacKeyResource objects.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    pass
+
+  def patch_hmac_key(self, access_id, etag, state):
+    """Updates an HMAC key.
+
+    Args:
+      access_id (str): The access ID corresponding to the HMAC key.
+      etag (str): Only perform the patch request if the etag matches this value.
+      state (HmacKeyState): The desired state of the HMAC key.
+
+    Returns:
+      gcs_resource_reference.GcsHmacKeyResource. Provider-specific data type
+      is used for now because we currently support this feature only for the
+      JSON API.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('patch_hmac_key must be overridden.')
+
+  def compose_objects(self,
+                      source_resources,
+                      destination_resource,
+                      request_config,
+                      original_source_resource=None):
+    """Concatenates a list of objects into a new object.
+
+    Args:
+      source_resources (list[ObjectResource|UnknownResource]): The objects to
+        compose.
+      destination_resource (resource_reference.UnknownResource): Metadata for
+        the resulting composite object.
       request_config (RequestConfig): Object containing general API function
         arguments. Subclasses for specific cloud providers are available.
-      fields_scope (FieldsScope): Determines the fields and projection
-        parameters of API call.
-      generation (string): Generation (or version) of the object to update.
+      original_source_resource (Resource|None): Useful for finding metadata to
+        apply to final object. For instance, if doing a composite upload, this
+        would represent the pre-split local file.
 
     Returns:
-      resource_reference.ObjectResource with patched object metadata.
+      resource_reference.ObjectResource with composite object's metadata.
 
     Raises:
       CloudApiError: API returned an error.
       NotImplementedError: This function was not implemented by a class using
         this interface.
-      ValueError: Invalid fields_scope.
     """
-    raise NotImplementedError('patch_object_metadata must be overridden.')
+    raise NotImplementedError('compose_object must be overridden.')
 
   def copy_object(self,
                   source_resource,
@@ -341,6 +412,21 @@ class CloudApi(object):
     """
     raise NotImplementedError('copy_object must be overridden')
 
+  def delete_object(self, object_url, request_config):
+    """Deletes an object.
+
+    Args:
+      object_url (storage_url.CloudUrl): Url of object to delete.
+      request_config (RequestConfig): Object containing general API function
+        arguments. Subclasses for specific cloud providers are available.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+          this interface.
+    """
+    raise NotImplementedError('delete_object must be overridden.')
+
   def download_object(self,
                       cloud_resource,
                       download_stream,
@@ -354,14 +440,14 @@ class CloudApi(object):
     """Gets object data.
 
     Args:
-      cloud_resource (resource_reference.ObjectResource): Contains
-        metadata and information about object being downloaded.
+      cloud_resource (resource_reference.ObjectResource): Contains metadata and
+        information about object being downloaded.
       download_stream (stream): Stream to send the object data to.
       request_config (RequestConfig): Contains arguments for API calls.
       digesters (dict): Dict of {string : digester}, where string is the name of
         a hash algorithm, and digester is a validation digester object that
-        update(bytes) and digest() using that algorithm. Implementation can
-        set the digester value to None to indicate supports bytes were not
+        update(bytes) and digest() using that algorithm. Implementation can set
+        the digester value to None to indicate supports bytes were not
         successfully digested on-the-fly.
       do_not_decompress (bool): If true, gzipped objects will not be
         decompressed on-the-fly if supported by the API.
@@ -377,8 +463,8 @@ class CloudApi(object):
         requests). If None, download the rest of the object.
 
     Returns:
-      DownloadApiClientReturnValue: Contains API-agnostic data useful at higher
-        levels like the task-level.
+      server_encoding (str): Useful for determining what the server actually
+        sent versus what object metadata claims.
 
     Raises:
       CloudApiError: API returned an error.
@@ -386,6 +472,143 @@ class CloudApi(object):
         this interface.
     """
     raise NotImplementedError('download_object must be overridden.')
+
+  def get_object_iam_policy(self, bucket_name, object_name, generation=None):
+    """Gets object IAM policy.
+
+    Args:
+      bucket_name (str): Name of the bucket.
+      object_name (str): Name of the object.
+      generation (str|None): Generation of object.
+
+    Returns:
+      Provider-specific data type. Currently, only available for GCS so returns
+        Apitools messages.Policy object. If supported for
+        more providers in the future, use a generic container.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('get_object_iam_policy must be overridden.')
+
+  def get_object_metadata(self,
+                          bucket_name,
+                          object_name,
+                          request_config=None,
+                          generation=None,
+                          fields_scope=None):
+    """Gets object metadata.
+
+    If decryption is supported by the implementing class, this function will
+    read decryption keys from configuration and appropriately retry requests to
+    encrypted objects with the correct key.
+
+    Args:
+      bucket_name (str): Bucket containing the object.
+      object_name (str): Object name.
+      request_config (RequestConfig): Contains API call arguments.
+      generation (string): Generation of the object to retrieve.
+      fields_scope (FieldsScope): Determines the fields and projection
+        parameters of API call.
+
+    Returns:
+      resource_reference.ObjectResource with object metadata.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotFoundError: Raised if object does not exist.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+      ValueError: Invalid fields_scope.
+    """
+    raise NotImplementedError('get_object_metadata must be overridden.')
+
+  def list_objects(self,
+                   bucket_name,
+                   prefix=None,
+                   delimiter=None,
+                   all_versions=None,
+                   fields_scope=None):
+    """Lists objects (with metadata) and prefixes in a bucket.
+
+    Args:
+      bucket_name (str): Bucket containing the objects.
+      prefix (str): Prefix for directory-like behavior.
+      delimiter (str): Delimiter for directory-like behavior.
+      all_versions (boolean): If true, list all object versions.
+      fields_scope (FieldsScope): Determines the fields and projection
+        parameters of API call.
+
+    Yields:
+      Iterator over resource_reference.ObjectResource objects.
+
+    Raises:
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+      ValueError: Invalid fields_scope.
+    """
+    raise NotImplementedError('list_objects must be overridden.')
+
+  def patch_object_metadata(self,
+                            bucket_name,
+                            object_name,
+                            object_resource,
+                            request_config,
+                            fields_scope=None,
+                            generation=None):
+    """Updates object metadata with patch semantics.
+
+    Args:
+      bucket_name (str): Bucket containing the object.
+      object_name (str): Object name.
+      object_resource (resource_reference.ObjectResource): Contains metadata
+        that will be used to update cloud object. May have different name than
+        object_name argument.
+      request_config (RequestConfig): Object containing general API function
+        arguments. Subclasses for specific cloud providers are available.
+      fields_scope (FieldsScope): Determines the fields and projection
+        parameters of API call.
+      generation (string): Generation (or version) of the object to update.
+
+    Returns:
+      resource_reference.ObjectResource with patched object metadata.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+      ValueError: Invalid fields_scope.
+    """
+    raise NotImplementedError('patch_object_metadata must be overridden.')
+
+  def set_object_iam_policy(self,
+                            bucket_name,
+                            object_name,
+                            policy,
+                            generation=None):
+    """Sets object IAM policy.
+
+    Args:
+      bucket_name (str): Name of the bucket.
+      object_name (str): Name of the object.
+      policy (object): Provider-specific data type. Currently, only available
+        for GCS so Apitools messages.Policy object. If supported for more
+        providers in the future, use a generic container.
+      generation (str|None): Generation of object.
+
+    Returns:
+      Provider-specific data type. Currently, only available for GCS so returns
+        Apitools messages.Policy object. If supported for
+        more providers in the future, use a generic container.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+    """
+    raise NotImplementedError('set_bucket_iam_policy must be overridden.')
 
   def upload_object(self,
                     source_stream,
@@ -420,34 +643,6 @@ class CloudApi(object):
         this interface.
     """
     raise NotImplementedError('upload_object must be overridden.')
-
-  def compose_objects(self,
-                      source_resources,
-                      destination_resource,
-                      request_config,
-                      original_source_resource=None):
-    """Concatenates a list of objects into a new object.
-
-    Args:
-      source_resources (list[ObjectResource|UnknownResource]): The objects
-        to compose.
-      destination_resource (resource_reference.UnknownResource): Metadata for
-        the resulting composite object.
-      request_config (RequestConfig): Object containing general API function
-        arguments. Subclasses for specific cloud providers are available.
-      original_source_resource (Resource|None): Useful for finding metadata
-        to apply to final object. For instance, if doing a composite upload,
-        this would represent the pre-split local file.
-
-    Returns:
-      resource_reference.ObjectResource with composite object's metadata.
-
-    Raises:
-      CloudApiError: API returned an error.
-      NotImplementedError: This function was not implemented by a class using
-        this interface.
-    """
-    raise NotImplementedError('compose_object must be overridden.')
 
   def get_service_agent(self, project_id=None, project_number=None):
     """Returns the email address (str) used to identify the service agent.
@@ -503,22 +698,6 @@ class CloudApi(object):
     raise NotImplementedError(
         'create_notification_configuration must be overridden.')
 
-  def get_notification_configuration(self, url, notification_id):
-    """Gets a notification configuration on a bucket.
-
-    Args:
-      url (storage_url.CloudUrl): Bucket URL.
-      notification_id (str): Name of the notification configuration.
-
-    Raises:
-      CloudApiError: API returned an error.
-      NotImplementedError: This function was not implemented by a class using
-        this interface.
-      ValueError: Received a non-bucket URL.
-    """
-    raise NotImplementedError(
-        'get_notification_configuration must be overridden.')
-
   def delete_notification_configuration(self, url, notification_id):
     """Deletes a notification configuration on a bucket.
 
@@ -534,6 +713,22 @@ class CloudApi(object):
     """
     raise NotImplementedError(
         'delete_notification_configuration must be overridden.')
+
+  def get_notification_configuration(self, url, notification_id):
+    """Gets a notification configuration on a bucket.
+
+    Args:
+      url (storage_url.CloudUrl): Bucket URL.
+      notification_id (str): Name of the notification configuration.
+
+    Raises:
+      CloudApiError: API returned an error.
+      NotImplementedError: This function was not implemented by a class using
+        this interface.
+      ValueError: Received a non-bucket URL.
+    """
+    raise NotImplementedError(
+        'get_notification_configuration must be overridden.')
 
   def list_notification_configurations(self, url):
     """Lists notification configurations on a bucket.

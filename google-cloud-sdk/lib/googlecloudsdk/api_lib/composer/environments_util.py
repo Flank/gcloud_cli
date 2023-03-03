@@ -22,6 +22,9 @@ from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.composer import util as api_util
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.composer.flags import CONNECTION_TYPE_FLAG_ALPHA
+from googlecloudsdk.command_lib.composer.flags import CONNECTION_TYPE_FLAG_BETA
+from googlecloudsdk.command_lib.composer.flags import CONNECTION_TYPE_FLAG_GA
 from googlecloudsdk.command_lib.composer.flags import ENVIRONMENT_SIZE_ALPHA
 from googlecloudsdk.command_lib.composer.flags import ENVIRONMENT_SIZE_BETA
 from googlecloudsdk.command_lib.composer.flags import ENVIRONMENT_SIZE_GA
@@ -88,6 +91,8 @@ class CreateEnvironmentFlags:
     connection_subnetwork: str or None, the Compute Engine subnetwork from which
       to reserve the IP address for internal connections, specified as relative
       resource name.
+    connection_type: str or None, mode of internal connectivity within the Cloud
+      Composer environment. Can be VPC_PEERING or PRIVATE_SERVICE_CONNECT.
     web_server_access_control: [{string: string}], List of IP ranges with
       descriptions to allow access to the web server.
     cloud_sql_machine_type: str or None, Cloud SQL machine type used by the
@@ -137,6 +142,8 @@ class CreateEnvironmentFlags:
       specified only in Airflow 2.2.x and greater
     triggerer_cpu: float or None, CPU allocated to Airflow triggerer. Can be
       specified only in Airflow 2.2.x and greater
+    triggerer_count: int or None, number of Airflow triggerers. Can be specified
+      only in Airflow 2.2.x and greater
     triggerer_memory_gb: float or None, memory allocated to Airflow triggerer.
       Can be specified only in Airflow 2.2.x and greater
     enable_scheduled_snapshot_creation: bool or None, whether the automatic
@@ -146,7 +153,11 @@ class CreateEnvironmentFlags:
     snapshot_location: str or None, a Cloud Storage location used to store
       automatically created snapshots
     snapshot_schedule_timezone: str or None, time zone that sets the context to
-      interpret snapshot_creation_schedule.
+      interpret snapshot_creation_schedule
+    enable_cloud_data_lineage_integration: bool or None, whether Cloud Data
+      Lineage integration should be enabled
+    enable_high_resilience: bool or None, whether high resilience
+      should be enabled
   """
 
   # TODO(b/154131605): This a type that is an immutable data object. Can't use
@@ -186,6 +197,7 @@ class CreateEnvironmentFlags:
                cloud_sql_ipv4_cidr=None,
                composer_network_ipv4_cidr=None,
                connection_subnetwork=None,
+               connection_type=None,
                web_server_access_control=None,
                cloud_sql_machine_type=None,
                web_server_machine_type=None,
@@ -211,11 +223,14 @@ class CreateEnvironmentFlags:
                release_track=base.ReleaseTrack.GA,
                enable_triggerer=None,
                triggerer_cpu=None,
+               triggerer_count=None,
                triggerer_memory_gb=None,
                enable_scheduled_snapshot_creation=None,
                snapshot_creation_schedule=None,
                snapshot_location=None,
-               snapshot_schedule_timezone=None):
+               snapshot_schedule_timezone=None,
+               enable_cloud_data_lineage_integration=None,
+               enable_high_resilience=None):
     self.node_count = node_count
     self.environment_size = environment_size
     self.labels = labels
@@ -247,6 +262,7 @@ class CreateEnvironmentFlags:
     self.cloud_sql_ipv4_cidr = cloud_sql_ipv4_cidr
     self.composer_network_ipv4_cidr = composer_network_ipv4_cidr
     self.connection_subnetwork = connection_subnetwork
+    self.connection_type = connection_type
     self.web_server_access_control = web_server_access_control
     self.cloud_sql_machine_type = cloud_sql_machine_type
     self.web_server_machine_type = web_server_machine_type
@@ -265,6 +281,7 @@ class CreateEnvironmentFlags:
     self.scheduler_count = scheduler_count
     self.enable_triggerer = enable_triggerer
     self.triggerer_cpu = triggerer_cpu
+    self.triggerer_count = triggerer_count
     self.triggerer_memory_gb = triggerer_memory_gb
     self.maintenance_window_start = maintenance_window_start
     self.maintenance_window_end = maintenance_window_end
@@ -277,6 +294,8 @@ class CreateEnvironmentFlags:
     self.snapshot_creation_schedule = snapshot_creation_schedule
     self.snapshot_location = snapshot_location
     self.snapshot_schedule_timezone = snapshot_schedule_timezone
+    self.enable_cloud_data_lineage_integration = enable_cloud_data_lineage_integration
+    self.enable_high_resilience = enable_high_resilience
 
 
 def _CreateNodeConfig(messages, flags):
@@ -361,7 +380,8 @@ def _CreateConfig(messages, flags, is_composer_v1):
           flags.environment_size)
   if (flags.image_version or flags.env_variables or
       flags.airflow_config_overrides or flags.python_version or
-      flags.airflow_executor_type or flags.scheduler_count and is_composer_v1):
+      flags.airflow_executor_type or flags.scheduler_count and is_composer_v1 or
+      flags.enable_cloud_data_lineage_integration):
     config.softwareConfig = messages.SoftwareConfig()
     if flags.image_version:
       config.softwareConfig.imageVersion = flags.image_version
@@ -380,6 +400,9 @@ def _CreateConfig(messages, flags, is_composer_v1):
           flags.airflow_executor_type)
     if flags.scheduler_count and is_composer_v1:
       config.softwareConfig.schedulerCount = flags.scheduler_count
+    if flags.enable_cloud_data_lineage_integration:
+      config.softwareConfig.cloudDataLineageIntegration = messages.CloudDataLineageIntegration(
+          enabled=True)
 
   if flags.maintenance_window_start:
     assert flags.maintenance_window_end, 'maintenance_window_end is missing'
@@ -404,14 +427,28 @@ def _CreateConfig(messages, flags, is_composer_v1):
   if flags.private_environment:
     # Adds a PrivateClusterConfig, if necessary.
     private_cluster_config = None
+    networking_config = None
     if flags.private_endpoint or flags.master_ipv4_cidr:
       private_cluster_config = messages.PrivateClusterConfig(
           enablePrivateEndpoint=flags.private_endpoint,
           masterIpv4CidrBlock=flags.master_ipv4_cidr)
+    if flags.connection_type:
+      if flags.release_track == base.ReleaseTrack.GA:
+        connection_type = CONNECTION_TYPE_FLAG_GA.GetEnumForChoice(
+            flags.connection_type)
+      elif flags.release_track == base.ReleaseTrack.BETA:
+        connection_type = CONNECTION_TYPE_FLAG_BETA.GetEnumForChoice(
+            flags.connection_type)
+      elif flags.release_track == base.ReleaseTrack.ALPHA:
+        connection_type = CONNECTION_TYPE_FLAG_ALPHA.GetEnumForChoice(
+            flags.connection_type)
+      networking_config = messages.NetworkingConfig(
+          connectionType=connection_type)
 
     private_env_config_args = {
         'enablePrivateEnvironment': flags.private_environment,
         'privateClusterConfig': private_cluster_config,
+        'networkingConfig': networking_config,
     }
 
     if flags.web_server_ipv4_cidr is not None:
@@ -437,6 +474,10 @@ def _CreateConfig(messages, flags, is_composer_v1):
     config.webServerNetworkAccessControl = BuildWebServerNetworkAccessControl(
         flags.web_server_access_control, flags.release_track)
 
+  if flags.enable_high_resilience:
+    config.resilienceMode = (
+        messages.EnvironmentConfig.ResilienceModeValueValuesEnum.HIGH_RESILIENCE
+    )
   if flags.cloud_sql_machine_type:
     config.databaseConfig = messages.DatabaseConfig(
         machineType=flags.cloud_sql_machine_type)
@@ -458,7 +499,7 @@ def _CreateConfig(messages, flags, is_composer_v1):
       flags.web_server_memory_gb or flags.scheduler_storage_gb or
       flags.worker_storage_gb or flags.web_server_storage_gb or
       flags.min_workers or flags.max_workers or flags.triggerer_memory_gb or
-      flags.triggerer_cpu or flags.enable_triggerer)
+      flags.triggerer_cpu or flags.enable_triggerer or flags.triggerer_count)
   if composer_v2_flag_used or (flags.scheduler_count and not is_composer_v1):
     config.workloadsConfig = _CreateWorkloadConfig(messages, flags)
   return config
@@ -482,11 +523,20 @@ def _CreateWorkloadConfig(messages, flags):
           storageGb=flags.worker_storage_gb,
           minCount=flags.min_workers,
           maxCount=flags.max_workers))
-  if flags.enable_triggerer or flags.triggerer_cpu or flags.triggerer_memory_gb:
+  if (
+      flags.enable_triggerer
+      or flags.triggerer_cpu
+      or flags.triggerer_memory_gb
+      or flags.triggerer_count
+  ):
+    triggerer_count = 1 if flags.enable_triggerer else 0
+    if flags.triggerer_count is not None:
+      triggerer_count = flags.triggerer_count
     workload_resources['triggerer'] = messages.TriggererResource(
         cpu=flags.triggerer_cpu,
         memoryGb=flags.triggerer_memory_gb,
-        count=1 if flags.enable_triggerer else 0)
+        count=triggerer_count
+    )
   return messages.WorkloadsConfig(**workload_resources)
 
 
@@ -636,6 +686,27 @@ def LoadSnapshot(environment_ref,
           skipGcsDataCopying=skip_gcs_data_copying,
           snapshotPath=snapshot_path))
   return GetService(release_track=release_track).LoadSnapshot(request_message)
+
+
+def DatabaseFailover(environment_ref, release_track=base.ReleaseTrack.ALPHA):
+  """Triggers the database failover (only for highly resilient environments).
+
+  Args:
+    environment_ref: Resource, the Composer environment resource to trigger the
+      database failover for.
+    release_track: base.ReleaseTrack, the release track of command. Determines
+      which Composer client library is used.
+
+  Returns:
+    Operation: the operation corresponding to triggering a database failover.
+  """
+  message_module = api_util.GetMessagesModule(release_track=release_track)
+  request_message = message_module.ComposerProjectsLocationsEnvironmentsDatabaseFailoverRequest(
+      environment=environment_ref.RelativeName(),
+      databaseFailoverRequest=message_module.DatabaseFailoverRequest())
+  return GetService(release_track=release_track).DatabaseFailover(
+      request_message
+  )
 
 
 def CheckUpgrade(environment_ref,

@@ -44,7 +44,7 @@ class Apply(base.Command):
           """\
           To create an application from specification
 
-              $ {command} appconfig.yaml
+              $ {command} stack.yaml
 
          """,
   }
@@ -64,10 +64,11 @@ class Apply(base.Command):
     app_dict = dict(args.FILE)
     name = app_dict.pop('name')
     appconfig = {'config': yaml.dump(args.FILE).encode('utf-8')}
+    release_track = self.ReleaseTrack()
 
     conn_context = connection_context.GetConnectionContext(
-        args, run_flags.Product.RUN_APPS, self.ReleaseTrack())
-    with run_apps_operations.Connect(conn_context) as client:
+        args, run_flags.Product.RUN_APPS, release_track)
+    with run_apps_operations.Connect(conn_context, release_track) as client:
 
       with progress_tracker.StagedProgressTracker(
           'Applying Configuration...',

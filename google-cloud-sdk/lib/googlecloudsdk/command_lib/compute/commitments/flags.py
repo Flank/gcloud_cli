@@ -116,6 +116,8 @@ def AddCreateFlags(parser,
   AddPlan(parser)
   AddReservationArgGroup(parser, support_share_setting, support_stable_fleet)
   AddResourcesArgGroup(parser)
+  AddSplitSourceCommitment(parser)
+  AddMergeSourceCommitments(parser)
 
 
 def AddUpdateFlags(parser):
@@ -155,14 +157,16 @@ def AddSplitSourceCommitment(parser):
   return parser.add_argument(
       '--split-source-commitment',
       required=False,
-      help='Split the resources of previous commitment into a new commitment.')
+      help=('Creates the new commitment by splitting the specified '
+            'source commitment and redistributing the specified resources.'))
 
 
 def AddMergeSourceCommitments(parser):
   return parser.add_argument(
       '--merge-source-commitments',
       required=False,
-      help='Merge the resources of two or more commitments into one new commitment.')  #  pylint:disable=line-too-long
+      help=('Creates the new commitment by merging the specified '
+            'source commitments and combining their resources.'))
 
 
 def AddResourcesArgGroup(parser):

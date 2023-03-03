@@ -23,25 +23,25 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util.apis import arg_utils
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Delete(base.DeleteCommand):
   """Delete a fleet namespace.
 
   This command can fail for the following reasons:
   * The project specified does not exist.
   * The namespace specified does not exist.
-  * The caller does not have permission to access the given project.
+  * The caller does not have permission to access the given project or
+  namespace.
 
   ## EXAMPLES
 
-  To delete fleet namespace `my-ns` in the active project:
+  To delete fleet namespace `NAMESPACE` in the active project:
 
-    $ {command} my-ns
+    $ {command} NAMESPACE
 
-  To delete fleet namespace `my-ns` in project `foo-bar-1`:
+  To delete fleet namespace `NAMESPACE` in project `PROJECT_ID`:
 
-    $ {command} my-ns --project=foo-bar-1
+    $ {command} NAMESPACE --project=PROJECT_ID
   """
 
   @staticmethod
@@ -51,5 +51,5 @@ class Delete(base.DeleteCommand):
 
   def Run(self, args):
     project = arg_utils.GetFromNamespace(args, '--project', use_defaults=True)
-    fleetclient = client.FleetClient(release_track=base.ReleaseTrack.ALPHA)
+    fleetclient = client.FleetClient(release_track=self.ReleaseTrack())
     return fleetclient.DeleteNamespace(project, args.NAME)

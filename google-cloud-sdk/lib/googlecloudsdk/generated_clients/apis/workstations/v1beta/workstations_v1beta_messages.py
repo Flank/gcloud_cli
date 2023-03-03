@@ -55,7 +55,6 @@ class AuditLogConfig(_messages.Message):
   Fields:
     exemptedMembers: Specifies the identities that do not cause logging for
       this type of permission. Follows the same format of Binding.members.
-    ignoreChildExemptions: A boolean attribute.
     logType: The log type that this config enables.
   """
 
@@ -74,45 +73,13 @@ class AuditLogConfig(_messages.Message):
     DATA_READ = 3
 
   exemptedMembers = _messages.StringField(1, repeated=True)
-  ignoreChildExemptions = _messages.BooleanField(2)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 3)
-
-
-class AuthorizationLoggingOptions(_messages.Message):
-  r"""Authorization-related information used by Cloud Audit Logging.
-
-  Enums:
-    PermissionTypeValueValuesEnum: The type of the permission that was
-      checked.
-
-  Fields:
-    permissionType: The type of the permission that was checked.
-  """
-
-  class PermissionTypeValueValuesEnum(_messages.Enum):
-    r"""The type of the permission that was checked.
-
-    Values:
-      PERMISSION_TYPE_UNSPECIFIED: Default. Should not be used.
-      ADMIN_READ: A read of admin (meta) data.
-      ADMIN_WRITE: A write of admin (meta) data.
-      DATA_READ: A read of standard data.
-      DATA_WRITE: A write of standard data.
-    """
-    PERMISSION_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    ADMIN_WRITE = 2
-    DATA_READ = 3
-    DATA_WRITE = 4
-
-  permissionType = _messages.EnumField('PermissionTypeValueValuesEnum', 1)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
 
 
 class Binding(_messages.Message):
   r"""Associates `members`, or principals, with a `role`.
 
   Fields:
-    bindingId: A string attribute.
     condition: The condition that is associated with this binding. If the
       condition evaluates to `true`, then this binding applies to the current
       request. If the condition evaluates to `false`, then this binding does
@@ -140,7 +107,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -157,171 +126,18 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
 
-  bindingId = _messages.StringField(1)
-  condition = _messages.MessageField('Expr', 2)
-  members = _messages.StringField(3, repeated=True)
-  role = _messages.StringField(4)
+  condition = _messages.MessageField('Expr', 1)
+  members = _messages.StringField(2, repeated=True)
+  role = _messages.StringField(3)
 
 
 class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
-
-
-class CloudAuditOptions(_messages.Message):
-  r"""Write a Cloud Audit log
-
-  Enums:
-    LogNameValueValuesEnum: The log_name to populate in the Cloud Audit
-      Record.
-
-  Fields:
-    authorizationLoggingOptions: Information used by the Cloud Audit Logging
-      pipeline.
-    logName: The log_name to populate in the Cloud Audit Record.
-  """
-
-  class LogNameValueValuesEnum(_messages.Enum):
-    r"""The log_name to populate in the Cloud Audit Record.
-
-    Values:
-      UNSPECIFIED_LOG_NAME: Default. Should not be used.
-      ADMIN_ACTIVITY: Corresponds to "cloudaudit.googleapis.com/activity"
-      DATA_ACCESS: Corresponds to "cloudaudit.googleapis.com/data_access"
-    """
-    UNSPECIFIED_LOG_NAME = 0
-    ADMIN_ACTIVITY = 1
-    DATA_ACCESS = 2
-
-  authorizationLoggingOptions = _messages.MessageField('AuthorizationLoggingOptions', 1)
-  logName = _messages.EnumField('LogNameValueValuesEnum', 2)
-
-
-class Condition(_messages.Message):
-  r"""A condition to be met.
-
-  Enums:
-    IamValueValuesEnum: Trusted attributes supplied by the IAM system.
-    OpValueValuesEnum: An operator to apply the subject with.
-    SysValueValuesEnum: Trusted attributes supplied by any service that owns
-      resources and uses the IAM system for access control.
-
-  Fields:
-    iam: Trusted attributes supplied by the IAM system.
-    op: An operator to apply the subject with.
-    svc: Trusted attributes discharged by the service.
-    sys: Trusted attributes supplied by any service that owns resources and
-      uses the IAM system for access control.
-    values: The objects of the condition.
-  """
-
-  class IamValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by the IAM system.
-
-    Values:
-      NO_ATTR: Default non-attribute.
-      AUTHORITY: Either principal or (if present) authority selector.
-      ATTRIBUTION: The principal (even if an authority selector is present),
-        which must only be used for attribution, not authorization.
-      SECURITY_REALM: Any of the security realms in the IAMContext
-        (go/security-realms). When used with IN, the condition indicates "any
-        of the request's realms match one of the given values; with NOT_IN,
-        "none of the realms match any of the given values". Note that a value
-        can be: - 'self:campus' (i.e., clients that are in the same campus) -
-        'self:metro' (i.e., clients that are in the same metro) - 'self:cloud-
-        region' (i.e., allow connections from clients that are in the same
-        cloud region) - 'self:prod-region' (i.e., allow connections from
-        clients that are in the same prod region) - 'guardians' (i.e., allow
-        connections from its guardian realms. See go/security-realms-
-        glossary#guardian for more information.) - 'self' [DEPRECATED] (i.e.,
-        allow connections from clients that are in the same security realm,
-        which is currently but not guaranteed to be campus-sized) - a realm
-        (e.g., 'campus-abc') - a realm group (e.g., 'realms-for-borg-cell-xx',
-        see: go/realm-groups) A match is determined by a realm group
-        membership check performed by a RealmAclRep object (go/realm-acl-
-        howto). It is not permitted to grant access based on the *absence* of
-        a realm, so realm conditions can only be used in a "positive" context
-        (e.g., ALLOW/IN or DENY/NOT_IN).
-      APPROVER: An approver (distinct from the requester) that has authorized
-        this request. When used with IN, the condition indicates that one of
-        the approvers associated with the request matches the specified
-        principal, or is a member of the specified group. Approvers can only
-        grant additional access, and are thus only used in a strictly positive
-        context (e.g. ALLOW/IN or DENY/NOT_IN).
-      JUSTIFICATION_TYPE: What types of justifications have been supplied with
-        this request. String values should match enum names from
-        security.credentials.JustificationType, e.g. "MANUAL_STRING". It is
-        not permitted to grant access based on the *absence* of a
-        justification, so justification conditions can only be used in a
-        "positive" context (e.g., ALLOW/IN or DENY/NOT_IN). Multiple
-        justifications, e.g., a Buganizer ID and a manually-entered reason,
-        are normal and supported.
-      CREDENTIALS_TYPE: What type of credentials have been supplied with this
-        request. String values should match enum names from
-        security_loas_l2.CredentialsType - currently, only
-        CREDS_TYPE_EMERGENCY is supported. It is not permitted to grant access
-        based on the *absence* of a credentials type, so the conditions can
-        only be used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-      CREDS_ASSERTION: EXPERIMENTAL -- DO NOT USE. The conditions can only be
-        used in a "positive" context (e.g., ALLOW/IN or DENY/NOT_IN).
-    """
-    NO_ATTR = 0
-    AUTHORITY = 1
-    ATTRIBUTION = 2
-    SECURITY_REALM = 3
-    APPROVER = 4
-    JUSTIFICATION_TYPE = 5
-    CREDENTIALS_TYPE = 6
-    CREDS_ASSERTION = 7
-
-  class OpValueValuesEnum(_messages.Enum):
-    r"""An operator to apply the subject with.
-
-    Values:
-      NO_OP: Default no-op.
-      EQUALS: DEPRECATED. Use IN instead.
-      NOT_EQUALS: DEPRECATED. Use NOT_IN instead.
-      IN: The condition is true if the subject (or any element of it if it is
-        a set) matches any of the supplied values.
-      NOT_IN: The condition is true if the subject (or every element of it if
-        it is a set) matches none of the supplied values.
-      DISCHARGED: Subject is discharged
-    """
-    NO_OP = 0
-    EQUALS = 1
-    NOT_EQUALS = 2
-    IN = 3
-    NOT_IN = 4
-    DISCHARGED = 5
-
-  class SysValueValuesEnum(_messages.Enum):
-    r"""Trusted attributes supplied by any service that owns resources and
-    uses the IAM system for access control.
-
-    Values:
-      NO_ATTR: Default non-attribute type
-      REGION: Region of the resource
-      SERVICE: Service name
-      NAME: Resource name
-      IP: IP address of the caller
-    """
-    NO_ATTR = 0
-    REGION = 1
-    SERVICE = 2
-    NAME = 3
-    IP = 4
-
-  iam = _messages.EnumField('IamValueValuesEnum', 1)
-  op = _messages.EnumField('OpValueValuesEnum', 2)
-  svc = _messages.StringField(3)
-  sys = _messages.EnumField('SysValueValuesEnum', 4)
-  values = _messages.StringField(5, repeated=True)
 
 
 class Container(_messages.Message):
@@ -373,108 +189,25 @@ class Container(_messages.Message):
   workingDir = _messages.StringField(6)
 
 
-class CounterOptions(_messages.Message):
-  r"""Increment a streamz counter with the specified metric and field names.
-  Metric names should start with a '/', generally be lowercase-only, and end
-  in "_count". Field names should not contain an initial slash. The actual
-  exported metric names will have "/iam/policy" prepended. Field names
-  correspond to IAM request parameters and field values are their respective
-  values. Supported field names: - "authority", which is "[token]" if
-  IAMContext.token is present, otherwise the value of
-  IAMContext.authority_selector if present, and otherwise a representation of
-  IAMContext.principal; or - "iam_principal", a representation of
-  IAMContext.principal even if a token or authority selector is present; or -
-  "" (empty string), resulting in a counter with no fields. Examples: counter
-  { metric: "/debug_access_count" field: "iam_principal" } ==> increment
-  counter /iam/policy/debug_access_count {iam_principal=[value of
-  IAMContext.principal]}
-
-  Fields:
-    customFields: Custom fields.
-    field: The field value to attribute.
-    metric: The metric to update.
-  """
-
-  customFields = _messages.MessageField('CustomField', 1, repeated=True)
-  field = _messages.StringField(2)
-  metric = _messages.StringField(3)
-
-
-class CustomField(_messages.Message):
-  r"""Custom fields. These can be used to create a counter with arbitrary
-  field/value pairs. See: go/rpcsp-custom-fields.
-
-  Fields:
-    name: Name is the field name.
-    value: Value is the field value. It is important that in contrast to the
-      CounterOptions.field, the value here is a constant that is not derived
-      from the IAMContext.
-  """
-
-  name = _messages.StringField(1)
-  value = _messages.StringField(2)
-
-
 class CustomerEncryptionKey(_messages.Message):
-  r"""A customer-specified encryption key for the Google Compute Engine
-  resources of this workstation configuration.
+  r"""A customer-managed encryption key for the Compute Engine resources of
+  this workstation configuration.
 
   Fields:
-    kmsKey: The name of the encryption key that is stored in Google Cloud KMS
-      e.g., projects/PROJECT_ID/locations/REGION/keyRings/KEY_RING/cryptoKeys/
-      KEY_NAME.
-    kmsKeyServiceAccount: The service account being used for the encryption
-      request for the given KMS key. If absent, the Compute Engine default
-      service account is used. However, it is recommended to use a separate
-      service account and to follow KMS best practices mentioned at
-      https://cloud.google.com/kms/docs/separation-of-duties
+    kmsKey: The name of the Google Cloud KMS encryption key. For example, `pro
+      jects/PROJECT_ID/locations/REGION/keyRings/KEY_RING/cryptoKeys/KEY_NAME`
+      .
+    kmsKeyServiceAccount: The service account to use with the specified KMS
+      key. We recommend that you use a separate service account and follow KMS
+      best practices. For more information, see [Separation of
+      duties](https://cloud.google.com/kms/docs/separation-of-duties) and
+      `gcloud kms keys add-iam-policy-binding`
+      [`--member`](https://cloud.google.com/sdk/gcloud/reference/kms/keys/add-
+      iam-policy-binding#--member).
   """
 
   kmsKey = _messages.StringField(1)
   kmsKeyServiceAccount = _messages.StringField(2)
-
-
-class DataAccessOptions(_messages.Message):
-  r"""Write a Data Access (Gin) log
-
-  Enums:
-    LogModeValueValuesEnum:
-
-  Fields:
-    logMode: A LogModeValueValuesEnum attribute.
-  """
-
-  class LogModeValueValuesEnum(_messages.Enum):
-    r"""LogModeValueValuesEnum enum type.
-
-    Values:
-      LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
-        immediately after the authorization check. If client chooses to write
-        one and it fails, client may either fail open (allow the operation to
-        continue) or fail closed (handle as a DENY outcome).
-      LOG_FAIL_CLOSED: The application's operation in the context of which
-        this authorization check is being made may only be performed if it is
-        successfully logged to Gin. For instance, the authorization library
-        may satisfy this obligation by emitting a partial log entry at
-        authorization check time and only returning ALLOW to the application
-        if it succeeds. If a matching Rule has this directive, but the client
-        has not indicated that it will honor such requirements, then the IAM
-        check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.
-    """
-    LOG_MODE_UNSPECIFIED = 0
-    LOG_FAIL_CLOSED = 1
-
-  logMode = _messages.EnumField('LogModeValueValuesEnum', 1)
-
-
-class Empty(_messages.Message):
-  r"""A generic empty message that you can re-use to avoid defining duplicated
-  empty messages in your APIs. A typical example is to use it as the request
-  or the response type of an API method. For instance: service Foo { rpc
-  Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
-  """
-
 
 
 class Expr(_messages.Message):
@@ -513,38 +246,45 @@ class Expr(_messages.Message):
   title = _messages.StringField(4)
 
 
+class GceConfidentialInstanceConfig(_messages.Message):
+  r"""A set of Compute Engine Confidential VM instance options.
+
+  Fields:
+    enableConfidentialCompute: Whether the instance has confidential compute
+      enabled.
+  """
+
+  enableConfidentialCompute = _messages.BooleanField(1)
+
+
 class GceInstance(_messages.Message):
-  r"""A runtime using a Google Compute Engine Instance.
+  r"""A runtime using a Compute Engine instance.
 
   Fields:
     bootDiskSizeGb: Size of the boot disk in GB.
+    confidentialInstanceConfig: A set of Compute Engine Confidential VM
+      instance options.
     disablePublicIpAddresses: Whether instances have no public IP address.
-    enableNestedVirtualization: Whether to enable nested virtualization on
-      instances.
-    machineType: The name of a Google Compute Engine machine type.
-    poolSize: Number of instances to pool for faster Workstation starup.
+    machineType: The name of a Compute Engine machine type.
+    poolSize: Number of instances to pool for faster workstation starup.
     serviceAccount: Email address of the service account that will be used on
       VM instances used to support this config. This service account must have
       permission to pull the specified container image. If not set, VMs will
       run without a service account, in which case the image must be publicly
       accessible.
-    serviceAccountScopes: Scopes to grant to the service account. Various
-      scopes are automatically added based on feature usage.
-    shieldedInstanceConfig: A set of Shielded Google Compute Engine Instance
-      options.
-    tags: Network tags to add to the Google Compute Engine machines backing
-      the Workstations.
+    shieldedInstanceConfig: A set of Compute Engine Shielded instance options.
+    tags: Network tags to add to the Compute Engine machines backing the
+      Workstations.
   """
 
   bootDiskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  disablePublicIpAddresses = _messages.BooleanField(2)
-  enableNestedVirtualization = _messages.BooleanField(3)
+  confidentialInstanceConfig = _messages.MessageField('GceConfidentialInstanceConfig', 2)
+  disablePublicIpAddresses = _messages.BooleanField(3)
   machineType = _messages.StringField(4)
   poolSize = _messages.IntegerField(5, variant=_messages.Variant.INT32)
   serviceAccount = _messages.StringField(6)
-  serviceAccountScopes = _messages.StringField(7, repeated=True)
-  shieldedInstanceConfig = _messages.MessageField('GceShieldedInstanceConfig', 8)
-  tags = _messages.StringField(9, repeated=True)
+  shieldedInstanceConfig = _messages.MessageField('GceShieldedInstanceConfig', 7)
+  tags = _messages.StringField(8, repeated=True)
 
 
 class GceRegionalPersistentDisk(_messages.Message):
@@ -553,24 +293,27 @@ class GceRegionalPersistentDisk(_messages.Message):
 
   Enums:
     ReclaimPolicyValueValuesEnum: What should happen to the disk after the
-      Workstation is deleted. Defaults to DELETE.
+      workstation is deleted. Defaults to DELETE.
 
   Fields:
     diskType: Type of the disk to use.
     fsType: Type of file system that the disk should be formatted with. The
-      Workstation image must support this file system type.
-    reclaimPolicy: What should happen to the disk after the Workstation is
+      workstation image must support this file system type. Must be empty if
+      source_snapshot is set.
+    reclaimPolicy: What should happen to the disk after the workstation is
       deleted. Defaults to DELETE.
-    sizeGb: Size of the disk in GB.
+    sizeGb: Size of the disk in GB. Must be empty if source_snapshot is set.
+    sourceSnapshot: Name of the snapshot to use as the source for the disk. If
+      set, size_gb and fs_type must be empty.
   """
 
   class ReclaimPolicyValueValuesEnum(_messages.Enum):
-    r"""What should happen to the disk after the Workstation is deleted.
+    r"""What should happen to the disk after the workstation is deleted.
     Defaults to DELETE.
 
     Values:
-      RECLAIM_POLICY_UNSPECIFIED: <no description>
-      DELETE: The persistent disk will be deleted with the Workstation.
+      RECLAIM_POLICY_UNSPECIFIED: Do not use.
+      DELETE: The persistent disk will be deleted with the workstation.
       RETAIN: The persistent disk will be remain after the workstation is
         deleted, and the administrator must manually delete the disk.
     """
@@ -582,10 +325,11 @@ class GceRegionalPersistentDisk(_messages.Message):
   fsType = _messages.StringField(2)
   reclaimPolicy = _messages.EnumField('ReclaimPolicyValueValuesEnum', 3)
   sizeGb = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  sourceSnapshot = _messages.StringField(5)
 
 
 class GceShieldedInstanceConfig(_messages.Message):
-  r"""A set of Shielded Google Compute Engine Instance options.
+  r"""A set of Compute Engine Shielded instance options.
 
   Fields:
     enableIntegrityMonitoring: Whether the instance has integrity monitoring
@@ -622,7 +366,7 @@ class GenerateAccessTokenResponse(_messages.Message):
   Fields:
     accessToken: The generated bearer access token. To use this token, include
       it in an Authorization header of an HTTP request sent to the associated
-      workstation's hostname, e.g. "Authorization: Bearer ".
+      workstation's hostname, for example, `Authorization: Bearer `.
     expireTime: Time at which the generated token will expire.
   """
 
@@ -630,12 +374,20 @@ class GenerateAccessTokenResponse(_messages.Message):
   expireTime = _messages.StringField(2)
 
 
+class GoogleProtobufEmpty(_messages.Message):
+  r"""A generic empty message that you can re-use to avoid defining duplicated
+  empty messages in your APIs. A typical example is to use it as the request
+  or the response type of an API method. For instance: service Foo { rpc
+  Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
+  """
+
+
+
 class Host(_messages.Message):
-  r"""The system will attempt to keep enough computational resources on
-  standby Runtime host for a Workstation.
+  r"""Runtime host for a workstation.
 
   Fields:
-    gceInstance: Specifies a Google Compute Engine Instance as the host.
+    gceInstance: Specifies a Compute Engine instance as the host.
   """
 
   gceInstance = _messages.MessageField('GceInstance', 1)
@@ -691,7 +443,7 @@ class ListWorkstationClustersResponse(_messages.Message):
     nextPageToken: Token to retrieve the next page of results, or empty if
       there are no more results in the list.
     unreachable: Unreachable resources.
-    workstationClusters: The requested clusters.
+    workstationClusters: The requested workstation clusters.
   """
 
   nextPageToken = _messages.StringField(1)
@@ -727,20 +479,6 @@ class ListWorkstationsResponse(_messages.Message):
   nextPageToken = _messages.StringField(1)
   unreachable = _messages.StringField(2, repeated=True)
   workstations = _messages.MessageField('Workstation', 3, repeated=True)
-
-
-class LogConfig(_messages.Message):
-  r"""Specifies what kind of log the caller must write
-
-  Fields:
-    cloudAudit: Cloud audit options.
-    counter: Counter options.
-    dataAccess: Data access options.
-  """
-
-  cloudAudit = _messages.MessageField('CloudAuditOptions', 1)
-  counter = _messages.MessageField('CounterOptions', 2)
-  dataAccess = _messages.MessageField('DataAccessOptions', 3)
 
 
 class Operation(_messages.Message):
@@ -852,37 +590,36 @@ class Operation(_messages.Message):
 
 
 class OperationMetadata(_messages.Message):
-  r"""Represents the metadata of the long-running operation.
+  r"""Metadata for long-running operations.
 
   Fields:
     apiVersion: Output only. API version used to start the operation.
-    cancelRequested: Output only. Identifies whether the user has requested
-      cancellation of the operation. Operations that have been cancelled
-      successfully have Operation.error value with a google.rpc.Status.code of
-      1, corresponding to `Code.CANCELLED`.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    statusDetail: Output only. Human-readable status of the operation, if any.
+    createTime: Output only. Time that the operation was created.
+    endTime: Output only. Time that the operation finished running.
+    requestedCancellation: Output only. Identifies whether the user has
+      requested cancellation of the operation.
+    statusMessage: Output only. Human-readable status of the operation, if
+      any.
     target: Output only. Server-defined resource path for the target of the
       operation.
     verb: Output only. Name of the verb executed by the operation.
   """
 
   apiVersion = _messages.StringField(1)
-  cancelRequested = _messages.BooleanField(2)
-  createTime = _messages.StringField(3)
-  endTime = _messages.StringField(4)
-  statusDetail = _messages.StringField(5)
+  createTime = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  requestedCancellation = _messages.BooleanField(4)
+  statusMessage = _messages.StringField(5)
   target = _messages.StringField(6)
   verb = _messages.StringField(7)
 
 
 class PersistentDirectory(_messages.Message):
-  r"""A directory persisted across Workstation sessions.
+  r"""A directory to persist across workstation sessions.
 
   Fields:
     gcePd: A PersistentDirectory backed by a Compute Engine persistent disk.
-    mountPath: Location of this directory in the running Workstation.
+    mountPath: Location of this directory in the running workstation.
   """
 
   gcePd = _messages.MessageField('GceRegionalPersistentDisk', 1)
@@ -942,13 +679,6 @@ class Policy(_messages.Message):
       `etag` field whenever you call `setIamPolicy`. If you omit this field,
       then IAM allows you to overwrite a version `3` policy with a version `1`
       policy, and all of the conditions in the version `3` policy are lost.
-    rules: If more than one rule is specified, the rules are applied in the
-      following manner: - All matching LOG rules are always applied. - If any
-      DENY/DENY_WITH_LOG rule matches, permission is denied. Logging will be
-      applied if one or more matching rule requires logging. - Otherwise, if
-      any ALLOW/ALLOW_WITH_LOG rule matches, permission is granted. Logging
-      will be applied if one or more matching rule requires logging. -
-      Otherwise, if no rule applies, permission is denied.
     version: Specifies the format of the policy. Valid values are `0`, `1`,
       and `3`. Requests that specify an invalid value are rejected. Any
       operation that affects conditional role bindings must specify version
@@ -971,84 +701,35 @@ class Policy(_messages.Message):
   auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
   bindings = _messages.MessageField('Binding', 2, repeated=True)
   etag = _messages.BytesField(3)
-  rules = _messages.MessageField('Rule', 4, repeated=True)
-  version = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class PrivateClusterConfig(_messages.Message):
   r"""Configuration options for private clusters.
 
   Fields:
-    clusterHostname: Output only. Hostname for the Workstation Cluster. This
+    allowedProjects: Additional projects that are allowed to attach to the
+      workstation cluster's service attachment. By default, the workstation
+      cluster's project and the VPC host project (if different) are allowed.
+    clusterHostname: Output only. Hostname for the workstation cluster. This
       field will be populated only when private endpoint is enabled. To access
       workstations in the cluster, create a new DNS zone mapping this domain
       name to an internal IP address and a forwarding rule mapping that
       address to the service attachment.
-    enablePrivateEndpoint: Whether Workstations endpoint is private.
+    enablePrivateEndpoint: Immutable. Whether Workstations endpoint is
+      private.
     serviceAttachmentUri: Output only. Service attachment URI for the
-      Workstation Cluster. The service attachemnt is created when private
+      workstation cluster. The service attachemnt is created when private
       endpoint is enabled. To access workstations in the cluster, configure
-      access to the managed service using (Private Service
-      Connect)[https://cloud.google.com/vpc/docs/configure-private-service-
-      connect-services].
+      access to the managed service using [Private Service
+      Connect](https://cloud.google.com/vpc/docs/configure-private-service-
+      connect-services).
   """
 
-  clusterHostname = _messages.StringField(1)
-  enablePrivateEndpoint = _messages.BooleanField(2)
-  serviceAttachmentUri = _messages.StringField(3)
-
-
-class Rule(_messages.Message):
-  r"""A rule to be applied in a Policy.
-
-  Enums:
-    ActionValueValuesEnum: Required
-
-  Fields:
-    action: Required
-    conditions: Additional restrictions that must be met. All conditions must
-      pass for the rule to match.
-    description: Human-readable description of the rule.
-    in_: If one or more 'in' clauses are specified, the rule matches if the
-      PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
-    logConfig: The config returned to callers of CheckPolicy for any entries
-      that match the LOG action.
-    notIn: If one or more 'not_in' clauses are specified, the rule matches if
-      the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries. The format
-      for in and not_in entries can be found at in the Local IAM documentation
-      (see go/local-iam#features).
-    permissions: A permission is a string of form '..' (e.g.,
-      'storage.buckets.list'). A value of '*' matches all permissions, and a
-      verb part of '*' (e.g., 'storage.buckets.*') matches all verbs.
-  """
-
-  class ActionValueValuesEnum(_messages.Enum):
-    r"""Required
-
-    Values:
-      NO_ACTION: Default no action.
-      ALLOW: Matching 'Entries' grant access.
-      ALLOW_WITH_LOG: Matching 'Entries' grant access and the caller promises
-        to log the request per the returned log_configs.
-      DENY: Matching 'Entries' deny access.
-      DENY_WITH_LOG: Matching 'Entries' deny access and the caller promises to
-        log the request per the returned log_configs.
-      LOG: Matching 'Entries' tell IAM.Check callers to generate logs.
-    """
-    NO_ACTION = 0
-    ALLOW = 1
-    ALLOW_WITH_LOG = 2
-    DENY = 3
-    DENY_WITH_LOG = 4
-    LOG = 5
-
-  action = _messages.EnumField('ActionValueValuesEnum', 1)
-  conditions = _messages.MessageField('Condition', 2, repeated=True)
-  description = _messages.StringField(3)
-  in_ = _messages.StringField(4, repeated=True)
-  logConfig = _messages.MessageField('LogConfig', 5, repeated=True)
-  notIn = _messages.StringField(6, repeated=True)
-  permissions = _messages.StringField(7, repeated=True)
+  allowedProjects = _messages.StringField(1, repeated=True)
+  clusterHostname = _messages.StringField(2)
+  enablePrivateEndpoint = _messages.BooleanField(3)
+  serviceAttachmentUri = _messages.StringField(4)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -1243,6 +924,8 @@ class Workstation(_messages.Message):
 
   Messages:
     AnnotationsValue: Client-specified annotations.
+    LabelsValue: Client-specified labels that are applied to the resource and
+      that are also propagated to the underlying Compute Engine resources.
 
   Fields:
     annotations: Client-specified annotations.
@@ -1256,7 +939,9 @@ class Workstation(_messages.Message):
       be received by the workstation. Authorized traffic will be received to
       the workstation as HTTP on port 80. To send traffic to a different port,
       clients may prefix the host with the destination port in the format
-      "{port}-{host}".
+      `{port}-{host}`.
+    labels: Client-specified labels that are applied to the resource and that
+      are also propagated to the underlying Compute Engine resources.
     name: Full name of this resource.
     reconciling: Output only. Indicates whether this resource is currently
       being updated to match its intended state.
@@ -1309,25 +994,53 @@ class Workstation(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Client-specified labels that are applied to the resource and that are
+    also propagated to the underlying Compute Engine resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   annotations = _messages.MessageField('AnnotationsValue', 1)
   createTime = _messages.StringField(2)
   deleteTime = _messages.StringField(3)
   displayName = _messages.StringField(4)
   etag = _messages.StringField(5)
   host = _messages.StringField(6)
-  name = _messages.StringField(7)
-  reconciling = _messages.BooleanField(8)
-  state = _messages.EnumField('StateValueValuesEnum', 9)
-  uid = _messages.StringField(10)
-  updateTime = _messages.StringField(11)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  reconciling = _messages.BooleanField(9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+  uid = _messages.StringField(11)
+  updateTime = _messages.StringField(12)
 
 
 class WorkstationCluster(_messages.Message):
-  r"""A grouping of WorkstationConfigs and their associated Workstations in a
-  region.
+  r"""A grouping of workstation configurations and the associated workstations
+  in that region.
 
   Messages:
     AnnotationsValue: Client-specified annotations.
+    LabelsValue: Client-specified labels that are applied to the resource and
+      that are also propagated to the underlying Compute Engine resources.
 
   Fields:
     annotations: Client-specified annotations.
@@ -1342,15 +1055,17 @@ class WorkstationCluster(_messages.Message):
     etag: Checksum computed by the server. May be sent on update and delete
       requests to ensure that the client has an up-to-date value before
       proceeding.
+    labels: Client-specified labels that are applied to the resource and that
+      are also propagated to the underlying Compute Engine resources.
     name: Full name of this resource.
-    network: Name of the Compute Engine network in which instances associated
-      with this cluster will be created.
+    network: Immutable. Name of the Compute Engine network in which instances
+      associated with this cluster will be created.
     privateClusterConfig: Configuration for private cluster.
     reconciling: Output only. Indicates whether this resource is currently
       being updated to match its intended state.
-    subnetwork: Name of the Compute Engine subnetwork in which instances
-      associated with this cluster will be created. Must be part of the
-      subnetwork specified for this cluster.
+    subnetwork: Immutable. Name of the Compute Engine subnetwork in which
+      instances associated with this cluster will be created. Must be part of
+      the subnetwork specified for this cluster.
     uid: Output only. A system-assigned unique identified for this resource.
     updateTime: Output only. Time when this resource was most recently
       updated.
@@ -1381,6 +1096,31 @@ class WorkstationCluster(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Client-specified labels that are applied to the resource and that are
+    also propagated to the underlying Compute Engine resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   annotations = _messages.MessageField('AnnotationsValue', 1)
   conditions = _messages.MessageField('Status', 2, repeated=True)
   createTime = _messages.StringField(3)
@@ -1388,61 +1128,67 @@ class WorkstationCluster(_messages.Message):
   deleteTime = _messages.StringField(5)
   displayName = _messages.StringField(6)
   etag = _messages.StringField(7)
-  name = _messages.StringField(8)
-  network = _messages.StringField(9)
-  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 10)
-  reconciling = _messages.BooleanField(11)
-  subnetwork = _messages.StringField(12)
-  uid = _messages.StringField(13)
-  updateTime = _messages.StringField(14)
+  labels = _messages.MessageField('LabelsValue', 8)
+  name = _messages.StringField(9)
+  network = _messages.StringField(10)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 11)
+  reconciling = _messages.BooleanField(12)
+  subnetwork = _messages.StringField(13)
+  uid = _messages.StringField(14)
+  updateTime = _messages.StringField(15)
 
 
 class WorkstationConfig(_messages.Message):
   r"""A set of configuration options describing how a workstation will be run.
-  WorkstationConfigs are intended to be shared across multiple workstations.
+  Workstation configurations are intended to be shared across multiple
+  workstations.
 
   Messages:
     AnnotationsValue: Client-specified annotations.
+    LabelsValue: Client-specified labels that are applied to the resource and
+      that are also propagated to the underlying Compute Engine resources.
 
   Fields:
     annotations: Client-specified annotations.
     conditions: Output only. Status conditions describing the current resource
       state.
-    container: Container that will be run for each Workstation using this
-      config when that Workstation is started.
+    container: Container that will be run for each workstation using this
+      configuration when that workstation is started.
     createTime: Output only. Time when this resource was created.
     degraded: Output only. Whether this resource is in degraded mode, in which
       case it may require user action to restore full functionality. Details
       can be found in the `conditions` field.
     deleteTime: Output only. Time when this resource was soft-deleted.
     displayName: Human-readable name for this resource.
-    encryptionKey: Encrypts resources of this workstation config using a
-      customer-specified encryption key. Boot disk of the Compute Engine
-      instance and the GceRegionalPersistentDisk, if specified will be
-      encrypted using this encryption key. If encryption_key is not set, the
-      disks will be encrypted using automatically generated key. Customer
-      specified encryption keys do not protect access to metadata of the
-      disks. If the customer-specified encryption key is rotated, Workstation
-      will attempt to recreate the GceRegionalPersistentDisk with new version
-      of the key, when the Workstation instance is stopped. Older versions of
-      the key are expected to be kept around until the
-      GceRegionalPersistentDisk is recreated, otherwise data on the
-      GceRegionalPersistentDisk will be lost.
+    encryptionKey: Encrypts resources of this workstation configuration using
+      a customer-managed encryption key. If specified, the boot disk of the
+      Compute Engine instance and the persistent disk are encrypted using this
+      encryption key. If this field is not set, the disks are encrypted using
+      a generated key. Customer-managed encryption keys do not protect disk
+      metadata. If the customer-managed encryption key is rotated, when the
+      workstation instance is stopped, the system attempts to recreate the
+      persistent disk with the new version of the key. Be sure to keep older
+      versions of the key until the persistent disk is recreated. Otherwise,
+      data on the persistent disk will be lost. If the encryption key is
+      revoked, the workstation session will automatically be stopped within 7
+      hours.
     etag: Checksum computed by the server. May be sent on update and delete
       requests to ensure that the client has an up-to-date value before
       proceeding.
-    host: Runtime host for the Workstation.
+    host: Runtime host for the workstation.
     idleTimeout: How long to wait before automatically stopping an instance
       that hasn't received any user traffic. A value of 0 indicates that this
-      instance should never time out due to idleness.
+      instance should never time out due to idleness. Defaults to 20 minutes.
+    labels: Client-specified labels that are applied to the resource and that
+      are also propagated to the underlying Compute Engine resources.
     name: Full name of this resource.
-    persistentDirectories: Directories to persist across Workstation sessions.
+    persistentDirectories: Directories to persist across workstation sessions.
     reconciling: Output only. Indicates whether this resource is currently
       being updated to match its intended state.
     runningTimeout: How long to wait before automatically stopping a
       workstation after it started. A value of 0 indicates that workstations
-      using this config should never time out. Must be greater than 0 and less
-      than 24 hours if encryption_key is set.
+      using this configuration should never time out. Must be greater than 0
+      and less than 24 hours if encryption_key is set. Defaults to 12 hours.
     uid: Output only. A system-assigned unique identified for this resource.
     updateTime: Output only. Time when this resource was most recently
       updated.
@@ -1462,6 +1208,31 @@ class WorkstationConfig(_messages.Message):
 
     class AdditionalProperty(_messages.Message):
       r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Client-specified labels that are applied to the resource and that are
+    also propagated to the underlying Compute Engine resources.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
 
       Fields:
         key: Name of the additional property.
@@ -1484,12 +1255,13 @@ class WorkstationConfig(_messages.Message):
   etag = _messages.StringField(9)
   host = _messages.MessageField('Host', 10)
   idleTimeout = _messages.StringField(11)
-  name = _messages.StringField(12)
-  persistentDirectories = _messages.MessageField('PersistentDirectory', 13, repeated=True)
-  reconciling = _messages.BooleanField(14)
-  runningTimeout = _messages.StringField(15)
-  uid = _messages.StringField(16)
-  updateTime = _messages.StringField(17)
+  labels = _messages.MessageField('LabelsValue', 12)
+  name = _messages.StringField(13)
+  persistentDirectories = _messages.MessageField('PersistentDirectory', 14, repeated=True)
+  reconciling = _messages.BooleanField(15)
+  runningTimeout = _messages.StringField(16)
+  uid = _messages.StringField(17)
+  updateTime = _messages.StringField(18)
 
 
 class WorkstationsProjectsLocationsOperationsCancelRequest(_messages.Message):
@@ -1550,7 +1322,7 @@ class WorkstationsProjectsLocationsWorkstationClustersCreateRequest(_messages.Me
       not actually apply it.
     workstationCluster: A WorkstationCluster resource to be passed as the
       request body.
-    workstationClusterId: Required. ID to use for the cluster.
+    workstationClusterId: Required. ID to use for the workstation cluster.
   """
 
   parent = _messages.StringField(1, required=True)
@@ -1564,13 +1336,13 @@ class WorkstationsProjectsLocationsWorkstationClustersDeleteRequest(_messages.Me
 
   Fields:
     etag: If set, the request will be rejected if the latest version of the
-      cluster on the server does not have this etag.
-    force: If set, any WorkstationConfigs and Workstations in the cluster will
-      also be deleted. Otherwise, the request will work only if the cluster
-      has no configs or workstations.
-    name: Required. Name of the cluster to delete.
+      workstation cluster on the server does not have this etag.
+    force: If set, any workstation configurations and workstations in the
+      workstation cluster are also deleted. Otherwise, the request only works
+      if the workstation cluster has no configurations or workstations.
+    name: Required. Name of the workstation cluster to delete.
     validateOnly: If set, validate the request and preview the review, but do
-      not actually apply it.
+      not apply it.
   """
 
   etag = _messages.StringField(1)
@@ -1608,11 +1380,12 @@ class WorkstationsProjectsLocationsWorkstationClustersPatchRequest(_messages.Mes
   r"""A WorkstationsProjectsLocationsWorkstationClustersPatchRequest object.
 
   Fields:
-    allowMissing: If set, and the cluster is not found, a new cluster will be
-      created. In this situation, update_mask is ignored.
+    allowMissing: If set, and the workstation cluster is not found, a new
+      workstation cluster will be created. In this situation, update_mask is
+      ignored.
     name: Full name of this resource.
-    updateMask: Required. Mask specifying which fields in the cluster should
-      be updated.
+    updateMask: Required. Mask that specifies which fields in the workstation
+      cluster should be updated.
     validateOnly: If set, validate the request and preview the review, but do
       not actually apply it.
     workstationCluster: A WorkstationCluster resource to be passed as the
@@ -1997,8 +1770,6 @@ class WorkstationsProjectsLocationsWorkstationClustersWorkstationConfigsWorkstat
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
-encoding.AddCustomJsonFieldMapping(
-    Rule, 'in_', 'in')
 encoding.AddCustomJsonFieldMapping(
     StandardQueryParameters, 'f__xgafv', '$.xgafv')
 encoding.AddCustomJsonEnumMapping(

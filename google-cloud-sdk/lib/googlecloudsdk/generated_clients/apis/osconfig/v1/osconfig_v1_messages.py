@@ -967,7 +967,8 @@ class OSPolicyAssignment(_messages.Message):
   An OS policy is used to define the desired state configuration for a Compute
   Engine VM instance through a set of configuration resources that provide
   capabilities such as installing or removing software packages, or executing
-  a script. For more information, see [OS policy and OS policy
+  a script. For more information about the OS policy resource definitions and
+  examples, see [OS policy and OS policy
   assignment](https://cloud.google.com/compute/docs/os-configuration-
   management/working-with-os-policies).
 
@@ -1465,8 +1466,7 @@ class OSPolicyResourceExecResourceExec(_messages.Message):
       OSPolicyResourceCompliance after a successful run. Absence or failure to
       read this file will result in this ExecResource being non-compliant.
       Output file size is limited to 100K bytes.
-    script: An inline script. The size of the script is limited to 1024
-      characters.
+    script: An inline script. The size of the script is limited to 32KiB.
   """
 
   class InterpreterValueValuesEnum(_messages.Enum):
@@ -1547,7 +1547,7 @@ class OSPolicyResourceFileResource(_messages.Message):
 
   Fields:
     content: A a file with this content. The size of the content is limited to
-      1024 characters.
+      32KiB.
     file: A remote or local source.
     path: Required. The absolute path of the file within the VM.
     permissions: Consists of three octal digits which represent, in order, the
@@ -2154,7 +2154,8 @@ class OsconfigProjectsLocationsOsPolicyAssignmentsCreateRequest(_messages.Messag
       a letter. * Must be between 1-63 characters. * Must end with a number or
       a letter. * Must be unique within the project.
     parent: Required. The parent resource name in the form:
-      projects/{project}/locations/{location}
+      projects/{project}/locations/{location}. Note: Specify the zone of your
+      VMs as the location.
   """
 
   oSPolicyAssignment = _messages.MessageField('OSPolicyAssignment', 1)

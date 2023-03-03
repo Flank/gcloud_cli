@@ -14,11 +14,9 @@
 # limitations under the License.
 """'vmware locations list' command."""
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
-
 
 from googlecloudsdk.api_lib.vmware.locations import LocationsClient
 from googlecloudsdk.calliope import base
@@ -38,7 +36,6 @@ DETAILED_HELP = {
 }
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List Google Cloud VMware Engine locations."""
@@ -58,4 +55,4 @@ class List(base.ListCommand):
   def Run(self, args):
     project = args.CONCEPTS.project.Parse()
     client = LocationsClient()
-    return client.List(project, limit=args.limit)
+    return client.List(project)

@@ -556,12 +556,54 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  PROJECTS_LOCATIONS_NASJOBS = (
+      'projects.locations.nasJobs',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/nasJobs/'
+              '{nasJobsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_NASJOBS_NASTRIALDETAILS = (
+      'projects.locations.nasJobs.nasTrialDetails',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/nasJobs/'
+              '{nasJobsId}/nasTrialDetails/{nasTrialDetailsId}',
+      },
+      ['name'],
+      True
+  )
   PROJECTS_LOCATIONS_OPERATIONS = (
       'projects.locations.operations',
       '{+name}',
       {
           '':
               'projects/{projectsId}/locations/{locationsId}/operations/'
+              '{operationsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_PERSISTENTRESOURCES = (
+      'projects.locations.persistentResources',
+      'projects/{projectsId}/locations/{locationsId}/persistentResources/'
+      '{persistentResourcesId}',
+      {},
+      ['projectsId', 'locationsId', 'persistentResourcesId'],
+      True
+  )
+  PROJECTS_LOCATIONS_PERSISTENTRESOURCES_OPERATIONS = (
+      'projects.locations.persistentResources.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'persistentResources/{persistentResourcesId}/operations/'
               '{operationsId}',
       },
       ['name'],
@@ -585,6 +627,24 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/pipelineJobs/'
               '{pipelineJobsId}/operations/{operationsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_SCHEDULES = (
+      'projects.locations.schedules',
+      'projects/{projectsId}/locations/{locationsId}/schedules/{schedulesId}',
+      {},
+      ['projectsId', 'locationsId', 'schedulesId'],
+      True
+  )
+  PROJECTS_LOCATIONS_SCHEDULES_OPERATIONS = (
+      'projects.locations.schedules.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/schedules/'
+              '{schedulesId}/operations/{operationsId}',
       },
       ['name'],
       True

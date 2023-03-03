@@ -46,6 +46,9 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
     self.projects_locations_global = self.ProjectsLocationsGlobalService(self)
     self.projects_locations_internalRanges = self.ProjectsLocationsInternalRangesService(self)
     self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
+    self.projects_locations_serviceClasses = self.ProjectsLocationsServiceClassesService(self)
+    self.projects_locations_serviceConnectionMaps = self.ProjectsLocationsServiceConnectionMapsService(self)
+    self.projects_locations_serviceConnectionPolicies = self.ProjectsLocationsServiceConnectionPoliciesService(self)
     self.projects_locations_spokes = self.ProjectsLocationsSpokesService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
@@ -320,6 +323,33 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
         request_field='',
         request_type_name='NetworkconnectivityProjectsLocationsGlobalHubsListRequest',
         response_type_name='ListHubsResponse',
+        supports_download=False,
+    )
+
+    def ListSpokes(self, request, global_params=None):
+      r"""Lists the Network Connectivity Center spokes associated with a specified hub and location. The list includes both spokes that are attached to the hub and spokes that have been proposed but not yet accepted.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListHubSpokesResponse) The response message.
+      """
+      config = self.GetMethodConfig('ListSpokes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListSpokes.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/global/hubs/{hubsId}:listSpokes',
+        http_method='GET',
+        method_id='networkconnectivity.projects.locations.global.hubs.listSpokes',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'orderBy', 'pageSize', 'pageToken', 'spokeLocations', 'view'],
+        relative_path='v1/{+name}:listSpokes',
+        request_field='',
+        request_type_name='NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest',
+        response_type_name='ListHubSpokesResponse',
         supports_download=False,
     )
 
@@ -624,7 +654,7 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      r"""Creates a new InternalRange in a given project and location.
+      r"""Creates a new internal range in a given project and location.
 
       Args:
         request: (NetworkconnectivityProjectsLocationsInternalRangesCreateRequest) input message
@@ -651,7 +681,7 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Deletes a single InternalRange.
+      r"""Deletes a single internal range.
 
       Args:
         request: (NetworkconnectivityProjectsLocationsInternalRangesDeleteRequest) input message
@@ -678,7 +708,7 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      r"""Gets details of a single InternalRange.
+      r"""Gets details of a single internal range.
 
       Args:
         request: (NetworkconnectivityProjectsLocationsInternalRangesGetRequest) input message
@@ -705,7 +735,7 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""Lists InternalRanges in a given project and location.
+      r"""Lists internal ranges in a given project and location.
 
       Args:
         request: (NetworkconnectivityProjectsLocationsInternalRangesListRequest) input message
@@ -732,7 +762,7 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Updates the parameters of a single InternalRange.
+      r"""Updates the parameters of a single internal range.
 
       Args:
         request: (NetworkconnectivityProjectsLocationsInternalRangesPatchRequest) input message
@@ -876,6 +906,279 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
+  class ProjectsLocationsServiceClassesService(base_api.BaseApiService):
+    """Service class for the projects_locations_serviceClasses resource."""
+
+    _NAME = 'projects_locations_serviceClasses'
+
+    def __init__(self, client):
+      super(NetworkconnectivityV1.ProjectsLocationsServiceClassesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceClasses/{serviceClassesId}:getIamPolicy',
+        http_method='GET',
+        method_id='networkconnectivity.projects.locations.serviceClasses.getIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=['options_requestedPolicyVersion'],
+        relative_path='v1/{+resource}:getIamPolicy',
+        request_field='',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceClasses/{serviceClassesId}:setIamPolicy',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceClasses.setIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:setIamPolicy',
+        request_field='setIamPolicyRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestIamPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceClasses/{serviceClassesId}:testIamPermissions',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceClasses.testIamPermissions',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:testIamPermissions',
+        request_field='testIamPermissionsRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest',
+        response_type_name='TestIamPermissionsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsServiceConnectionMapsService(base_api.BaseApiService):
+    """Service class for the projects_locations_serviceConnectionMaps resource."""
+
+    _NAME = 'projects_locations_serviceConnectionMaps'
+
+    def __init__(self, client):
+      super(NetworkconnectivityV1.ProjectsLocationsServiceConnectionMapsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionMaps/{serviceConnectionMapsId}:getIamPolicy',
+        http_method='GET',
+        method_id='networkconnectivity.projects.locations.serviceConnectionMaps.getIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=['options_requestedPolicyVersion'],
+        relative_path='v1/{+resource}:getIamPolicy',
+        request_field='',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionMaps/{serviceConnectionMapsId}:setIamPolicy',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceConnectionMaps.setIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:setIamPolicy',
+        request_field='setIamPolicyRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestIamPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionMaps/{serviceConnectionMapsId}:testIamPermissions',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceConnectionMaps.testIamPermissions',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:testIamPermissions',
+        request_field='testIamPermissionsRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermissionsRequest',
+        response_type_name='TestIamPermissionsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsServiceConnectionPoliciesService(base_api.BaseApiService):
+    """Service class for the projects_locations_serviceConnectionPolicies resource."""
+
+    _NAME = 'projects_locations_serviceConnectionPolicies'
+
+    def __init__(self, client):
+      super(NetworkconnectivityV1.ProjectsLocationsServiceConnectionPoliciesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionPolicies/{serviceConnectionPoliciesId}:getIamPolicy',
+        http_method='GET',
+        method_id='networkconnectivity.projects.locations.serviceConnectionPolicies.getIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=['options_requestedPolicyVersion'],
+        relative_path='v1/{+resource}:getIamPolicy',
+        request_field='',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionPolicies/{serviceConnectionPoliciesId}:setIamPolicy',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceConnectionPolicies.setIamPolicy',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:setIamPolicy',
+        request_field='setIamPolicyRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestIamPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/serviceConnectionPolicies/{serviceConnectionPoliciesId}:testIamPermissions',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.serviceConnectionPolicies.testIamPermissions',
+        ordered_params=['resource'],
+        path_params=['resource'],
+        query_params=[],
+        relative_path='v1/{+resource}:testIamPermissions',
+        request_field='testIamPermissionsRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPermissionsRequest',
+        response_type_name='TestIamPermissionsResponse',
+        supports_download=False,
+    )
+
   class ProjectsLocationsSpokesService(base_api.BaseApiService):
     """Service class for the projects_locations_spokes resource."""
 
@@ -885,6 +1188,33 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
       super(NetworkconnectivityV1.ProjectsLocationsSpokesService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def Accept(self, request, global_params=None):
+      r"""Accepts a proposal to attach a Network Connectivity Center spoke to the hub.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsSpokesAcceptRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Accept')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Accept.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/spokes/{spokesId}:accept',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.spokes.accept',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}:accept',
+        request_field='acceptSpokeRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsSpokesAcceptRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
 
     def Activate(self, request, global_params=None):
       r"""Activates a Network Connectivity Center spoke. By activating a spoke, you permit connectivity between it and other spokes that are attached to the same hub.
@@ -1098,6 +1428,33 @@ class NetworkconnectivityV1(base_api.BaseApiClient):
         relative_path='v1/{+name}',
         request_field='spoke',
         request_type_name='NetworkconnectivityProjectsLocationsSpokesPatchRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def Reject(self, request, global_params=None):
+      r"""Does one of the following: * Rejects a proposal to attach a Network Connectivity Center spoke to the hub. * Rejects and removes a previously attached spoke from the hub.
+
+      Args:
+        request: (NetworkconnectivityProjectsLocationsSpokesRejectRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Reject')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Reject.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/spokes/{spokesId}:reject',
+        http_method='POST',
+        method_id='networkconnectivity.projects.locations.spokes.reject',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}:reject',
+        request_field='rejectSpokeRequest',
+        request_type_name='NetworkconnectivityProjectsLocationsSpokesRejectRequest',
         response_type_name='GoogleLongrunningOperation',
         supports_download=False,
     )

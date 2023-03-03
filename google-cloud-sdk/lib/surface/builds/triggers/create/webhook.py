@@ -26,7 +26,6 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class CreateWebhook(base.CreateCommand):
   """Create a build trigger with a Webhook trigger event."""
 
@@ -50,8 +49,13 @@ class CreateWebhook(base.CreateCommand):
     flag_config = trigger_utils.AddTriggerArgs(parser)
     flag_config.add_argument(
         '--secret',
-        help='The full path of the secret version required to validate webhook requests against this trigger. For example, projects/my-project/secrets/my-secret/versions/1.',
-        required=True)
+        help=("""\
+The full path of the secret version required to validate webhook requests
+against this trigger.
+For example, projects/my-project/secrets/my-secret/versions/1.
+"""),
+        required=True,
+    )
     trigger_utils.AddBuildConfigArgs(flag_config)
     trigger_utils.AddGitRepoSource(flag_config)
     trigger_utils.AddFilterArg(flag_config)

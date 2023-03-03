@@ -273,7 +273,7 @@
           "type": "string"
         },
         "unreachable": {
-          "description": "Locations that could not be reached. For example, ['us-west1', 'us-central1']. A ListRuntimesResponse will only contain either runtimes or unreachables,",
+          "description": "Locations that could not be reached. For example, `['us-west1', 'us-central1']`. A ListRuntimesResponse will only contain either runtimes or unreachables,",
           "type": "array",
           "items": {
             "type": "string"
@@ -365,6 +365,13 @@
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
+        },
+        "labels": {
+          "description": "Optional. The labels to associate with this Managed Notebook or Runtime. Label **keys** must contain 1 to 63 characters, and must conform to [RFC 1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). Label **values** may be empty, but, if present, must contain 1 to 63 characters, and must conform to [RFC 1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). No more than 32 labels can be associated with a cluster.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
@@ -522,7 +529,7 @@
           "type": "boolean"
         },
         "deviceName": {
-          "description": "Optional. Output only. Specifies a unique device name of your choice that is reflected into the \/dev\/disk\/by-id\/google-* tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.",
+          "description": "Optional. Output only. Specifies a unique device name of your choice that is reflected into the `\/dev\/disk\/by-id\/google-*` tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.",
           "readOnly": true,
           "type": "string"
         },
@@ -545,7 +552,7 @@
           "$ref": "LocalDiskInitializeParams"
         },
         "interface": {
-          "description": "Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Persistent disks must always use SCSI and the request will fail if you attempt to attach a persistent disk in any other format than SCSI. Local SSDs can use either NVME or SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance. Valid values: * NVME * SCSI",
+          "description": "Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Persistent disks must always use SCSI and the request will fail if you attempt to attach a persistent disk in any other format than SCSI. Local SSDs can use either NVME or SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance. Valid values: * `NVME` * `SCSI`",
           "type": "string"
         },
         "kind": {
@@ -562,7 +569,7 @@
           }
         },
         "mode": {
-          "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode. Valid values: * READ_ONLY * READ_WRITE",
+          "description": "The mode in which to attach this disk, either `READ_WRITE` or `READ_ONLY`. If not specified, the default is to attach the disk in `READ_WRITE` mode. Valid values: * `READ_ONLY` * `READ_WRITE`",
           "type": "string"
         },
         "source": {
@@ -570,7 +577,7 @@
           "type": "string"
         },
         "type": {
-          "description": "Specifies the type of the disk, either SCRATCH or PERSISTENT. If not specified, the default is PERSISTENT. Valid values: * PERSISTENT * SCRATCH",
+          "description": "Specifies the type of the disk, either `SCRATCH` or `PERSISTENT`. If not specified, the default is `PERSISTENT`. Valid values: * `PERSISTENT` * `SCRATCH`",
           "type": "string"
         }
       }
@@ -581,7 +588,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "The ID of a supported feature. Read [Enabling guest operating system features](https:\/\/cloud.google.com\/compute\/docs\/images\/create-delete-deprecate-private-images#guest-os-features) to see a list of available options. Valid values: * FEATURE_TYPE_UNSPECIFIED * MULTI_IP_SUBNET * SECURE_BOOT * UEFI_COMPATIBLE * VIRTIO_SCSI_MULTIQUEUE * WINDOWS",
+          "description": "The ID of a supported feature. Read [Enabling guest operating system features](https:\/\/cloud.google.com\/compute\/docs\/images\/create-delete-deprecate-private-images#guest-os-features) to see a list of available options. Valid values: * `FEATURE_TYPE_UNSPECIFIED` * `MULTI_IP_SUBNET` * `SECURE_BOOT` * `UEFI_COMPATIBLE` * `VIRTIO_SCSI_MULTIQUEUE` * `WINDOWS`",
           "type": "string"
         }
       }
@@ -671,7 +678,7 @@
           "type": "string",
           "enumDescriptions": [
             "Accelerator type is not specified.",
-            "b\/241005111 K80 deprecation in Google Managed Notebooks Accelerator type is Nvidia Tesla K80.",
+            "Accelerator type is Nvidia Tesla K80.",
             "Accelerator type is Nvidia Tesla P100.",
             "Accelerator type is Nvidia Tesla V100.",
             "Accelerator type is Nvidia Tesla P4.",
@@ -805,6 +812,15 @@
         "disableTerminal": {
           "description": "Bool indicating whether JupyterLab terminal will be available or not. Default: False",
           "type": "boolean"
+        },
+        "version": {
+          "description": "Output only. version of boot image such as M100, from release label of the image.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "mixerDisabled": {
+          "description": "Bool indicating whether mixer client should be disabled. Default: False",
+          "type": "boolean"
         }
       }
     },
@@ -867,6 +883,17 @@
     "ResetRuntimeRequest": {
       "id": "ResetRuntimeRequest",
       "description": "Request for resetting a Managed Notebook Runtime.",
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "description": "Idempotent request UUID.",
+          "type": "string"
+        }
+      }
+    },
+    "UpgradeRuntimeRequest": {
+      "id": "UpgradeRuntimeRequest",
+      "description": "Request for upgrading a Managed Notebook Runtime to the latest version. option (google.api.message_visibility).restriction = \"TRUSTED_TESTER,SPECIAL_TESTER\";",
       "type": "object",
       "properties": {
         "requestId": {
@@ -972,11 +999,11 @@
       "type": "object",
       "properties": {
         "gcsBucket": {
-          "description": "Required. User Cloud Storage bucket location (REQUIRED) ## Must be formatted with path prefix (gs:\/\/$GCS_BUCKET) Permissions: User Managed Notebooks: - storage.buckets.writer: Must be given to the project's service account attached to VM. Google Managed Notebooks: - storage.buckets.writer: Must be given to the project's service account or ## user credentials attached to VM depending on authentication mode. Cloud Storage bucket Log file will be written to gs:\/\/$GCS_BUCKET\/$RELATIVE_PATH\/$VM_DATE_$TIME.tar.gz",
+          "description": "Required. User Cloud Storage bucket location (REQUIRED). Must be formatted with path prefix (`gs:\/\/$GCS_BUCKET`). Permissions: User Managed Notebooks: - storage.buckets.writer: Must be given to the project's service account attached to VM. Google Managed Notebooks: - storage.buckets.writer: Must be given to the project's service account or user credentials attached to VM depending on authentication mode. Cloud Storage bucket Log file will be written to `gs:\/\/$GCS_BUCKET\/$RELATIVE_PATH\/$VM_DATE_$TIME.tar.gz`",
           "type": "string"
         },
         "relativePath": {
-          "description": "Optional. Defines the relative storage path in the Cloud Storage bucket where the diagnostic logs will be written: Default path will be the root directory of the Cloud Storage bucket (gs:\/\/$GCS_BUCKET\/$DATE_$TIME.tar.gz) Example of full path where Log file will be written: gs:\/\/$GCS_BUCKET\/$RELATIVE_PATH\/",
+          "description": "Optional. Defines the relative storage path in the Cloud Storage bucket where the diagnostic logs will be written: Default path will be the root directory of the Cloud Storage bucket (`gs:\/\/$GCS_BUCKET\/$DATE_$TIME.tar.gz`) Example of full path where Log file will be written: `gs:\/\/$GCS_BUCKET\/$RELATIVE_PATH\/`",
           "type": "string"
         },
         "repairFlagEnabled": {
@@ -1010,7 +1037,7 @@
           "type": "string"
         },
         "unreachable": {
-          "description": "Locations that could not be reached. For example, ['us-west1-a', 'us-central1-b']. A ListInstancesResponse will only contain either instances or unreachables,",
+          "description": "Locations that could not be reached. For example, `['us-west1-a', 'us-central1-b']`. A ListInstancesResponse will only contain either instances or unreachables,",
           "type": "array",
           "items": {
             "type": "string"
@@ -1064,11 +1091,11 @@
           }
         },
         "machineType": {
-          "description": "Required. The [Compute Engine machine type](\/compute\/docs\/machine-types) of this instance.",
+          "description": "Required. The [Compute Engine machine type](https:\/\/cloud.google.com\/compute\/docs\/machine-types) of this instance.",
           "type": "string"
         },
         "acceleratorConfig": {
-          "description": "The hardware accelerator used on this instance. If you use accelerators, make sure that your configuration has [enough vCPUs and memory to support the `machine_type` you have selected](\/compute\/docs\/gpus\/#gpus-list).",
+          "description": "The hardware accelerator used on this instance. If you use accelerators, make sure that your configuration has [enough vCPUs and memory to support the `machine_type` you have selected](https:\/\/cloud.google.com\/compute\/docs\/gpus\/#gpus-list).",
           "$ref": "AcceleratorConfig"
         },
         "state": {
@@ -1298,7 +1325,7 @@
     },
     "AcceleratorConfig": {
       "id": "AcceleratorConfig",
-      "description": "Definition of a hardware accelerator. Note that not all combinations of `type` and `core_count` are valid. Check [GPUs on Compute Engine](\/compute\/docs\/gpus\/#gpus-list) to find a valid combination. TPUs are not supported.",
+      "description": "Definition of a hardware accelerator. Note that not all combinations of `type` and `core_count` are valid. Check [GPUs on Compute Engine](https:\/\/cloud.google.com\/compute\/docs\/gpus\/#gpus-list) to find a valid combination. TPUs are not supported.",
       "type": "object",
       "properties": {
         "type": {
@@ -1354,7 +1381,7 @@
           "type": "boolean"
         },
         "deviceName": {
-          "description": "Indicates a unique device name of your choice that is reflected into the \/dev\/disk\/by-id\/google-* tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine.This field is only applicable for persistent disks.",
+          "description": "Indicates a unique device name of your choice that is reflected into the `\/dev\/disk\/by-id\/google-*` tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine.This field is only applicable for persistent disks.",
           "type": "string"
         },
         "diskSizeGb": {
@@ -1375,7 +1402,7 @@
           "format": "int64"
         },
         "interface": {
-          "description": "Indicates the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Persistent disks must always use SCSI and the request will fail if you attempt to attach a persistent disk in any other format than SCSI. Local SSDs can use either NVME or SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance. Valid values: * NVME * SCSI",
+          "description": "Indicates the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Persistent disks must always use SCSI and the request will fail if you attempt to attach a persistent disk in any other format than SCSI. Local SSDs can use either NVME or SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance. Valid values: * `NVME` * `SCSI`",
           "type": "string"
         },
         "kind": {
@@ -1390,7 +1417,7 @@
           }
         },
         "mode": {
-          "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode. Valid values: * READ_ONLY * READ_WRITE",
+          "description": "The mode in which to attach this disk, either `READ_WRITE` or `READ_ONLY`. If not specified, the default is to attach the disk in `READ_WRITE` mode. Valid values: * `READ_ONLY` * `READ_WRITE`",
           "type": "string"
         },
         "source": {
@@ -1398,7 +1425,7 @@
           "type": "string"
         },
         "type": {
-          "description": "Indicates the type of the disk, either SCRATCH or PERSISTENT. Valid values: * PERSISTENT * SCRATCH",
+          "description": "Indicates the type of the disk, either `SCRATCH` or `PERSISTENT`. Valid values: * `PERSISTENT` * `SCRATCH`",
           "type": "string"
         }
       }
@@ -1409,14 +1436,14 @@
       "type": "object",
       "properties": {
         "type": {
-          "description": "The ID of a supported feature. Read Enabling guest operating system features to see a list of available options. Valid values: * FEATURE_TYPE_UNSPECIFIED * MULTI_IP_SUBNET * SECURE_BOOT * UEFI_COMPATIBLE * VIRTIO_SCSI_MULTIQUEUE * WINDOWS",
+          "description": "The ID of a supported feature. Read Enabling guest operating system features to see a list of available options. Valid values: * `FEATURE_TYPE_UNSPECIFIED` * `MULTI_IP_SUBNET` * `SECURE_BOOT` * `UEFI_COMPATIBLE` * `VIRTIO_SCSI_MULTIQUEUE` * `WINDOWS`",
           "type": "string"
         }
       }
     },
     "ShieldedInstanceConfig": {
       "id": "ShieldedInstanceConfig",
-      "description": "A set of Shielded Instance options. Check [Images using supported Shielded VM features] Not all combinations are valid.",
+      "description": "A set of Shielded Instance options. Check [Images using supported Shielded VM features](https:\/\/cloud.google.com\/compute\/docs\/instances\/modifying-shielded-vm). Not all combinations are valid.",
       "type": "object",
       "properties": {
         "enableSecureBoot": {
@@ -1480,7 +1507,7 @@
           "format": "google-datetime"
         },
         "targetImage": {
-          "description": "Target VM Image. Format: ainotebooks-vm\/project\/image-name\/name.",
+          "description": "Target VM Image. Format: `ainotebooks-vm\/project\/image-name\/name`.",
           "type": "string"
         },
         "action": {
@@ -1809,7 +1836,7 @@
       "type": "object",
       "properties": {
         "targetSnapshot": {
-          "description": "Required. The snapshot for rollback. Example: \"projects\/test-project\/global\/snapshots\/krwlzipynril\".",
+          "description": "Required. The snapshot for rollback. Example: `projects\/test-project\/global\/snapshots\/krwlzipynril`.",
           "type": "string"
         }
       }
@@ -1953,7 +1980,7 @@
           "type": "string"
         },
         "displayName": {
-          "description": "Output only. Display name used for UI purposes. Name can only contain alphanumeric characters, hyphens '-', and underscores '_'.",
+          "description": "Output only. Display name used for UI purposes. Name can only contain alphanumeric characters, hyphens `-`, and underscores `_`.",
           "readOnly": true,
           "type": "string"
         },
@@ -1983,7 +2010,7 @@
           ]
         },
         "cronSchedule": {
-          "description": "Cron-tab formatted schedule by which the job will execute. Format: minute, hour, day of month, month, day of week, e.g. 0 0 * * WED = every Wednesday More examples: https:\/\/crontab.guru\/examples.html",
+          "description": "Cron-tab formatted schedule by which the job will execute. Format: minute, hour, day of month, month, day of week, e.g. `0 0 * * WED` = every Wednesday More examples: https:\/\/crontab.guru\/examples.html",
           "type": "string"
         },
         "timeZone": {
@@ -2169,11 +2196,11 @@
       "type": "object",
       "properties": {
         "network": {
-          "description": "The full name of the Compute Engine [network](\/compute\/docs\/networks-and-firewalls#networks) to which the Job should be peered. For example, `projects\/12345\/global\/networks\/myVPC`. [Format](https:\/\/cloud.google.com\/compute\/docs\/reference\/rest\/v1\/networks\/insert) is of the form `projects\/{project}\/global\/networks\/{network}`. Where {project} is a project number, as in `12345`, and {network} is a network name. Private services access must already be configured for the network. If left unspecified, the job is not peered with any network.",
+          "description": "The full name of the Compute Engine [network](https:\/\/cloud.google.com\/compute\/docs\/networks-and-firewalls#networks) to which the Job should be peered. For example, `projects\/12345\/global\/networks\/myVPC`. [Format](https:\/\/cloud.google.com\/compute\/docs\/reference\/rest\/v1\/networks\/insert) is of the form `projects\/{project}\/global\/networks\/{network}`. Where `{project}` is a project number, as in `12345`, and `{network}` is a network name. Private services access must already be configured for the network. If left unspecified, the job is not peered with any network.",
           "type": "string"
         },
         "env": {
-          "description": "Environment variables. At most 100 environment variables can be specified and unique. Example: GCP_BUCKET=gs:\/\/my-bucket\/samples\/",
+          "description": "Environment variables. At most 100 environment variables can be specified and unique. Example: `GCP_BUCKET=gs:\/\/my-bucket\/samples\/`",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -2288,6 +2315,21 @@
         }
       }
     },
+    "ReportInstanceEventRequest": {
+      "id": "ReportInstanceEventRequest",
+      "description": "Request for reporting a Managed Notebook Event.",
+      "type": "object",
+      "properties": {
+        "vmId": {
+          "description": "Required. The VM hardware token for authenticating the VM. https:\/\/cloud.google.com\/compute\/docs\/instances\/verifying-instance-identity",
+          "type": "string"
+        },
+        "event": {
+          "description": "Required. The Event to be reported.",
+          "$ref": "Event"
+        }
+      }
+    },
     "SetIamPolicyRequest": {
       "id": "SetIamPolicyRequest",
       "description": "Request message for `SetIamPolicy` method.",
@@ -2333,7 +2375,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2750,7 +2792,7 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required. Specifies the path, relative to `Runtime`, of the field to update. For example, to change the software configuration kernels, the `update_mask` parameter would be specified as `software_config.kernels`, and the `PATCH` request body would specify the new value, as follows: { \"software_config\":{ \"kernels\": [{ 'repository': 'gcr.io\/deeplearning-platform-release\/pytorch-gpu', 'tag': 'latest' }], } } Currently, only the following fields can be updated: - software_config.kernels - software_config.post_startup_script - software_config.custom_gpu_driver_path - software_config.idle_shutdown - software_config.idle_shutdown_timeout - software_config.disable_terminal",
+                      "description": "Required. Specifies the path, relative to `Runtime`, of the field to update. For example, to change the software configuration kernels, the `update_mask` parameter would be specified as `software_config.kernels`, and the `PATCH` request body would specify the new value, as follows: { \"software_config\":{ \"kernels\": [{ 'repository': 'gcr.io\/deeplearning-platform-release\/pytorch-gpu', 'tag': 'latest' }], } } Currently, only the following fields can be updated: - `software_config.kernels` - `software_config.post_startup_script` - `software_config.custom_gpu_driver_path` - `software_config.idle_shutdown` - `software_config.idle_shutdown_timeout` - `software_config.disable_terminal` - `labels`",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2916,6 +2958,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Resets a Managed Notebook Runtime."
+                },
+                "upgrade": {
+                  "id": "notebooks.projects.locations.runtimes.upgrade",
+                  "path": "v1/{+name}:upgrade",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/runtimes/{runtimesId}:upgrade",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Format: `projects\/{project_id}\/locations\/{location}\/runtimes\/{runtime_id}`",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/runtimes\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "UpgradeRuntimeRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Upgrades a Managed Notebook Runtime to the latest version."
                 },
                 "reportEvent": {
                   "id": "notebooks.projects.locations.runtimes.reportEvent",
@@ -3700,6 +3770,34 @@
                   ],
                   "description": "Allows notebook instances to call this endpoint to upgrade themselves. Do not use this method directly."
                 },
+                "reportEvent": {
+                  "id": "notebooks.projects.locations.instances.reportEvent",
+                  "path": "v1/{+name}:reportEvent",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}:reportEvent",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Format: `projects\/{project_id}\/locations\/{location}\/instances\/{instance_id}`",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "ReportInstanceEventRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Reports and processes an instance event."
+                },
                 "setIamPolicy": {
                   "id": "notebooks.projects.locations.instances.setIamPolicy",
                   "path": "v1/{+resource}:setIamPolicy",
@@ -4100,7 +4198,7 @@
                       "type": "string"
                     },
                     "filter": {
-                      "description": "Filter applied to resulting executions. Currently only supports filtering executions by a specified schedule_id. Format: `schedule_id=`",
+                      "description": "Filter applied to resulting executions. Currently only supports filtering executions by a specified `schedule_id`. Format: `schedule_id=`",
                       "location": "query",
                       "type": "string"
                     },

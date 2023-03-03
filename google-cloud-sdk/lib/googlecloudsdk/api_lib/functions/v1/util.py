@@ -27,6 +27,7 @@ import os
 import re
 
 from apitools.base.py import exceptions as apitools_exceptions
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.functions.v1 import exceptions
 from googlecloudsdk.api_lib.functions.v1 import operations
 from googlecloudsdk.api_lib.storage import storage_util
@@ -45,35 +46,32 @@ import six.moves.http_client
 
 _DEPLOY_WAIT_NOTICE = 'Deploying function (may take a while - up to 2 minutes)'
 
-_FUNCTION_NAME_RE = re.compile(r'^[A-Za-z](?:[-_A-Za-z0-9]{0,61}[A-Za-z0-9])?$')
+_FUNCTION_NAME_RE = re.compile(
+    r'^(.*/)?[A-Za-z](?:[-_A-Za-z0-9]{0,61}[A-Za-z0-9])?$'
+)
 _FUNCTION_NAME_ERROR = (
     'Function name must contain only Latin letters, digits and a '
     'hyphen (-). It must start with letter, must not end with a hyphen, '
-    'and must be at most 63 characters long.')
+    'and must be at most 63 characters long.'
+)
 
 _TOPIC_NAME_RE = re.compile(r'^[a-zA-Z][\-\._~%\+a-zA-Z0-9]{2,254}$')
 _TOPIC_NAME_ERROR = (
     'Topic must contain only Latin letters (lower- or upper-case), digits and '
     'the characters - + . _ ~ %. It must start with a letter and be from 3 to '
-    '255 characters long.')
+    '255 characters long.'
+)
 
 _DEPRECATED_NODEJS_RUNTIMES = (
     'nodejs6',
     'nodejs8',
     'nodejs10',
-    )
+)
 _DEPRECATED_GO_RUNTIMES = ('go111',)
 _SUGGESTED_NODEJS_RUNTIME = 'nodejs12'
 _SUGGESTED_GO_RUNTIME = 'go113'
 
 _BUCKET_RESOURCE_URI_RE = re.compile(r'^projects/_/buckets/.{3,222}$')
-
-_KMS_KEY_RE = re.compile(
-    r'^projects/[^/]+/locations/(?P<location>[^/]+)/keyRings/[a-zA-Z0-9_-]+'
-    '/cryptoKeys/[a-zA-Z0-9_-]+$')
-_DOCKER_REPOSITORY_RE = re.compile(
-    r'^projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)'
-    '/repositories/[a-z]([a-z0-9-]*[a-z0-9])?$')
 
 _API_NAME = 'cloudfunctions'
 _API_VERSION = 'v1'
@@ -109,10 +107,13 @@ def GetApiMessagesModule(track=calliope_base.ReleaseTrack.GA):
 
 def GetFunctionRef(name):
   return resources.REGISTRY.Parse(
-      name, params={
+      name,
+      params={
           'projectsId': properties.VALUES.core.project.Get(required=True),
-          'locationsId': properties.VALUES.functions.region.Get()},
-      collection='cloudfunctions.projects.locations.functions')
+          'locationsId': properties.VALUES.functions.region.Get(),
+      },
+      collection='cloudfunctions.projects.locations.functions',
+  )
 
 
 _ID_CHAR = '[a-zA-Z0-9_]'
@@ -129,8 +130,10 @@ _PART = '(/(' + _SEGMENT + '|' + _CAPTURE + '))'
 # path: part+ (but first / is optional)
 _PATH = '(/?(' + _SEGMENT + '|' + _CAPTURE + ')' + _PART + '*)'
 
-_PATH_RE_ERROR = ('Path must be a slash-separated list of segments and '
-                  'captures. For example, [users/{userId}/profilePic].')
+_PATH_RE_ERROR = (
+    'Path must be a slash-separated list of segments and '
+    'captures. For example, [users/{userId}/profilePic].'
+)
 
 
 def GetHttpErrorMessage(error):
@@ -161,7 +164,8 @@ def GetHttpErrorMessage(error):
   except (ValueError, TypeError):
     message = error.content
   return 'ResponseError: status=[{0}], code=[{1}], message=[{2}]'.format(
-      status, code, encoding.Decode(message))
+      status, code, encoding.Decode(message)
+  )
 
 
 def _ValidateArgumentByRegexOrRaise(argument, regex, error_message):
@@ -171,7 +175,8 @@ def _ValidateArgumentByRegexOrRaise(argument, regex, error_message):
     match = regex.match(argument)
   if not match:
     raise arg_parsers.ArgumentTypeError(
-        "Invalid value '{0}': {1}".format(argument, error_message))
+        "Invalid value '{0}': {1}".format(argument, error_message)
+    )
   return argument
 
 
@@ -180,13 +185,15 @@ def ValidateFunctionNameOrRaise(name):
 
   Args:
     name: Function name provided by user.
+
   Returns:
     Function name.
   Raises:
     ArgumentTypeError: If the name provided by user is not valid.
   """
-  return _ValidateArgumentByRegexOrRaise(name, _FUNCTION_NAME_RE,
-                                         _FUNCTION_NAME_ERROR)
+  return _ValidateArgumentByRegexOrRaise(
+      name, _FUNCTION_NAME_RE, _FUNCTION_NAME_ERROR
+  )
 
 
 def ValidateAndStandarizeBucketUriOrRaise(bucket):
@@ -196,6 +203,7 @@ def ValidateAndStandarizeBucketUriOrRaise(bucket):
 
   Args:
     bucket: Bucket uri provided by user.
+
   Returns:
     Sanitized bucket uri.
   Raises:
@@ -206,10 +214,12 @@ def ValidateAndStandarizeBucketUriOrRaise(bucket):
   else:
     try:
       bucket_ref = storage_util.BucketReference.FromArgument(
-          bucket, require_prefix=False)
+          bucket, require_prefix=False
+      )
     except argparse.ArgumentTypeError as e:
       raise arg_parsers.ArgumentTypeError(
-          "Invalid value '{}': {}".format(bucket, e))
+          "Invalid value '{}': {}".format(bucket, e)
+      )
 
   # strip any extrenuous '/' and append single '/'
   bucket = bucket_ref.ToUrl().rstrip('/') + '/'
@@ -221,13 +231,15 @@ def ValidatePubsubTopicNameOrRaise(topic):
 
   Args:
     topic: Pub/Sub topic name provided by user.
+
   Returns:
     Topic name.
   Raises:
     ArgumentTypeError: If the name provided by user is not valid.
   """
-  topic = _ValidateArgumentByRegexOrRaise(topic, _TOPIC_NAME_RE,
-                                          _TOPIC_NAME_ERROR)
+  topic = _ValidateArgumentByRegexOrRaise(
+      topic, _TOPIC_NAME_RE, _TOPIC_NAME_ERROR
+  )
   return topic
 
 
@@ -242,15 +254,19 @@ def ValidateRuntime(runtime):
   """
   # TODO(b/178004928): replace hardcoded warnings with ListRuntimes api
   if runtime in _DEPRECATED_NODEJS_RUNTIMES:
-    return ('The {} runtime is deprecated on Cloud Functions. '
-            'Please migrate to a newer Node.js version '
-            '(--runtime={}). '
-            'See https://cloud.google.com/functions/docs/migrating/'
-            'nodejs-runtimes'.format(runtime, _SUGGESTED_NODEJS_RUNTIME))
+    return (
+        'The {} runtime is deprecated on Cloud Functions. '
+        'Please migrate to a newer Node.js version '
+        '(--runtime={}). '
+        'See https://cloud.google.com/functions/docs/migrating/'
+        'nodejs-runtimes'.format(runtime, _SUGGESTED_NODEJS_RUNTIME)
+    )
   elif runtime in _DEPRECATED_GO_RUNTIMES:
-    return ('The {} runtime is deprecated on Cloud Functions. '
-            'Please migrate to a newer Golang version '
-            '(--runtime={}).'.format(runtime, _SUGGESTED_GO_RUNTIME))
+    return (
+        'The {} runtime is deprecated on Cloud Functions. '
+        'Please migrate to a newer Golang version '
+        '(--runtime={}).'.format(runtime, _SUGGESTED_GO_RUNTIME)
+    )
   return None
 
 
@@ -259,6 +275,7 @@ def ValidateDirectoryExistsOrRaiseFunctionError(directory):
 
   Args:
     directory: A string: a local path to directory provided by user.
+
   Returns:
     The argument provided, if found valid.
   Raises:
@@ -266,10 +283,12 @@ def ValidateDirectoryExistsOrRaiseFunctionError(directory):
   """
   if not os.path.exists(directory):
     raise exceptions.FunctionsError(
-        'argument `--source`: Provided directory does not exist')
+        'argument `--source`: Provided directory does not exist'
+    )
   if not os.path.isdir(directory):
     raise exceptions.FunctionsError(
-        'argument `--source`: Provided path does not point to a directory')
+        'argument `--source`: Provided path does not point to a directory'
+    )
   return directory
 
 
@@ -278,6 +297,7 @@ def ValidatePathOrRaise(path):
 
   Args:
     path: A string: resource path
+
   Returns:
     The argument provided, if found valid.
   Raises:
@@ -287,74 +307,26 @@ def ValidatePathOrRaise(path):
   return path
 
 
-def ValidateKMSKeyForFunction(kms_key, function_ref):
-  """Checks that the KMS key is compatible with the function.
-
-  Args:
-    kms_key: Fully qualified KMS key name.
-    function_ref: Function resource reference.
-
-  Raises:
-    InvalidArgumentException: If the specified KMS key is not compatible with
-      the function.
-  """
-  function_project = function_ref.projectsId
-  function_location = function_ref.locationsId
-  kms_key_match = _KMS_KEY_RE.search(kms_key)
-  if kms_key_match:
-    kms_keyring_location = kms_key_match.group('location')
-    if kms_keyring_location == 'global':
-      raise base_exceptions.InvalidArgumentException(
-          '--kms-key', 'Global KMS keyrings are not allowed.')
-    if function_location != kms_keyring_location:
-      raise base_exceptions.InvalidArgumentException(
-          '--kms-key',
-          'KMS keyrings should be created in the same region as the function.')
-
-
-def ValidateDockerRepositoryForFunction(docker_repository, function_ref):
-  """Checks that the Docker repository is compatible with the function.
-
-  Args:
-    docker_repository: Fully qualified Docker repository resource name.
-    function_ref: Function resource reference.
-
-  Raises:
-    InvalidArgumentException: If the specified Docker repository is not
-      compatible with the function.
-  """
-  function_project = function_ref.projectsId
-  function_location = function_ref.locationsId
-  repo_match = _DOCKER_REPOSITORY_RE.search(docker_repository)
-  if repo_match:
-    repo_project = repo_match.group('project')
-    repo_location = repo_match.group('location')
-    if function_project != repo_project and function_project.isdigit(
-    ) == repo_project.isdigit():
-      raise base_exceptions.InvalidArgumentException(
-          '--docker-repository',
-          'Cross-project repositories are not supported.')
-    if function_location != repo_location:
-      raise base_exceptions.InvalidArgumentException(
-          '--docker-repository',
-          'Cross-location repositories are not supported.')
-
-
 def _GetViolationsFromError(error):
   """Looks for violations descriptions in error message.
 
   Args:
     error: HttpError containing error information.
+
   Returns:
     String of newline-separated violations descriptions.
   """
   error_payload = exceptions_util.HttpErrorPayload(error)
   errors = []
   errors.extend(
-      ['{}:\n{}'.format(k, v) for k, v in error_payload.violations.items()])
-  errors.extend([
-      '{}:\n{}'.format(k, v) for k, v in error_payload.field_violations.items()
-  ])
+      ['{}:\n{}'.format(k, v) for k, v in error_payload.violations.items()]
+  )
+  errors.extend(
+      [
+          '{}:\n{}'.format(k, v)
+          for k, v in error_payload.field_violations.items()
+      ]
+  )
   if errors:
     return '\n'.join(errors) + '\n'
   return ''
@@ -365,6 +337,7 @@ def _GetPermissionErrorDetails(error_info):
 
   Args:
     error_info: json containing error information.
+
   Returns:
     string containing details on permission issue and suggestions to correct.
   """
@@ -388,7 +361,8 @@ def CatchHTTPErrorRaiseHTTPException(func):
       return func(*args, **kwargs)
     except apitools_exceptions.HttpError as error:
       core_exceptions.reraise(
-          base_exceptions.HttpException(GetHttpErrorMessage(error)))
+          base_exceptions.HttpException(GetHttpErrorMessage(error))
+      )
 
   return CatchHTTPErrorRaiseHTTPExceptionFn
 
@@ -414,7 +388,9 @@ def GetFunction(function_name):
     # We got response for a get request so a function exists.
     return client.projects_locations_functions.Get(
         messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
-            name=function_name))
+            name=function_name
+        )
+    )
   except apitools_exceptions.HttpError as error:
     if error.status_code == six.moves.http_client.NOT_FOUND:
       # The function has not been found.
@@ -422,22 +398,43 @@ def GetFunction(function_name):
     raise
 
 
+@CatchHTTPErrorRaiseHTTPException
+def ListRegions():
+  """Returns the list of regions where GCF 1st Gen is supported."""
+  client = GetApiClientInstance()
+  messages = client.MESSAGES_MODULE
+  return list_pager.YieldFromList(
+      service=client.projects_locations,
+      request=messages.CloudfunctionsProjectsLocationsListRequest(
+          name='projects/' + properties.VALUES.core.project.Get(required=True)
+      ),
+      field='locations',
+      batch_size_attribute='pageSize',
+  )
+
+
 # TODO(b/130604453): Remove try_set_invoker option
 @CatchHTTPErrorRaiseHTTPException
-def WaitForFunctionUpdateOperation(op, try_set_invoker=None,
-                                   on_every_poll=None):
+def WaitForFunctionUpdateOperation(
+    op, try_set_invoker=None, on_every_poll=None
+):
   """Wait for the specied function update to complete.
 
   Args:
     op: Cloud operation to wait on.
     try_set_invoker: function to try setting invoker, see above TODO.
-    on_every_poll: list of functions to execute every time we poll.
-                   Functions should take in Operation as an argument.
+    on_every_poll: list of functions to execute every time we poll. Functions
+      should take in Operation as an argument.
   """
   client = GetApiClientInstance()
-  operations.Wait(op, client.MESSAGES_MODULE, client, _DEPLOY_WAIT_NOTICE,
-                  try_set_invoker=try_set_invoker,
-                  on_every_poll=on_every_poll)
+  operations.Wait(
+      op,
+      client.MESSAGES_MODULE,
+      client,
+      _DEPLOY_WAIT_NOTICE,
+      try_set_invoker=try_set_invoker,
+      on_every_poll=on_every_poll,
+  )
 
 
 @CatchHTTPErrorRaiseHTTPException
@@ -478,7 +475,9 @@ def CreateFunction(function, location):
   messages = client.MESSAGES_MODULE
   return client.projects_locations_functions.Create(
       messages.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
-          location=location, cloudFunction=function))
+          location=location, cloudFunction=function
+      )
+  )
 
 
 @CatchHTTPErrorRaiseHTTPException
@@ -487,13 +486,17 @@ def GetFunctionIamPolicy(function_resource_name):
   messages = client.MESSAGES_MODULE
   return client.projects_locations_functions.GetIamPolicy(
       messages.CloudfunctionsProjectsLocationsFunctionsGetIamPolicyRequest(
-          resource=function_resource_name))
+          resource=function_resource_name
+      )
+  )
 
 
 @CatchHTTPErrorRaiseHTTPException
-def AddFunctionIamPolicyBinding(function_resource_name,
-                                member='allUsers',
-                                role='roles/cloudfunctions.invoker'):
+def AddFunctionIamPolicyBinding(
+    function_resource_name,
+    member='allUsers',
+    role='roles/cloudfunctions.invoker',
+):
   client = GetApiClientInstance()
   messages = client.MESSAGES_MODULE
   policy = GetFunctionIamPolicy(function_resource_name)
@@ -501,14 +504,17 @@ def AddFunctionIamPolicyBinding(function_resource_name,
   return client.projects_locations_functions.SetIamPolicy(
       messages.CloudfunctionsProjectsLocationsFunctionsSetIamPolicyRequest(
           resource=function_resource_name,
-          setIamPolicyRequest=messages.SetIamPolicyRequest(policy=policy)))
+          setIamPolicyRequest=messages.SetIamPolicyRequest(policy=policy),
+      )
+  )
 
 
 @CatchHTTPErrorRaiseHTTPException
 def RemoveFunctionIamPolicyBindingIfFound(
     function_resource_name,
     member='allUsers',
-    role='roles/cloudfunctions.invoker'):
+    role='roles/cloudfunctions.invoker',
+):
   """Removes the specified policy binding if it is found."""
   client = GetApiClientInstance()
   messages = client.MESSAGES_MODULE
@@ -518,7 +524,9 @@ def RemoveFunctionIamPolicyBindingIfFound(
     client.projects_locations_functions.SetIamPolicy(
         messages.CloudfunctionsProjectsLocationsFunctionsSetIamPolicyRequest(
             resource=function_resource_name,
-            setIamPolicyRequest=messages.SetIamPolicyRequest(policy=policy)))
+            setIamPolicyRequest=messages.SetIamPolicyRequest(policy=policy),
+        )
+    )
     return True
   else:
     return False
@@ -531,11 +539,14 @@ def CanAddFunctionIamPolicyBinding(project):
   messages = client.MESSAGES_MODULE
   needed_permissions = [
       'resourcemanager.projects.getIamPolicy',
-      'resourcemanager.projects.setIamPolicy']
+      'resourcemanager.projects.setIamPolicy',
+  ]
   iam_request = messages.CloudresourcemanagerProjectsTestIamPermissionsRequest(
       resource=project,
       testIamPermissionsRequest=messages.TestIamPermissionsRequest(
-          permissions=needed_permissions))
+          permissions=needed_permissions
+      ),
+  )
   iam_response = client.projects.TestIamPermissions(iam_request)
   can_add = True
   for needed_permission in needed_permissions:

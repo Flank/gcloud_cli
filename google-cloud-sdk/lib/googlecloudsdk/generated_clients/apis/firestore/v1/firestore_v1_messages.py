@@ -278,9 +278,12 @@ class CompositeFilter(_messages.Message):
     Values:
       OPERATOR_UNSPECIFIED: Unspecified. This value must not be used.
       AND: Documents are required to satisfy all of the combined filters.
+      OR: Documents are required to satisfy at least one of the combined
+        filters.
     """
     OPERATOR_UNSPECIFIED = 0
     AND = 1
+    OR = 2
 
   filters = _messages.MessageField('Filter', 1, repeated=True)
   op = _messages.EnumField('OpValueValuesEnum', 2)
@@ -825,11 +828,8 @@ class FirestoreProjectsDatabasesCreateRequest(_messages.Message):
 
   Fields:
     databaseId: Required. The ID to use for the database, which will become
-      the final component of the database's resource name. This value should
-      be 4-63 characters. Valid characters are /a-z-/ with first character a
-      letter and the last a letter or a number. Must not be UUID-like
-      /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database id is
-      also valid.
+      the final component of the database's resource name. The value must be
+      set to "(default)".
     googleFirestoreAdminV1Database: A GoogleFirestoreAdminV1Database resource
       to be passed as the request body.
     parent: Required. A parent name of the form `projects/{project_id}`
@@ -838,6 +838,27 @@ class FirestoreProjectsDatabasesCreateRequest(_messages.Message):
   databaseId = _messages.StringField(1)
   googleFirestoreAdminV1Database = _messages.MessageField('GoogleFirestoreAdminV1Database', 2)
   parent = _messages.StringField(3, required=True)
+
+
+class FirestoreProjectsDatabasesDeleteRequest(_messages.Message):
+  r"""A FirestoreProjectsDatabasesDeleteRequest object.
+
+  Fields:
+    allowMissing: If set to true and the Database is not found, the request
+      will succeed but no action will be taken.
+    etag: The current etag of the Database. If an etag is provided and does
+      not match the current etag of the database, deletion will be blocked and
+      a FAILED_PRECONDITION error will be returned.
+    name: Required. A name of the form
+      `projects/{project_id}/databases/{database_id}`
+    validateOnly: If set, validate the request and preview the response, but
+      do not actually delete the database.
+  """
+
+  allowMissing = _messages.BooleanField(1)
+  etag = _messages.StringField(2)
+  name = _messages.StringField(3, required=True)
+  validateOnly = _messages.BooleanField(4)
 
 
 class FirestoreProjectsDatabasesDocumentsBatchGetRequest(_messages.Message):
@@ -977,28 +998,37 @@ class FirestoreProjectsDatabasesDocumentsListDocumentsRequest(_messages.Message)
   r"""A FirestoreProjectsDatabasesDocumentsListDocumentsRequest object.
 
   Fields:
-    collectionId: Required. The collection ID, relative to `parent`, to list.
-      For example: `chatrooms` or `messages`.
+    collectionId: Optional. The collection ID, relative to `parent`, to list.
+      For example: `chatrooms` or `messages`. This is optional, and when not
+      provided, Firestore will list documents from all collections under the
+      provided `parent`.
     mask_fieldPaths: The list of field paths in the mask. See Document.fields
       for a field path syntax reference.
-    orderBy: The order to sort results by. For example: `priority desc, name`.
-    pageSize: The maximum number of documents to return.
-    pageToken: The `next_page_token` value returned from a previous List
-      request, if any.
+    orderBy: Optional. The optional ordering of the documents to return. For
+      example: `priority desc, __name__ desc`. This mirrors the `ORDER BY`
+      used in Firestore queries but in a string representation. When absent,
+      documents are ordered based on `__name__ ASC`.
+    pageSize: Optional. The maximum number of documents to return in a single
+      response. Firestore may return fewer than this value.
+    pageToken: Optional. A page token, received from a previous
+      `ListDocuments` response. Provide this to retrieve the subsequent page.
+      When paginating, all other parameters (with the exception of
+      `page_size`) must match the values set in the request that generated the
+      page token.
     parent: Required. The parent resource name. In the format:
       `projects/{project_id}/databases/{database_id}/documents` or `projects/{
       project_id}/databases/{database_id}/documents/{document_path}`. For
       example: `projects/my-project/databases/my-database/documents` or
       `projects/my-project/databases/my-database/documents/chatrooms/my-
       chatroom`
-    readTime: Reads documents as they were at the given time. This may not be
-      older than 270 seconds.
-    showMissing: If the list should show missing documents. A missing document
-      is a document that does not exist but has sub-documents. These documents
-      will be returned with a key but will not have fields,
-      Document.create_time, or Document.update_time set. Requests with
-      `show_missing` may not specify `where` or `order_by`.
-    transaction: Reads documents in a transaction.
+    readTime: Perform the read at the provided time. This may not be older
+      than 270 seconds.
+    showMissing: If the list should show missing documents. A document is
+      missing if it does not exist, but there are sub-documents nested
+      underneath it. When true, such missing documents will be returned with a
+      key but will not have fields, `create_time`, or `update_time` set.
+      Requests with `show_missing` may not specify `where` or `order_by`.
+    transaction: Perform the read as part of an already active transaction.
   """
 
   collectionId = _messages.StringField(1, required=True)
@@ -1016,28 +1046,37 @@ class FirestoreProjectsDatabasesDocumentsListRequest(_messages.Message):
   r"""A FirestoreProjectsDatabasesDocumentsListRequest object.
 
   Fields:
-    collectionId: Required. The collection ID, relative to `parent`, to list.
-      For example: `chatrooms` or `messages`.
+    collectionId: Optional. The collection ID, relative to `parent`, to list.
+      For example: `chatrooms` or `messages`. This is optional, and when not
+      provided, Firestore will list documents from all collections under the
+      provided `parent`.
     mask_fieldPaths: The list of field paths in the mask. See Document.fields
       for a field path syntax reference.
-    orderBy: The order to sort results by. For example: `priority desc, name`.
-    pageSize: The maximum number of documents to return.
-    pageToken: The `next_page_token` value returned from a previous List
-      request, if any.
+    orderBy: Optional. The optional ordering of the documents to return. For
+      example: `priority desc, __name__ desc`. This mirrors the `ORDER BY`
+      used in Firestore queries but in a string representation. When absent,
+      documents are ordered based on `__name__ ASC`.
+    pageSize: Optional. The maximum number of documents to return in a single
+      response. Firestore may return fewer than this value.
+    pageToken: Optional. A page token, received from a previous
+      `ListDocuments` response. Provide this to retrieve the subsequent page.
+      When paginating, all other parameters (with the exception of
+      `page_size`) must match the values set in the request that generated the
+      page token.
     parent: Required. The parent resource name. In the format:
       `projects/{project_id}/databases/{database_id}/documents` or `projects/{
       project_id}/databases/{database_id}/documents/{document_path}`. For
       example: `projects/my-project/databases/my-database/documents` or
       `projects/my-project/databases/my-database/documents/chatrooms/my-
       chatroom`
-    readTime: Reads documents as they were at the given time. This may not be
-      older than 270 seconds.
-    showMissing: If the list should show missing documents. A missing document
-      is a document that does not exist but has sub-documents. These documents
-      will be returned with a key but will not have fields,
-      Document.create_time, or Document.update_time set. Requests with
-      `show_missing` may not specify `where` or `order_by`.
-    transaction: Reads documents in a transaction.
+    readTime: Perform the read at the provided time. This may not be older
+      than 270 seconds.
+    showMissing: If the list should show missing documents. A document is
+      missing if it does not exist, but there are sub-documents nested
+      underneath it. When true, such missing documents will be returned with a
+      key but will not have fields, `create_time`, or `update_time` set.
+      Requests with `show_missing` may not specify `where` or `order_by`.
+    transaction: Perform the read as part of an already active transaction.
   """
 
   collectionId = _messages.StringField(1, required=True)
@@ -1335,6 +1374,7 @@ class GoogleFirestoreAdminV1Database(_messages.Message):
     appEngineIntegrationMode: The App Engine integration mode to use for this
       database.
     concurrencyMode: The concurrency control mode to use for this database.
+    createTime: Output only. The timestamp at which this database was created.
     etag: This checksum is computed by the server based on the value of other
       fields, and may be sent on update and delete requests to ensure the
       client has an up-to-date value before proceeding.
@@ -1351,6 +1391,10 @@ class GoogleFirestoreAdminV1Database(_messages.Message):
     type: The type of the database. See
       https://cloud.google.com/datastore/docs/firestore-or-datastore for
       information about how to choose.
+    uid: Output only. The system-generated UUID4 for this Database.
+    updateTime: Output only. The timestamp at which this database was most
+      recently updated. Note this only includes updates to the database
+      resource and not data contained by the database.
   """
 
   class AppEngineIntegrationModeValueValuesEnum(_messages.Enum):
@@ -1406,11 +1450,14 @@ class GoogleFirestoreAdminV1Database(_messages.Message):
 
   appEngineIntegrationMode = _messages.EnumField('AppEngineIntegrationModeValueValuesEnum', 1)
   concurrencyMode = _messages.EnumField('ConcurrencyModeValueValuesEnum', 2)
-  etag = _messages.StringField(3)
-  keyPrefix = _messages.StringField(4)
-  locationId = _messages.StringField(5)
-  name = _messages.StringField(6)
-  type = _messages.EnumField('TypeValueValuesEnum', 7)
+  createTime = _messages.StringField(3)
+  etag = _messages.StringField(4)
+  keyPrefix = _messages.StringField(5)
+  locationId = _messages.StringField(6)
+  name = _messages.StringField(7)
+  type = _messages.EnumField('TypeValueValuesEnum', 8)
+  uid = _messages.StringField(9)
+  updateTime = _messages.StringField(10)
 
 
 class GoogleFirestoreAdminV1ExportDocumentsMetadata(_messages.Message):
@@ -1424,8 +1471,9 @@ class GoogleFirestoreAdminV1ExportDocumentsMetadata(_messages.Message):
     collectionIds: Which collection ids are being exported.
     endTime: The time this operation completed. Will be unset if operation
       still in progress.
+    namespaceIds: Which namespace ids are being exported.
     operationState: The state of the export operation.
-    outputUriPrefix: Where the entities are being exported to.
+    outputUriPrefix: Where the documents are being exported to.
     progressBytes: The progress, in bytes, of this operation.
     progressDocuments: The progress, in documents, of this operation.
     startTime: The time this operation started.
@@ -1457,11 +1505,12 @@ class GoogleFirestoreAdminV1ExportDocumentsMetadata(_messages.Message):
 
   collectionIds = _messages.StringField(1, repeated=True)
   endTime = _messages.StringField(2)
-  operationState = _messages.EnumField('OperationStateValueValuesEnum', 3)
-  outputUriPrefix = _messages.StringField(4)
-  progressBytes = _messages.MessageField('GoogleFirestoreAdminV1Progress', 5)
-  progressDocuments = _messages.MessageField('GoogleFirestoreAdminV1Progress', 6)
-  startTime = _messages.StringField(7)
+  namespaceIds = _messages.StringField(3, repeated=True)
+  operationState = _messages.EnumField('OperationStateValueValuesEnum', 4)
+  outputUriPrefix = _messages.StringField(5)
+  progressBytes = _messages.MessageField('GoogleFirestoreAdminV1Progress', 6)
+  progressDocuments = _messages.MessageField('GoogleFirestoreAdminV1Progress', 7)
+  startTime = _messages.StringField(8)
 
 
 class GoogleFirestoreAdminV1ExportDocumentsRequest(_messages.Message):
@@ -1608,6 +1657,7 @@ class GoogleFirestoreAdminV1ImportDocumentsMetadata(_messages.Message):
     endTime: The time this operation completed. Will be unset if operation
       still in progress.
     inputUriPrefix: The location of the documents being imported.
+    namespaceIds: Which namespace ids are being imported.
     operationState: The state of the import operation.
     progressBytes: The progress, in bytes, of this operation.
     progressDocuments: The progress, in documents, of this operation.
@@ -1641,10 +1691,11 @@ class GoogleFirestoreAdminV1ImportDocumentsMetadata(_messages.Message):
   collectionIds = _messages.StringField(1, repeated=True)
   endTime = _messages.StringField(2)
   inputUriPrefix = _messages.StringField(3)
-  operationState = _messages.EnumField('OperationStateValueValuesEnum', 4)
-  progressBytes = _messages.MessageField('GoogleFirestoreAdminV1Progress', 5)
-  progressDocuments = _messages.MessageField('GoogleFirestoreAdminV1Progress', 6)
-  startTime = _messages.StringField(7)
+  namespaceIds = _messages.StringField(4, repeated=True)
+  operationState = _messages.EnumField('OperationStateValueValuesEnum', 5)
+  progressBytes = _messages.MessageField('GoogleFirestoreAdminV1Progress', 6)
+  progressDocuments = _messages.MessageField('GoogleFirestoreAdminV1Progress', 7)
+  startTime = _messages.StringField(8)
 
 
 class GoogleFirestoreAdminV1ImportDocumentsRequest(_messages.Message):
@@ -1674,6 +1725,7 @@ class GoogleFirestoreAdminV1Index(_messages.Message):
   documents in a database.
 
   Enums:
+    ApiScopeValueValuesEnum: The API scope supported by this index.
     QueryScopeValueValuesEnum: Indexes with a collection query scope specified
       allow queries against a collection that is the child of a specific
       document, specified at query time, and that has the same collection id.
@@ -1683,6 +1735,7 @@ class GoogleFirestoreAdminV1Index(_messages.Message):
     StateValueValuesEnum: Output only. The serving state of the index.
 
   Fields:
+    apiScope: The API scope supported by this index.
     fields: The fields supported by this index. For composite indexes, this
       requires a minimum of 2 and a maximum of 100 fields. The last field
       entry is always for the field path `__name__`. If, on creation,
@@ -1705,6 +1758,18 @@ class GoogleFirestoreAdminV1Index(_messages.Message):
     state: Output only. The serving state of the index.
   """
 
+  class ApiScopeValueValuesEnum(_messages.Enum):
+    r"""The API scope supported by this index.
+
+    Values:
+      ANY_API: The index can be used by both Firestore Native and Firestore in
+        Datastore Mode query API. This is the default.
+      DATASTORE_MODE_API: The index can only be used by the Firestore in
+        Datastore Mode query API.
+    """
+    ANY_API = 0
+    DATASTORE_MODE_API = 1
+
   class QueryScopeValueValuesEnum(_messages.Enum):
     r"""Indexes with a collection query scope specified allow queries against
     a collection that is the child of a specific document, specified at query
@@ -1723,10 +1788,13 @@ class GoogleFirestoreAdminV1Index(_messages.Message):
       COLLECTION_GROUP: Indexes with a collection group query scope specified
         allow queries against all collections that has the collection id
         specified by the index.
+      COLLECTION_RECURSIVE: Include all the collections's ancestor in the
+        index. Only available for Datastore Mode databases.
     """
     QUERY_SCOPE_UNSPECIFIED = 0
     COLLECTION = 1
     COLLECTION_GROUP = 2
+    COLLECTION_RECURSIVE = 3
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The serving state of the index.
@@ -1751,10 +1819,11 @@ class GoogleFirestoreAdminV1Index(_messages.Message):
     READY = 2
     NEEDS_REPAIR = 3
 
-  fields = _messages.MessageField('GoogleFirestoreAdminV1IndexField', 1, repeated=True)
-  name = _messages.StringField(2)
-  queryScope = _messages.EnumField('QueryScopeValueValuesEnum', 3)
-  state = _messages.EnumField('StateValueValuesEnum', 4)
+  apiScope = _messages.EnumField('ApiScopeValueValuesEnum', 1)
+  fields = _messages.MessageField('GoogleFirestoreAdminV1IndexField', 2, repeated=True)
+  name = _messages.StringField(3)
+  queryScope = _messages.EnumField('QueryScopeValueValuesEnum', 4)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
 
 
 class GoogleFirestoreAdminV1IndexConfig(_messages.Message):
@@ -2204,7 +2273,8 @@ class ListDocumentsResponse(_messages.Message):
 
   Fields:
     documents: The Documents found.
-    nextPageToken: The next page token.
+    nextPageToken: A token to retrieve the next page of documents. If this
+      field is omitted, there are no subsequent pages.
   """
 
   documents = _messages.MessageField('Document', 1, repeated=True)

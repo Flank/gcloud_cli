@@ -30,6 +30,7 @@ _API_NAME = 'apikeys'
 
 _RELEASE_TRACK_TO_API_VERSION = {
     calliope_base.ReleaseTrack.ALPHA: 'v2',
+    calliope_base.ReleaseTrack.BETA: 'v2',
     calliope_base.ReleaseTrack.GA: 'v2'
 }
 
@@ -112,6 +113,24 @@ def GetApiTargets(args, messages):
             service=api_target.get('service'),
             methods=api_target.get('methods', [])))
   return api_targets
+
+
+def GetAnnotations(args, messages):
+  """Create list of annotations."""
+  annotations = getattr(args, 'annotations', {})
+  additional_property_messages = []
+  if not annotations:
+    return None
+
+  for key, value in annotations.items():
+    additional_property_messages.append(
+        messages.V2Key.AnnotationsValue.AdditionalProperty(
+            key=key, value=value))
+
+  annotation_value_message = messages.V2Key.AnnotationsValue(
+      additionalProperties=additional_property_messages)
+
+  return annotation_value_message
 
 
 def GetParentResourceName(project):

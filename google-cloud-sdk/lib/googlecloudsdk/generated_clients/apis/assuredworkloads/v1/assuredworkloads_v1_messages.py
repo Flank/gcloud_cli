@@ -78,8 +78,8 @@ class AssuredworkloadsOrganizationsLocationsWorkloadsGetRequest(_messages.Messag
 
   Fields:
     name: Required. The resource name of the Workload to fetch. This is the
-      workloads's relative path in the API, formatted as "organizations/{organ
-      ization_id}/locations/{location_id}/workloads/{workload_id}". For
+      workload's relative path in the API, formatted as "organizations/{organi
+      zation_id}/locations/{location_id}/workloads/{workload_id}". For
       example, "organizations/123/locations/us-east1/workloads/assured-
       workload-1".
   """
@@ -105,6 +105,22 @@ class AssuredworkloadsOrganizationsLocationsWorkloadsListRequest(_messages.Messa
   pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(3)
   parent = _messages.StringField(4, required=True)
+
+
+class AssuredworkloadsOrganizationsLocationsWorkloadsMutatePartnerPermissionsRequest(_messages.Message):
+  r"""A AssuredworkloadsOrganizationsLocationsWorkloadsMutatePartnerPermission
+  sRequest object.
+
+  Fields:
+    googleCloudAssuredworkloadsV1MutatePartnerPermissionsRequest: A
+      GoogleCloudAssuredworkloadsV1MutatePartnerPermissionsRequest resource to
+      be passed as the request body.
+    name: Required. The `name` field is used to identify the workload. Format:
+      organizations/{org_id}/locations/{location_id}/workloads/{workload_id}
+  """
+
+  googleCloudAssuredworkloadsV1MutatePartnerPermissionsRequest = _messages.MessageField('GoogleCloudAssuredworkloadsV1MutatePartnerPermissionsRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class AssuredworkloadsOrganizationsLocationsWorkloadsPatchRequest(_messages.Message):
@@ -203,9 +219,10 @@ class GoogleCloudAssuredworkloadsV1AcknowledgeViolationRequest(_messages.Message
   Fields:
     comment: Required. Business justification explaining the need for
       violation acknowledgement
-    nonCompliantOrgPolicy: Optional. Name of the OrgPolicy which was modified
-      with non-compliant change and resulted in this violation. Format:
-      projects/{project_number}/policies/{constraint_name}
+    nonCompliantOrgPolicy: Optional. This field is deprecated and will be
+      removed in future version of the API. Name of the OrgPolicy which was
+      modified with non-compliant change and resulted in this violation.
+      Format: projects/{project_number}/policies/{constraint_name}
       folders/{folder_id}/policies/{constraint_name}
       organizations/{organization_id}/policies/{constraint_name}
   """
@@ -252,7 +269,13 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
       CA_REGIONS_AND_SUPPORT: Assured Workloads For Canada Regions and Support
         controls
       ITAR: International Traffic in Arms Regulations
-      ASSURED_WORKLOADS_FOR_PARTNERS: Assured Workloads for Partners;
+      AU_REGIONS_AND_US_SUPPORT: Assured Workloads for Australia Regions and
+        Support controls Available for public preview consumption. Don't
+        create production workloads.
+      ASSURED_WORKLOADS_FOR_PARTNERS: Assured Workloads for Partners
+      ISR_REGIONS: Assured Workloads for Israel Regions
+      ISR_REGIONS_AND_SUPPORT: Assured Workloads for Israel Regions
+      CA_PROTECTED_B: Assured Workloads for Canada Protected B regime
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -265,7 +288,11 @@ class GoogleCloudAssuredworkloadsV1CreateWorkloadOperationMetadata(_messages.Mes
     EU_REGIONS_AND_SUPPORT = 8
     CA_REGIONS_AND_SUPPORT = 9
     ITAR = 10
-    ASSURED_WORKLOADS_FOR_PARTNERS = 11
+    AU_REGIONS_AND_US_SUPPORT = 11
+    ASSURED_WORKLOADS_FOR_PARTNERS = 12
+    ISR_REGIONS = 13
+    ISR_REGIONS_AND_SUPPORT = 14
+    CA_PROTECTED_B = 15
 
   complianceRegime = _messages.EnumField('ComplianceRegimeValueValuesEnum', 1)
   createTime = _messages.StringField(2)
@@ -298,6 +325,22 @@ class GoogleCloudAssuredworkloadsV1ListWorkloadsResponse(_messages.Message):
   workloads = _messages.MessageField('GoogleCloudAssuredworkloadsV1Workload', 2, repeated=True)
 
 
+class GoogleCloudAssuredworkloadsV1MutatePartnerPermissionsRequest(_messages.Message):
+  r"""Request of updating permission settings for a partner workload.
+
+  Fields:
+    etag: Optional. The etag of the workload. If this is provided, it must
+      match the server's etag.
+    partnerPermissions: Required. The partner permissions to be updated.
+    updateMask: Required. The list of fields to be updated. E.g. update_mask {
+      paths: "partner_permissions.data_logs_viewer"}
+  """
+
+  etag = _messages.StringField(1)
+  partnerPermissions = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadPartnerPermissions', 2)
+  updateMask = _messages.StringField(3)
+
+
 class GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesRequest(_messages.Message):
   r"""Request for restricting list of available resources in Workload
   environment.
@@ -323,10 +366,15 @@ class GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesRequest(_messages.Mes
       ALLOW_COMPLIANT_RESOURCES: Based on Workload's compliance regime,
         allowed list changes. See - https://cloud.google.com/assured-
         workloads/docs/supported-products for the list of supported resources.
+      APPEND_COMPLIANT_RESOURCES: Similar to ALLOW_COMPLIANT_RESOURCES but
+        adds the list of compliant resources to the existing list of
+        resources. Effective org-policy of the Folder is considered to ensure
+        there is no disruption to the existing customer workflows.
     """
     RESTRICTION_TYPE_UNSPECIFIED = 0
     ALLOW_ALL_GCP_RESOURCES = 1
     ALLOW_COMPLIANT_RESOURCES = 2
+    APPEND_COMPLIANT_RESOURCES = 3
 
   restrictionType = _messages.EnumField('RestrictionTypeValueValuesEnum', 1)
 
@@ -336,7 +384,7 @@ class GoogleCloudAssuredworkloadsV1RestrictAllowedResourcesResponse(_messages.Me
 
 
 class GoogleCloudAssuredworkloadsV1Violation(_messages.Message):
-  r"""Workload monitoring Violation.
+  r"""Workload monitoring Violation. Next Id: 22
 
   Enums:
     StateValueValuesEnum: Output only. State of the violation
@@ -354,6 +402,10 @@ class GoogleCloudAssuredworkloadsV1Violation(_messages.Message):
       Location, Service Usage, Access, Encryption, etc.
     description: Output only. Description for the Violation. e.g. OrgPolicy
       gcp.resourceLocations has non compliant value.
+    exceptionAuditLogLink: Output only. Immutable. Audit Log link to find
+      business justification provided for violation exception. Format: https:/
+      /console.cloud.google.com/logs/query;query={logName}{protoPayload.resour
+      ceName}{protoPayload.methodName}{timeRange}{organization}
     name: Output only. Immutable. Name of the Violation. Format: organizations
       /{organization}/locations/{location}/workloads/{workload_id}/violations/
       {violations_id}
@@ -392,13 +444,14 @@ class GoogleCloudAssuredworkloadsV1Violation(_messages.Message):
   beginTime = _messages.StringField(4)
   category = _messages.StringField(5)
   description = _messages.StringField(6)
-  name = _messages.StringField(7)
-  nonCompliantOrgPolicy = _messages.StringField(8)
-  orgPolicyConstraint = _messages.StringField(9)
-  remediation = _messages.MessageField('GoogleCloudAssuredworkloadsV1ViolationRemediation', 10)
-  resolveTime = _messages.StringField(11)
-  state = _messages.EnumField('StateValueValuesEnum', 12)
-  updateTime = _messages.StringField(13)
+  exceptionAuditLogLink = _messages.StringField(7)
+  name = _messages.StringField(8)
+  nonCompliantOrgPolicy = _messages.StringField(9)
+  orgPolicyConstraint = _messages.StringField(10)
+  remediation = _messages.MessageField('GoogleCloudAssuredworkloadsV1ViolationRemediation', 11)
+  resolveTime = _messages.StringField(12)
+  state = _messages.EnumField('StateValueValuesEnum', 13)
+  updateTime = _messages.StringField(14)
 
 
 class GoogleCloudAssuredworkloadsV1ViolationRemediation(_messages.Message):
@@ -487,7 +540,7 @@ class GoogleCloudAssuredworkloadsV1ViolationRemediationInstructionsGcloud(_messa
 
 
 class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
-  r"""An Workload object for managing highly regulated workloads of cloud
+  r"""A Workload object for managing highly regulated workloads of cloud
   customers.
 
   Enums:
@@ -495,7 +548,7 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
       associated with this workload.
     KajEnrollmentStateValueValuesEnum: Output only. Represents the KAJ
       enrollment state of the given workload.
-    PartnerValueValuesEnum: Optional. Compliance Regime associated with this
+    PartnerValueValuesEnum: Optional. Partner regime associated with this
       workload.
 
   Messages:
@@ -511,6 +564,7 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
       `billingAccounts/012345-567890-ABCDEF`.
     complianceRegime: Required. Immutable. Compliance Regime associated with
       this workload.
+    complianceStatus: Output only. Count of active Violations in the Workload.
     compliantButDisallowedServices: Output only. Urls for services which are
       compliant for this Assured Workload, but which are currently disallowed
       by the ResourceUsageRestriction org policy. Invoke
@@ -536,7 +590,7 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
     name: Optional. The resource name of the workload. Format:
       organizations/{organization}/locations/{location}/workloads/{workload}
       Read-only.
-    partner: Optional. Compliance Regime associated with this workload.
+    partner: Optional. Partner regime associated with this workload.
     provisionedResourcesParent: Input only. The parent resource for the
       resources managed by this Assured Workload. May be either empty or a
       folder resource which is a child of the Workload parent. If not
@@ -574,7 +628,13 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
       CA_REGIONS_AND_SUPPORT: Assured Workloads For Canada Regions and Support
         controls
       ITAR: International Traffic in Arms Regulations
-      ASSURED_WORKLOADS_FOR_PARTNERS: Assured Workloads for Partners;
+      AU_REGIONS_AND_US_SUPPORT: Assured Workloads for Australia Regions and
+        Support controls Available for public preview consumption. Don't
+        create production workloads.
+      ASSURED_WORKLOADS_FOR_PARTNERS: Assured Workloads for Partners
+      ISR_REGIONS: Assured Workloads for Israel Regions
+      ISR_REGIONS_AND_SUPPORT: Assured Workloads for Israel Regions
+      CA_PROTECTED_B: Assured Workloads for Canada Protected B regime
     """
     COMPLIANCE_REGIME_UNSPECIFIED = 0
     IL4 = 1
@@ -587,7 +647,11 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
     EU_REGIONS_AND_SUPPORT = 8
     CA_REGIONS_AND_SUPPORT = 9
     ITAR = 10
-    ASSURED_WORKLOADS_FOR_PARTNERS = 11
+    AU_REGIONS_AND_US_SUPPORT = 11
+    ASSURED_WORKLOADS_FOR_PARTNERS = 12
+    ISR_REGIONS = 13
+    ISR_REGIONS_AND_SUPPORT = 14
+    CA_PROTECTED_B = 15
 
   class KajEnrollmentStateValueValuesEnum(_messages.Enum):
     r"""Output only. Represents the KAJ enrollment state of the given
@@ -603,14 +667,16 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
     KAJ_ENROLLMENT_STATE_COMPLETE = 2
 
   class PartnerValueValuesEnum(_messages.Enum):
-    r"""Optional. Compliance Regime associated with this workload.
+    r"""Optional. Partner regime associated with this workload.
 
     Values:
-      PARTNER_UNSPECIFIED: Unknown compliance regime.
-      LOCAL_CONTROLS_BY_S3NS: S3NS regime
+      PARTNER_UNSPECIFIED: <no description>
+      LOCAL_CONTROLS_BY_S3NS: Enum representing S3NS partner.
+      SOVEREIGN_CONTROLS_BY_T_SYSTEMS: Enum representing T_SYSTEM partner.
     """
     PARTNER_UNSPECIFIED = 0
     LOCAL_CONTROLS_BY_S3NS = 1
+    SOVEREIGN_CONTROLS_BY_T_SYSTEMS = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -638,24 +704,41 @@ class GoogleCloudAssuredworkloadsV1Workload(_messages.Message):
 
   billingAccount = _messages.StringField(1)
   complianceRegime = _messages.EnumField('ComplianceRegimeValueValuesEnum', 2)
-  compliantButDisallowedServices = _messages.StringField(3, repeated=True)
-  createTime = _messages.StringField(4)
-  displayName = _messages.StringField(5)
-  enableSovereignControls = _messages.BooleanField(6)
-  etag = _messages.StringField(7)
-  kajEnrollmentState = _messages.EnumField('KajEnrollmentStateValueValuesEnum', 8)
-  kmsSettings = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadKMSSettings', 9)
-  labels = _messages.MessageField('LabelsValue', 10)
-  name = _messages.StringField(11)
-  partner = _messages.EnumField('PartnerValueValuesEnum', 12)
-  provisionedResourcesParent = _messages.StringField(13)
-  resourceSettings = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadResourceSettings', 14, repeated=True)
-  resources = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadResourceInfo', 15, repeated=True)
-  saaEnrollmentResponse = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponse', 16)
+  complianceStatus = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus', 3)
+  compliantButDisallowedServices = _messages.StringField(4, repeated=True)
+  createTime = _messages.StringField(5)
+  displayName = _messages.StringField(6)
+  enableSovereignControls = _messages.BooleanField(7)
+  etag = _messages.StringField(8)
+  kajEnrollmentState = _messages.EnumField('KajEnrollmentStateValueValuesEnum', 9)
+  kmsSettings = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadKMSSettings', 10)
+  labels = _messages.MessageField('LabelsValue', 11)
+  name = _messages.StringField(12)
+  partner = _messages.EnumField('PartnerValueValuesEnum', 13)
+  provisionedResourcesParent = _messages.StringField(14)
+  resourceSettings = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadResourceSettings', 15, repeated=True)
+  resources = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadResourceInfo', 16, repeated=True)
+  saaEnrollmentResponse = _messages.MessageField('GoogleCloudAssuredworkloadsV1WorkloadSaaEnrollmentResponse', 17)
+
+
+class GoogleCloudAssuredworkloadsV1WorkloadComplianceStatus(_messages.Message):
+  r"""Represents the Compliance Status of this workload
+
+  Fields:
+    acknowledgedViolationCount: Count of active Violations which are
+      acknowledged in the Workload.
+    activeViolationCount: Count of active Violations which haven't been
+      acknowledged.
+  """
+
+  acknowledgedViolationCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  activeViolationCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class GoogleCloudAssuredworkloadsV1WorkloadKMSSettings(_messages.Message):
-  r"""Settings specific to the Key Management Service.
+  r"""Settings specific to the Key Management Service. This message is
+  deprecated. In order to create a Keyring, callers should specify,
+  ENCRYPTION_KEYS_PROJECT or KEYRING in ResourceSettings.resource_type field.
 
   Fields:
     nextRotationTime: Required. Input only. Immutable. The time at which the
@@ -668,6 +751,23 @@ class GoogleCloudAssuredworkloadsV1WorkloadKMSSettings(_messages.Message):
 
   nextRotationTime = _messages.StringField(1)
   rotationPeriod = _messages.StringField(2)
+
+
+class GoogleCloudAssuredworkloadsV1WorkloadPartnerPermissions(_messages.Message):
+  r"""Permissions granted to the AW Partner SA account for the customer
+  workload
+
+  Fields:
+    dataLogsViewer: Allow partner to view data and logs
+    remediateFolderViolations: Allow partner to monitor folder and remediate
+      violations
+    serviceAccessApprover: Allow partner to approve or reject Service Access
+      requests
+  """
+
+  dataLogsViewer = _messages.BooleanField(1)
+  remediateFolderViolations = _messages.BooleanField(2)
+  serviceAccessApprover = _messages.BooleanField(3)
 
 
 class GoogleCloudAssuredworkloadsV1WorkloadResourceInfo(_messages.Message):
@@ -710,8 +810,8 @@ class GoogleCloudAssuredworkloadsV1WorkloadResourceSettings(_messages.Message):
 
   Enums:
     ResourceTypeValueValuesEnum: Indicates the type of resource. This field
-      should be specified to correspond the id to the right project type
-      (CONSUMER_PROJECT or ENCRYPTION_KEYS_PROJECT)
+      should be specified to correspond the id to the right resource type
+      (CONSUMER_FOLDER or ENCRYPTION_KEYS_PROJECT)
 
   Fields:
     displayName: User-assigned resource display name. If not empty it will be
@@ -721,13 +821,13 @@ class GoogleCloudAssuredworkloadsV1WorkloadResourceSettings(_messages.Message):
       KeyRing, this represents the keyring_id. For a folder, don't set this
       value as folder_id is assigned by Google.
     resourceType: Indicates the type of resource. This field should be
-      specified to correspond the id to the right project type
-      (CONSUMER_PROJECT or ENCRYPTION_KEYS_PROJECT)
+      specified to correspond the id to the right resource type
+      (CONSUMER_FOLDER or ENCRYPTION_KEYS_PROJECT)
   """
 
   class ResourceTypeValueValuesEnum(_messages.Enum):
     r"""Indicates the type of resource. This field should be specified to
-    correspond the id to the right project type (CONSUMER_PROJECT or
+    correspond the id to the right resource type (CONSUMER_FOLDER or
     ENCRYPTION_KEYS_PROJECT)
 
     Values:

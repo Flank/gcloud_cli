@@ -548,7 +548,7 @@ class FirestoreV1(base_api.BaseApiClient):
     )
 
     def Listen(self, request, global_params=None):
-      r"""Listens to changes.
+      r"""Listens to changes. This method is only available via the gRPC API (not REST).
 
       Args:
         request: (FirestoreProjectsDatabasesDocumentsListenRequest) input message
@@ -710,7 +710,7 @@ class FirestoreV1(base_api.BaseApiClient):
     )
 
     def Write(self, request, global_params=None):
-      r"""Streams batches of document updates and deletes, in order.
+      r"""Streams batches of document updates and deletes, in order. This method is only available via the gRPC API (not REST).
 
       Args:
         request: (FirestoreProjectsDatabasesDocumentsWriteRequest) input message
@@ -887,6 +887,33 @@ class FirestoreV1(base_api.BaseApiClient):
         relative_path='v1/{+parent}/databases',
         request_field='googleFirestoreAdminV1Database',
         request_type_name='FirestoreProjectsDatabasesCreateRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a database.
+
+      Args:
+        request: (FirestoreProjectsDatabasesDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/databases/{databasesId}',
+        http_method='DELETE',
+        method_id='firestore.projects.databases.delete',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['allowMissing', 'etag', 'validateOnly'],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='FirestoreProjectsDatabasesDeleteRequest',
         response_type_name='GoogleLongrunningOperation',
         supports_download=False,
     )

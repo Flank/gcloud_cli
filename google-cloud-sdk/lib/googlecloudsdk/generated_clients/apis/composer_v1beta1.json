@@ -317,6 +317,11 @@
           "readOnly": true,
           "type": "string"
         },
+        "airflowByoidUri": {
+          "description": "Output only. The 'bring your own identity' variant of the URI of the Apache Airflow Web UI hosted within this environment, to be accessed with third-party identity credentials (see [Airflow web interface](\/composer\/docs\/how-to\/accessing\/airflow-web-interface)).",
+          "readOnly": true,
+          "type": "string"
+        },
         "encryptionConfig": {
           "description": "Optional. The encryption options for the Cloud Composer environment and its dependencies. Cannot be updated.",
           "$ref": "EncryptionConfig"
@@ -356,6 +361,18 @@
         "dataRetentionConfig": {
           "description": "Optional. The configuration setting for Airflow database data retention mechanism.",
           "$ref": "DataRetentionConfig"
+        },
+        "resilienceMode": {
+          "description": "Optional. Resilience mode of the Cloud Composer Environment. This field is supported for Cloud Composer environments in versions composer-2.0.32-airflow-*.*.* and newer.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default mode doesn't change environment parameters.",
+            "Enabled High Resilience mode, including Cloud SQL HA."
+          ],
+          "enum": [
+            "RESILIENCE_MODE_UNSPECIFIED",
+            "HIGH_RESILIENCE"
+          ]
         }
       }
     },
@@ -453,7 +470,7 @@
           "type": "string"
         },
         "tags": {
-          "description": "Optional. The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with [RFC1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). Cannot be updated. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+          "description": "Optional. The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with [RFC1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). Cannot be updated.",
           "type": "array",
           "items": {
             "type": "string"
@@ -632,10 +649,6 @@
         "zone": {
           "description": "Optional. The Compute Engine zone where the Airflow database is created. If zone is provided, it must be in the region selected for the environment. If zone is not provided, a zone is automatically selected. The zone can only be set during environment creation. Supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.*.",
           "type": "string"
-        },
-        "highAvailability": {
-          "description": "Optional. Creates the Airflow Database in High Availability mode. This option can only be set during environment creation. Supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.*.",
-          "type": "boolean"
         }
       }
     },
@@ -751,6 +764,11 @@
           "description": "Optional. Storage (GB) request and limit for Airflow web server.",
           "type": "number",
           "format": "float"
+        },
+        "count": {
+          "description": "Optional. The number of web server instances. If not provided or set to 0, a single web server instance will be created.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -903,6 +921,36 @@
             "CLOUD_LOGGING_AND_CLOUD_STORAGE",
             "CLOUD_LOGGING_ONLY"
           ]
+        },
+        "taskLogsRetentionConfig": {
+          "description": "Optional. The configuration settings for task logs retention",
+          "$ref": "TaskLogsRetentionConfig"
+        }
+      }
+    },
+    "TaskLogsRetentionConfig": {
+      "id": "TaskLogsRetentionConfig",
+      "description": "The configuration setting for Task Logs.",
+      "type": "object",
+      "properties": {
+        "retentionDays": {
+          "description": "Optional. The number of days to retain task logs in the Cloud Logging bucket",
+          "type": "integer",
+          "format": "int32"
+        },
+        "storageMode": {
+          "description": "Optional. The mode of storage for Airflow workers task logs. For details, see go\/composer-store-task-logs-in-cloud-logging-only-design-doc",
+          "type": "string",
+          "enumDescriptions": [
+            "This configuration is not specified by the user.",
+            "Store task logs in Cloud Logging and in the environment's Cloud Storage bucket.",
+            "Store task logs in Cloud Logging only."
+          ],
+          "enum": [
+            "TASK_LOGS_STORAGE_MODE_UNSPECIFIED",
+            "CLOUD_LOGGING_AND_CLOUD_STORAGE",
+            "CLOUD_LOGGING_ONLY"
+          ]
         }
       }
     },
@@ -938,6 +986,129 @@
       "properties": {
         "imageVersion": {
           "description": "The version of the software running in the environment. This encapsulates both the version of Cloud Composer functionality and the version of Apache Airflow. It must match the regular expression `composer-([0-9]+(\\.[0-9]+\\.[0-9]+(-preview\\.[0-9]+)?)?|latest)-airflow-([0-9]+(\\.[0-9]+(\\.[0-9]+)?)?)`. When used as input, the server also checks if the provided version is supported and denies the request for an unsupported version. The Cloud Composer portion of the image version is a full [semantic version](https:\/\/semver.org), or an alias in the form of major version number or `latest`. When an alias is provided, the server replaces it with the current Cloud Composer version that satisfies the alias. The Apache Airflow portion of the image version is a full semantic version that points to one of the supported Apache Airflow versions, or an alias in the form of only major or major.minor versions specified. When an alias is provided, the server replaces it with the latest Apache Airflow version that satisfies the alias and is supported in the given Cloud Composer version. In all cases, the resolved image version is stored in the same field. See also [version list](\/composer\/docs\/concepts\/versioning\/composer-versions) and [versioning overview](\/composer\/docs\/concepts\/versioning\/composer-versioning-overview).",
+          "type": "string"
+        }
+      }
+    },
+    "ExecuteAirflowCommandRequest": {
+      "id": "ExecuteAirflowCommandRequest",
+      "description": "Execute Airflow Command request.",
+      "type": "object",
+      "properties": {
+        "command": {
+          "description": "Airflow command.",
+          "type": "string"
+        },
+        "subcommand": {
+          "description": "Airflow subcommand.",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "Parameters for the Airflow command\/subcommand as an array of arguments. It may contain positional arguments like `[\"my-dag-id\"]`, key-value parameters like `[\"--foo=bar\"]` or `[\"--foo\",\"bar\"]`, or other flags like `[\"-f\"]`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ExecuteAirflowCommandResponse": {
+      "id": "ExecuteAirflowCommandResponse",
+      "description": "Response to ExecuteAirflowCommandRequest.",
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "description": "The unique ID of the command execution for polling.",
+          "type": "string"
+        },
+        "pod": {
+          "description": "The name of the pod where the command is executed.",
+          "type": "string"
+        },
+        "podNamespace": {
+          "description": "The namespace of the pod where the command is executed.",
+          "type": "string"
+        },
+        "error": {
+          "description": "Error message. Empty if there was no error.",
+          "type": "string"
+        }
+      }
+    },
+    "PollAirflowCommandRequest": {
+      "id": "PollAirflowCommandRequest",
+      "description": "Poll Airflow Command request.",
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "description": "The unique ID of the command execution.",
+          "type": "string"
+        },
+        "pod": {
+          "description": "The name of the pod where the command is executed.",
+          "type": "string"
+        },
+        "podNamespace": {
+          "description": "The namespace of the pod where the command is executed.",
+          "type": "string"
+        },
+        "nextLineNumber": {
+          "description": "Line number from which new logs should be fetched.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "PollAirflowCommandResponse": {
+      "id": "PollAirflowCommandResponse",
+      "description": "Response to PollAirflowCommandRequest.",
+      "type": "object",
+      "properties": {
+        "output": {
+          "description": "Output from the command execution. It may not contain the full output and the caller may need to poll for more lines.",
+          "type": "array",
+          "items": {
+            "$ref": "Line"
+          }
+        },
+        "outputEnd": {
+          "description": "Whether the command execution has finished and there is no more output.",
+          "type": "boolean"
+        },
+        "exitInfo": {
+          "description": "The result exit status of the command.",
+          "$ref": "ExitInfo"
+        }
+      }
+    },
+    "Line": {
+      "id": "Line",
+      "description": "Contains information about a single line from logs.",
+      "type": "object",
+      "properties": {
+        "lineNumber": {
+          "description": "Number of the line.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "content": {
+          "description": "Text content of the log line.",
+          "type": "string"
+        }
+      }
+    },
+    "ExitInfo": {
+      "id": "ExitInfo",
+      "description": "Information about how a command ended.",
+      "type": "object",
+      "properties": {
+        "exitCode": {
+          "description": "The exit code from the command execution.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "error": {
+          "description": "Error message. Empty if there was no error.",
           "type": "string"
         }
       }
@@ -978,6 +1149,13 @@
           "description": "Whether or not to skip copying Cloud Storage data when loading the environment's state.",
           "type": "boolean"
         }
+      }
+    },
+    "DatabaseFailoverRequest": {
+      "id": "DatabaseFailoverRequest",
+      "description": "Request to trigger database failover (only for highly resilient environments).",
+      "type": "object",
+      "properties": {
       }
     },
     "ListImageVersionsResponse": {
@@ -1087,7 +1265,8 @@
             "A resource update operation.",
             "A resource check operation.",
             "Saves snapshot of the resource operation.",
-            "Loads snapshot of the resource operation."
+            "Loads snapshot of the resource operation.",
+            "Triggers failover of environment's Cloud SQL instance (only for highly resilient environments)."
           ],
           "enum": [
             "TYPE_UNSPECIFIED",
@@ -1096,7 +1275,8 @@
             "UPDATE",
             "CHECK",
             "SAVE_SNAPSHOT",
-            "LOAD_SNAPSHOT"
+            "LOAD_SNAPSHOT",
+            "DATABASE_FAILOVER"
           ]
         },
         "resource": {
@@ -1176,6 +1356,13 @@
     "LoadSnapshotResponse": {
       "id": "LoadSnapshotResponse",
       "description": "Response to LoadSnapshotRequest.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "DatabaseFailoverResponse": {
+      "id": "DatabaseFailoverResponse",
+      "description": "Response for DatabaseFailoverRequest.",
       "type": "object",
       "properties": {
       }
@@ -1515,6 +1702,62 @@
                   ],
                   "description": "Check if an upgrade operation on the environment will succeed. In case of problems detailed info can be found in the returned Operation."
                 },
+                "executeAirflowCommand": {
+                  "id": "composer.projects.locations.environments.executeAirflowCommand",
+                  "path": "v1beta1/{+environment}:executeAirflowCommand",
+                  "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:executeAirflowCommand",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "environment": {
+                      "description": "The resource name of the environment in the form: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\".",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "environment"
+                  ],
+                  "request": {
+                    "$ref": "ExecuteAirflowCommandRequest"
+                  },
+                  "response": {
+                    "$ref": "ExecuteAirflowCommandResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Executes Airflow CLI command."
+                },
+                "pollAirflowCommand": {
+                  "id": "composer.projects.locations.environments.pollAirflowCommand",
+                  "path": "v1beta1/{+environment}:pollAirflowCommand",
+                  "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:pollAirflowCommand",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "environment": {
+                      "description": "The resource name of the environment in the form: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\"",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "environment"
+                  ],
+                  "request": {
+                    "$ref": "PollAirflowCommandRequest"
+                  },
+                  "response": {
+                    "$ref": "PollAirflowCommandResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Polls Airflow CLI command execution and fetches logs."
+                },
                 "saveSnapshot": {
                   "id": "composer.projects.locations.environments.saveSnapshot",
                   "path": "v1beta1/{+environment}:saveSnapshot",
@@ -1570,6 +1813,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Loads a snapshot of a Cloud Composer environment. As a result of this operation, a snapshot of environment's specified in LoadSnapshotRequest is loaded into the environment."
+                },
+                "databaseFailover": {
+                  "id": "composer.projects.locations.environments.databaseFailover",
+                  "path": "v1beta1/{+environment}:databaseFailover",
+                  "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:databaseFailover",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "environment": {
+                      "description": "Target environment: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\"",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "environment"
+                  ],
+                  "request": {
+                    "$ref": "DatabaseFailoverRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Triggers database failover (only for highly resilient environments)."
                 }
               }
             },

@@ -175,7 +175,9 @@ def MembershipLocationSpecified(args, flag_override=''):
   return False
 
 
-def SearchMembershipResource(args, flag_override=''):
+def SearchMembershipResource(args,
+                             flag_override='',
+                             filter_cluster_missing=False):
   """Searches the fleet for an ambiguous membership provided in args.
 
   Only necessary if location is ambiguous, i.e.
@@ -187,6 +189,8 @@ def SearchMembershipResource(args, flag_override=''):
   Args:
     args: arguments provided to a command, including a membership resource arg
     flag_override: a custom membership flag
+    filter_cluster_missing: whether to filter out memberships that are missing
+    a cluster.
 
   Returns:
     A membership resource name string
@@ -208,7 +212,8 @@ def SearchMembershipResource(args, flag_override=''):
   else:
     return None
 
-  all_memberships, unavailable = api_util.ListMembershipsFull()
+  all_memberships, unavailable = api_util.ListMembershipsFull(
+      filter_cluster_missing=filter_cluster_missing)
   if unavailable:
     raise exceptions.Error(
         ('Locations {} are currently unreachable. Please specify '
@@ -230,7 +235,7 @@ def SearchMembershipResource(args, flag_override=''):
   return found[0]
 
 
-def SearchMembershipResourcesPlural(args):
+def SearchMembershipResourcesPlural(args, filter_cluster_missing=False):
   """Searches the fleet for the membership resources provided in args.
 
   Only necessary if location is ambiguous, i.e.
@@ -241,6 +246,8 @@ def SearchMembershipResourcesPlural(args):
 
   Args:
     args: arguments provided to a command, including a membership resource arg
+    filter_cluster_missing: whether to filter out memberships that are missing
+    a cluster.
 
   Returns:
     A list of membership resource names
@@ -255,7 +262,8 @@ def SearchMembershipResourcesPlural(args):
   else:
     return None
 
-  all_memberships, unavailable = api_util.ListMembershipsFull()
+  all_memberships, unavailable = api_util.ListMembershipsFull(
+      filter_cluster_missing=filter_cluster_missing)
   if unavailable:
     raise exceptions.Error(
         ('Locations [{}] are currently unreachable. Please specify '
@@ -361,9 +369,13 @@ def InProdRegionalAllowlist(project, track=None):
       'anthonytong-hub2',
       'wenjuntoy2',
       'hub-regionalisation-test',  # For Cloud Console UI testing.
+      'hub-regionalisation-test-2',  # For Cloud Console UI testing.
       'a4vm-ui-tests-3',  # For Cloud Console UI testing.
       'm4a-ui-playground-1',  # For Cloud Console UI testing.
       'pikalov-tb',
+      'anthos-cl-e2e-tests',
+      'a4vm-ui-playground',
+      'm4a-ui-playground-1',
   ]
   return track is calliope_base.ReleaseTrack.ALPHA and (
       project in prod_regional_allowlist)
@@ -425,6 +437,58 @@ def ParseMembershipArg(args, membership_flag='MEMBERSHIP_NAME'):
       membership_flag, 'membership is required for this command.')
 
 
+def _DefaultToGlobalLocationAtributeConfig(help_text=''):
+  """Create basic attributes that fallthrough location to global in resource argument.
+
+  Args:
+    help_text: If set, overrides default help text
+
+  Returns:
+    Resource argument parameter config
+  """
+  return concepts.ResourceParameterAttributeConfig(
+      name='location',
+      fallthroughs=[
+          deps.Fallthrough(
+              function=cmd_util.DefaultToGlobal,
+              hint='global is the only supported location',
+          )
+      ],
+      help_text=help_text if help_text else ('Name of the {resource}.'),
+  )
+
+
+def AddScopeResourceArg(
+    parser,
+    flag_name='NAME',
+    api_version='v1',
+    scope_help='',
+    required=False,
+    group=None,
+):
+  """Add resource arg for projects/{}/locations/{}/scopes/{}."""
+  spec = concepts.ResourceSpec(
+      'gkehub.projects.locations.scopes',
+      api_version=api_version,
+      resource_name='scope',
+      plural_name='scopes',
+      disable_auto_completers=True,
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
+      locationsId=_DefaultToGlobalLocationAtributeConfig(),
+      scopesId=_BasicAttributeConfig('scope', scope_help),
+  )
+  concept_parsers.ConceptParser.ForResource(
+      flag_name,
+      spec,
+      'The group of arguments defining the Fleet Scope.',
+      plural=False,
+      required=required,
+      group=group,
+      # This hides the location flag as we only allow global scope.
+      flag_name_overrides={'location': ''},
+  ).AddToParser(parser)
+
+
 def AddRBACResourceArg(parser, api_version='v1', rbacrb_help=''):
   """Add resource arg for projects/{}/locations/{}/memberships/{}."""
   # Flags without '--' prefix are automatically positional
@@ -460,3 +524,40 @@ def RBACResourceName(args):
     projects/x/locations/global/namespaces/y/rbacrolebindings/z)
   """
   return args.CONCEPTS.name.Parse().RelativeName()
+
+
+def AddMembershipBindingResourceArg(parser, api_version='v1', binding_help=''):
+  """Add resource arg for projects/{}/locations/{}/memberships/{}/bindings/{}."""
+  # Flags without '--' prefix are automatically positional
+  flag_name = 'BINDING'
+  spec = concepts.ResourceSpec(
+      'gkehub.projects.locations.memberships.bindings',
+      api_version=api_version,
+      resource_name='binding',
+      plural_name='bindings',
+      disable_auto_completers=True,
+      projectsId=concepts.DEFAULT_PROJECT_ATTRIBUTE_CONFIG,
+      locationsId=_LocationAttributeConfig(),
+      membershipsId=_BasicAttributeConfig('membership', ''),
+      bindingsId=_BasicAttributeConfig('binding', binding_help))
+  concept_parsers.ConceptParser.ForResource(
+      flag_name,
+      spec,
+      'The group of arguments defining a Membership Binding.',
+      plural=False,
+      required=True).AddToParser(parser)
+
+
+def MembershipBindingResourceName(args):
+  """Gets a Membership-Binding resource name from a resource argument.
+
+  Assumes the argument is called BINDING.
+
+  Args:
+    args: arguments provided to a command, including a Binding resource arg
+
+  Returns:
+    The Binding resource name (e.g.
+    projects/x/locations/l/memberships/y/bindings/z)
+  """
+  return args.CONCEPTS.binding.Parse().RelativeName()

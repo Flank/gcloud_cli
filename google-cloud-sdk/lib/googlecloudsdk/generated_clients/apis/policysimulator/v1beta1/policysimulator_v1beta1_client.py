@@ -39,54 +39,134 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
-    self.folders_locations_replays_results = self.FoldersLocationsReplaysResultsService(self)
+    self.folders_locations_orgPolicyViolationsPreviews_operations = self.FoldersLocationsOrgPolicyViolationsPreviewsOperationsService(self)
+    self.folders_locations_orgPolicyViolationsPreviews = self.FoldersLocationsOrgPolicyViolationsPreviewsService(self)
+    self.folders_locations_replays_operations = self.FoldersLocationsReplaysOperationsService(self)
     self.folders_locations_replays = self.FoldersLocationsReplaysService(self)
     self.folders_locations = self.FoldersLocationsService(self)
     self.folders = self.FoldersService(self)
     self.operations = self.OperationsService(self)
-    self.organizations_locations_replays_results = self.OrganizationsLocationsReplaysResultsService(self)
+    self.organizations_locations_orgPolicyViolationsPreviews_operations = self.OrganizationsLocationsOrgPolicyViolationsPreviewsOperationsService(self)
+    self.organizations_locations_orgPolicyViolationsPreviews = self.OrganizationsLocationsOrgPolicyViolationsPreviewsService(self)
+    self.organizations_locations_replays_operations = self.OrganizationsLocationsReplaysOperationsService(self)
     self.organizations_locations_replays = self.OrganizationsLocationsReplaysService(self)
     self.organizations_locations = self.OrganizationsLocationsService(self)
     self.organizations = self.OrganizationsService(self)
-    self.projects_locations_replays_results = self.ProjectsLocationsReplaysResultsService(self)
+    self.projects_locations_orgPolicyViolationsPreviews_operations = self.ProjectsLocationsOrgPolicyViolationsPreviewsOperationsService(self)
+    self.projects_locations_orgPolicyViolationsPreviews = self.ProjectsLocationsOrgPolicyViolationsPreviewsService(self)
+    self.projects_locations_replays_operations = self.ProjectsLocationsReplaysOperationsService(self)
     self.projects_locations_replays = self.ProjectsLocationsReplaysService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
 
-  class FoldersLocationsReplaysResultsService(base_api.BaseApiService):
-    """Service class for the folders_locations_replays_results resource."""
+  class FoldersLocationsOrgPolicyViolationsPreviewsOperationsService(base_api.BaseApiService):
+    """Service class for the folders_locations_orgPolicyViolationsPreviews_operations resource."""
 
-    _NAME = 'folders_locations_replays_results'
+    _NAME = 'folders_locations_orgPolicyViolationsPreviews_operations'
 
     def __init__(self, client):
-      super(PolicysimulatorV1beta1.FoldersLocationsReplaysResultsService, self).__init__(client)
+      super(PolicysimulatorV1beta1.FoldersLocationsOrgPolicyViolationsPreviewsOperationsService, self).__init__(client)
       self._upload_configs = {
           }
 
-    def List(self, request, global_params=None):
-      r"""Lists the results of running a Replay.
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 
       Args:
-        request: (PolicysimulatorFoldersLocationsReplaysResultsListRequest) input message
+        request: (PolicysimulatorFoldersLocationsOrgPolicyViolationsPreviewsOperationsGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse) The response message.
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.folders.locations.orgPolicyViolationsPreviews.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorFoldersLocationsOrgPolicyViolationsPreviewsOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+  class FoldersLocationsOrgPolicyViolationsPreviewsService(base_api.BaseApiService):
+    """Service class for the folders_locations_orgPolicyViolationsPreviews resource."""
+
+    _NAME = 'folders_locations_orgPolicyViolationsPreviews'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.FoldersLocationsOrgPolicyViolationsPreviewsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+  class FoldersLocationsReplaysOperationsService(base_api.BaseApiService):
+    """Service class for the folders_locations_replays_operations resource."""
+
+    _NAME = 'folders_locations_replays_operations'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.FoldersLocationsReplaysOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
+
+      Args:
+        request: (PolicysimulatorFoldersLocationsReplaysOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/replays/{replaysId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.folders.locations.replays.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorFoldersLocationsReplaysOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+
+      Args:
+        request: (PolicysimulatorFoldersLocationsReplaysOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningListOperationsResponse) The response message.
       """
       config = self.GetMethodConfig('List')
       return self._RunMethod(
           config, request, global_params=global_params)
 
     List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/replays/{replaysId}/results',
+        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/replays/{replaysId}/operations',
         http_method='GET',
-        method_id='policysimulator.folders.locations.replays.results.list',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=['pageSize', 'pageToken'],
-        relative_path='v1beta1/{+parent}/results',
+        method_id='policysimulator.folders.locations.replays.operations.list',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'pageSize', 'pageToken'],
+        relative_path='v1beta1/{+name}',
         request_field='',
-        request_type_name='PolicysimulatorFoldersLocationsReplaysResultsListRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse',
+        request_type_name='PolicysimulatorFoldersLocationsReplaysOperationsListRequest',
+        response_type_name='GoogleLongrunningListOperationsResponse',
         supports_download=False,
     )
 
@@ -99,60 +179,6 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
       super(PolicysimulatorV1beta1.FoldersLocationsReplaysService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Create(self, request, global_params=None):
-      r"""Creates and starts a Replay using the given ReplayConfig.
-
-      Args:
-        request: (PolicysimulatorFoldersLocationsReplaysCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleLongrunningOperation) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/replays',
-        http_method='POST',
-        method_id='policysimulator.folders.locations.replays.create',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=[],
-        relative_path='v1beta1/{+parent}/replays',
-        request_field='googleCloudPolicysimulatorV1beta1Replay',
-        request_type_name='PolicysimulatorFoldersLocationsReplaysCreateRequest',
-        response_type_name='GoogleLongrunningOperation',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Gets the specified Replay. Each `Replay` is available for at least 7 days.
-
-      Args:
-        request: (PolicysimulatorFoldersLocationsReplaysGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleCloudPolicysimulatorV1beta1Replay) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/folders/{foldersId}/locations/{locationsId}/replays/{replaysId}',
-        http_method='GET',
-        method_id='policysimulator.folders.locations.replays.get',
-        ordered_params=['name'],
-        path_params=['name'],
-        query_params=[],
-        relative_path='v1beta1/{+name}',
-        request_field='',
-        request_type_name='PolicysimulatorFoldersLocationsReplaysGetRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1Replay',
-        supports_download=False,
-    )
 
   class FoldersLocationsService(base_api.BaseApiService):
     """Service class for the folders_locations resource."""
@@ -225,52 +251,127 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
           config, request, global_params=global_params)
 
     List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/operations',
         http_method='GET',
         method_id='policysimulator.operations.list',
-        ordered_params=[],
-        path_params=[],
-        query_params=['filter', 'name', 'pageSize', 'pageToken'],
-        relative_path='v1beta1/operations',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'pageSize', 'pageToken'],
+        relative_path='v1beta1/{+name}',
         request_field='',
         request_type_name='PolicysimulatorOperationsListRequest',
         response_type_name='GoogleLongrunningListOperationsResponse',
         supports_download=False,
     )
 
-  class OrganizationsLocationsReplaysResultsService(base_api.BaseApiService):
-    """Service class for the organizations_locations_replays_results resource."""
+  class OrganizationsLocationsOrgPolicyViolationsPreviewsOperationsService(base_api.BaseApiService):
+    """Service class for the organizations_locations_orgPolicyViolationsPreviews_operations resource."""
 
-    _NAME = 'organizations_locations_replays_results'
+    _NAME = 'organizations_locations_orgPolicyViolationsPreviews_operations'
 
     def __init__(self, client):
-      super(PolicysimulatorV1beta1.OrganizationsLocationsReplaysResultsService, self).__init__(client)
+      super(PolicysimulatorV1beta1.OrganizationsLocationsOrgPolicyViolationsPreviewsOperationsService, self).__init__(client)
       self._upload_configs = {
           }
 
-    def List(self, request, global_params=None):
-      r"""Lists the results of running a Replay.
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 
       Args:
-        request: (PolicysimulatorOrganizationsLocationsReplaysResultsListRequest) input message
+        request: (PolicysimulatorOrganizationsLocationsOrgPolicyViolationsPreviewsOperationsGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse) The response message.
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.organizations.locations.orgPolicyViolationsPreviews.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorOrganizationsLocationsOrgPolicyViolationsPreviewsOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+  class OrganizationsLocationsOrgPolicyViolationsPreviewsService(base_api.BaseApiService):
+    """Service class for the organizations_locations_orgPolicyViolationsPreviews resource."""
+
+    _NAME = 'organizations_locations_orgPolicyViolationsPreviews'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.OrganizationsLocationsOrgPolicyViolationsPreviewsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+  class OrganizationsLocationsReplaysOperationsService(base_api.BaseApiService):
+    """Service class for the organizations_locations_replays_operations resource."""
+
+    _NAME = 'organizations_locations_replays_operations'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.OrganizationsLocationsReplaysOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
+
+      Args:
+        request: (PolicysimulatorOrganizationsLocationsReplaysOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/replays/{replaysId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.organizations.locations.replays.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorOrganizationsLocationsReplaysOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+
+      Args:
+        request: (PolicysimulatorOrganizationsLocationsReplaysOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningListOperationsResponse) The response message.
       """
       config = self.GetMethodConfig('List')
       return self._RunMethod(
           config, request, global_params=global_params)
 
     List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/replays/{replaysId}/results',
+        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/replays/{replaysId}/operations',
         http_method='GET',
-        method_id='policysimulator.organizations.locations.replays.results.list',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=['pageSize', 'pageToken'],
-        relative_path='v1beta1/{+parent}/results',
+        method_id='policysimulator.organizations.locations.replays.operations.list',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'pageSize', 'pageToken'],
+        relative_path='v1beta1/{+name}',
         request_field='',
-        request_type_name='PolicysimulatorOrganizationsLocationsReplaysResultsListRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse',
+        request_type_name='PolicysimulatorOrganizationsLocationsReplaysOperationsListRequest',
+        response_type_name='GoogleLongrunningListOperationsResponse',
         supports_download=False,
     )
 
@@ -283,60 +384,6 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
       super(PolicysimulatorV1beta1.OrganizationsLocationsReplaysService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Create(self, request, global_params=None):
-      r"""Creates and starts a Replay using the given ReplayConfig.
-
-      Args:
-        request: (PolicysimulatorOrganizationsLocationsReplaysCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleLongrunningOperation) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/replays',
-        http_method='POST',
-        method_id='policysimulator.organizations.locations.replays.create',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=[],
-        relative_path='v1beta1/{+parent}/replays',
-        request_field='googleCloudPolicysimulatorV1beta1Replay',
-        request_type_name='PolicysimulatorOrganizationsLocationsReplaysCreateRequest',
-        response_type_name='GoogleLongrunningOperation',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Gets the specified Replay. Each `Replay` is available for at least 7 days.
-
-      Args:
-        request: (PolicysimulatorOrganizationsLocationsReplaysGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleCloudPolicysimulatorV1beta1Replay) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/organizations/{organizationsId}/locations/{locationsId}/replays/{replaysId}',
-        http_method='GET',
-        method_id='policysimulator.organizations.locations.replays.get',
-        ordered_params=['name'],
-        path_params=['name'],
-        query_params=[],
-        relative_path='v1beta1/{+name}',
-        request_field='',
-        request_type_name='PolicysimulatorOrganizationsLocationsReplaysGetRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1Replay',
-        supports_download=False,
-    )
 
   class OrganizationsLocationsService(base_api.BaseApiService):
     """Service class for the organizations_locations resource."""
@@ -358,40 +405,114 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
-  class ProjectsLocationsReplaysResultsService(base_api.BaseApiService):
-    """Service class for the projects_locations_replays_results resource."""
+  class ProjectsLocationsOrgPolicyViolationsPreviewsOperationsService(base_api.BaseApiService):
+    """Service class for the projects_locations_orgPolicyViolationsPreviews_operations resource."""
 
-    _NAME = 'projects_locations_replays_results'
+    _NAME = 'projects_locations_orgPolicyViolationsPreviews_operations'
 
     def __init__(self, client):
-      super(PolicysimulatorV1beta1.ProjectsLocationsReplaysResultsService, self).__init__(client)
+      super(PolicysimulatorV1beta1.ProjectsLocationsOrgPolicyViolationsPreviewsOperationsService, self).__init__(client)
       self._upload_configs = {
           }
 
-    def List(self, request, global_params=None):
-      r"""Lists the results of running a Replay.
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 
       Args:
-        request: (PolicysimulatorProjectsLocationsReplaysResultsListRequest) input message
+        request: (PolicysimulatorProjectsLocationsOrgPolicyViolationsPreviewsOperationsGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse) The response message.
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.projects.locations.orgPolicyViolationsPreviews.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorProjectsLocationsOrgPolicyViolationsPreviewsOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsOrgPolicyViolationsPreviewsService(base_api.BaseApiService):
+    """Service class for the projects_locations_orgPolicyViolationsPreviews resource."""
+
+    _NAME = 'projects_locations_orgPolicyViolationsPreviews'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.ProjectsLocationsOrgPolicyViolationsPreviewsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+  class ProjectsLocationsReplaysOperationsService(base_api.BaseApiService):
+    """Service class for the projects_locations_replays_operations resource."""
+
+    _NAME = 'projects_locations_replays_operations'
+
+    def __init__(self, client):
+      super(PolicysimulatorV1beta1.ProjectsLocationsReplaysOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
+
+      Args:
+        request: (PolicysimulatorProjectsLocationsReplaysOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/replays/{replaysId}/operations/{operationsId}',
+        http_method='GET',
+        method_id='policysimulator.projects.locations.replays.operations.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='PolicysimulatorProjectsLocationsReplaysOperationsGetRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+
+      Args:
+        request: (PolicysimulatorProjectsLocationsReplaysOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningListOperationsResponse) The response message.
       """
       config = self.GetMethodConfig('List')
       return self._RunMethod(
           config, request, global_params=global_params)
 
     List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/replays/{replaysId}/results',
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/replays/{replaysId}/operations',
         http_method='GET',
-        method_id='policysimulator.projects.locations.replays.results.list',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=['pageSize', 'pageToken'],
-        relative_path='v1beta1/{+parent}/results',
+        method_id='policysimulator.projects.locations.replays.operations.list',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['filter', 'pageSize', 'pageToken'],
+        relative_path='v1beta1/{+name}',
         request_field='',
-        request_type_name='PolicysimulatorProjectsLocationsReplaysResultsListRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1ListReplayResultsResponse',
+        request_type_name='PolicysimulatorProjectsLocationsReplaysOperationsListRequest',
+        response_type_name='GoogleLongrunningListOperationsResponse',
         supports_download=False,
     )
 
@@ -404,60 +525,6 @@ class PolicysimulatorV1beta1(base_api.BaseApiClient):
       super(PolicysimulatorV1beta1.ProjectsLocationsReplaysService, self).__init__(client)
       self._upload_configs = {
           }
-
-    def Create(self, request, global_params=None):
-      r"""Creates and starts a Replay using the given ReplayConfig.
-
-      Args:
-        request: (PolicysimulatorProjectsLocationsReplaysCreateRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleLongrunningOperation) The response message.
-      """
-      config = self.GetMethodConfig('Create')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Create.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/replays',
-        http_method='POST',
-        method_id='policysimulator.projects.locations.replays.create',
-        ordered_params=['parent'],
-        path_params=['parent'],
-        query_params=[],
-        relative_path='v1beta1/{+parent}/replays',
-        request_field='googleCloudPolicysimulatorV1beta1Replay',
-        request_type_name='PolicysimulatorProjectsLocationsReplaysCreateRequest',
-        response_type_name='GoogleLongrunningOperation',
-        supports_download=False,
-    )
-
-    def Get(self, request, global_params=None):
-      r"""Gets the specified Replay. Each `Replay` is available for at least 7 days.
-
-      Args:
-        request: (PolicysimulatorProjectsLocationsReplaysGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleCloudPolicysimulatorV1beta1Replay) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/replays/{replaysId}',
-        http_method='GET',
-        method_id='policysimulator.projects.locations.replays.get',
-        ordered_params=['name'],
-        path_params=['name'],
-        query_params=[],
-        relative_path='v1beta1/{+name}',
-        request_field='',
-        request_type_name='PolicysimulatorProjectsLocationsReplaysGetRequest',
-        response_type_name='GoogleCloudPolicysimulatorV1beta1Replay',
-        supports_download=False,
-    )
 
   class ProjectsLocationsService(base_api.BaseApiService):
     """Service class for the projects_locations resource."""

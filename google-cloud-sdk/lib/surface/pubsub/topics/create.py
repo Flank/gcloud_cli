@@ -37,7 +37,7 @@ _KMS_FLAG_OVERRIDES = {
     'kms-key': '--topic-encryption-key',
     'kms-keyring': '--topic-encryption-key-keyring',
     'kms-location': '--topic-encryption-key-location',
-    'kms-project': '--topic-encryption-key-project'
+    'kms-project': '--topic-encryption-key-project',
 }
 
 _KMS_PERMISSION_INFO = """
@@ -53,12 +53,14 @@ def _GetKmsKeyPresentationSpec():
   return kms_resource_args.GetKmsKeyPresentationSpec(
       'topic',
       flag_overrides=_KMS_FLAG_OVERRIDES,
-      permission_info=_KMS_PERMISSION_INFO)
+      permission_info=_KMS_PERMISSION_INFO,
+  )
 
 
 def _GetTopicPresentationSpec():
   return resource_args.CreateTopicResourceArg(
-      'to create.', positional=True, plural=True)
+      'to create.', positional=True, plural=True
+  )
 
 
 def _Run(args, legacy_output=False):
@@ -74,22 +76,31 @@ def _Run(args, legacy_output=False):
   else:
     # Did user supply any topic-encryption-key flags?
     for keyword in [
-        'topic-encryption-key', 'topic-encryption-key-project',
-        'topic-encryption-key-location', 'topic-encryption-key-keyring'
+        'topic-encryption-key',
+        'topic-encryption-key-project',
+        'topic-encryption-key-location',
+        'topic-encryption-key-keyring',
     ]:
       if args.IsSpecified(keyword.replace('-', '_')):
         raise core_exceptions.Error(
-            '--topic-encryption-key was not fully specified.')
+            '--topic-encryption-key was not fully specified.'
+        )
 
   retention_duration = getattr(args, 'message_retention_duration', None)
   if args.IsSpecified('message_retention_duration'):
     retention_duration = util.FormatDuration(retention_duration)
 
-  message_storage_policy_allowed_regions = args.message_storage_policy_allowed_regions
+  message_storage_policy_allowed_regions = (
+      args.message_storage_policy_allowed_regions
+  )
 
   schema = getattr(args, 'schema', None)
+  first_revision_id = None
+  last_revision_id = None
   if schema:
     schema = args.CONCEPTS.schema.Parse().RelativeName()
+    first_revision_id = getattr(args, 'first_revision_id', None)
+    last_revision_id = getattr(args, 'last_revision_id', None)
   message_encoding_list = getattr(args, 'message_encoding', None)
   message_encoding = None
   if message_encoding_list:
@@ -105,13 +116,17 @@ def _Run(args, legacy_output=False):
           message_retention_duration=retention_duration,
           message_storage_policy_allowed_regions=message_storage_policy_allowed_regions,
           schema=schema,
-          message_encoding=message_encoding)
+          message_encoding=message_encoding,
+          first_revision_id=first_revision_id,
+          last_revision_id=last_revision_id,
+      )
     except api_ex.HttpError as error:
       exc = exceptions.HttpException(error)
       log.CreatedResource(
           topic_ref.RelativeName(),
           kind='topic',
-          failed=exc.payload.status_message)
+          failed=exc.payload.status_message,
+      )
       failed.append(topic_ref.topicsId)
       continue
 
@@ -124,13 +139,38 @@ def _Run(args, legacy_output=False):
     raise util.RequestsFailedError(failed, 'create')
 
 
+def _Args(parser):
+  """Custom args implementation.
+
+  Args:
+    parser: The current parser.
+  """
+
+  resource_args.AddResourceArgs(
+      parser, [_GetKmsKeyPresentationSpec(), _GetTopicPresentationSpec()]
+  )
+  # This group should not be hidden
+  flags.AddSchemaSettingsFlags(parser, is_update=False)
+  labels_util.AddCreateLabelsFlags(parser)
+  flags.AddTopicMessageRetentionFlags(parser, is_update=False)
+
+  parser.add_argument(
+      '--message-storage-policy-allowed-regions',
+      metavar='REGION',
+      type=arg_parsers.ArgList(),
+      help=(
+          'A list of one or more Cloud regions where messages are allowed to'
+          ' be stored at rest.'
+      ),
+  )
+
+
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
   """Creates one or more Cloud Pub/Sub topics."""
 
   detailed_help = {
-      'EXAMPLES':
-          """\
+      'EXAMPLES': """\
           To create a Cloud Pub/Sub topic, run:
 
               $ {command} mytopic"""
@@ -138,19 +178,7 @@ class Create(base.CreateCommand):
 
   @staticmethod
   def Args(parser):
-    resource_args.AddResourceArgs(
-        parser, [_GetKmsKeyPresentationSpec(),
-                 _GetTopicPresentationSpec()])
-    flags.AddSchemaSettingsFlags(parser)
-    labels_util.AddCreateLabelsFlags(parser)
-    flags.AddTopicMessageRetentionFlags(parser, is_update=False)
-
-    parser.add_argument(
-        '--message-storage-policy-allowed-regions',
-        metavar='REGION',
-        type=arg_parsers.ArgList(),
-        help='A list of one or more Cloud regions where messages are allowed to'
-        ' be stored at rest.')
+    _Args(parser)
 
   def Run(self, args):
     return _Run(args)
@@ -159,6 +187,10 @@ class Create(base.CreateCommand):
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateBeta(Create):
   """Creates one or more Cloud Pub/Sub topics."""
+
+  @staticmethod
+  def Args(parser):
+    _Args(parser)
 
   def Run(self, args):
     legacy_output = properties.VALUES.pubsub.legacy_output.GetBool()

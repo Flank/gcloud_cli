@@ -20,19 +20,108 @@ from __future__ import unicode_literals
 
 VMWARE_CLUSTER_ARGS_TO_UPDATE_MASKS = {
     'description': 'description',
+    'version': 'on_prem_version',
+    'add_annotations': 'annotations',
+    'clear_annotations': 'annotations',
+    'remove_annotations': 'annotations',
+    'set_annotations': 'annotations',
+    'cpus': 'control_plane_node.cpus',
+    'memory': 'control_plane_node.memory',
+    'enable_auto_resize': 'control_plane_node.auto_resize_config.enabled',
+    'disable_auto_resize': 'control_plane_node.auto_resize_config.enabled',
+    'enable_aag_config': 'anti_affinity_groups.aag_config_disabled',
+    'disable_aag_config': 'anti_affinity_groups.aag_config_disabled',
+    'enable_vsphere_csi': 'storage.vsphere_csi_disabled',
+    'disable_vsphere_csi': 'storage.vsphere_csi_disabled',
+    'static_ip_config_from_file': 'network_config.static_ip_config',
+    'static_ip_config_ip_blocks': 'network_config.static_ip_config',
+    'metal_lb_config_from_file': 'load_balancer.metal_lb_config',
+    'metal_lb_config_address_pools': 'load_balancer.metal_lb_config',
+    'enable_auto_repair': 'auto_repair_config.enabled',
+    'disable_auto_repair': 'auto_repair_config.enabled',
+    'admin_users': 'authorization.admin_users',
 }
 
 VMWARE_NODE_POOL_ARGS_TO_UPDATE_MASKS = {
     'display_name': 'display_name',
     'min_replicas': 'node_pool_autoscaling.min_replicas',
     'max_replicas': 'node_pool_autoscaling.max_replicas',
+    'cpus': 'config.cpus',
+    'memory': 'config.memory_mb',
     'replicas': 'config.replicas',
+    'image_type': 'config.image_type',
+    'image': 'config.image',
+    'boot_disk_size': 'config.boot_disk_size_gb',
+    'node_taints': 'config.taints',
+    'node_labels': 'config.labels',
     'enable_load_balancer': 'config.enable_load_balancer',
     'disable_load_balancer': 'config.enable_load_balancer',
 }
 
 VMWARE_ADMIN_CLUSTER_ARGS_TO_UPDATE_MASKS = {
     'required_platform_version': 'platform_config.required_platform_version',
+}
+
+BARE_METAL_CLUSTER_ARGS_TO_UPDATE_MASKS = {
+    'metal_lb_address_pools_from_file':
+        'load_balancer.metal_lb_config.address_pools',
+    'metal_lb_address_pools':
+        'load_balancer.metal_lb_config.address_pools',
+    'metal_lb_load_balancer_node_configs_from_file':
+        'load_balancer.metal_lb_config.node_pool_config.node_pool_config.node_configs',
+    'metal_lb_load_balancer_node_configs':
+        'load_balancer.metal_lb_config.node_pool_config.node_pool_config.node_configs',
+    'metal_lb_load_balancer_node_labels':
+        'load_balancer.metal_lb_config.node_pool_config.node_pool_config.labels',
+    'metal_lb_load_balancer_node_taints':
+        'load_balancer.metal_lb_config.node_pool_config.node_pool_config.taints',
+    'control_plane_node_configs_from_file':
+        'control_plane.node_pool_config.node_pool_config.node_configs',
+    'control_plane_node_configs': 'control_plane.node_pool_config.node_pool_config.node_configs',
+    'control_plane_node_labels':
+        'control_plane.node_pool_config.node_pool_config.labels',
+    'control_plane_node_taints':
+        'control_plane.node_pool_config.node_pool_config.taints',
+    'api_server_args':
+        'control_plane.api_server_args',
+    'description':
+        'description',
+    'version':
+        'bare_metal_version',
+    'enable_application_logs':
+        'cluster_operations.enable_application_logs',
+    'maintenance_address_cidr_blocks':
+        'maintenance_config.maintenance_address_cidr_blocks',
+    'admin_users':
+        'security_config.authorization.admin_users',
+    'login_user': 'node_access_config.login_user'
+}
+
+BARE_METAL_NODE_POOL_ARGS_TO_UPDATE_MASKS = {
+    'node_configs_from_file': 'node_pool_config.node_configs',
+    'node_configs': 'node_pool_config.node_configs',
+    'node_labels': 'node_pool_config.labels',
+    'node_taints': 'node_pool_config.taints',
+    'display_name': 'display_name',
+}
+
+BARE_METAL_ADMIN_CLUSTER_ARGS_TO_UPDATE_MASKS = {
+    'version': 'bare_metal_version',
+    'description': 'description',
+    'control_plane_node_configs_from_file':
+        'control_plane.node_pool_config.node_pool_config.node_configs',
+    'control_plane_node_labels':
+        'control_plane.node_pool_config.node_pool_config.labels',
+    'control_plane_node_taints':
+        'control_plane.node_pool_config.node_pool_config.taints',
+    'api_server_args': 'control_plane.api_server_args',
+    'uri': 'proxy.uri',
+    'no_proxy': 'proxy.no_proxy',
+    'enable_application_logs': 'cluster_operations.enable_application_logs',
+    'maintenance_address_cidr_blocks':
+        'maintenance_config.maintenance_address_cidr_blocks',
+    'max_pods_per_node': 'node_config.max_pods_per_node',
+    'login_user': 'node_access_config.login_user',
 }
 
 

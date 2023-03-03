@@ -132,14 +132,16 @@ def AddHost(parser):
   """Add the '--host' flag to the parser."""
   parser.add_argument(
       '--host',
-      help=('Cloud SQL user\'s host name expressed as a specific IP address'
-            ' or address range. `%` denotes an unrestricted host name. '
-            'Applicable flag for MySQL instances; ignored for all other '
-            'engines. Note, if you connect to your instance using IP '
-            'addresses, you must add your client IP address as an Authorized'
-            ' Address, even if your host name is unrestricted. For help on '
-            'how to do so, read: '
-            'https://cloud.google.com/sql/docs/mysql/configure-ip'))
+      help=(
+          "Cloud SQL user's hostname expressed as a specific IP address or"
+          ' address range. `%` denotes an unrestricted hostname. Applicable'
+          ' flag for MySQL instances; ignored for all other engines. Note, if'
+          ' you connect to your instance using IP addresses, you must add your'
+          ' client IP address as an authorized address, even if your hostname'
+          ' is unrestricted. For more information, see [Configure'
+          ' IP](https://cloud.google.com/sql/docs/mysql/configure-ip).'
+      ),
+  )
 
 
 def AddAvailabilityType(parser):
@@ -211,8 +213,7 @@ def AddAssignIp(parser):
       '--assign-ip',
       help='Assign a public IP address to the instance. This is a public, '
       'externally available IPv4 address that you can use to connect to your '
-      'instance when properly authorized. Use --assign-ip to enable a public '
-      'IP and --no-assign-ip to disable it.',
+      'instance when properly authorized.',
       action=arg_parsers.StoreTrueFalseAction)
 
 
@@ -221,12 +222,11 @@ def AddEnableGooglePrivatePath(parser):
   parser.add_argument(
       '--enable-google-private-path',
       required=False,
-      hidden=True,
-      help='Enable private path for Google Cloud services. '
-      'This field specifies whether the instance should be '
-      'accessible to Google internal Cloud services, e.g. BigQuery. '
-      'This is only applicable to MySQL and Postgres instances that use '
-      'private IP.  Currently SQL Server isn\'t supported.',
+      help='Enable a private path for Google Cloud services. '
+      'This flag specifies whether the instance is accessible to '
+      'internal Google Cloud services such as BigQuery. '
+      'This is only applicable to MySQL and PostgreSQL instances that '
+      'don\'t use public IP. Currently, SQL Server isn\'t supported.',
       **kwargs)
 
 
@@ -1020,20 +1020,28 @@ def AddEncryptedBakFlags(parser):
 
 def AddBakExportStripeCountArgument(parser):
   """Add the 'stripe_count' argument to the parser for striped export."""
-  parser.add_argument('--stripe_count', type=int, hidden=True, help=(
+  parser.add_argument('--stripe_count', type=int, default=None, help=(
       'Specifies the number of stripes to use for SQL Server exports.'))
 
 
-def AddBakExportStripedArgument(parser):
+def AddBakExportStripedArgument(parser, show_negated_in_help=True):
   """Add the 'striped' argument to the parser for striped export."""
-  parser.add_argument('--striped', type=bool, hidden=True, help=(
-      'Whether or not the SQL Server export should be striped.'))
+  kwargs = _GetKwargsForBoolFlag(show_negated_in_help)
+  parser.add_argument(
+      '--striped',
+      required=False,
+      help='Whether SQL Server export should be striped.',
+      **kwargs)
 
 
-def AddBakImportStripedArgument(parser):
+def AddBakImportStripedArgument(parser, show_negated_in_help=True):
   """Add the 'striped' argument to the parser for striped import."""
-  parser.add_argument('--striped', type=bool, hidden=True, help=(
-      'Whether or not the SQL Server import is striped.'))
+  kwargs = _GetKwargsForBoolFlag(show_negated_in_help)
+  parser.add_argument(
+      '--striped',
+      required=False,
+      help='Whether SQL Server import should be striped.',
+      **kwargs)
 
 
 def AddRescheduleType(parser):
@@ -1386,9 +1394,7 @@ def AddDeletionProtection(parser):
     parser: The current argparse parser to add this to.
   """
   help_text = (
-      'Enable deletion protection on a Cloud SQL instance. Use '
-      '--deletion-protection to enable deletion protection on an instance and '
-      '--no-deletion-protection to disable it.')
+      'Enable deletion protection on a Cloud SQL instance.')
   parser.add_argument(
       '--deletion-protection',
       action=arg_parsers.StoreTrueFalseAction,
@@ -1422,3 +1428,55 @@ def AddConnectorEnforcement(parser):
       required=False,
       default=None,
       help=help_text)
+
+
+def AddTimeout(
+    parser,
+    default_max_wait,
+    help_text='Time to synchronously wait for the operation to complete, after'
+              ' which the operation continues asynchronously. Ignored if '
+              '--async flag is specified. By default, set to 3600s. To wait '
+              'indefinitely, set to *unlimited*.'):
+  """Adds --timeout flag."""
+  parser.add_argument(
+      '--timeout',
+      required=False,
+      default=default_max_wait,
+      help=help_text,
+      type=arg_parsers.BoundedInt(lower_bound=0, unlimited=True))
+
+
+def AddEnablePrivateServiceConnect(parser):
+  kwargs = _GetKwargsForBoolFlag(False)
+  parser.add_argument(
+      '--enable-private-service-connect',
+      hidden=True,
+      required=False,
+      help=('When the flag is set, a Cloud SQL instance will be created with '
+            'PSC enabled.'),
+      **kwargs)
+
+
+def AddAllowedPscProjects(parser):
+  parser.add_argument(
+      '--allowed-psc-projects',
+      type=arg_parsers.ArgList(min_length=1),
+      required=False,
+      hidden=True,
+      metavar='PROJECT',
+      help=('A comma-separated list of projects. Each project in this list may '
+            'be represented by a project number (numeric) or by a project id '
+            '(alphanumeric). This will allow certain projects to create PSC '
+            'bindings to the instance. This can be set only after PSC is '
+            'enabled.'))
+
+
+def AddClearAllowedPscProjects(parser):
+  kwargs = _GetKwargsForBoolFlag(False)
+  parser.add_argument(
+      '--clear-allowed-psc-projects',
+      hidden=True,
+      required=False,
+      help=('This will clear the project allowlist of PSC, disallowing all '
+            'projects from creating new PSC bindings to the instance.'),
+      **kwargs)

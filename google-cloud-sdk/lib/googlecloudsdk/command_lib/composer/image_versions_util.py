@@ -24,6 +24,7 @@ import re
 from googlecloudsdk.api_lib.composer import environments_util as environments_api_util
 from googlecloudsdk.api_lib.composer import image_versions_util as image_version_api_util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.composer import flags
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core.util import semver
 
@@ -32,8 +33,6 @@ MIN_UPGRADEABLE_COMPOSER_VER = '1.0.0'
 
 UpgradeValidator = collections.namedtuple('UpgradeValidator',
                                           ['upgrade_valid', 'error'])
-
-MIN_TRIGGERER_AIRFLOW_VERSION = '2.2.0'
 
 
 class InvalidImageVersionError(command_util.Error):
@@ -109,9 +108,32 @@ def ImageVersionFromAirflowVersion(airflow_version):
 
 def IsImageVersionStringComposerV1(image_version):
   """Checks if string composer-X.Y.Z-airflow-A.B.C is Composer v1 version."""
-  return (not image_version or image_version.startswith('composer-1.') or
-          image_version.startswith('composer-1-') or
-          image_version.startswith('composer-latest'))
+  return image_version is not None and (
+      image_version.startswith('composer-1.')
+      or image_version.startswith('composer-1-')
+  )
+
+
+def IsDefaultImageVersion(image_version):
+  return image_version is None or image_version.startswith('composer-latest')
+
+
+def BuildDefaultComposerVersionWarning(image_version, airflow_version):
+  """Builds warning message about using default Composer version."""
+  message = (
+      '{} resolves to Cloud Composer current default version, which changed'
+      ' from 1 to 2 in a recent release and is subject to'
+      ' further changes in the future. Consider using'
+      ' --image-version=composer-A-airflow-X[.Y[.Z]]. More info at'
+      ' https://cloud.google.com/composer/docs/concepts/versioning/composer-versioning-overview#version-aliases'
+  )
+  if airflow_version:
+    return message.format('Using --airflow-version=X[.Y[.Z]]')
+  if image_version:
+    return message.format(
+        'Using --image-version=composer-latest-airflow-X[.Y[.Z]]'
+    )
+  return message.format('Not defining --image-version')
 
 
 def _CompareVersions(v1, v2):
@@ -159,16 +181,20 @@ def IsVersionTriggererCompatible(image_version):
     image_version: image version str that includes airflow version.
 
   Returns:
-    True if given airflow version is compatible with Triggerer(>=2.2.x),
-    otherwise False
+    True if given airflow version is compatible with Triggerer(>=2.2.x)
+    and Composer version is >=2.0.31 otherwise False
   """
 
   if image_version:
     version_item = _ImageVersionItem(image_version)
-    if version_item and version_item.airflow_ver:
+    if version_item and version_item.airflow_ver and version_item.composer_ver:
       airflow_version = version_item.airflow_ver
-      return IsVersionInRange(airflow_version, MIN_TRIGGERER_AIRFLOW_VERSION,
-                              None, True)
+      composer_version = version_item.composer_ver
+      return IsVersionInRange(
+          airflow_version,
+          flags.MIN_TRIGGERER_AIRFLOW_VERSION, None, True) and IsVersionInRange(
+              composer_version, flags.MIN_TRIGGERER_COMPOSER_VERSION, None,
+              True)
   return False
 
 

@@ -32,13 +32,18 @@ class CreateGitHub(base.CreateCommand):
   detailed_help = {
       'EXAMPLES':
           """\
-            To create a push trigger for all branches:
+            To create a push trigger with a 1st-gen repository for all branches:
 
               $ {command} --name="my-trigger" --service-account="projects/my-project/serviceAccounts/my-byosa@my-project.iam.gserviceaccount.com" --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --branch-pattern=".*" --build-config="cloudbuild.yaml"
 
-            To create a pull request trigger for master:
+            To create a pull request trigger with a 1st-gen repository for master:
 
               $ {command} --name="my-trigger" --service-account="projects/my-project/serviceAccounts/my-byosa@my-project.iam.gserviceaccount.com" --repo-owner="GoogleCloudPlatform" --repo-name="cloud-builders" --pull-request-pattern="^master$" --build-config="cloudbuild.yaml"
+
+            To create a pull request trigger with a 2nd gen repository for master:
+
+              $ {command} --name="my-trigger"  --repository=projects/my-project/locations/us-central1/connections/my-conn/repositories/my-repo --pull-request-pattern="^master$" --build-config="cloudbuild.yaml"
+
           """,
   }
 
@@ -51,10 +56,34 @@ class CreateGitHub(base.CreateCommand):
         to capture some information, but behaves like an ArgumentParser.
     """
     flag_config = trigger_utils.AddTriggerArgs(parser)
-    flag_config.add_argument(
-        '--repo-owner', help='Owner of the GitHub Repository.', required=True)
-    flag_config.add_argument(
-        '--repo-name', help='Name of the GitHub Repository.', required=True)
+
+    gen_config = flag_config.add_mutually_exclusive_group(required=True)
+    gen_config.add_argument(
+        '--repository',
+        help=("""\
+Repository resource (2nd gen) to use, in the format
+"projects/*/locations/*/connections/*/repositories/*".
+"""),
+    )
+    v1_config = gen_config.add_argument_group(
+        help='1st-gen repository settings.')
+    v1_config.add_argument(
+        '--repo-owner',
+        help='Owner of the GitHub Repository (1st gen).',
+        required=True)
+    v1_config.add_argument(
+        '--repo-name',
+        help='Name of the GitHub Repository (1st gen).',
+        required=True)
+    v1_config.add_argument(
+        '--enterprise-config',
+        help="""\
+Resource name of the GitHub Enterprise config that should be applied to this
+installation.
+
+For example: "projects/{$project_id}/locations/{$location_id}/githubEnterpriseConfigs/{$config_id}
+        """)
+
     ref_config = flag_config.add_mutually_exclusive_group(required=True)
     trigger_utils.AddBranchPattern(ref_config)
     trigger_utils.AddTagPattern(ref_config)
@@ -74,18 +103,20 @@ For example, --pull-request-pattern=foo will match "foo", "foobar", and "barfoo"
 The syntax of the regular expressions accepted is the syntax accepted by
 RE2 and described at https://github.com/google/re2/wiki/Syntax.
 """)
+    comment_control_choices = {
+        'COMMENTS_DISABLED': """Do not require comments on Pull Requests before builds are triggered.""",
+        'COMMENTS_ENABLED': """Enforce that repository owners or collaborators must comment on Pull Requests before builds are triggered.""",
+        'COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY': """Enforce that repository owners or collaborators must comment on external contributors' Pull Requests before builds are triggered.""",
+    }
+
     pr_config.add_argument(
         '--comment-control',
-        choices={
-            'COMMENTS_DISABLED':
-                'Do not require comments on Pull Requests before builds are triggered.',
-            'COMMENTS_ENABLED':
-                'Enforce that repository owners or collaborators must comment on Pull Requests before builds are triggered.',
-            'COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY':
-                'Enforce that repository owners or collaborators must comment on external contributors\' Pull Requests before builds are triggered.'
-        },
+        choices=comment_control_choices,
         default='COMMENTS_ENABLED',
-        help='Require a repository collaborator or owner to comment \'/gcbrun\' on a pull request before running the build.'
+        help=("""\
+Require a repository collaborator or owner to comment '/gcbrun' on a pull
+request before running the build.
+"""),
     )
 
     trigger_utils.AddBuildConfigArgs(flag_config)
@@ -112,19 +143,30 @@ RE2 and described at https://github.com/google/re2/wiki/Syntax.
     if done:
       return trigger
 
-    # GitHub config
-    gh = messages.GitHubEventsConfig(owner=args.repo_owner, name=args.repo_name)
+    if args.repo_owner and args.repo_name:  # 1st-gen GitHub config
+      trigger.github = messages.GitHubEventsConfig(
+          owner=args.repo_owner,
+          name=args.repo_name,
+          enterpriseConfigResourceName=args.enterprise_config)
+      rcfg = trigger.github
+    else:  # 2nd-gen (Repos API) config
+      trigger.repositoryEventConfig = messages.RepositoryEventConfig(
+          repository=args.repository)
+      rcfg = trigger.repositoryEventConfig
+
     if args.pull_request_pattern:
-      gh.pullRequest = messages.PullRequestFilter(
+      rcfg.pullRequest = messages.PullRequestFilter(
           branch=args.pull_request_pattern)
       if args.comment_control:
-        gh.pullRequest.commentControl = messages.PullRequestFilter.CommentControlValueValuesEnum(
-            args.comment_control)
+        rcfg.pullRequest.commentControl = (
+            messages.PullRequestFilter.CommentControlValueValuesEnum(
+                args.comment_control
+            )
+        )
     else:
       # Push event
-      gh.push = messages.PushFilter(
+      rcfg.push = messages.PushFilter(
           branch=args.branch_pattern, tag=args.tag_pattern)
-    trigger.github = gh
 
     default_image = 'gcr.io/%s/github.com/%s/%s:$COMMIT_SHA' % (
         project, args.repo_owner, args.repo_name)

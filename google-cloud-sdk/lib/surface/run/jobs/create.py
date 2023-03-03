@@ -36,12 +36,12 @@ from googlecloudsdk.core.console import progress_tracker
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class Create(base.Command):
-  """Deploy a new job to Cloud Run."""
+  """Create a Cloud Run job."""
 
   detailed_help = {
       'DESCRIPTION':
           """\
-          Deploys a new job to Google Cloud Run.
+          Creates a new Cloud Run job.
           """,
       'EXAMPLES':
           """\
@@ -72,8 +72,8 @@ class Create(base.Command):
     flags.AddTasksFlag(parser)
     flags.AddMaxRetriesFlag(parser)
     flags.AddTaskTimeoutFlags(parser)
-    flags.AddServiceAccountFlag(parser)
-    flags.AddSetEnvVarsFlag(parser)
+    flags.AddServiceAccountFlag(parser, managed_only=True)
+    flags.AddMutexEnvVarsFlagsForCreate(parser)
     flags.AddSetCloudSQLFlag(parser)
     flags.AddVpcConnectorArg(parser)
     flags.AddEgressSettingsFlag(parser)
@@ -174,3 +174,4 @@ class AlphaCreate(Create):
     flags.AddVpcNetworkFlags(parser, resource_kind='Job')
     flags.AddVpcSubnetFlags(parser, resource_kind='Job')
     flags.AddVpcNetworkTagsFlags(parser, resource_kind='Job')
+    flags.AddRuntimeFlag(parser)

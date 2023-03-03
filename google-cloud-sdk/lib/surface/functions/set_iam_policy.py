@@ -24,11 +24,11 @@ from googlecloudsdk.command_lib.functions.v1.set_iam_policy import command as co
 from googlecloudsdk.command_lib.functions.v2.set_iam_policy import command as command_v2
 
 
-def _CommonArgs(parser, track):
+def _CommonArgs(parser):
   """Registers flags for this command."""
   flags.AddFunctionResourceArg(parser, 'to get IAM policy for')
   flags.AddIAMPolicyFileArg(parser)
-  flags.AddGen2Flag(parser, track)
+  flags.AddGen2Flag(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -36,10 +36,8 @@ class SetIamPolicy(base.Command):
   """Sets IAM policy for a Google Cloud Function."""
 
   detailed_help = {
-      'DESCRIPTION':
-          '{description}',
-      'EXAMPLES':
-          """\
+      'DESCRIPTION': '{description}',
+      'EXAMPLES': """\
           To set the iam policy for `FUNCTION-1` to the policy defined in `POLICY-FILE-1` run:
 
             $ {command} FUNCTION-1 POLICY-FILE-1
@@ -49,7 +47,7 @@ class SetIamPolicy(base.Command):
   @staticmethod
   def Args(parser):
     """Register flags for this command."""
-    _CommonArgs(parser, base.ReleaseTrack.GA)
+    _CommonArgs(parser)
 
   def Run(self, args):
     """Runs the command.
@@ -71,17 +69,7 @@ class SetIamPolicy(base.Command):
 class SetIamPolicyBeta(SetIamPolicy):
   """Sets IAM policy for a Google Cloud Function."""
 
-  @staticmethod
-  def Args(parser):
-    """Registers flags for this command."""
-    _CommonArgs(parser, base.ReleaseTrack.BETA)
-
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class SetIamPolicyAlpha(SetIamPolicyBeta):
   """Sets IAM policy for a Google Cloud Function."""
-
-  @staticmethod
-  def Args(parser):
-    """Registers flags for this command."""
-    _CommonArgs(parser, base.ReleaseTrack.ALPHA)

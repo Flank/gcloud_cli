@@ -84,9 +84,7 @@ _ASYNC_PRIMARY_DISK_REGION_EXPLANATION = """\
 
 _ASYNC_SECONDARY_DISK_HELP = """\
       Secondary disk for asynchronous replication. This flag is required when
-      starting replication. It is also required when stopping replication on the
-      primary disk. It must not be used when stopping replication on the
-      secondary disk.
+      starting replication.
 """
 
 _ASYNC_SECONDARY_DISK_ZONE_EXPLANATION = """\
@@ -95,6 +93,14 @@ _ASYNC_SECONDARY_DISK_ZONE_EXPLANATION = """\
 
 _ASYNC_SECONDARY_DISK_REGION_EXPLANATION = """\
       Region of the secondary disk for asynchronous replication.
+"""
+
+_ASYNC_SECONDARY_DISK_PROJECT_EXPLANATION = """\
+      Project of the secondary disk for asynchronous replication.
+"""
+
+_ASYNC_PRIMARY_DISK_PROJECT_EXPLANATION = """\
+      Project of the primary disk for asynchronous replication.
 """
 
 DEFAULT_LIST_FORMAT = """\
@@ -186,24 +192,42 @@ def AddStopGroupAsyncReplicationArgs(parser):
           compute_flags.REGION_PROPERTY_EXPLANATION))
 
 
-def AddProvisionedIopsFlag(parser, arg_parsers, constants):
+def AddBulkCreateArgs(parser):
+  """Adds bulk create specific arguments to parser."""
+  parser.add_argument(
+      '--source-consistency-group-policy',
+      help='''
+      URL of the source consistency group resource policy. The resource policy
+      is always in the region of the source disks.
+      ''',
+      # This argument is required because consistent cloning is only supported
+      # feature under the BulkCreate now. May become optional in the future.
+      required=True)
+
+  help_text = """Target {0} of the created disks, which currently must be the same as the source {0}. {1}"""
+  scope_parser = parser.add_mutually_exclusive_group(required=True)
+  scope_parser.add_argument(
+      '--zone',
+      completer=compute_completers.ZonesCompleter,
+      action=actions.StoreProperty(properties.VALUES.compute.zone),
+      help=help_text.format('zone', compute_flags.ZONE_PROPERTY_EXPLANATION))
+  scope_parser.add_argument(
+      '--region',
+      completer=compute_completers.RegionsCompleter,
+      action=actions.StoreProperty(properties.VALUES.compute.region),
+      help=help_text.format('region',
+                            compute_flags.REGION_PROPERTY_EXPLANATION))
+
+
+def AddProvisionedIopsFlag(parser, arg_parsers):
   return parser.add_argument(
       '--provisioned-iops',
-      type=arg_parsers.BoundedInt(constants.MIN_PROVISIONED_IOPS,
-                                  constants.MAX_PROVISIONED_IOPS),
+      type=arg_parsers.BoundedInt(),
       help=(
-          'Provisioned IOPS of pd-extreme disk to create. Only for use with '
-          'disks of type pd-extreme. If specified, the value must be in the '
-          'range between {min} and {max}. If not specified, the default value '
-          'is {default}.').format(
-              min=constants.MIN_PROVISIONED_IOPS,
-              # TODO(b/246777440):
-              # Replace max=120000 with max=constants.MAX_PROVISIONED_IOPS.
-              # This is because the field is already GA, but hyperdisk-extreme
-              # no yet, so we will use the old text with old iops range for
-              # alpha.
-              max=120000,
-              default=constants.DEFAULT_PROVISIONED_IOPS))
+          'Provisioned IOPS of disk to create. Only for use with disks of type '
+          'pd-extreme and hyperdisk-extreme.'
+      ),
+  )
 
 
 def AddProvisionedThroughputFlag(parser, arg_parsers):
@@ -248,9 +272,49 @@ def MakeSecondaryDiskArg(required=False):
       detailed_help=_ASYNC_SECONDARY_DISK_HELP,
       plural=False,
       required=required,
-      use_existing_default_scope=False,
+      scope_flags_usage=compute_flags.ScopeFlagsUsage
+      .GENERATE_DEDICATED_SCOPE_FLAGS,
       zone_help_text=_ASYNC_SECONDARY_DISK_ZONE_EXPLANATION,
       region_help_text=_ASYNC_SECONDARY_DISK_REGION_EXPLANATION)
+
+
+def MakeDeprecatedSecondaryDiskArg(parser):
+  """Adds deprecated stop async replication specific arguments to parser."""
+  parser.add_argument(
+      '--secondary-disk',
+      completer=compute_completers.DisksCompleter,
+      help='Secondary disk for asynchronous replication.',
+      action=actions.DeprecationAction('--secondary-disk', removed=False),
+  )
+  scope_parser = parser.add_mutually_exclusive_group(required=False)
+  scope_parser.add_argument(
+      '--secondary-disk-zone',
+      completer=compute_completers.ZonesCompleter,
+      action=actions.DeprecationAction('--secondary-disk-zone', removed=False),
+      help=_ASYNC_SECONDARY_DISK_ZONE_EXPLANATION,
+  )
+  scope_parser.add_argument(
+      '--secondary-disk-region',
+      completer=compute_completers.RegionsCompleter,
+      action=actions.DeprecationAction('--secondary-disk-zone', removed=False),
+      help=_ASYNC_SECONDARY_DISK_REGION_EXPLANATION,
+  )
+
+
+def AddSecondaryDiskProject(parser, category=None):
+  parser.add_argument(
+      '--secondary-disk-project',
+      category=category,
+      help=_ASYNC_SECONDARY_DISK_PROJECT_EXPLANATION,
+  )
+
+
+def AddPrimaryDiskProject(parser, category=None):
+  parser.add_argument(
+      '--primary-disk-project',
+      category=category,
+      help=_ASYNC_PRIMARY_DISK_PROJECT_EXPLANATION,
+  )
 
 
 SOURCE_SNAPSHOT_ARG = compute_flags.ResourceArgument(
@@ -273,7 +337,7 @@ SOURCE_INSTANT_SNAPSHOT_ARG = compute_flags.ResourceArgument(
     required=False,
     short_help='Source instant snapshot used to create the disks.',
     detailed_help=_DETAILED_SOURCE_INSTANT_SNAPSHOT_HELP,
-    use_existing_default_scope=True)
+    scope_flags_usage=compute_flags.ScopeFlagsUsage.USE_EXISTING_SCOPE_FLAGS)
 
 SOURCE_DISK_ARG = compute_flags.ResourceArgument(
     resource_name='source disk',
@@ -299,6 +363,7 @@ ASYNC_PRIMARY_DISK_ARG = compute_flags.ResourceArgument(
     detailed_help=_ASYNC_PRIMARY_DISK_HELP,
     plural=False,
     required=False,
-    use_existing_default_scope=False,
+    scope_flags_usage=compute_flags.ScopeFlagsUsage
+    .GENERATE_DEDICATED_SCOPE_FLAGS,
     zone_help_text=_ASYNC_PRIMARY_DISK_ZONE_EXPLANATION,
     region_help_text=_ASYNC_PRIMARY_DISK_REGION_EXPLANATION)

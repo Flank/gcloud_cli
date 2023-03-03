@@ -168,6 +168,21 @@ class ComposerProjectsLocationsEnvironmentsListRequest(_messages.Message):
   parent = _messages.StringField(3, required=True)
 
 
+class ComposerProjectsLocationsEnvironmentsLoadSnapshotRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsEnvironmentsLoadSnapshotRequest object.
+
+  Fields:
+    environment: The resource name of the target environment in the form:
+      "projects/{projectId}/locations/{locationId}/environments/{environmentId
+      }"
+    loadSnapshotRequest: A LoadSnapshotRequest resource to be passed as the
+      request body.
+  """
+
+  environment = _messages.StringField(1, required=True)
+  loadSnapshotRequest = _messages.MessageField('LoadSnapshotRequest', 2)
+
+
 class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
   r"""A ComposerProjectsLocationsEnvironmentsPatchRequest object.
 
@@ -259,6 +274,21 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
   environment = _messages.MessageField('Environment', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class ComposerProjectsLocationsEnvironmentsSaveSnapshotRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsEnvironmentsSaveSnapshotRequest object.
+
+  Fields:
+    environment: The resource name of the source environment in the form:
+      "projects/{projectId}/locations/{locationId}/environments/{environmentId
+      }"
+    saveSnapshotRequest: A SaveSnapshotRequest resource to be passed as the
+      request body.
+  """
+
+  environment = _messages.StringField(1, required=True)
+  saveSnapshotRequest = _messages.MessageField('SaveSnapshotRequest', 2)
 
 
 class ComposerProjectsLocationsImageVersionsListRequest(_messages.Message):
@@ -520,6 +550,9 @@ class EnvironmentConfig(_messages.Message):
       Composer environments in versions composer-1.*.*-airflow-*.*.*.
     privateEnvironmentConfig: The configuration used for the Private IP Cloud
       Composer environment.
+    recoveryConfig: Optional. The Recovery settings configuration of an
+      environment. This field is supported for Cloud Composer environments in
+      versions composer-2.*.*-airflow-*.*.* and newer.
     softwareConfig: The configuration settings for software inside the
       environment.
     webServerConfig: Optional. The configuration settings for the Airflow web
@@ -562,10 +595,11 @@ class EnvironmentConfig(_messages.Message):
   nodeConfig = _messages.MessageField('NodeConfig', 9)
   nodeCount = _messages.IntegerField(10, variant=_messages.Variant.INT32)
   privateEnvironmentConfig = _messages.MessageField('PrivateEnvironmentConfig', 11)
-  softwareConfig = _messages.MessageField('SoftwareConfig', 12)
-  webServerConfig = _messages.MessageField('WebServerConfig', 13)
-  webServerNetworkAccessControl = _messages.MessageField('WebServerNetworkAccessControl', 14)
-  workloadsConfig = _messages.MessageField('WorkloadsConfig', 15)
+  recoveryConfig = _messages.MessageField('RecoveryConfig', 12)
+  softwareConfig = _messages.MessageField('SoftwareConfig', 13)
+  webServerConfig = _messages.MessageField('WebServerConfig', 14)
+  webServerNetworkAccessControl = _messages.MessageField('WebServerNetworkAccessControl', 15)
+  workloadsConfig = _messages.MessageField('WorkloadsConfig', 16)
 
 
 class IPAllocationPolicy(_messages.Message):
@@ -679,6 +713,29 @@ class ListOperationsResponse(_messages.Message):
   operations = _messages.MessageField('Operation', 2, repeated=True)
 
 
+class LoadSnapshotRequest(_messages.Message):
+  r"""Request to load a snapshot into a Cloud Composer environment.
+
+  Fields:
+    skipAirflowOverridesSetting: Whether or not to skip setting Airflow
+      overrides when loading the environment's state.
+    skipEnvironmentVariablesSetting: Whether or not to skip setting
+      environment variables when loading the environment's state.
+    skipGcsDataCopying: Whether or not to skip copying Cloud Storage data when
+      loading the environment's state.
+    skipPypiPackagesInstallation: Whether or not to skip installing Pypi
+      packages when loading the environment's state.
+    snapshotPath: A Cloud Storage path to a snapshot to load, e.g.: "gs://my-
+      bucket/snapshots/project_location_environment_timestamp".
+  """
+
+  skipAirflowOverridesSetting = _messages.BooleanField(1)
+  skipEnvironmentVariablesSetting = _messages.BooleanField(2)
+  skipGcsDataCopying = _messages.BooleanField(3)
+  skipPypiPackagesInstallation = _messages.BooleanField(4)
+  snapshotPath = _messages.StringField(5)
+
+
 class LoadSnapshotResponse(_messages.Message):
   r"""Response to LoadSnapshotRequest."""
 
@@ -722,6 +779,42 @@ class MasterAuthorizedNetworksConfig(_messages.Message):
 
   cidrBlocks = _messages.MessageField('CidrBlock', 1, repeated=True)
   enabled = _messages.BooleanField(2)
+
+
+class NetworkingConfig(_messages.Message):
+  r"""Configuration options for networking connections in the Composer 2
+  environment.
+
+  Enums:
+    ConnectionTypeValueValuesEnum: Optional. Indicates the user requested
+      specifc connection type between Tenant and Customer projects. You cannot
+      set networking connection type in public IP environment.
+
+  Fields:
+    connectionType: Optional. Indicates the user requested specifc connection
+      type between Tenant and Customer projects. You cannot set networking
+      connection type in public IP environment.
+  """
+
+  class ConnectionTypeValueValuesEnum(_messages.Enum):
+    r"""Optional. Indicates the user requested specifc connection type between
+    Tenant and Customer projects. You cannot set networking connection type in
+    public IP environment.
+
+    Values:
+      CONNECTION_TYPE_UNSPECIFIED: No specific connection type was requested,
+        so the environment uses the default value corresponding to the rest of
+        its configuration.
+      VPC_PEERING: Requests the use of VPC peerings for connecting the
+        Customer and Tenant projects.
+      PRIVATE_SERVICE_CONNECT: Requests the use of Private Service Connect for
+        connecting the Customer and Tenant projects.
+    """
+    CONNECTION_TYPE_UNSPECIFIED = 0
+    VPC_PEERING = 1
+    PRIVATE_SERVICE_CONNECT = 2
+
+  connectionType = _messages.EnumField('ConnectionTypeValueValuesEnum', 1)
 
 
 class NodeConfig(_messages.Message):
@@ -798,9 +891,7 @@ class NodeConfig(_messages.Message):
     tags: Optional. The list of instance tags applied to all node VMs. Tags
       are used to identify valid sources or targets for network firewalls.
       Each tag within the list must comply with
-      [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Cannot be updated. This
-      field is supported for Cloud Composer environments in versions
-      composer-1.*.*-airflow-*.*.*.
+      [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Cannot be updated.
   """
 
   diskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1041,6 +1132,8 @@ class PrivateEnvironmentConfig(_messages.Message):
       (non-RFC1918) ranges can be used for
       `IPAllocationPolicy.cluster_ipv4_cidr_block` and
       `IPAllocationPolicy.service_ipv4_cidr_block`.
+    networkingConfig: Optional. Configuration for the network connections
+      configuration in the environment.
     privateClusterConfig: Optional. Configuration for the private GKE cluster
       for a Private IP Cloud Composer environment.
     webServerIpv4CidrBlock: Optional. The CIDR block from which IP range for
@@ -1059,9 +1152,32 @@ class PrivateEnvironmentConfig(_messages.Message):
   cloudSqlIpv4CidrBlock = _messages.StringField(4)
   enablePrivateEnvironment = _messages.BooleanField(5)
   enablePrivatelyUsedPublicIps = _messages.BooleanField(6)
-  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 7)
-  webServerIpv4CidrBlock = _messages.StringField(8)
-  webServerIpv4ReservedRange = _messages.StringField(9)
+  networkingConfig = _messages.MessageField('NetworkingConfig', 7)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 8)
+  webServerIpv4CidrBlock = _messages.StringField(9)
+  webServerIpv4ReservedRange = _messages.StringField(10)
+
+
+class RecoveryConfig(_messages.Message):
+  r"""The Recovery settings of an environment.
+
+  Fields:
+    scheduledSnapshotsConfig: Optional. The configuration for scheduled
+      snapshot creation mechanism.
+  """
+
+  scheduledSnapshotsConfig = _messages.MessageField('ScheduledSnapshotsConfig', 1)
+
+
+class SaveSnapshotRequest(_messages.Message):
+  r"""Request to create a snapshot of a Cloud Composer environment.
+
+  Fields:
+    snapshotLocation: Location in a Cloud Storage where the snapshot is going
+      to be stored, e.g.: "gs://my-bucket/snapshots".
+  """
+
+  snapshotLocation = _messages.StringField(1)
 
 
 class SaveSnapshotResponse(_messages.Message):
@@ -1075,6 +1191,26 @@ class SaveSnapshotResponse(_messages.Message):
   """
 
   snapshotPath = _messages.StringField(1)
+
+
+class ScheduledSnapshotsConfig(_messages.Message):
+  r"""The configuration for scheduled snapshot creation mechanism.
+
+  Fields:
+    enabled: Optional. Whether scheduled snapshots creation is enabled.
+    snapshotCreationSchedule: Optional. The cron expression representing the
+      time when snapshots creation mechanism runs. This field is subject to
+      additional validation around frequency of execution.
+    snapshotLocation: Optional. The Cloud Storage location for storing
+      automatically created snapshots.
+    timeZone: Optional. Time zone that sets the context to interpret
+      snapshot_creation_schedule.
+  """
+
+  enabled = _messages.BooleanField(1)
+  snapshotCreationSchedule = _messages.StringField(2)
+  snapshotLocation = _messages.StringField(3)
+  timeZone = _messages.StringField(4)
 
 
 class SchedulerResource(_messages.Message):
@@ -1157,9 +1293,9 @@ class SoftwareConfig(_messages.Message):
     imageVersion: The version of the software running in the environment. This
       encapsulates both the version of Cloud Composer functionality and the
       version of Apache Airflow. It must match the regular expression `compose
-      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-9]+(
-      \.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks if
-      the provided version is supported and denies the request for an
+      r-([0-9]+(\.[0-9]+\.[0-9]+(-preview\.[0-9]+)?)?|latest)-airflow-([0-
+      9]+(\.[0-9]+(\.[0-9]+)?)?)`. When used as input, the server also checks
+      if the provided version is supported and denies the request for an
       unsupported version. The Cloud Composer portion of the image version is
       a full [semantic version](https://semver.org), or an alias in the form
       of major version number or `latest`. When an alias is provided, the

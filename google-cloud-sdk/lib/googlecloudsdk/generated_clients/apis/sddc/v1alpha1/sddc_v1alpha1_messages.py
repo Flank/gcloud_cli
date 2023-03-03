@@ -235,7 +235,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -252,9 +254,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -1978,10 +1978,12 @@ class Operation(_messages.Message):
         onboarding process. It is only available to Google internal services,
         and the service must be approved by chemist-dev@google.com in order to
         use this level.
+      PROMOTED: Used internally by Chemist.
     """
     LOW = 0
     HIGH = 1
     DEBUG = 2
+    PROMOTED = 3
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -2192,13 +2194,10 @@ class QuotaProperties(_messages.Message):
         not fail and available quota goes down to zero but it returns error.
       CHECK: Does not change any available quota. Only checks if there is
         enough quota. No lock is placed on the checked tokens neither.
-      RELEASE: DEPRECATED: Increases available quota by the operation cost
-        specified for the operation.
     """
     ACQUIRE = 0
     ACQUIRE_BEST_EFFORT = 1
     CHECK = 2
-    RELEASE = 3
 
   quotaMode = _messages.EnumField('QuotaModeValueValuesEnum', 1)
 

@@ -222,7 +222,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -239,9 +241,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -508,7 +508,7 @@ class GoogleIamAdminV1WorkforcePoolProviderSaml(_messages.Message):
       the following constraints: 1) Must contain an Identity Provider Entity
       ID. 2) Must contain at least one non-expired signing key certificate. 3)
       For each signing key: a) Valid from should be no more than 7 days from
-      now. b) Valid to should be no more than 10 years in the future. 4) Up to
+      now. b) Valid to should be no more than 14 years in the future. 4) Up to
       3 IdP signing keys are allowed in the metadata xml. When updating the
       provider's metadata xml, at least one non-expired signing key must
       overlap with the existing metadata. This requirement is skipped if there
@@ -1212,6 +1212,196 @@ class IamProjectsLocationsWorkloadIdentityPoolsListRequest(_messages.Message):
   showDeleted = _messages.BooleanField(4)
 
 
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesCreateRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesCreateRequest
+  object.
+
+  Fields:
+    parent: Required. The parent resource to create the namespace in. The only
+      supported location is `global`.
+    workloadIdentityPoolNamespace: A WorkloadIdentityPoolNamespace resource to
+      be passed as the request body.
+    workloadIdentityPoolNamespaceId: Required. The ID to use for the
+      namespace. Must conform to the SPIFFE spec which limits characters to
+      letters, numbers, dots, dashes, and underscores [a-zA-Z0-9.-_] (it
+      cannot include only periods) and sets a maximum length of the full
+      canonical identifier at 2048 bytes. The prefix "gcp-" will be reserved
+      for future uses.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  workloadIdentityPoolNamespace = _messages.MessageField('WorkloadIdentityPoolNamespace', 2)
+  workloadIdentityPoolNamespaceId = _messages.StringField(3)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesDeleteRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesDeleteRequest
+  object.
+
+  Fields:
+    name: Required. The name of the namespace to delete.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesGetRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesGetRequest object.
+
+  Fields:
+    name: Required. The name of the namespace to retrieve.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesListRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesListRequest object.
+
+  Fields:
+    pageSize: The maximum number of namespaces to return. If unspecified, at
+      most 50 namespaces are returned. The maximum value is 1000; values above
+      are 1000 truncated to 1000.
+    pageToken: A page token, received from a previous
+      `ListWorkloadIdentityPoolNamespaces` call. Provide this to retrieve the
+      subsequent page.
+    parent: Required. The parent resource to list namespaces for.
+    showDeleted: Whether to return soft-deleted namespaces.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  showDeleted = _messages.BooleanField(4)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesCreateRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesCr
+  eateRequest object.
+
+  Fields:
+    parent: Required. The parent resource to create the manage identity in.
+      The only supported location is `global`.
+    workloadIdentityPoolManagedIdentity: A WorkloadIdentityPoolManagedIdentity
+      resource to be passed as the request body.
+    workloadIdentityPoolManagedIdentityId: Required. The ID to use for the
+      managed identity. Must conform to the SPIFFE spec which limits
+      characters to letters, numbers, dots, dashes, and underscores
+      [a-zA-Z0-9.-_] (it cannot include only periods) and sets a maximum
+      length of the full canonical identifier at 2048 bytes. The prefix "gcp-"
+      will be reserved for future uses.
+  """
+
+  parent = _messages.StringField(1, required=True)
+  workloadIdentityPoolManagedIdentity = _messages.MessageField('WorkloadIdentityPoolManagedIdentity', 2)
+  workloadIdentityPoolManagedIdentityId = _messages.StringField(3)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesDeleteRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesDe
+  leteRequest object.
+
+  Fields:
+    name: Required. The name of the managed identity to delete.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesGetRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesGe
+  tRequest object.
+
+  Fields:
+    name: Required. The name of the managed identity to retrieve.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesListRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesLi
+  stRequest object.
+
+  Fields:
+    pageSize: The maximum number of managed identities to return. If
+      unspecified, at most 50 managed identities are returned. The maximum
+      value is 1000; values above are 1000 truncated to 1000.
+    pageToken: A page token, received from a previous
+      `ListWorkloadIdentityPoolManagedIdentities` call. Provide this to
+      retrieve the subsequent page.
+    parent: Required. The parent resource to list managed identities for.
+    showDeleted: Whether to return soft-deleted namespaces.
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  showDeleted = _messages.BooleanField(4)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesPatchRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesPa
+  tchRequest object.
+
+  Fields:
+    name: Output only. The resource name of the managed identity.
+    updateMask: Required. The list of fields to update.
+    workloadIdentityPoolManagedIdentity: A WorkloadIdentityPoolManagedIdentity
+      resource to be passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  updateMask = _messages.StringField(2)
+  workloadIdentityPoolManagedIdentity = _messages.MessageField('WorkloadIdentityPoolManagedIdentity', 3)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesUndeleteRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesManagedIdentitiesUn
+  deleteRequest object.
+
+  Fields:
+    name: Required. The name of the managed identity to undelete.
+    undeleteWorkloadIdentityPoolManagedIdentityRequest: A
+      UndeleteWorkloadIdentityPoolManagedIdentityRequest resource to be passed
+      as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  undeleteWorkloadIdentityPoolManagedIdentityRequest = _messages.MessageField('UndeleteWorkloadIdentityPoolManagedIdentityRequest', 2)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesPatchRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesPatchRequest
+  object.
+
+  Fields:
+    name: Output only. The resource name of the namespace.
+    updateMask: Required. The list of fields to update.
+    workloadIdentityPoolNamespace: A WorkloadIdentityPoolNamespace resource to
+      be passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  updateMask = _messages.StringField(2)
+  workloadIdentityPoolNamespace = _messages.MessageField('WorkloadIdentityPoolNamespace', 3)
+
+
+class IamProjectsLocationsWorkloadIdentityPoolsNamespacesUndeleteRequest(_messages.Message):
+  r"""A IamProjectsLocationsWorkloadIdentityPoolsNamespacesUndeleteRequest
+  object.
+
+  Fields:
+    name: Required. The name of the namespace to undelete.
+    undeleteWorkloadIdentityPoolNamespaceRequest: A
+      UndeleteWorkloadIdentityPoolNamespaceRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  undeleteWorkloadIdentityPoolNamespaceRequest = _messages.MessageField('UndeleteWorkloadIdentityPoolNamespaceRequest', 2)
+
+
 class IamProjectsLocationsWorkloadIdentityPoolsOperationsGetRequest(_messages.Message):
   r"""A IamProjectsLocationsWorkloadIdentityPoolsOperationsGetRequest object.
 
@@ -1682,11 +1872,18 @@ class IamProjectsServiceAccountsDeleteRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsDeleteRequest object.
 
   Fields:
-    name: Required. The resource name of the service account in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
-      a wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: Required. The resource name of the service account. Use one of the
+      following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1698,11 +1895,17 @@ class IamProjectsServiceAccountsDisableRequest(_messages.Message):
   Fields:
     disableServiceAccountRequest: A DisableServiceAccountRequest resource to
       be passed as the request body.
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: The resource name of the service account. Use one of the following
+      formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   disableServiceAccountRequest = _messages.MessageField('DisableServiceAccountRequest', 1)
@@ -1715,11 +1918,17 @@ class IamProjectsServiceAccountsEnableRequest(_messages.Message):
   Fields:
     enableServiceAccountRequest: A EnableServiceAccountRequest resource to be
       passed as the request body.
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: The resource name of the service account. Use one of the following
+      formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   enableServiceAccountRequest = _messages.MessageField('EnableServiceAccountRequest', 1)
@@ -1756,11 +1965,18 @@ class IamProjectsServiceAccountsGetRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsGetRequest object.
 
   Fields:
-    name: Required. The resource name of the service account in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
-      a wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: Required. The resource name of the service account. Use one of the
+      following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1773,11 +1989,17 @@ class IamProjectsServiceAccountsIdentityBindingsCreateRequest(_messages.Message)
     createServiceAccountIdentityBindingRequest: A
       CreateServiceAccountIdentityBindingRequest resource to be passed as the
       request body.
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: The resource name of the service account. Use one of the following
+      formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   createServiceAccountIdentityBindingRequest = _messages.MessageField('CreateServiceAccountIdentityBindingRequest', 1)
@@ -1788,11 +2010,19 @@ class IamProjectsServiceAccountsIdentityBindingsDeleteRequest(_messages.Message)
   r"""A IamProjectsServiceAccountsIdentityBindingsDeleteRequest object.
 
   Fields:
-    name: The resource name of the service account identity binding in the
-      following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/identi
-      tyBindings/{BINDING}`. Using `-` as a wildcard for the `PROJECT_ID` will
-      infer the project from the account. The `ACCOUNT` value can be the
-      `email` address or the `unique_id` of the service account.
+    name: The resource name of the service account identity binding. Use one
+      of the following formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAI
+      L_ADDRESS}/identityBindings/{BINDING}` * `projects/{PROJECT_ID}/serviceA
+      ccounts/{UNIQUE_ID}/identityBindings/{BINDING}` As an alternative, you
+      can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}/identityBindings/{BINDING}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/identityBindings/{BINDING}`
+      When possible, avoid using the `-` wildcard character, because it can
+      cause response messages to contain misleading error codes. For example,
+      if you try to access the service account identity binding
+      `projects/-/serviceAccounts/fake@example.com/identityBindings/fake-
+      binding`, which does not exist, the response contains an HTTP `403
+      Forbidden` error instead of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1802,11 +2032,19 @@ class IamProjectsServiceAccountsIdentityBindingsGetRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsIdentityBindingsGetRequest object.
 
   Fields:
-    name: The resource name of the service account identity binding in the
-      following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/identi
-      tyBindings/{BINDING}`. Using `-` as a wildcard for the `PROJECT_ID` will
-      infer the project from the account. The `ACCOUNT` value can be the
-      `email` address or the `unique_id` of the service account.
+    name: The resource name of the service account identity binding. Use one
+      of the following formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAI
+      L_ADDRESS}/identityBindings/{BINDING}` * `projects/{PROJECT_ID}/serviceA
+      ccounts/{UNIQUE_ID}/identityBindings/{BINDING}` As an alternative, you
+      can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}/identityBindings/{BINDING}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/identityBindings/{BINDING}`
+      When possible, avoid using the `-` wildcard character, because it can
+      cause response messages to contain misleading error codes. For example,
+      if you try to access the service account identity binding
+      `projects/-/serviceAccounts/fake@example.com/identityBindings/fake-
+      binding`, which does not exist, the response contains an HTTP `403
+      Forbidden` error instead of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1816,11 +2054,17 @@ class IamProjectsServiceAccountsIdentityBindingsListRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsIdentityBindingsListRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID`, will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: The resource name of the service account. Use one of the following
+      formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1832,11 +2076,18 @@ class IamProjectsServiceAccountsKeysCreateRequest(_messages.Message):
   Fields:
     createServiceAccountKeyRequest: A CreateServiceAccountKeyRequest resource
       to be passed as the request body.
-    name: Required. The resource name of the service account in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
-      a wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: Required. The resource name of the service account. Use one of the
+      following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   createServiceAccountKeyRequest = _messages.MessageField('CreateServiceAccountKeyRequest', 1)
@@ -1847,12 +2098,19 @@ class IamProjectsServiceAccountsKeysDeleteRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsKeysDeleteRequest object.
 
   Fields:
-    name: Required. The resource name of the service account key in the
-      following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`. Using `-`
-      as a wildcard for the `PROJECT_ID` will infer the project from the
-      account. The `ACCOUNT` value can be the `email` address or the
-      `unique_id` of the service account.
+    name: Required. The resource name of the service account key. Use one of
+      the following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` As an
+      alternative, you can use the `-` wildcard character instead of the
+      project ID: * `projects/-/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` When possible,
+      avoid using the `-` wildcard character, because it can cause response
+      messages to contain misleading error codes. For example, if you try to
+      access the service account key
+      `projects/-/serviceAccounts/fake@example.com/keys/fake-key`, which does
+      not exist, the response contains an HTTP `403 Forbidden` error instead
+      of a `404 Not Found` error.
   """
 
   name = _messages.StringField(1, required=True)
@@ -1864,12 +2122,19 @@ class IamProjectsServiceAccountsKeysDisableRequest(_messages.Message):
   Fields:
     disableServiceAccountKeyRequest: A DisableServiceAccountKeyRequest
       resource to be passed as the request body.
-    name: Required. The resource name of the service account key in the
-      following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`. Using `-`
-      as a wildcard for the `PROJECT_ID` will infer the project from the
-      account. The `ACCOUNT` value can be the `email` address or the
-      `unique_id` of the service account.
+    name: Required. The resource name of the service account key. Use one of
+      the following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` As an
+      alternative, you can use the `-` wildcard character instead of the
+      project ID: * `projects/-/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` When possible,
+      avoid using the `-` wildcard character, because it can cause response
+      messages to contain misleading error codes. For example, if you try to
+      access the service account key
+      `projects/-/serviceAccounts/fake@example.com/keys/fake-key`, which does
+      not exist, the response contains an HTTP `403 Forbidden` error instead
+      of a `404 Not Found` error.
   """
 
   disableServiceAccountKeyRequest = _messages.MessageField('DisableServiceAccountKeyRequest', 1)
@@ -1882,12 +2147,19 @@ class IamProjectsServiceAccountsKeysEnableRequest(_messages.Message):
   Fields:
     enableServiceAccountKeyRequest: A EnableServiceAccountKeyRequest resource
       to be passed as the request body.
-    name: Required. The resource name of the service account key in the
-      following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`. Using `-`
-      as a wildcard for the `PROJECT_ID` will infer the project from the
-      account. The `ACCOUNT` value can be the `email` address or the
-      `unique_id` of the service account.
+    name: Required. The resource name of the service account key. Use one of
+      the following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` As an
+      alternative, you can use the `-` wildcard character instead of the
+      project ID: * `projects/-/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` When possible,
+      avoid using the `-` wildcard character, because it can cause response
+      messages to contain misleading error codes. For example, if you try to
+      access the service account key
+      `projects/-/serviceAccounts/fake@example.com/keys/fake-key`, which does
+      not exist, the response contains an HTTP `403 Forbidden` error instead
+      of a `404 Not Found` error.
   """
 
   enableServiceAccountKeyRequest = _messages.MessageField('EnableServiceAccountKeyRequest', 1)
@@ -1903,12 +2175,19 @@ class IamProjectsServiceAccountsKeysGetRequest(_messages.Message):
       returned.
 
   Fields:
-    name: Required. The resource name of the service account key in the
-      following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`. Using `-`
-      as a wildcard for the `PROJECT_ID` will infer the project from the
-      account. The `ACCOUNT` value can be the `email` address or the
-      `unique_id` of the service account.
+    name: Required. The resource name of the service account key. Use one of
+      the following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` As an
+      alternative, you can use the `-` wildcard character instead of the
+      project ID: * `projects/-/serviceAccounts/{EMAIL_ADDRESS}/keys/{KEY_ID}`
+      * `projects/-/serviceAccounts/{UNIQUE_ID}/keys/{KEY_ID}` When possible,
+      avoid using the `-` wildcard character, because it can cause response
+      messages to contain misleading error codes. For example, if you try to
+      access the service account key
+      `projects/-/serviceAccounts/fake@example.com/keys/fake-key`, which does
+      not exist, the response contains an HTTP `403 Forbidden` error instead
+      of a `404 Not Found` error.
     publicKeyType: Optional. The output format of the public key. The default
       is `TYPE_NONE`, which means that the public key is not returned.
   """
@@ -1942,11 +2221,18 @@ class IamProjectsServiceAccountsKeysListRequest(_messages.Message):
     keyTypes: Filters the types of keys the user wants to include in the list
       response. Duplicate key types are not allowed. If no key type is
       provided, all keys are returned.
-    name: Required. The resource name of the service account in the following
-      format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as
-      a wildcard for the `PROJECT_ID`, will infer the project from the
-      account. The `ACCOUNT` value can be the `email` address or the
-      `unique_id` of the service account.
+    name: Required. The resource name of the service account. Use one of the
+      following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
   """
 
   class KeyTypesValueValuesEnum(_messages.Enum):
@@ -1972,11 +2258,18 @@ class IamProjectsServiceAccountsKeysUploadRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsKeysUploadRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+    name: The resource name of the service account key. Use one of the
+      following formats: *
+      `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
     uploadServiceAccountKeyRequest: A UploadServiceAccountKeyRequest resource
       to be passed as the request body.
   """
@@ -2015,7 +2308,7 @@ class IamProjectsServiceAccountsPatchRequest(_messages.Message):
       `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
       `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
       `-` wildcard character, because it can cause response messages to
-      contain misleading error codes. For example, if you try to get the
+      contain misleading error codes. For example, if you try to access the
       service account `projects/-/serviceAccounts/fake@example.com`, which
       does not exist, the response contains an HTTP `403 Forbidden` error
       instead of a `404 Not Found` error.
@@ -2049,11 +2342,17 @@ class IamProjectsServiceAccountsSignBlobRequest(_messages.Message):
   Fields:
     name: Required. Deprecated. [Migrate to Service Account Credentials
       API](https://cloud.google.com/iam/help/credentials/migrate-api). The
-      resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+      resource name of the service account. Use one of the following formats:
+      * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
     signBlobRequest: A SignBlobRequest resource to be passed as the request
       body.
   """
@@ -2068,11 +2367,17 @@ class IamProjectsServiceAccountsSignJwtRequest(_messages.Message):
   Fields:
     name: Required. Deprecated. [Migrate to Service Account Credentials
       API](https://cloud.google.com/iam/help/credentials/migrate-api). The
-      resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
-      wildcard for the `PROJECT_ID` will infer the project from the account.
-      The `ACCOUNT` value can be the `email` address or the `unique_id` of the
-      service account.
+      resource name of the service account. Use one of the following formats:
+      * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
     signJwtRequest: A SignJwtRequest resource to be passed as the request
       body.
   """
@@ -2101,10 +2406,17 @@ class IamProjectsServiceAccountsUndeleteRequest(_messages.Message):
   r"""A IamProjectsServiceAccountsUndeleteRequest object.
 
   Fields:
-    name: The resource name of the service account in the following format:
-      `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`. Using `-`
-      as a wildcard for the `PROJECT_ID` will infer the project from the
-      account.
+    name: The resource name of the service account. Use one of the following
+      formats: * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}` As an alternative,
+      you can use the `-` wildcard character instead of the project ID: *
+      `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
+      `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
+      `-` wildcard character, because it can cause response messages to
+      contain misleading error codes. For example, if you try to access the
+      service account `projects/-/serviceAccounts/fake@example.com`, which
+      does not exist, the response contains an HTTP `403 Forbidden` error
+      instead of a `404 Not Found` error.
     undeleteServiceAccountRequest: A UndeleteServiceAccountRequest resource to
       be passed as the request body.
   """
@@ -2275,12 +2587,11 @@ class LintPolicyRequest(_messages.Message):
   Fields:
     condition: google.iam.v1.Binding.condition object to be linted.
     fullResourceName: The full resource name of the policy this lint request
-      is about. The name follows the Google Cloud Platform (GCP) resource
-      format. For example, a GCP project with ID `my-project` will be named
+      is about. The name follows the Google Cloud format for full resource
+      names. For example, a Cloud project with ID `my-project` will be named
       `//cloudresourcemanager.googleapis.com/projects/my-project`. The
-      resource name is not used to read the policy instance from the Cloud IAM
-      database. The candidate policy for lint has to be provided in the same
-      request object.
+      resource name is not used to read a policy from IAM. Only the data in
+      the request object is linted.
   """
 
   condition = _messages.MessageField('Expr', 1)
@@ -2460,6 +2771,32 @@ class ListWorkforcePoolsResponse(_messages.Message):
   workforcePools = _messages.MessageField('WorkforcePool', 2, repeated=True)
 
 
+class ListWorkloadIdentityPoolManagedIdentitiesResponse(_messages.Message):
+  r"""Response message for ListWorkloadIdentityPoolManagedIdentities.
+
+  Fields:
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    workloadIdentityPoolManagedIdentities: A list of namespaces.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  workloadIdentityPoolManagedIdentities = _messages.MessageField('WorkloadIdentityPoolManagedIdentity', 2, repeated=True)
+
+
+class ListWorkloadIdentityPoolNamespacesResponse(_messages.Message):
+  r"""Response message for ListWorkloadIdentityPoolNamespaces.
+
+  Fields:
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    workloadIdentityPoolNamespaces: A list of namespaces.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  workloadIdentityPoolNamespaces = _messages.MessageField('WorkloadIdentityPoolNamespace', 2, repeated=True)
+
+
 class ListWorkloadIdentityPoolProviderKeysResponse(_messages.Message):
   r"""Response message for ListWorkloadIdentityPoolProviderKeys.
 
@@ -2514,10 +2851,19 @@ class Oidc(_messages.Message):
       //locations//workloadIdentityPools//providers/ https://iam.googleapis.co
       m/projects//locations//workloadIdentityPools//providers/ ```
     issuerUri: Required. The OIDC issuer URL. Must be an HTTPS endpoint.
+    jwksJson: Optional. OIDC JWKs in JSON String format. For details on the
+      definition of a JWK, see https://tools.ietf.org/html/rfc7517. If not
+      set, the `jwks_uri` from the discovery document(fetched from the .well-
+      known path of the `issuer_uri`) will be used. Currently, RSA and EC
+      asymmetric keys are supported. The JWK must use following format and
+      include only the following fields: { "keys": [ { "kty": "RSA/EC", "alg":
+      "", "use": "sig", "kid": "", "n": "", "e": "", "x": "", "y": "", "crv":
+      "" } ] }
   """
 
   allowedAudiences = _messages.StringField(1, repeated=True)
   issuerUri = _messages.StringField(2)
+  jwksJson = _messages.StringField(3)
 
 
 class Operation(_messages.Message):
@@ -2982,7 +3328,7 @@ class Saml(_messages.Message):
       the following constraints: 1) Must contain an Identity Provider Entity
       ID. 2) Must contain at least one non-expired signing key certificate. 3)
       For each signing key: a) Valid from should be no more than 7 days from
-      now. b) Valid to should be no more than 10 years in the future. 4) Upto
+      now. b) Valid to should be no more than 14 years in the future. 4) Upto
       3 IdP signing keys are allowed in the metadata xml. When updating the
       provider's metadata xml, at lease one non-expired signing key must
       overlap with the existing metadata. This requirement is skipped if there
@@ -3000,7 +3346,7 @@ class ServiceAccount(_messages.Message):
   accounts/overview). When you create a service account, you specify the
   project ID that owns the service account, as well as a name that must be
   unique within the project. IAM uses these values to create an email address
-  that identifies the service account.
+  that identifies the service //
 
   Fields:
     description: Optional. A user-specified, human-readable description of the
@@ -3017,7 +3363,7 @@ class ServiceAccount(_messages.Message):
       `projects/-/serviceAccounts/{EMAIL_ADDRESS}` *
       `projects/-/serviceAccounts/{UNIQUE_ID}` When possible, avoid using the
       `-` wildcard character, because it can cause response messages to
-      contain misleading error codes. For example, if you try to get the
+      contain misleading error codes. For example, if you try to access the
       service account `projects/-/serviceAccounts/fake@example.com`, which
       does not exist, the response contains an HTTP `403 Forbidden` error
       instead of a `404 Not Found` error.
@@ -3459,6 +3805,14 @@ class UndeleteWorkforcePoolSubjectRequest(_messages.Message):
   r"""Request message for UndeleteWorkforcePoolSubject."""
 
 
+class UndeleteWorkloadIdentityPoolManagedIdentityRequest(_messages.Message):
+  r"""Request message for UndeleteWorkloadIdentityPoolManagedIdentity."""
+
+
+class UndeleteWorkloadIdentityPoolNamespaceRequest(_messages.Message):
+  r"""Request message for UndeleteWorkloadIdentityPoolNamespace."""
+
+
 class UndeleteWorkloadIdentityPoolProviderKeyRequest(_messages.Message):
   r"""Request message for UndeleteWorkloadIdentityPoolProviderKey."""
 
@@ -3507,7 +3861,9 @@ class WorkforcePool(_messages.Message):
       sign-in sessions, and `gcloud` sign-in sessions from this pool are
       valid. Must be greater than 15 minutes (900s) and less than 12 hours
       (43200s). If `session_duration` is not configured, minted credentials
-      have a default duration of one hour (3600s).
+      have a default duration of one hour (3600s). For SAML providers, the
+      lifetime of the token is the minimum of the `session_duration` and the
+      `SessionNotOnOrAfter` claim in the SAML assertion.
     state: Output only. The state of the pool.
   """
 
@@ -3582,7 +3938,7 @@ class WorkforcePoolProvider(_messages.Message):
       expression to access a JSON representation of the authentication
       credential issued by the provider. The maximum length of an attribute
       mapping expression is 2048 characters. When evaluated, the total size of
-      all mapped attributes must not exceed 8KB. For OIDC providers, you must
+      all mapped attributes must not exceed 4KB. For OIDC providers, you must
       supply a custom mapping that includes the `google.subject` attribute.
       For example, the following maps the `sub` claim of the incoming
       credential to the `subject` attribute on a Google token: ```
@@ -3641,7 +3997,7 @@ class WorkforcePoolProvider(_messages.Message):
       expression to access a JSON representation of the authentication
       credential issued by the provider. The maximum length of an attribute
       mapping expression is 2048 characters. When evaluated, the total size of
-      all mapped attributes must not exceed 8KB. For OIDC providers, you must
+      all mapped attributes must not exceed 4KB. For OIDC providers, you must
       supply a custom mapping that includes the `google.subject` attribute.
       For example, the following maps the `sub` claim of the incoming
       credential to the `subject` attribute on a Google token: ```
@@ -3713,7 +4069,7 @@ class WorkforcePoolProvider(_messages.Message):
     expression to access a JSON representation of the authentication
     credential issued by the provider. The maximum length of an attribute
     mapping expression is 2048 characters. When evaluated, the total size of
-    all mapped attributes must not exceed 8KB. For OIDC providers, you must
+    all mapped attributes must not exceed 4KB. For OIDC providers, you must
     supply a custom mapping that includes the `google.subject` attribute. For
     example, the following maps the `sub` claim of the incoming credential to
     the `subject` attribute on a Google token: ``` {"google.subject":
@@ -3854,6 +4210,91 @@ class WorkloadIdentityPool(_messages.Message):
   name = _messages.StringField(4)
   sessionDuration = _messages.StringField(5)
   state = _messages.EnumField('StateValueValuesEnum', 6)
+
+
+class WorkloadIdentityPoolManagedIdentity(_messages.Message):
+  r"""Represents a managed identity for a workload identity pool namespace.
+
+  Enums:
+    StateValueValuesEnum: Output only. The state of the managed identity.
+
+  Fields:
+    description: A description of the managed identity. Cannot exceed 256
+      characters.
+    disabled: Whether the managed identity is disabled. If disabled,
+      credentials may no longer be issued for this identity and this identity
+      will no longer be able to access Google Cloud APIs. Existing credentials
+      may continue to be accepted by third party APIs and workloads until they
+      expire.
+    expireTime: Output only. Time after which the managed identity will be
+      permanently purged and cannot be recovered.
+    name: Output only. The resource name of the managed identity.
+    state: Output only. The state of the managed identity.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The state of the managed identity.
+
+    Values:
+      STATE_UNSPECIFIED: State unspecified.
+      ACTIVE: The managed identity is active.
+      DELETED: The managed identity is soft-deleted. Soft-deleted managed
+        identities are permanently deleted after approximately 30 days. You
+        can restore a soft-deleted managed identity using
+        UndeleteWorkloadIdentityPoolManagedIdentity. You cannot reuse the ID
+        of a soft-deleted managed identity until it is permanently deleted.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    DELETED = 2
+
+  description = _messages.StringField(1)
+  disabled = _messages.BooleanField(2)
+  expireTime = _messages.StringField(3)
+  name = _messages.StringField(4)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
+
+
+class WorkloadIdentityPoolNamespace(_messages.Message):
+  r"""Represents a namespace for a workload identity pool.
+
+  Enums:
+    StateValueValuesEnum: Output only. The state of the namespace.
+
+  Fields:
+    description: A description of the namespace. Cannot exceed 256 characters.
+    disabled: Whether the namespace is disabled. If disabled, credentials may
+      no longer be issued for identities within this namespace (including
+      federated identities) and they will no longer be able to access Google
+      Cloud APIs. Existing credentials may continue to be accepted by third
+      party APIs and workloads until they expire.
+    expireTime: Output only. Time after which the namespace will be
+      permanently purged and cannot be recovered.
+    name: Output only. The resource name of the namespace.
+    state: Output only. The state of the namespace.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The state of the namespace.
+
+    Values:
+      STATE_UNSPECIFIED: State unspecified.
+      ACTIVE: The namespace is active.
+      DELETED: The namespace is soft-deleted. Soft-deleted namespaces are
+        permanently deleted after approximately 30 days. You can restore a
+        soft-deleted namespace using UndeleteWorkloadIdentityPoolNamespace.
+        You cannot reuse the ID of a soft-deleted namespace until it is
+        permanently deleted.
+    """
+    STATE_UNSPECIFIED = 0
+    ACTIVE = 1
+    DELETED = 2
+
+  description = _messages.StringField(1)
+  disabled = _messages.BooleanField(2)
+  expireTime = _messages.StringField(3)
+  name = _messages.StringField(4)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
 
 
 class WorkloadIdentityPoolOperationMetadata(_messages.Message):

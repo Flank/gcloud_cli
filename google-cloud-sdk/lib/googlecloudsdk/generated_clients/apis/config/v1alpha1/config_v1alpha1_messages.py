@@ -157,7 +157,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -174,9 +176,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -1428,12 +1428,6 @@ class Revision(_messages.Message):
 
     Values:
       ERROR_CODE_UNSPECIFIED: No error code was specified.
-      BUCKET_CREATION_PERMISSION_DENIED: A Cloud Storage bucket failed due to
-        a permissions issue. Deprecated in favor of equivalent ErrorCode on
-        Deployment.
-      BUCKET_CREATION_FAILED: A Cloud Storage bucket failed for a non-
-        permissions-related issue. Deprecated in favor of equivalent ErrorCode
-        on Deployment.
       CLOUD_BUILD_PERMISSION_DENIED: Cloud Build failed due to a permissions
         issue.
       PIPELINE_BUILD_API_FAILED: The pipeline Cloud Build failed before logs
@@ -1450,15 +1444,13 @@ class Revision(_messages.Message):
         could be generated.
     """
     ERROR_CODE_UNSPECIFIED = 0
-    BUCKET_CREATION_PERMISSION_DENIED = 1
-    BUCKET_CREATION_FAILED = 2
-    CLOUD_BUILD_PERMISSION_DENIED = 3
-    PIPELINE_BUILD_API_FAILED = 4
-    PIPELINE_BUILD_RUN_FAILED = 5
-    APPLY_BUILD_API_FAILED = 6
-    APPLY_BUILD_RUN_FAILED = 7
-    PREVIEW_BUILD_API_FAILED = 8
-    PREVIEW_BUILD_RUN_FAILED = 9
+    CLOUD_BUILD_PERMISSION_DENIED = 1
+    PIPELINE_BUILD_API_FAILED = 2
+    PIPELINE_BUILD_RUN_FAILED = 3
+    APPLY_BUILD_API_FAILED = 4
+    APPLY_BUILD_RUN_FAILED = 5
+    PREVIEW_BUILD_API_FAILED = 6
+    PREVIEW_BUILD_RUN_FAILED = 7
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. Current state of the revision.

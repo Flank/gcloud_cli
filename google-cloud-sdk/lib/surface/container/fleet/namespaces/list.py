@@ -24,8 +24,7 @@ from googlecloudsdk.command_lib.container.fleet import util
 from googlecloudsdk.core import properties
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class List(base.ListCommand):
   """List fleet namespaces in a project.
 
@@ -35,13 +34,13 @@ class List(base.ListCommand):
 
   ## EXAMPLES
 
-  The following command lists fleets in the active project:
+  The following command lists namespaces in the active project:
 
     $ {command}
 
-  The following command lists fleets in project `foo-bar-1`:
+  The following command lists namespaces in project `PROJECT_ID`:
 
-    $ {command} --project=foo-bar-1
+    $ {command} --project=PROJECT_ID
   """
 
   @staticmethod
@@ -50,7 +49,7 @@ class List(base.ListCommand):
     parser.display_info.AddFormat(util.NS_LIST_FORMAT)
 
   def Run(self, args):
-    fleetclient = client.FleetClient(release_track=base.ReleaseTrack.ALPHA)
+    fleetclient = client.FleetClient(release_track=self.ReleaseTrack())
     project = args.project
     if project is None:
       project = properties.VALUES.core.project.Get()

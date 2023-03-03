@@ -23,7 +23,6 @@ import binascii
 import copy
 import re
 
-from googlecloudsdk.api_lib.storage import errors
 from googlecloudsdk.api_lib.storage import metadata_util
 from googlecloudsdk.api_lib.storage import s3_metadata_field_converters
 from googlecloudsdk.command_lib.storage import storage_url
@@ -186,10 +185,8 @@ def _get_md5_hash_from_etag(etag, object_url):
   return None
 
 
-def _get_error_string_or_value(value):
+def _get_error_or_value(value):
   """Returns the error string if value is error or the value itself."""
-  if isinstance(value, errors.S3ApiError):
-    return str(value)
   if isinstance(value, dict) and 'ResponseMetadata' in value:
     value_copy = value.copy()
     value_copy.pop('ResponseMetadata')
@@ -207,13 +204,13 @@ def get_bucket_resource_from_s3_response(bucket_dict, bucket_name):
   Returns:
     resource_reference.S3BucketResource populated with data.
   """
-  requester_pays = _get_error_string_or_value(bucket_dict.get('Payer'))
+  requester_pays = _get_error_or_value(bucket_dict.get('Payer'))
   if requester_pays == 'Requester':
     requester_pays = True
   elif requester_pays == 'BucketOwner':
     requester_pays = False
 
-  versioning_enabled = _get_error_string_or_value(bucket_dict.get('Versioning'))
+  versioning_enabled = _get_error_or_value(bucket_dict.get('Versioning'))
   if isinstance(versioning_enabled, dict):
     if versioning_enabled.get('Status') == 'Enabled':
       versioning_enabled = True
@@ -222,18 +219,16 @@ def get_bucket_resource_from_s3_response(bucket_dict, bucket_name):
 
   return s3_resource_reference.S3BucketResource(
       storage_url.CloudUrl(storage_url.ProviderPrefix.S3, bucket_name),
-      acl=_get_error_string_or_value(bucket_dict.get('ACL')),
-      cors_config=_get_error_string_or_value(bucket_dict.get('CORSRules')),
-      lifecycle_config=_get_error_string_or_value(
+      acl=_get_error_or_value(bucket_dict.get('ACL')),
+      cors_config=_get_error_or_value(bucket_dict.get('CORSRules')),
+      lifecycle_config=_get_error_or_value(
           bucket_dict.get('LifecycleConfiguration')),
-      logging_config=_get_error_string_or_value(
-          bucket_dict.get('LoggingEnabled')),
+      logging_config=_get_error_or_value(bucket_dict.get('LoggingEnabled')),
       requester_pays=requester_pays,
-      location=_get_error_string_or_value(
-          bucket_dict.get('LocationConstraint')),
+      location=_get_error_or_value(bucket_dict.get('LocationConstraint')),
       metadata=bucket_dict,
       versioning_enabled=versioning_enabled,
-      website_config=_get_error_string_or_value(bucket_dict.get('Website')))
+      website_config=_get_error_or_value(bucket_dict.get('Website')))
 
 
 def get_object_resource_from_s3_response(object_dict,
@@ -271,7 +266,7 @@ def get_object_resource_from_s3_response(object_dict,
     raw_acl_data = object_dict.get('ACL')
   if raw_acl_data:
     object_dict['ACL'] = raw_acl_data
-  acl = _get_error_string_or_value(raw_acl_data)
+  acl = _get_error_or_value(raw_acl_data)
 
   return s3_resource_reference.S3ObjectResource(
       object_url,
@@ -282,7 +277,7 @@ def get_object_resource_from_s3_response(object_dict,
       content_encoding=object_dict.get('ContentEncoding'),
       content_language=object_dict.get('ContentLanguage'),
       content_type=object_dict.get('ContentType'),
-      custom_metadata=object_dict.get('Metadata'),
+      custom_fields=object_dict.get('Metadata'),
       encryption_algorithm=encryption_algorithm,
       etag=etag,
       kms_key=object_dict.get('SSEKMSKeyId'),
@@ -380,10 +375,10 @@ def update_object_metadata_dict_from_request_config(object_metadata,
 
   existing_metadata = object_metadata.get('Metadata', {})
 
-  custom_metadata_dict = metadata_util.get_updated_custom_metadata(
+  custom_fields_dict = metadata_util.get_updated_custom_fields(
       existing_metadata, request_config, file_path=file_path)
-  if custom_metadata_dict is not None:
-    object_metadata['Metadata'] = custom_metadata_dict
+  if custom_fields_dict is not None:
+    object_metadata['Metadata'] = custom_fields_dict
 
   if resource_args:
     _process_value_or_clear_flag(object_metadata, 'CacheControl',

@@ -15,8 +15,8 @@
 #
 import proto  # type: ignore
 
-from google.protobuf import struct_pb2  # type: ignore
-from google.protobuf import timestamp_pb2  # type: ignore
+from cloudsdk.google.protobuf import struct_pb2  # type: ignore
+from cloudsdk.google.protobuf import timestamp_pb2  # type: ignore
 from google.rpc import status_pb2  # type: ignore
 from googlecloudsdk.generated_clients.gapic_clients.spanner_v1.types import keys
 from googlecloudsdk.generated_clients.gapic_clients.spanner_v1.types import mutation
@@ -615,7 +615,6 @@ class ExecuteBatchDmlRequest(proto.Message):
             each request idempotent such that if the request
             is received multiple times, at most one will
             succeed.
-
             The sequence number must be monotonically
             increasing within the transaction. If a request
             arrives for the first time with an out-of-order

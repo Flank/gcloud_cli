@@ -108,7 +108,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -125,9 +127,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -135,68 +135,6 @@ class Binding(_messages.Message):
   condition = _messages.MessageField('Expr', 1)
   members = _messages.StringField(2, repeated=True)
   role = _messages.StringField(3)
-
-
-class ConsumerPscConfig(_messages.Message):
-  r"""Allow the producer to specify which consumers can connect to it.
-
-  Fields:
-    network: The consumer network where PSC connections are allowed to be
-      created in. Note, this network does not need be in the
-      ConsumerPscConfiguration.project in the case of SharedVPC.
-    project: The consumer project where PSC connections are allowed to be
-      created in.
-  """
-
-  network = _messages.StringField(1)
-  project = _messages.StringField(2)
-
-
-class ConsumerPscConnection(_messages.Message):
-  r"""PSC connection details on consumer side.
-
-  Enums:
-    StateValueValuesEnum: The state of the PSC connection.
-
-  Fields:
-    ip: The IP literal allocated on the consumer network for the PSC
-      forwarding rule that is created to connect to the producer service
-      attachment in this service connection map.
-    network: The consumer network whose PSC forwarding rule is connected to
-      the service attachments in this service connection map. Note that the
-      network could be on a different project (shared VPC).
-    project: The consumer project whose PSC forwarding rule is connected to
-      the service attachments in this service connection map.
-    pscConnectionId: The PSC connection id of the PSC forwarding rule
-      connected to the service attachments in this service connection map.
-    serviceAttachmentUri: The URI of a service attachment which is the target
-      of the PSC connection.
-    state: The state of the PSC connection.
-  """
-
-  class StateValueValuesEnum(_messages.Enum):
-    r"""The state of the PSC connection.
-
-    Values:
-      STATE_UNSPECIFIED: An invalid state as the default case.
-      ACTIVE: The connection is fully established and ready to use.
-      FAILED: The connection is not functional since some resources on the
-        connection fail to be created.
-      CREATING: The connection is being created.
-      DELETING: The connection is being deleted.
-    """
-    STATE_UNSPECIFIED = 0
-    ACTIVE = 1
-    FAILED = 2
-    CREATING = 3
-    DELETING = 4
-
-  ip = _messages.StringField(1)
-  network = _messages.StringField(2)
-  project = _messages.StringField(3)
-  pscConnectionId = _messages.StringField(4)
-  serviceAttachmentUri = _messages.StringField(5)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
 
 
 class Empty(_messages.Message):
@@ -499,55 +437,54 @@ class Hub(_messages.Message):
 
 
 class InternalRange(_messages.Message):
-  r"""The InternalRange resource for IPAM operations within a VPC network.
+  r"""The internal range resource for IPAM operations within a VPC network.
   Used to represent a private address range along with behavioral
-  characterstics of that range (it's usage and peering behavior). Networking
+  characterstics of that range (its usage and peering behavior). Networking
   resources can link to this range if they are created as belonging to it.
-  Next id: 14
 
   Enums:
     OverlapsValueListEntryValuesEnum:
-    PeeringValueValuesEnum: The type of peering set for this InternalRange.
-    UsageValueValuesEnum: The type of usage set for this InternalRange.
+    PeeringValueValuesEnum: The type of peering set for this internal range.
+    UsageValueValuesEnum: The type of usage set for this internal range.
 
   Messages:
     LabelsValue: User-defined labels.
 
   Fields:
-    createTime: Time when the InternalRange was created.
+    createTime: Time when the internal range was created.
     description: A description of this resource.
-    ipCidrRange: IP range that this InternalRange defines.
+    ipCidrRange: IP range that this internal range defines.
     labels: User-defined labels.
-    name: Immutable. The name of a InternalRange. Format:
+    name: Immutable. The name of an internal range. Format:
       projects/{project}/locations/{location}/internalRanges/{internal_range}
       See: https://google.aip.dev/122#fields-representing-resource-names
     network: The URL or resource ID of the network in which to reserve the
-      Internal Range. The network cannot be deleted if there are any reserved
-      Internal Ranges referring to it. Legacy network is not supported. This
+      internal range. The network cannot be deleted if there are any reserved
+      internal ranges referring to it. Legacy networks are not supported. This
       can only be specified for a global internal address. Example: - URL:
       /compute/v1/projects/{project}/global/networks/{resourceId} - ID:
       network123
     overlaps: Optional. Types of resources that are allowed to overlap with
-      the current InternalRange.
-    peering: The type of peering set for this InternalRange.
-    prefixLength: An alternate to ip_cidr_range. Can be set when trying to
+      the current internal range.
+    peering: The type of peering set for this internal range.
+    prefixLength: An alternative to ip_cidr_range. Can be set when trying to
       create a reservation that automatically finds a free range of the given
-      size. If both ip_cidr_range and prefix_length are set, it's an error if
-      the range sizes don't match. Can also be used during updates to change
-      the range size.
+      size. If both ip_cidr_range and prefix_length are set, there is an error
+      if the range sizes do not match. Can also be used during updates to
+      change the range size.
     targetCidrRange: Optional. Can be set to narrow down or pick a different
       address space while searching for a free range. If not set, defaults to
       the "10.0.0.0/8" address space. This can be used to search in other
       rfc-1918 address spaces like "172.16.0.0/12" and "192.168.0.0/16" or
       non-rfc-1918 address spaces used in the VPC.
-    updateTime: Time when the InternalRange was updated.
-    usage: The type of usage set for this InternalRange.
+    updateTime: Time when the internal range was updated.
+    usage: The type of usage set for this internal range.
     users: Output only. The list of resources that refer to this internal
-      range. Resources that use the InternalRange for their range allocation
+      range. Resources that use the internal range for their range allocation
       are referred to as users of the range. Other resources mark themselves
-      as users while doing so by creating a reference to this InternalRange.
+      as users while doing so by creating a reference to this internal range.
       Having a user, based on this reference, prevents deletion of the
-      InternalRange referred to. Can be empty.
+      internal range that is referred to. Can be empty.
   """
 
   class OverlapsValueListEntryValuesEnum(_messages.Enum):
@@ -555,36 +492,36 @@ class InternalRange(_messages.Message):
 
     Values:
       OVERLAP_UNSPECIFIED: No overlap overrides.
-      OVERLAP_ROUTE_RANGE: Allow creation of static routes more specific that
-        the current InternalRange.
+      OVERLAP_ROUTE_RANGE: Allow creation of static routes more specific than
+        the current internal range.
     """
     OVERLAP_UNSPECIFIED = 0
     OVERLAP_ROUTE_RANGE = 1
 
   class PeeringValueValuesEnum(_messages.Enum):
-    r"""The type of peering set for this InternalRange.
+    r"""The type of peering set for this internal range.
 
     Values:
       PEERING_UNSPECIFIED: If Peering is left unspecified in
         CreateInternalRange or UpdateInternalRange, it will be defaulted to
         FOR_SELF.
       FOR_SELF: This is the default behavior and represents the case that this
-        InternalRange is intended to be used in the VPC on which it is created
-        and is accessible from it's peers. This implies that peers or peer-of-
-        peer's cannot use this range.
-      FOR_PEER: This behavior can be set when the Internal Range is being
+        internal range is intended to be used in the VPC in which it is
+        created and is accessible from its peers. This implies that peers or
+        peers-of-peers cannot use this range.
+      FOR_PEER: This behavior can be set when the internal range is being
         reserved for usage by the peers. This means that no resource within
         the VPC in which it is being created can use this to associate with a
-        GCP resource, but one of the peer's can. This represents "donating" a
+        VPC resource, but one of the peers can. This represents donating a
         range for peers to use.
-      NOT_SHARED: This behavior can be set when the Internal Range is being
-        reserved for usage by the VPC on which it is created but not shared
+      NOT_SHARED: This behavior can be set when the internal range is being
+        reserved for usage by the VPC in which it is created but not shared
         with the peers. In a sense it is local to the VPC. This can be used to
-        create Internal Ranges for various purposes like
-        HTTP_INTERNAL_LOAD_BALANCER or for interconnect routes that are not
-        shared with peers. This also implies that peer's cannot use this range
+        create internal ranges for various purposes like
+        HTTP_INTERNAL_LOAD_BALANCER or for Interconnect routes that are not
+        shared with peers. This also implies that peers cannot use this range
         in a way that is visible to this VPC, but can re-use this range as
-        long as it is NOT_SHARED from the peer VPC too.
+        long as it is NOT_SHARED from the peer VPC, too.
     """
     PEERING_UNSPECIFIED = 0
     FOR_SELF = 1
@@ -592,20 +529,20 @@ class InternalRange(_messages.Message):
     NOT_SHARED = 3
 
   class UsageValueValuesEnum(_messages.Enum):
-    r"""The type of usage set for this InternalRange.
+    r"""The type of usage set for this internal range.
 
     Values:
       USAGE_UNSPECIFIED: Unspecified usage is allowed in calls which identify
         the resource by other fields and do not need Usage set to complete.
-        These are i.e.: GetInternalRange and DeleteInternalRange. Usage needs
+        These are, i.e.: GetInternalRange and DeleteInternalRange. Usage needs
         to be specified explicitly in CreateInternalRange or
         UpdateInternalRange calls.
-      FOR_VPC: A GCP resource can use the reserved CIDR block by associating
-        it with the Internal Range resource if usage is set to FOR_VPC.
+      FOR_VPC: A VPC resource can use the reserved CIDR block by associating
+        it with the internal range resource if usage is set to FOR_VPC.
       EXTERNAL_TO_VPC: Ranges created with EXTERNAL_TO_VPC cannot be
-        associated with GCP resources and are meant to block out address
-        ranges for various use cases, like for example, usage on-prem, with
-        dynamic route announcements via interconnect.
+        associated with VPC resources and are meant to block out address
+        ranges for various use cases such as usage on-premises, with dynamic
+        route announcements via Interconnect.
     """
     USAGE_UNSPECIFIED = 0
     FOR_VPC = 1
@@ -670,7 +607,7 @@ class ListInternalRangesResponse(_messages.Message):
   r"""Response for InternalRange.ListInternalRanges
 
   Fields:
-    internalRanges: InternalRanges to be returned.
+    internalRanges: Internal range to be returned.
     nextPageToken: The next pagination token in the List response. It should
       be used as page_token for the following request. An empty value means no
       more result.
@@ -693,54 +630,6 @@ class ListLocationsResponse(_messages.Message):
 
   locations = _messages.MessageField('Location', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
-
-
-class ListServiceClassesResponse(_messages.Message):
-  r"""Response for ListServiceClasses.
-
-  Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
-    serviceClasses: ServiceClasses to be returned.
-    unreachable: Locations that could not be reached.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  serviceClasses = _messages.MessageField('ServiceClass', 2, repeated=True)
-  unreachable = _messages.StringField(3, repeated=True)
-
-
-class ListServiceConnectionMapsResponse(_messages.Message):
-  r"""Response for ListServiceConnectionMaps.
-
-  Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
-    serviceConnectionMaps: ServiceConnectionMaps to be returned.
-    unreachable: Locations that could not be reached.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  serviceConnectionMaps = _messages.MessageField('ServiceConnectionMap', 2, repeated=True)
-  unreachable = _messages.StringField(3, repeated=True)
-
-
-class ListServiceConnectionPoliciesResponse(_messages.Message):
-  r"""Response for ListServiceConnectionPolicies.
-
-  Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
-    serviceConnectionPolicies: ServiceConnectionPolicies to be returned.
-    unreachable: Locations that could not be reached.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  serviceConnectionPolicies = _messages.MessageField('ServiceConnectionPolicy', 2, repeated=True)
-  unreachable = _messages.StringField(3, repeated=True)
 
 
 class ListSpokesResponse(_messages.Message):
@@ -861,7 +750,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsCreateRequest(_messages.Mess
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -885,7 +774,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsDeleteRequest(_messages.Mess
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes after the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -964,7 +853,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsPatchRequest(_messages.Messa
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -1034,11 +923,11 @@ class NetworkconnectivityProjectsLocationsInternalRangesCreateRequest(_messages.
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
       request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
+      the same request ID, the server can check if the original operation with
+      the same request ID was received, and if so, will ignore the second
+      request. This prevents clients from accidentally creating duplicate
+      commitments. The request ID must be a valid UUID with the exception that
+      zero UUID is not supported (00000000-0000-0000-0000-000000000000).
   """
 
   internalRange = _messages.MessageField('InternalRange', 1)
@@ -1059,11 +948,11 @@ class NetworkconnectivityProjectsLocationsInternalRangesDeleteRequest(_messages.
       server will guarantee that for at least 60 minutes after the first
       request. For example, consider a situation where you make an initial
       request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
+      the same request ID, the server can check if the original operation with
+      the same request ID was received, and if so, will ignore the second
+      request. This prevents clients from accidentally creating duplicate
+      commitments. The request ID must be a valid UUID with the exception that
+      zero UUID is not supported (00000000-0000-0000-0000-000000000000).
   """
 
   name = _messages.StringField(1, required=True)
@@ -1131,7 +1020,7 @@ class NetworkconnectivityProjectsLocationsInternalRangesPatchRequest(_messages.M
 
   Fields:
     internalRange: A InternalRange resource to be passed as the request body.
-    name: Immutable. The name of a InternalRange. Format:
+    name: Immutable. The name of an internal range. Format:
       projects/{project}/locations/{location}/internalRanges/{internal_range}
       See: https://google.aip.dev/122#fields-representing-resource-names
     requestId: Optional. An optional request ID to identify requests. Specify
@@ -1140,13 +1029,13 @@ class NetworkconnectivityProjectsLocationsInternalRangesPatchRequest(_messages.M
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
       request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
+      the same request ID, the server can check if the original operation with
+      the same request ID was received, and if so, will ignore the second
+      request. This prevents clients from accidentally creating duplicate
+      commitments. The request ID must be a valid UUID with the exception that
+      zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     updateMask: Optional. Field mask is used to specify the fields to be
-      overwritten in the InternalRange resource by the update. The fields
+      overwritten in the internal range resource by the update. The fields
       specified in the update_mask are relative to the resource, not the full
       request. A field will be overwritten if it is in the mask. If the user
       does not provide a mask then all fields will be overwritten.
@@ -1263,550 +1152,6 @@ class NetworkconnectivityProjectsLocationsOperationsListRequest(_messages.Messag
   pageToken = _messages.StringField(4)
 
 
-class NetworkconnectivityProjectsLocationsServiceClassesCreateRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesCreateRequest
-  object.
-
-  Fields:
-    parent: Required. The parent resource's name of the ServiceClass.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceClass: A ServiceClass resource to be passed as the request body.
-    serviceClassId: Optional. Resource ID (i.e. 'foo' in
-      '[...]/projects/p/locations/l/serviceClasses/foo') See
-      https://google.aip.dev/122#resource-id-segments Unique per location. If
-      one is not provided, one will be generated.
-  """
-
-  parent = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceClass = _messages.MessageField('ServiceClass', 3)
-  serviceClassId = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesDeleteRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesDeleteRequest
-  object.
-
-  Fields:
-    name: Required. The name of the ServiceClass to delete.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes after the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest
-  object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesGetRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesGetRequest object.
-
-  Fields:
-    name: Required. Name of the ServiceClass to get.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesListRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesListRequest object.
-
-  Fields:
-    filter: A filter expression that filters the results listed in the
-      response.
-    orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
-    pageToken: The page token.
-    parent: Required. The parent resource's name.
-  """
-
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesPatchRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesPatchRequest object.
-
-  Fields:
-    name: Immutable. The name of a ServiceClass. Format:
-      projects/{project}/locations/{location}/serviceClasses/{service_class}
-      See: https://google.aip.dev/122#fields-representing-resource-names
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceClass: A ServiceClass resource to be passed as the request body.
-    updateMask: Optional. Field mask is used to specify the fields to be
-      overwritten in the ServiceClass resource by the update. The fields
-      specified in the update_mask are relative to the resource, not the full
-      request. A field will be overwritten if it is in the mask. If the user
-      does not provide a mask then all fields will be overwritten.
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceClass = _messages.MessageField('ServiceClass', 3)
-  updateMask = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest
-  object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest
-  object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsCreateRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsCreateRequest
-  object.
-
-  Fields:
-    parent: Required. The parent resource's name of the ServiceConnectionMap.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceConnectionMap: A ServiceConnectionMap resource to be passed as the
-      request body.
-    serviceConnectionMapId: Optional. Resource ID (i.e. 'foo' in
-      '[...]/projects/p/locations/l/serviceConnectionMaps/foo') See
-      https://google.aip.dev/122#resource-id-segments Unique per location. If
-      one is not provided, one will be generated.
-  """
-
-  parent = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceConnectionMap = _messages.MessageField('ServiceConnectionMap', 3)
-  serviceConnectionMapId = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsDeleteRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsDeleteRequest
-  object.
-
-  Fields:
-    name: Required. The name of the ServiceConnectionMap to delete.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes after the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest
-  object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsGetRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsGetRequest
-  object.
-
-  Fields:
-    name: Required. Name of the ServiceConnectionMap to get.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsListRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsListRequest
-  object.
-
-  Fields:
-    filter: A filter expression that filters the results listed in the
-      response.
-    orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
-    pageToken: The page token.
-    parent: Required. The parent resource's name.
-  """
-
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsPatchRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsPatchRequest
-  object.
-
-  Fields:
-    name: Immutable. The name of a ServiceConnectionMap. Format: projects/{pro
-      ject}/locations/{location}/serviceConnectionMaps/{service_connection_map
-      } See: https://google.aip.dev/122#fields-representing-resource-names
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceConnectionMap: A ServiceConnectionMap resource to be passed as the
-      request body.
-    updateMask: Optional. Field mask is used to specify the fields to be
-      overwritten in the ServiceConnectionMap resource by the update. The
-      fields specified in the update_mask are relative to the resource, not
-      the full request. A field will be overwritten if it is in the mask. If
-      the user does not provide a mask then all fields will be overwritten.
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceConnectionMap = _messages.MessageField('ServiceConnectionMap', 3)
-  updateMask = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest
-  object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermissionsRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermis
-  sionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesCreateRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionPoliciesCreateRequest
-  object.
-
-  Fields:
-    parent: Required. The parent resource's name of the
-      ServiceConnectionPolicy.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceConnectionPolicy: A ServiceConnectionPolicy resource to be passed
-      as the request body.
-    serviceConnectionPolicyId: Optional. Resource ID (i.e. 'foo' in
-      '[...]/projects/p/locations/l/serviceConnectionPolicies/foo') See
-      https://google.aip.dev/122#resource-id-segments Unique per location.
-  """
-
-  parent = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceConnectionPolicy = _messages.MessageField('ServiceConnectionPolicy', 3)
-  serviceConnectionPolicyId = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesDeleteRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionPoliciesDeleteRequest
-  object.
-
-  Fields:
-    name: Required. The name of the ServiceConnectionPolicy to delete.
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes after the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPolicyRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPol
-  icyRequest object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetRequest
-  object.
-
-  Fields:
-    name: Required. Name of the ServiceConnectionPolicy to get.
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesListRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionPoliciesListRequest
-  object.
-
-  Fields:
-    filter: A filter expression that filters the results listed in the
-      response.
-    orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
-    pageToken: The page token.
-    parent: Required. The parent resource's name.
-  """
-
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesPatchRequest(_messages.Message):
-  r"""A
-  NetworkconnectivityProjectsLocationsServiceConnectionPoliciesPatchRequest
-  object.
-
-  Fields:
-    name: Immutable. The name of a ServiceConnectionPolicy. Format: projects/{
-      project}/locations/{location}/serviceConnectionPolicies/{service_connect
-      ion_policy} See: https://google.aip.dev/122#fields-representing-
-      resource-names
-    requestId: Optional. An optional request ID to identify requests. Specify
-      a unique request ID so that if you must retry your request, the server
-      will know to ignore the request if it has already been completed. The
-      server will guarantee that for at least 60 minutes since the first
-      request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
-      the same request ID, the server can check if original operation with the
-      same request ID was received, and if so, will ignore the second request.
-      This prevents clients from accidentally creating duplicate commitments.
-      The request ID must be a valid UUID with the exception that zero UUID is
-      not supported (00000000-0000-0000-0000-000000000000).
-    serviceConnectionPolicy: A ServiceConnectionPolicy resource to be passed
-      as the request body.
-    updateMask: Optional. Field mask is used to specify the fields to be
-      overwritten in the ServiceConnectionPolicy resource by the update. The
-      fields specified in the update_mask are relative to the resource, not
-      the full request. A field will be overwritten if it is in the mask. If
-      the user does not provide a mask then all fields will be overwritten.
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  serviceConnectionPolicy = _messages.MessageField('ServiceConnectionPolicy', 3)
-  updateMask = _messages.StringField(4)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPolicyRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPol
-  icyRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPermissionsRequest(_messages.Message):
-  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPe
-  rmissionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
 class NetworkconnectivityProjectsLocationsSpokesCreateRequest(_messages.Message):
   r"""A NetworkconnectivityProjectsLocationsSpokesCreateRequest object.
 
@@ -1817,7 +1162,7 @@ class NetworkconnectivityProjectsLocationsSpokesCreateRequest(_messages.Message)
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -1843,7 +1188,7 @@ class NetworkconnectivityProjectsLocationsSpokesDeleteRequest(_messages.Message)
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes after the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -1920,7 +1265,7 @@ class NetworkconnectivityProjectsLocationsSpokesPatchRequest(_messages.Message):
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -2078,17 +1423,6 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
-class ProducerPscConfig(_messages.Message):
-  r"""The PSC configurations on producer side.
-
-  Fields:
-    serviceAttachmentUri: The URI of a service attachment included in this
-      connection map.
-  """
-
-  serviceAttachmentUri = _messages.StringField(1)
-
-
 class RouterApplianceInstance(_messages.Message):
   r"""RouterAppliance represents a Router appliance which is specified by a VM
   URI and a NIC address.
@@ -2102,190 +1436,6 @@ class RouterApplianceInstance(_messages.Message):
   ipAddress = _messages.StringField(1)
   networkInterface = _messages.StringField(2)
   virtualMachine = _messages.StringField(3)
-
-
-class ServiceClass(_messages.Message):
-  r"""The ServiceClass resource. Next id: 8
-
-  Messages:
-    LabelsValue: User-defined labels.
-
-  Fields:
-    allowedAccounts: Accounts that could associate this service class with a
-      Service Connection Map.
-    createTime: Output only. Time when the ServiceClass was created.
-    description: A description of this resource.
-    labels: User-defined labels.
-    name: Immutable. The name of a ServiceClass. Format:
-      projects/{project}/locations/{location}/serviceClasses/{service_class}
-      See: https://google.aip.dev/122#fields-representing-resource-names
-    serviceConnectionMaps: Output only. URIs of all Service Connection Maps
-      using this service class.
-    updateTime: Output only. Time when the ServiceClass was updated.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class LabelsValue(_messages.Message):
-    r"""User-defined labels.
-
-    Messages:
-      AdditionalProperty: An additional property for a LabelsValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type LabelsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a LabelsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  allowedAccounts = _messages.StringField(1, repeated=True)
-  createTime = _messages.StringField(2)
-  description = _messages.StringField(3)
-  labels = _messages.MessageField('LabelsValue', 4)
-  name = _messages.StringField(5)
-  serviceConnectionMaps = _messages.StringField(6, repeated=True)
-  updateTime = _messages.StringField(7)
-
-
-class ServiceConnectionMap(_messages.Message):
-  r"""The ServiceConnectionMap resource. Next id: 12
-
-  Enums:
-    InfrastructureValueValuesEnum: The infrastructure used for connections
-      between consumers/producers.
-
-  Messages:
-    LabelsValue: User-defined labels.
-
-  Fields:
-    consumerPscConfig: The PSC configurations on consumer side.
-    consumerPscConnection: Output only. PSC connection details on consumer
-      side.
-    createTime: Output only. Time when the ServiceConnectionMap was created.
-    description: A description of this resource.
-    infrastructure: The infrastructure used for connections between
-      consumers/producers.
-    labels: User-defined labels.
-    name: Immutable. The name of a ServiceConnectionMap. Format: projects/{pro
-      ject}/locations/{location}/serviceConnectionMaps/{service_connection_map
-      } See: https://google.aip.dev/122#fields-representing-resource-names
-    network: The URI of the producer network. Example:
-      projects/{project}/global/networks/{resourceId}.
-    producerPscConfig: The PSC configurations on producer side.
-    serviceClassUri: The URI of the service class.
-    updateTime: Output only. Time when the ServiceConnectionMap was updated.
-  """
-
-  class InfrastructureValueValuesEnum(_messages.Enum):
-    r"""The infrastructure used for connections between consumers/producers.
-
-    Values:
-      INFRASTRUCTURE_UNSPECIFIED: An invalid infrastructure as the default
-        case.
-      PSC: Private Service Connect is used for connections.
-    """
-    INFRASTRUCTURE_UNSPECIFIED = 0
-    PSC = 1
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class LabelsValue(_messages.Message):
-    r"""User-defined labels.
-
-    Messages:
-      AdditionalProperty: An additional property for a LabelsValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type LabelsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a LabelsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  consumerPscConfig = _messages.MessageField('ConsumerPscConfig', 1, repeated=True)
-  consumerPscConnection = _messages.MessageField('ConsumerPscConnection', 2, repeated=True)
-  createTime = _messages.StringField(3)
-  description = _messages.StringField(4)
-  infrastructure = _messages.EnumField('InfrastructureValueValuesEnum', 5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  name = _messages.StringField(7)
-  network = _messages.StringField(8)
-  producerPscConfig = _messages.MessageField('ProducerPscConfig', 9, repeated=True)
-  serviceClassUri = _messages.StringField(10)
-  updateTime = _messages.StringField(11)
-
-
-class ServiceConnectionPolicy(_messages.Message):
-  r"""The ServiceConnectionPolicy resource. Next id: 8
-
-  Messages:
-    LabelsValue: User-defined labels.
-
-  Fields:
-    createTime: Output only. Time when the ServiceConnectionMap was created.
-    description: A description of this resource.
-    labels: User-defined labels.
-    name: Immutable. The name of a ServiceConnectionPolicy. Format: projects/{
-      project}/locations/{location}/serviceConnectionPolicies/{service_connect
-      ion_policy} See: https://google.aip.dev/122#fields-representing-
-      resource-names
-    network: The URI of the consumer network. Example:
-      projects/{project}/global/networks/{resourceId}.
-    serviceClass: A unique, symbolic representation for a service class or
-      service type. For example: cloud-sql-a3dfcx.
-    updateTime: Output only. Time when the ServiceConnectionMap was updated.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class LabelsValue(_messages.Message):
-    r"""User-defined labels.
-
-    Messages:
-      AdditionalProperty: An additional property for a LabelsValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type LabelsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a LabelsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  createTime = _messages.StringField(1)
-  description = _messages.StringField(2)
-  labels = _messages.MessageField('LabelsValue', 3)
-  name = _messages.StringField(4)
-  network = _messages.StringField(5)
-  serviceClass = _messages.StringField(6)
-  updateTime = _messages.StringField(7)
 
 
 class SetIamPolicyRequest(_messages.Message):

@@ -159,7 +159,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -176,9 +178,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -1240,10 +1240,12 @@ class GoogleApiServicecontrolV1Operation(_messages.Message):
         onboarding process. It is only available to Google internal services,
         and the service must be approved by chemist-dev@google.com in order to
         use this level.
+      PROMOTED: Used internally by Chemist.
     """
     LOW = 0
     HIGH = 1
     DEBUG = 2
+    PROMOTED = 3
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -1342,13 +1344,10 @@ class GoogleApiServicecontrolV1QuotaProperties(_messages.Message):
         not fail and available quota goes down to zero but it returns error.
       CHECK: Does not change any available quota. Only checks if there is
         enough quota. No lock is placed on the checked tokens neither.
-      RELEASE: DEPRECATED: Increases available quota by the operation cost
-        specified for the operation.
     """
     ACQUIRE = 0
     ACQUIRE_BEST_EFFORT = 1
     CHECK = 2
-    RELEASE = 3
 
   quotaMode = _messages.EnumField('QuotaModeValueValuesEnum', 1)
 
@@ -1528,7 +1527,7 @@ class IdsProjectsLocationsEndpointsCreateRequest(_messages.Message):
       request ID so that if you must retry your request, the server will know
       to ignore the request if it has already been completed. The server will
       guarantee that for at least 60 minutes since the first request. For
-      example, consider a situation where you make an initial request and t he
+      example, consider a situation where you make an initial request and the
       request times out. If you make the request again with the same request
       ID, the server can check if original operation with the same request ID
       was received, and if so, will ignore the second request. This prevents
@@ -1552,7 +1551,7 @@ class IdsProjectsLocationsEndpointsDeleteRequest(_messages.Message):
       request ID so that if you must retry your request, the server will know
       to ignore the request if it has already been completed. The server will
       guarantee that for at least 60 minutes after the first request. For
-      example, consider a situation where you make an initial request and t he
+      example, consider a situation where you make an initial request and the
       request times out. If you make the request again with the same request
       ID, the server can check if original operation with the same request ID
       was received, and if so, will ignore the second request. This prevents
@@ -1636,7 +1635,7 @@ class IdsProjectsLocationsEndpointsPatchRequest(_messages.Message):
       request ID so that if you must retry your request, the server will know
       to ignore the request if it has already been completed. The server will
       guarantee that for at least 60 minutes since the first request. For
-      example, consider a situation where you make an initial request and t he
+      example, consider a situation where you make an initial request and the
       request times out. If you make the request again with the same request
       ID, the server can check if original operation with the same request ID
       was received, and if so, will ignore the second request. This prevents

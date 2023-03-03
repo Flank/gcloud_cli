@@ -6,7 +6,7 @@
   "canonicalName": "Blockchain Node Engine",
   "version": "v1alpha1",
   "revision": "0",
-  "title": "blockchainnodeengine API (prod)",
+  "title": "Blockchain Node Engine API",
   "description": "",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -14,7 +14,7 @@
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
    },
-  "documentationLink": "https://cloud.google.com/blockchainnodeengine",
+  "documentationLink": "https://cloud.google.com/web3",
   "protocol": "rest",
   "rootUrl": "https://blockchainnodeengine.googleapis.com/",
   "mtlsRootUrl": "https://blockchainnodeengine.mtls.googleapis.com/",
@@ -22,6 +22,7 @@
   "baseUrl": "https://blockchainnodeengine.googleapis.com/",
   "batchPath": "batch",
   "version_module": true,
+  "fullyEncodeReservedExpansion": true,
   "parameters": {
     "access_token": {
       "type": "string",
@@ -189,8 +190,8 @@
         }
       }
     },
-    "Empty": {
-      "id": "Empty",
+    "GoogleProtobufEmpty": {
+      "id": "GoogleProtobufEmpty",
       "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
       "type": "object",
       "properties": {
@@ -205,14 +206,14 @@
     },
     "ListBlockchainNodesResponse": {
       "id": "ListBlockchainNodesResponse",
-      "description": "Message for response to listing Nodes",
+      "description": "Message for response to listing Blockchain Nodes",
       "type": "object",
       "properties": {
-        "nodes": {
+        "blockchainNodes": {
           "description": "The list of nodes",
           "type": "array",
           "items": {
-            "$ref": "BlockchainNodeSpec"
+            "$ref": "BlockchainNode"
           }
         },
         "nextPageToken": {
@@ -228,33 +229,218 @@
         }
       }
     },
-    "BlockchainNodeSpec": {
-      "id": "BlockchainNodeSpec",
-      "description": "Message describing BlockchainNodeSpec object",
+    "BlockchainNode": {
+      "id": "BlockchainNode",
+      "description": "Client-facing representation of a Blockchain Node.",
       "type": "object",
       "properties": {
         "name": {
-          "description": "name of resource",
+          "description": "Output only. The fully qualified name of the blockchain node. e.g. projects\/my-project\/locations\/us-central1\/blockchainNodes\/my-node.",
+          "readOnly": true,
           "type": "string"
         },
         "createTime": {
-          "description": "Output only. [Output only] Create time stamp",
+          "description": "Output only. The timestamp at which the Blockchain Node was first created.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
-          "description": "Output only. [Output only] Update time stamp",
+          "description": "Output only. The timestamp at which the Blockchain Node was last updated.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "labels": {
-          "description": "Labels as key value pairs",
+          "description": "User-provided key-value pairs.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "blockchainType": {
+          "description": "Immutable. The blockchain type of the node.",
+          "type": "string",
+          "enumDescriptions": [
+            "",
+            ""
+          ],
+          "enum": [
+            "BLOCKCHAIN_TYPE_UNSPECIFIED",
+            "ETHEREUM"
+          ]
+        },
+        "connectionInfo": {
+          "readOnly": true,
+          "$ref": "ConnectionInformation"
+        },
+        "state": {
+          "description": "Output only. A status representing the state of the node.",
+          "readOnly": true,
+          "type": "string",
+          "enumDescriptions": [
+            "The state has not been specified.",
+            "The node has been requested and is in the process of being created.",
+            "The existing node is undergoing deletion, but not yet finished.",
+            "The node is running and ready for use.",
+            "The node is in an unexpected or errored state.",
+            "The node is currently being updated.",
+            "The node is currently being repaired.",
+            "The node is currently being reconciled."
+          ],
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "CREATING",
+            "DELETING",
+            "RUNNING",
+            "ERROR",
+            "UPDATING",
+            "REPAIRING",
+            "RECONCILING"
+          ]
+        },
+        "ethereumDetails": {
+          "$ref": "EthereumDetails"
+        }
+      }
+    },
+    "ConnectionInformation": {
+      "id": "ConnectionInformation",
+      "description": "The connection information through which to interact with a Blockchain Node.",
+      "type": "object",
+      "properties": {
+        "ipInfo": {
+          "readOnly": true,
+          "$ref": "IpInformation"
+        },
+        "endpointInfo": {
+          "description": "Output only. The endpoint information through which to interact with a Blockchain Node.",
+          "readOnly": true,
+          "$ref": "EndpointInfo"
+        }
+      }
+    },
+    "IpInformation": {
+      "id": "IpInformation",
+      "description": "The public IP information through which to interact with a Blockchain Node.",
+      "type": "object",
+      "properties": {
+        "p2pIpv4Address": {
+          "description": "Output only. The IPv4 address for the node peer-to-peer endpoint.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "p2pIpv6Address": {
+          "description": "Output only. The IPv6 address for the node peer-to-peer endpoint.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "rpcIpv4Address": {
+          "description": "Output only. The IPv4 address for the node RPC API endpoint.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "rpcIpv6Address": {
+          "description": "Output only. The IPv6 address for the node RPC API endpoint.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "EndpointInfo": {
+      "id": "EndpointInfo",
+      "description": "Contains endpoint information through which to interact with a Blockchain Node.",
+      "type": "object",
+      "properties": {
+        "jsonRpcApiEndpoint": {
+          "description": "Output only. The assigned URL for the node JSON RPC API endpoint.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "websocketsApiEndpoint": {
+          "description": "Output only. The assigned URL for the node websockets API endpoint.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "beaconApiEndpoint": {
+          "description": "Output only. The assigned URL for the node Beacon API endpoint.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "EthereumDetails": {
+      "id": "EthereumDetails",
+      "description": "Ethereum-specific Blockchain Node details.",
+      "type": "object",
+      "properties": {
+        "network": {
+          "description": "Immutable. The Ethereum environment being accessed.",
+          "type": "string",
+          "enumDescriptions": [
+            "",
+            "The ethereum Mainnet.",
+            "Ethereum Testnet based on Goerli protocol.",
+            "Ethereum Testnet based on Sepolia\/Bepolia protocol."
+          ],
+          "enum": [
+            "NETWORK_UNSPECIFIED",
+            "MAINNET",
+            "TESTNET_GOERLI_PRATER",
+            "TESTNET_SEPOLIA"
+          ]
+        },
+        "nodeType": {
+          "description": "Immutable. The type of Ethereum node.",
+          "type": "string",
+          "enumDescriptions": [
+            "",
+            "An Ethereum node that only downloads Ethereum block headers.",
+            "Keeps a complete copy of the blockchain data, and contributes to the network by receiving, validating and forwarding transactions. This type is currently only available for nodes running Geth\/Lighthouse clients.",
+            "Holds the same data as full node as well as all of the blockchain's history state data dating back to the Genesis Block. This type is currently only available for the nodes running Erigon clients."
+          ],
+          "enum": [
+            "NODE_TYPE_UNSPECIFIED",
+            "LIGHT",
+            "FULL",
+            "ARCHIVE"
+          ]
+        },
+        "executionClient": {
+          "description": "Immutable. The execution client",
+          "type": "string",
+          "enumDescriptions": [
+            "",
+            "Official Go implementation of the Ethereum protocol. https:\/\/geth.ethereum.org\/",
+            "An implementation of Ethereum (execution client), on the efficiency frontier, written in Go. https:\/\/github.com\/ledgerwatch\/erigon"
+          ],
+          "enum": [
+            "EXECUTION_CLIENT_UNSPECIFIED",
+            "GETH",
+            "ERIGON"
+          ]
+        },
+        "consensusClient": {
+          "description": "Immutable. The consensus client",
+          "type": "string",
+          "enumDescriptions": [
+            "",
+            "Consensus client implementation written in Rust, maintained by Sigma Prime. https:\/\/lighthouse.sigmaprime.io\/",
+            "Erigon's native Embedded Consensus Layer. https:\/\/github.com\/ledgerwatch\/erigon#embedded-consensus-layer"
+          ],
+          "enum": [
+            "CONSENSUS_CLIENT_UNSPECIFIED",
+            "LIGHTHOUSE",
+            "ERIGON_EMBEDDED_CONSENSUS_LAYER"
+          ]
+        },
+        "apiEnableAdmin": {
+          "description": "Immutable. Enables access to the admin HTTP endpoints",
+          "type": "boolean"
+        },
+        "apiEnableDebug": {
+          "description": "Immutable. Enables access to the debug HTTP endpoints",
+          "type": "boolean"
         }
       }
     },
@@ -515,7 +701,7 @@
                     "name"
                   ],
                   "response": {
-                    "$ref": "Empty"
+                    "$ref": "GoogleProtobufEmpty"
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
@@ -543,7 +729,7 @@
                     "$ref": "CancelOperationRequest"
                   },
                   "response": {
-                    "$ref": "Empty"
+                    "$ref": "GoogleProtobufEmpty"
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
@@ -607,7 +793,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. Name of the resource",
+                      "description": "Required. The fully qualified name of the blockchain node to fetch. e.g. projects\/my-project\/locations\/us-central1\/blockchainNodes\/my-node.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/blockchainNodes\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -618,12 +804,12 @@
                     "name"
                   ],
                   "response": {
-                    "$ref": "BlockchainNodeSpec"
+                    "$ref": "BlockchainNode"
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Gets details of a single Node."
+                  "description": "Gets details of a single Blockchain Node."
                 },
                 "create": {
                   "id": "blockchainnodeengine.projects.locations.blockchainNodes.create",
@@ -638,13 +824,13 @@
                       "required": true,
                       "type": "string"
                     },
-                    "nodeId": {
+                    "blockchainNodeId": {
                       "description": "Required. Id of the requesting object If auto-generating Id server-side, remove this field and node_id from the method_signature of Create RPC",
                       "location": "query",
                       "type": "string"
                     },
                     "requestId": {
-                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
                       "location": "query",
                       "type": "string"
                     }
@@ -653,7 +839,7 @@
                     "parent"
                   ],
                   "request": {
-                    "$ref": "BlockchainNodeSpec"
+                    "$ref": "BlockchainNode"
                   },
                   "response": {
                     "$ref": "Operation"
@@ -661,7 +847,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new Node in a given project and location."
+                  "description": "Creates a new Blockchain Node in a given project and location."
                 },
                 "patch": {
                   "id": "blockchainnodeengine.projects.locations.blockchainNodes.patch",
@@ -670,20 +856,20 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "name of resource",
+                      "description": "Output only. The fully qualified name of the blockchain node. e.g. projects\/my-project\/locations\/us-central1\/blockchainNodes\/my-node.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/blockchainNodes\/[^\/]+$",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required. Field mask is used to specify the fields to be overwritten in the Node resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.",
+                      "description": "Required. Field mask is used to specify the fields to be overwritten in the Blockchain Node resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
                     },
                     "requestId": {
-                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
                       "location": "query",
                       "type": "string"
                     }
@@ -692,7 +878,7 @@
                     "name"
                   ],
                   "request": {
-                    "$ref": "BlockchainNodeSpec"
+                    "$ref": "BlockchainNode"
                   },
                   "response": {
                     "$ref": "Operation"
@@ -700,7 +886,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Updates the parameters of a single Node."
+                  "description": "Updates the parameters of a single Blockchain Node."
                 },
                 "delete": {
                   "id": "blockchainnodeengine.projects.locations.blockchainNodes.delete",
@@ -709,14 +895,14 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. Name of the resource",
+                      "description": "Required. The fully qualified name of the blockchain node to delete. e.g. projects\/my-project\/locations\/us-central1\/blockchainNodes\/my-node.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/blockchainNodes\/[^\/]+$",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "requestId": {
-                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
                       "location": "query",
                       "type": "string"
                     }
@@ -730,7 +916,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Deletes a single Node."
+                  "description": "Deletes a single Blockchain Node."
                 }
               }
             }

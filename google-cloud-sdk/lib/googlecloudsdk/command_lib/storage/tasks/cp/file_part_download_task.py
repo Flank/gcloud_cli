@@ -104,10 +104,12 @@ def _get_digesters(component_number, resource):
   if check_hashes != properties.CheckHashes.NEVER.value:
     if component_number is None and resource.md5_hash:
       digesters[hash_util.HashAlgorithm.MD5] = hashing.get_md5()
-
-    elif (resource.crc32c_hash and
-          (check_hashes == properties.CheckHashes.ALWAYS.value or
-           fast_crc32c_util.is_fast_crc32c_available())):
+    elif resource.crc32c_hash and (
+        check_hashes == properties.CheckHashes.ALWAYS.value
+        or fast_crc32c_util.check_if_fast_crc32c_available(
+            install_if_missing=True
+        )
+    ):
       digesters[hash_util.HashAlgorithm.CRC32C] = fast_crc32c_util.get_crc32c()
 
   if not digesters:
@@ -129,7 +131,7 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
                component_number=None,
                total_components=None,
                do_not_decompress=False,
-               strategy=cloud_api.DownloadStrategy.ONE_SHOT,
+               strategy=cloud_api.DownloadStrategy.RETRIABLE_IN_FLIGHT,
                user_request_args=None):
     """Initializes task.
 
@@ -155,13 +157,40 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
     super(FilePartDownloadTask,
           self).__init__(source_resource, destination_resource, offset, length,
                          component_number, total_components)
-    self._do_not_decompress = do_not_decompress
+    self._do_not_decompress_flag = do_not_decompress
     self._strategy = strategy
     self._user_request_args = user_request_args
 
+  def _calculate_deferred_hashes(self, digesters):
+    """DeferredCrc32c does not hash on-the-fly and needs a summation call."""
+    if isinstance(
+        digesters.get(hash_util.HashAlgorithm.CRC32C),
+        fast_crc32c_util.DeferredCrc32c,
+    ):
+      digesters[hash_util.HashAlgorithm.CRC32C].sum_file(
+          self._destination_resource.storage_url.object_name,
+          self._offset,
+          self._length,
+      )
+
+  def _disable_in_flight_decompression(self, is_resumable_or_sliced_download):
+    """Whether or not to disable on-the-fly decompression."""
+    if self._do_not_decompress_flag:
+      # Respect user preference.
+      return True
+    if not is_resumable_or_sliced_download:
+      # If we don't decompress in-flight, we'll do it later on the disk, which
+      # is probably slower. However, the requests library might add the
+      # "accept-encoding: gzip" header anyways.
+      return False
+    # Decompressing in flight changes file size, making resumable and sliced
+    # downloads impossible.
+    return bool(self._source_resource.content_encoding and
+                'gzip' in self._source_resource.content_encoding)
+
   def _perform_download(self, request_config, progress_callback,
-                        download_strategy, start_byte, end_byte, write_mode,
-                        digesters):
+                        do_not_decompress, download_strategy, start_byte,
+                        end_byte, write_mode, digesters):
     """Prepares file stream, calls API, and validates hash."""
     with files.BinaryFileWriter(
         self._destination_resource.storage_url.object_name,
@@ -179,12 +208,13 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
           download_stream,
           request_config,
           digesters=digesters,
-          do_not_decompress=self._do_not_decompress,
+          do_not_decompress=do_not_decompress,
           download_strategy=download_strategy,
           progress_callback=progress_callback,
           start_byte=start_byte,
           end_byte=end_byte)
 
+    self._calculate_deferred_hashes(digesters)
     if hash_util.HashAlgorithm.MD5 in digesters:
       calculated_digest = hash_util.get_base64_hash_digest_string(
           digesters[hash_util.HashAlgorithm.MD5])
@@ -192,12 +222,6 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
           self._destination_resource.storage_url.object_name,
           self._source_resource.md5_hash, calculated_digest)
     elif hash_util.HashAlgorithm.CRC32C in digesters:
-      # Perform deferred hash calculations now.
-      if isinstance(digesters[hash_util.HashAlgorithm.CRC32C],
-                    fast_crc32c_util.DeferredCrc32c):
-        digesters[hash_util.HashAlgorithm.CRC32C].sum_file(
-            self._destination_resource.storage_url.object_name, self._offset,
-            self._length)
       # Only for one-shot composite object downloads as final CRC32C validated
       # in FinalizeSlicedDownloadTask.
       if self._component_number is None:
@@ -209,26 +233,30 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
 
     return api_download_result
 
-  def _perform_one_shot_download(self, request_config, progress_callback,
-                                 digesters):
+  def _perform_retriable_download(self, request_config, progress_callback,
+                                  digesters):
     """Sets up a basic download based on task attributes."""
     start_byte = self._offset
     end_byte = self._offset + self._length - 1
 
-    return self._perform_download(request_config, progress_callback,
-                                  cloud_api.DownloadStrategy.ONE_SHOT,
-                                  start_byte, end_byte,
-                                  files.BinaryFileWriterMode.TRUNCATE,
-                                  digesters)
+    return self._perform_download(
+        request_config, progress_callback,
+        self._disable_in_flight_decompression(False),
+        cloud_api.DownloadStrategy.RETRIABLE_IN_FLIGHT, start_byte, end_byte,
+        files.BinaryFileWriterMode.TRUNCATE, digesters)
 
   def _catch_up_digesters(self, digesters, start_byte, end_byte):
-    with files.BinaryFileReader(
-        self._destination_resource.storage_url.object_name
-    ) as file_reader:
-      # Get hash of partially-downloaded file as start for validation.
-      for hash_algorithm in digesters:
-        digesters[hash_algorithm] = hash_util.get_hash_from_file_stream(
-            file_reader, hash_algorithm, start=start_byte, stop=end_byte)
+    """Gets hash of partially-downloaded file as start for validation."""
+    for hash_algorithm in digesters:
+      if isinstance(digesters[hash_algorithm], fast_crc32c_util.DeferredCrc32c):
+        # Deferred calculation runs at end, no on-the-fly.
+        continue
+      digesters[hash_algorithm] = hash_util.get_hash_from_file(
+          self._destination_resource.storage_url.object_name,
+          hash_algorithm,
+          start=start_byte,
+          stop=end_byte,
+      )
 
   def _perform_resumable_download(self, request_config, progress_callback,
                                   digesters):
@@ -254,16 +282,17 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
       write_mode = files.BinaryFileWriterMode.TRUNCATE
 
     return self._perform_download(request_config, progress_callback,
+                                  self._disable_in_flight_decompression(True),
                                   cloud_api.DownloadStrategy.RESUMABLE,
                                   start_byte, end_byte, write_mode, digesters)
 
-  def _get_output(self, digesters, api_download_result):
+  def _get_output(self, digesters, server_encoding):
     """Generates task.Output from download execution results.
 
     Args:
       digesters (dict): Contains hash objects for download checksums.
-      api_download_result (cloud_api.DownloadApiClientReturnValue|None): Generic
-        information from API client about the download results.
+      server_encoding (str|None): Generic information from API client about the
+        download results.
 
     Returns:
       task.Output: Data the parent download or finalize download class would
@@ -287,12 +316,16 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
                   'length': self._length,
               }))
 
-    if (api_download_result and self._user_request_args and
-        self._user_request_args.system_posix_data):
+    if (
+        server_encoding
+        and self._user_request_args
+        and self._user_request_args.system_posix_data
+    ):
       messages.append(
           task.Message(
-              topic=task.Topic.API_DOWNLOAD_RESULT,
-              payload=api_download_result))
+              topic=task.Topic.API_DOWNLOAD_RESULT, payload=server_encoding
+          )
+      )
 
     return task.Output(additional_task_iterators=None, messages=messages)
 
@@ -316,6 +349,7 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
       if start_byte > end_byte:
         log.status.Print('{} component {} already downloaded.'.format(
             self._source_resource, self._component_number))
+        self._calculate_deferred_hashes(digesters)
         self._catch_up_digesters(
             digesters,
             start_byte=self._offset,
@@ -331,6 +365,7 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
       start_byte = self._offset
 
     return self._perform_download(request_config, progress_callback,
+                                  self._disable_in_flight_decompression(True),
                                   self._strategy, start_byte, end_byte,
                                   files.BinaryFileWriterMode.MODIFY, digesters)
 
@@ -353,14 +388,16 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
 
     request_config = request_config_factory.get_request_config(
         self._source_resource.storage_url,
-        decryption_key_hash=self._source_resource.decryption_key_hash,
+        decryption_key_hash_sha256=(
+            self._source_resource.decryption_key_hash_sha256),
         user_request_args=self._user_request_args,
     )
 
     if self._source_resource.size and self._component_number is not None:
       try:
-        api_download_result = self._perform_component_download(
-            request_config, progress_callback, digesters)
+        server_encoding = self._perform_component_download(
+            request_config, progress_callback, digesters
+        )
       # pylint:disable=broad-except
       except Exception as e:
         # pylint:enable=broad-except
@@ -369,9 +406,11 @@ class FilePartDownloadTask(file_part_task.FilePartTask):
             messages=[task.Message(topic=task.Topic.ERROR, payload=e)])
 
     elif self._strategy is cloud_api.DownloadStrategy.RESUMABLE:
-      api_download_result = self._perform_resumable_download(
-          request_config, progress_callback, digesters)
+      server_encoding = self._perform_resumable_download(
+          request_config, progress_callback, digesters
+      )
     else:
-      api_download_result = self._perform_one_shot_download(
-          request_config, progress_callback, digesters)
-    return self._get_output(digesters, api_download_result)
+      server_encoding = self._perform_retriable_download(
+          request_config, progress_callback, digesters
+      )
+    return self._get_output(digesters, server_encoding)

@@ -47,14 +47,42 @@ class CategoryHealth(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 3)
 
 
+class CertChain(_messages.Message):
+  r"""A CertChain object.
+
+  Fields:
+    certificates: The certificates that form the CA chain, from leaf to root
+      order.
+  """
+
+  certificates = _messages.StringField(1, repeated=True)
+
+
+class CertificateAuthority(_messages.Message):
+  r"""Redis cluster certificate authority
+
+  Fields:
+    managedServerCa: A ManagedCertificateAuthority attribute.
+  """
+
+  managedServerCa = _messages.MessageField('ManagedCertificateAuthority', 1)
+
+
 class Cluster(_messages.Message):
   r"""A cluster instance.
 
   Enums:
+    AuthorizationModeValueValuesEnum: The authorization mode of the Redis
+      cluster. If not provided, auth feature is disabled for the cluster.
     StateValueValuesEnum: Output only. The current state of this cluster. Can
       be CREATING, READY, UPDATING, DELETING and SUSPENDED
+    TransitEncryptionModeValueValuesEnum: Optional. The in-transit encryption
+      for the Redis cluster. If not provided, encryption is disabled for the
+      cluster.
 
   Fields:
+    authorizationMode: The authorization mode of the Redis cluster. If not
+      provided, auth feature is disabled for the cluster.
     createTime: Output only. The timestamp associated with the cluster
       creation request.
     displayName: Optional. An arbitrary and optional user-provided name for
@@ -64,12 +92,30 @@ class Cluster(_messages.Message):
       `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}`
     privateServiceConnect: Optional. Populate to use private service connect
       network option.
+    replicaCount: Optional. The number of replica nodes per shard.
+    sizeGb: Optional. Redis memory size in GB for the entire cluster. See
+      b/257175558 for comments in naming the field. Use unit GB to follow GCE
+      conventions: https://cloud.google.com/compute/docs/instances/creating-
+      instance-with-custom-machine-type#memory_units.
     state: Output only. The current state of this cluster. Can be CREATING,
       READY, UPDATING, DELETING and SUSPENDED
-    totalMemorySizeGb: Optional. Redis memory size in GiB for the entire
-      cluster.
+    transitEncryptionMode: Optional. The in-transit encryption for the Redis
+      cluster. If not provided, encryption is disabled for the cluster.
     uid: Output only. System assigned, unique identifier for the cluster.
   """
+
+  class AuthorizationModeValueValuesEnum(_messages.Enum):
+    r"""The authorization mode of the Redis cluster. If not provided, auth
+    feature is disabled for the cluster.
+
+    Values:
+      AUTH_MODE_UNSPECIFIED: Not set.
+      AUTH_MODE_IAM_AUTH: IAM basic authorization mode
+      AUTH_MODE_DISABLED: Authorization disabled mode
+    """
+    AUTH_MODE_UNSPECIFIED = 0
+    AUTH_MODE_IAM_AUTH = 1
+    AUTH_MODE_DISABLED = 2
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current state of this cluster. Can be CREATING,
@@ -81,22 +127,37 @@ class Cluster(_messages.Message):
       ACTIVE: Redis cluster has been created and is fully usable.
       UPDATING: Redis cluster configuration is being updated.
       DELETING: Redis cluster is being deleted.
-      REPAIRING: Redis instance is being reparied.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
     ACTIVE = 2
     UPDATING = 3
     DELETING = 4
-    REPAIRING = 5
 
-  createTime = _messages.StringField(1)
-  displayName = _messages.StringField(2)
-  name = _messages.StringField(3)
-  privateServiceConnect = _messages.MessageField('PrivateServiceConnect', 4)
-  state = _messages.EnumField('StateValueValuesEnum', 5)
-  totalMemorySizeGb = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  uid = _messages.StringField(7)
+  class TransitEncryptionModeValueValuesEnum(_messages.Enum):
+    r"""Optional. The in-transit encryption for the Redis cluster. If not
+    provided, encryption is disabled for the cluster.
+
+    Values:
+      TRANSIT_ENCRYPTION_MODE_UNSPECIFIED: In-transit encryption not set.
+      TRANSIT_ENCRYPTION_MODE_DISABLED: In-transit encryption disabled.
+      TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION: Use server managed
+        encryption for in-transit encryption.
+    """
+    TRANSIT_ENCRYPTION_MODE_UNSPECIFIED = 0
+    TRANSIT_ENCRYPTION_MODE_DISABLED = 1
+    TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION = 2
+
+  authorizationMode = _messages.EnumField('AuthorizationModeValueValuesEnum', 1)
+  createTime = _messages.StringField(2)
+  displayName = _messages.StringField(3)
+  name = _messages.StringField(4)
+  privateServiceConnect = _messages.MessageField('PrivateServiceConnect', 5)
+  replicaCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  sizeGb = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  state = _messages.EnumField('StateValueValuesEnum', 8)
+  transitEncryptionMode = _messages.EnumField('TransitEncryptionModeValueValuesEnum', 9)
+  uid = _messages.StringField(10)
 
 
 class Empty(_messages.Message):
@@ -800,6 +861,17 @@ class MaintenanceSchedule(_messages.Message):
   startTime = _messages.StringField(4)
 
 
+class ManagedCertificateAuthority(_messages.Message):
+  r"""A ManagedCertificateAuthority object.
+
+  Fields:
+    caCerts: The PEM encoded CA certificate chains for redis managed server
+      authentication
+  """
+
+  caCerts = _messages.MessageField('CertChain', 1, repeated=True)
+
+
 class MetricHealth(_messages.Message):
   r"""Metric health, such as used_memory_ratio, redis_server_cpu_usage
 
@@ -1064,7 +1136,7 @@ class PersistenceConfig(_messages.Message):
       ONE_HOUR: Snapshot every 1 hour.
       SIX_HOURS: Snapshot every 6 hours.
       TWELVE_HOURS: Snapshot every 12 hours.
-      TWENTY_FOUR_HOURS: Snapshot every 24 horus.
+      TWENTY_FOUR_HOURS: Snapshot every 24 hours.
     """
     SNAPSHOT_PERIOD_UNSPECIFIED = 0
     FIFTEEN_MINUTES = 1
@@ -1092,6 +1164,40 @@ class PrivateServiceConnect(_messages.Message):
   serviceAttachment = _messages.StringField(1)
 
 
+class ReconciliationOperationMetadata(_messages.Message):
+  r"""Operation metadata returned by the CLH during resource state
+  reconciliation.
+
+  Enums:
+    ExclusiveActionValueValuesEnum: Excluisive action returned by the CLH.
+
+  Fields:
+    deleteResource: DEPRECATED. Use exclusive_action instead.
+    exclusiveAction: Excluisive action returned by the CLH.
+  """
+
+  class ExclusiveActionValueValuesEnum(_messages.Enum):
+    r"""Excluisive action returned by the CLH.
+
+    Values:
+      UNKNOWN_REPAIR_ACTION: Unknown repair action.
+      DELETE: The resource has to be deleted. When using this bit, the CLH
+        should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE
+        OperationSignal in SideChannel. For more information - go/ccfe-delete-
+        on-upsert, go/ccfe-reconciliation-protocol-ug#apply_delete
+      RETRY: This resource could not be repaired but the repair should be
+        tried again at a later time. This can happen if there is a dependency
+        that needs to be resolved first- e.g. if a parent resource must be
+        repaired before a child resource.
+    """
+    UNKNOWN_REPAIR_ACTION = 0
+    DELETE = 1
+    RETRY = 2
+
+  deleteResource = _messages.BooleanField(1)
+  exclusiveAction = _messages.EnumField('ExclusiveActionValueValuesEnum', 2)
+
+
 class RedisProjectsLocationsClustersCreateRequest(_messages.Message):
   r"""A RedisProjectsLocationsClustersCreateRequest object.
 
@@ -1100,7 +1206,7 @@ class RedisProjectsLocationsClustersCreateRequest(_messages.Message):
     clusterId: Required. The logical name of the Redis cluster in the customer
       project with the following restrictions: * Must contain only lowercase
       letters, numbers, and hyphens. * Must start with a letter. * Must be
-      between 1-40 characters. * Must end with a number or a letter. * Must be
+      between 1-63 characters. * Must end with a number or a letter. * Must be
       unique within the customer project / location
     parent: Required. The resource name of the cluster location using the
       form: `projects/{project_id}/locations/{location_id}` where
@@ -1126,6 +1232,18 @@ class RedisProjectsLocationsClustersDeleteRequest(_messages.Message):
 
   name = _messages.StringField(1, required=True)
   requestId = _messages.StringField(2)
+
+
+class RedisProjectsLocationsClustersGetCertificateAuthorityRequest(_messages.Message):
+  r"""A RedisProjectsLocationsClustersGetCertificateAuthorityRequest object.
+
+  Fields:
+    name: Required. Redis cluster certificate authority resource name using
+      the form: `projects/{project_id}/locations/{location_id}/clusters/{clust
+      er_id}/certificateAuthority` where `location_id` refers to a GCP region.
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class RedisProjectsLocationsClustersGetRequest(_messages.Message):

@@ -5,7 +5,7 @@
   "name": "firestore",
   "canonicalName": "Firestore",
   "version": "v1",
-  "revision": "20220926",
+  "revision": "20230221",
   "title": "Cloud Firestore API",
   "description": "Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ",
   "ownerDomain": "google.com",
@@ -274,12 +274,26 @@
           "enumDescriptions": [
             "The query scope is unspecified. Not a valid option.",
             "Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the collection id specified by the index.",
-            "Indexes with a collection group query scope specified allow queries against all collections that has the collection id specified by the index."
+            "Indexes with a collection group query scope specified allow queries against all collections that has the collection id specified by the index.",
+            "Include all the collections's ancestor in the index. Only available for Datastore Mode databases."
           ],
           "enum": [
             "QUERY_SCOPE_UNSPECIFIED",
             "COLLECTION",
-            "COLLECTION_GROUP"
+            "COLLECTION_GROUP",
+            "COLLECTION_RECURSIVE"
+          ]
+        },
+        "apiScope": {
+          "description": "The API scope supported by this index.",
+          "type": "string",
+          "enumDescriptions": [
+            "The index can be used by both Firestore Native and Firestore in Datastore Mode query API. This is the default.",
+            "The index can only be used by the Firestore in Datastore Mode query API."
+          ],
+          "enum": [
+            "ANY_API",
+            "DATASTORE_MODE_API"
           ]
         },
         "fields": {
@@ -508,6 +522,23 @@
           "description": "The resource name of the Database. Format: `projects\/{project}\/databases\/{database}`",
           "type": "string"
         },
+        "uid": {
+          "description": "Output only. The system-generated UUID4 for this Database.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The timestamp at which this database was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "description": "Output only. The timestamp at which this database was most recently updated. Note this only includes updates to the database resource and not data contained by the database.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
         "locationId": {
           "description": "The location of the database. Available databases are listed at https:\/\/cloud.google.com\/firestore\/docs\/locations.",
           "type": "string"
@@ -728,7 +759,7 @@
           }
         },
         "nextPageToken": {
-          "description": "The next page token.",
+          "description": "A token to retrieve the next page of documents. If this field is omitted, there are no subsequent pages.",
           "type": "string"
         }
       }
@@ -1187,11 +1218,13 @@
           "type": "string",
           "enumDescriptions": [
             "Unspecified. This value must not be used.",
-            "Documents are required to satisfy all of the combined filters."
+            "Documents are required to satisfy all of the combined filters.",
+            "Documents are required to satisfy at least one of the combined filters."
           ],
           "enum": [
             "OPERATOR_UNSPECIFIED",
-            "AND"
+            "AND",
+            "OR"
           ]
         },
         "filters": {
@@ -2136,8 +2169,15 @@
           }
         },
         "outputUriPrefix": {
-          "description": "Where the entities are being exported to.",
+          "description": "Where the documents are being exported to.",
           "type": "string"
+        },
+        "namespaceIds": {
+          "description": "Which namespace ids are being exported.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -2198,6 +2238,13 @@
         "inputUriPrefix": {
           "description": "The location of the documents being imported.",
           "type": "string"
+        },
+        "namespaceIds": {
+          "description": "Which namespace ids are being imported.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -2369,7 +2416,7 @@
                   "type": "string"
                 },
                 "databaseId": {
-                  "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are \/a-z-\/ with first character a letter and the last a letter or a number. Must not be UUID-like \/[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\/. \"(default)\" database id is also valid.",
+                  "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. The value must be set to \"(default)\".",
                   "location": "query",
                   "type": "string"
                 }
@@ -2475,6 +2522,47 @@
                 "https://www.googleapis.com/auth/datastore"
               ],
               "description": "Updates a database."
+            },
+            "delete": {
+              "id": "firestore.projects.databases.delete",
+              "path": "v1/{+name}",
+              "flatPath": "v1/projects/{projectsId}/databases/{databasesId}",
+              "httpMethod": "DELETE",
+              "parameters": {
+                "name": {
+                  "description": "Required. A name of the form `projects\/{project_id}\/databases\/{database_id}`",
+                  "pattern": "^projects\/[^\/]+\/databases\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "validateOnly": {
+                  "description": "If set, validate the request and preview the response, but do not actually delete the database.",
+                  "location": "query",
+                  "type": "boolean"
+                },
+                "etag": {
+                  "description": "The current etag of the Database. If an etag is provided and does not match the current etag of the database, deletion will be blocked and a FAILED_PRECONDITION error will be returned.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "allowMissing": {
+                  "description": "If set to true and the Database is not found, the request will succeed but no action will be taken.",
+                  "location": "query",
+                  "type": "boolean"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "GoogleLongrunningOperation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/datastore"
+              ],
+              "description": "Deletes a database."
             }
           }
           ,
@@ -2904,24 +2992,24 @@
                       "type": "string"
                     },
                     "collectionId": {
-                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`.",
+                      "description": "Optional. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`. This is optional, and when not provided, Firestore will list documents from all collections under the provided `parent`.",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "pageSize": {
-                      "description": "The maximum number of documents to return.",
+                      "description": "Optional. The maximum number of documents to return in a single response. Firestore may return fewer than this value.",
                       "location": "query",
                       "type": "integer",
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "The `next_page_token` value returned from a previous List request, if any.",
+                      "description": "Optional. A page token, received from a previous `ListDocuments` response. Provide this to retrieve the subsequent page. When paginating, all other parameters (with the exception of `page_size`) must match the values set in the request that generated the page token.",
                       "location": "query",
                       "type": "string"
                     },
                     "orderBy": {
-                      "description": "The order to sort results by. For example: `priority desc, name`.",
+                      "description": "Optional. The optional ordering of the documents to return. For example: `priority desc, __name__ desc`. This mirrors the `ORDER BY` used in Firestore queries but in a string representation. When absent, documents are ordered based on `__name__ ASC`.",
                       "location": "query",
                       "type": "string"
                     },
@@ -2932,19 +3020,19 @@
                       "type": "string"
                     },
                     "transaction": {
-                      "description": "Reads documents in a transaction.",
+                      "description": "Perform the read as part of an already active transaction.",
                       "location": "query",
                       "type": "string",
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads documents as they were at the given time. This may not be older than 270 seconds.",
+                      "description": "Perform the read at the provided time. This may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
                     },
                     "showMissing": {
-                      "description": "If the list should show missing documents. A missing document is a document that does not exist but has sub-documents. These documents will be returned with a key but will not have fields, Document.create_time, or Document.update_time set. Requests with `show_missing` may not specify `where` or `order_by`.",
+                      "description": "If the list should show missing documents. A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, `create_time`, or `update_time` set. Requests with `show_missing` may not specify `where` or `order_by`.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -2976,24 +3064,24 @@
                       "type": "string"
                     },
                     "collectionId": {
-                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`.",
+                      "description": "Optional. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`. This is optional, and when not provided, Firestore will list documents from all collections under the provided `parent`.",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "pageSize": {
-                      "description": "The maximum number of documents to return.",
+                      "description": "Optional. The maximum number of documents to return in a single response. Firestore may return fewer than this value.",
                       "location": "query",
                       "type": "integer",
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "The `next_page_token` value returned from a previous List request, if any.",
+                      "description": "Optional. A page token, received from a previous `ListDocuments` response. Provide this to retrieve the subsequent page. When paginating, all other parameters (with the exception of `page_size`) must match the values set in the request that generated the page token.",
                       "location": "query",
                       "type": "string"
                     },
                     "orderBy": {
-                      "description": "The order to sort results by. For example: `priority desc, name`.",
+                      "description": "Optional. The optional ordering of the documents to return. For example: `priority desc, __name__ desc`. This mirrors the `ORDER BY` used in Firestore queries but in a string representation. When absent, documents are ordered based on `__name__ ASC`.",
                       "location": "query",
                       "type": "string"
                     },
@@ -3004,19 +3092,19 @@
                       "type": "string"
                     },
                     "transaction": {
-                      "description": "Reads documents in a transaction.",
+                      "description": "Perform the read as part of an already active transaction.",
                       "location": "query",
                       "type": "string",
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads documents as they were at the given time. This may not be older than 270 seconds.",
+                      "description": "Perform the read at the provided time. This may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
                     },
                     "showMissing": {
-                      "description": "If the list should show missing documents. A missing document is a document that does not exist but has sub-documents. These documents will be returned with a key but will not have fields, Document.create_time, or Document.update_time set. Requests with `show_missing` may not specify `where` or `order_by`.",
+                      "description": "If the list should show missing documents. A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, `create_time`, or `update_time` set. Requests with `show_missing` may not specify `where` or `order_by`.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -3440,7 +3528,7 @@
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/datastore"
                   ],
-                  "description": "Streams batches of document updates and deletes, in order."
+                  "description": "Streams batches of document updates and deletes, in order. This method is only available via the gRPC API (not REST)."
                 },
                 "listen": {
                   "id": "firestore.projects.databases.documents.listen",
@@ -3469,7 +3557,7 @@
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/datastore"
                   ],
-                  "description": "Listens to changes."
+                  "description": "Listens to changes. This method is only available via the gRPC API (not REST)."
                 },
                 "listCollectionIds": {
                   "id": "firestore.projects.databases.documents.listCollectionIds",

@@ -190,6 +190,58 @@
         }
       }
     },
+    "ListLocationsResponse": {
+      "id": "ListLocationsResponse",
+      "description": "The response message for Locations.ListLocations.",
+      "type": "object",
+      "properties": {
+        "locations": {
+          "description": "A list of locations that matches the specified filter in the request.",
+          "type": "array",
+          "items": {
+            "$ref": "Location"
+          }
+        },
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
+        }
+      }
+    },
+    "Location": {
+      "id": "Location",
+      "description": "A resource that represents Google Cloud Platform location.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects\/example-project\/locations\/us-east1\"`",
+          "type": "string"
+        },
+        "locationId": {
+          "description": "The canonical id for this location. For example: `\"us-east1\"`.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\".",
+          "type": "string"
+        },
+        "labels": {
+          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com\/region\": \"us-east1\"}",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "description": "Service-specific metadata. For example the available capacity at the given location.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          }
+        }
+      }
+    },
     "Recognizer": {
       "id": "Recognizer",
       "description": "A Recognizer message. Stores recognition configuration and metadata.",
@@ -210,7 +262,7 @@
           "type": "string"
         },
         "model": {
-          "description": "Required. Which model to use for recognition requests. Select the model best suited to your domain to get best results. Supported models: - `latest_long` Best for long form content like media or conversation. - `latest_short` Best for short form content like commands or single shot directed speech. When using this model, the service will stop transcribing audio after the first utterance is detected and completed. When using this model, SEPARATE_RECOGNITION_PER_CHANNEL is not supported; multi-channel audio is accepted, but only the first channel will be processed and transcribed.",
+          "description": "Required. Which model to use for recognition requests. Select the model best suited to your domain to get best results. Supported models: - `latest_long` Best for long form content like media or conversation. - `latest_short` Best for short form content like commands or single shot directed speech. When using this model, the service will stop transcribing audio after the first utterance is detected and completed. When using this model, SEPARATE_RECOGNITION_PER_CHANNEL is not supported; multi-channel audio is accepted, but only the first channel will be processed and transcribed. - `telephony` Best for audio that originated from a phone call (typically recorded at an 8khz sampling rate). - `medical_conversation` For conversations between a medical provider\u2014for example, a doctor or nurse\u2014and a patient. Use this model when both a provider and a patient are speaking. Words uttered by each speaker are automatically detected and labeled in the returned transcript. For supported features please see [medical models documentation](https:\/\/cloud.google.com\/speech-to-text\/docs\/medical-models). - `medical_dictation` For dictated notes spoken by a single medical provider\u2014for example, a doctor dictating notes about a patient's blood test results. For supported features please see [medical models documentation](https:\/\/cloud.google.com\/speech-to-text\/docs\/medical-models).",
           "type": "string"
         },
         "languageCodes": {
@@ -349,7 +401,7 @@
           "format": "int32"
         },
         "audioChannelCount": {
-          "description": "Number of channels present in the audio data sent for recognition. Supported for the following encodings: * LINEAR16: Headerless 16-bit signed little-endian PCM samples. * MULAW: Headerless 8-bit companded mulaw samples. * ALAW: Headerless 8-bit companded alaw samples.",
+          "description": "Number of channels present in the audio data sent for recognition. Supported for the following encodings: * LINEAR16: Headerless 16-bit signed little-endian PCM samples. * MULAW: Headerless 8-bit companded mulaw samples. * ALAW: Headerless 8-bit companded alaw samples. The maximum allowed value is 8.",
           "type": "integer",
           "format": "int32"
         }
@@ -413,7 +465,7 @@
       "type": "object",
       "properties": {
         "minSpeakerCount": {
-          "description": "Required. Minimum number of speakers in the conversation. This range gives you more flexibility by allowing the system to automatically determine the correct number of speakers. If not set, the default value is 2. To fix the number of speakers detected in the audio, set `min_speaker_count` = `max_speaker_count`.",
+          "description": "Required. Minimum number of speakers in the conversation. This range gives you more flexibility by allowing the system to automatically determine the correct number of speakers. To fix the number of speakers detected in the audio, set `min_speaker_count` = `max_speaker_count`.",
           "type": "integer",
           "format": "int32"
         },
@@ -483,7 +535,7 @@
           }
         },
         "boost": {
-          "description": "Hint Boost. Positive value will increase the probability that a specific phrase will be recognized over other similar sounding phrases. The higher the boost, the higher the chance of false positive recognition as well. Valid `boost` values are between 0 (exclusive) and 20. We recommend using a binary search approach to finding the optimal value for your use case.",
+          "description": "Hint Boost. Positive value will increase the probability that a specific phrase will be recognized over other similar sounding phrases. The higher the boost, the higher the chance of false positive recognition as well. Valid `boost` values are between 0 (exclusive) and 20. We recommend using a binary search approach to finding the optimal value for your use case as well as adding phrases both with and without boost to your requests.",
           "type": "number",
           "format": "float"
         },
@@ -569,7 +621,7 @@
           "type": "string"
         },
         "boost": {
-          "description": "Hint Boost. Overrides the boost set at the phrase set level. Positive value will increase the probability that a specific phrase will be recognized over other similar sounding phrases. The higher the boost, the higher the chance of false positive recognition as well. Negative boost values would correspond to anti-biasing. Anti-biasing is not enabled, so negative boost values will return an error. Boost values must be between 0 and 20. Any values outside that range will return an error. We recommend using a binary search approach to finding the optimal value for your use case. Speech recognition will skip PhraseSets with a boost value of 0.",
+          "description": "Hint Boost. Overrides the boost set at the phrase set level. Positive value will increase the probability that a specific phrase will be recognized over other similar sounding phrases. The higher the boost, the higher the chance of false positive recognition as well. Negative boost values would correspond to anti-biasing. Anti-biasing is not enabled, so negative boost values will return an error. Boost values must be between 0 and 20. Any values outside that range will return an error. We recommend using a binary search approach to finding the optimal value for your use case as well as adding phrases both with and without boost to your requests.",
           "type": "number",
           "format": "float"
         }
@@ -873,7 +925,7 @@
           "format": "google-fieldmask"
         },
         "files": {
-          "description": "Audio files with file metadata for ASR. The maximum number of files allowed to be specified is 1.",
+          "description": "Audio files with file metadata for ASR. The maximum number of files allowed to be specified is 5.",
           "type": "array",
           "items": {
             "$ref": "BatchRecognizeFileMetadata"
@@ -1106,10 +1158,6 @@
           "description": "The UndeletePhraseSetRequest that spawned the Operation.",
           "$ref": "UndeletePhraseSetRequest"
         },
-        "updateConfigRequest": {
-          "description": "The UpdateConfigRequest that spawned the Operation.",
-          "$ref": "UpdateConfigRequest"
-        },
         "progressPercent": {
           "description": "The percent progress of the Operation. Values can range from 0-100. If the value is 100, then the operation is finished.",
           "type": "integer",
@@ -1319,22 +1367,6 @@
         }
       }
     },
-    "UpdateConfigRequest": {
-      "id": "UpdateConfigRequest",
-      "description": "Request message for the UpdateConfig method.",
-      "type": "object",
-      "properties": {
-        "config": {
-          "description": "Required. The config to update. The config's `name` field is used to identify the config to be updated. The expected format is `projects\/{project}\/locations\/{location}\/config`.",
-          "$ref": "Config"
-        },
-        "updateMask": {
-          "description": "The list of fields to be updated.",
-          "type": "string",
-          "format": "google-fieldmask"
-        }
-      }
-    },
     "BatchRecognizeMetadata": {
       "id": "BatchRecognizeMetadata",
       "description": "Operation metadata for BatchRecognize.",
@@ -1418,6 +1450,11 @@
           "additionalProperties": {
             "$ref": "BatchRecognizeFileResult"
           }
+        },
+        "totalBilledDuration": {
+          "description": "When available, billed audio seconds for the corresponding request.",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -1433,6 +1470,9 @@
         "error": {
           "description": "Error if one was encountered.",
           "$ref": "Status"
+        },
+        "metadata": {
+          "$ref": "RecognitionResponseMetadata"
         }
       }
     }
@@ -1442,64 +1482,71 @@
       "resources": {
         "locations": {
           "methods": {
-            "getConfig": {
-              "id": "speech.projects.locations.getConfig",
-              "path": "v2/{+name}",
-              "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/config",
+            "list": {
+              "id": "speech.projects.locations.list",
+              "path": "v2/{+name}/locations",
+              "flatPath": "v2/projects/{projectsId}/locations",
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Required. The name of the config to retrieve. There is exactly one config resource per project per location. The expected format is `projects\/{project}\/locations\/{location}\/config`.",
-                  "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/config$",
-                  "location": "path",
-                  "required": true,
-                  "type": "string"
-                }
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "response": {
-                "$ref": "Config"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "description": "Returns the requested Config."
-            },
-            "updateConfig": {
-              "id": "speech.projects.locations.updateConfig",
-              "path": "v2/{+name}",
-              "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/config",
-              "httpMethod": "PATCH",
-              "parameters": {
-                "name": {
-                  "description": "Output only. The name of the config resource. There is exactly one config resource per project per location. The expected format is `projects\/{project}\/locations\/{location}\/config`.",
-                  "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/config$",
+                  "description": "The resource that owns the locations collection, if applicable.",
+                  "pattern": "^projects\/[^\/]+$",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
-                "updateMask": {
-                  "description": "The list of fields to be updated.",
+                "filter": {
+                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https:\/\/google.aip.dev\/160).",
                   "location": "query",
-                  "type": "string",
-                  "format": "google-fieldmask"
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pageToken": {
+                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
+                  "location": "query",
+                  "type": "string"
                 }
               },
               "parameterOrder": [
                 "name"
               ],
-              "request": {
-                "$ref": "Config"
-              },
               "response": {
-                "$ref": "Config"
+                "$ref": "ListLocationsResponse"
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Updates the Config."
+              "description": "Lists information about the supported locations for this service."
+            },
+            "get": {
+              "id": "speech.projects.locations.get",
+              "path": "v2/{+name}",
+              "flatPath": "v2/projects/{projectsId}/locations/{locationsId}",
+              "httpMethod": "GET",
+              "parameters": {
+                "name": {
+                  "description": "Resource name for the location.",
+                  "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "Location"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Gets information about a location."
             }
           }
           ,
@@ -1842,6 +1889,69 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Performs batch asynchronous speech recognition: send a request with N audio files and receive a long running operation that can be polled to see when the transcriptions are finished."
+                }
+              }
+            },
+            "config": {
+              "methods": {
+                "get": {
+                  "id": "speech.projects.locations.config.get",
+                  "path": "v2/{+name}",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/config",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The name of the config to retrieve. There is exactly one config resource per project per location. The expected format is `projects\/{project}\/locations\/{location}\/config`.",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/config$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Config"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Returns the requested Config."
+                },
+                "update": {
+                  "id": "speech.projects.locations.config.update",
+                  "path": "v2/{+name}",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/config",
+                  "httpMethod": "PATCH",
+                  "parameters": {
+                    "name": {
+                      "description": "Output only. The name of the config resource. There is exactly one config resource per project per location. The expected format is `projects\/{project}\/locations\/{location}\/config`.",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/config$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "updateMask": {
+                      "description": "The list of fields to be updated.",
+                      "location": "query",
+                      "type": "string",
+                      "format": "google-fieldmask"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "Config"
+                  },
+                  "response": {
+                    "$ref": "Config"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Updates the Config."
                 }
               }
             },

@@ -124,6 +124,7 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
       TPU_V3: TPU v3.
       TPU_V2_POD: TPU v2 POD.
       TPU_V3_POD: TPU v3 POD.
+      TPU_V4_POD: TPU v4 POD.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
@@ -136,6 +137,7 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
     TPU_V3 = 8
     TPU_V2_POD = 9
     TPU_V3_POD = 10
+    TPU_V4_POD = 11
 
   count = _messages.IntegerField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -305,6 +307,7 @@ class GoogleCloudMlV1Capability(_messages.Message):
       TPU_V3: TPU v3.
       TPU_V2_POD: TPU v2 POD.
       TPU_V3_POD: TPU v3 POD.
+      TPU_V4_POD: TPU v4 POD.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
@@ -317,6 +320,7 @@ class GoogleCloudMlV1Capability(_messages.Message):
     TPU_V3 = 8
     TPU_V2_POD = 9
     TPU_V3_POD = 10
+    TPU_V4_POD = 11
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""TypeValueValuesEnum enum type.
@@ -3466,7 +3470,9 @@ class GoogleIamV1Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -3483,9 +3489,7 @@ class GoogleIamV1Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """

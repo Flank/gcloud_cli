@@ -43,6 +43,8 @@ class Create(base.CreateCommand):
   # pylint: disable=line-too-long
   r"""Create a new root certificate authority.
 
+  TIP: Consider setting a [project lien](https://cloud.google.com/resource-manager/docs/project-liens) on the project to prevent it from accidental deletion.
+
   ## EXAMPLES
 
   To create a root CA that supports one layer of subordinates:
@@ -173,8 +175,10 @@ class Create(base.CreateCommand):
       bucket_ref = storage.ValidateBucketForCertificateAuthority(args.bucket)
       new_ca.gcsBucket = bucket_ref.bucket
 
-    p4sa_email = p4sa.GetOrCreate(project_ref)
-    p4sa.AddResourceRoleBindings(p4sa_email, kms_key_ref, bucket_ref)
+    # P4SA is needed only if user specifies any resource.
+    if bucket_ref or kms_key_ref:
+      p4sa.AddResourceRoleBindings(
+          p4sa.GetOrCreate(project_ref), kms_key_ref, bucket_ref)
 
     operation = self.client.projects_locations_caPools_certificateAuthorities.Create(
         self.messages
@@ -189,6 +193,13 @@ class Create(base.CreateCommand):
                                            self.messages.CertificateAuthority)
 
     log.status.Print('Created Certificate Authority [{}].'.format(ca.name))
+    log.status.Print(
+        'TIP: To avoid accidental deletion, '
+        'please consider adding a project lien on this project. To find out '
+        'more, see the following doc: '
+        'https://cloud.google.com/resource-manager/docs/project-liens.'
+    )
+
     if self._ShouldEnableCa(args, ca_ref):
       self._EnableCertificateAuthority(ca_ref.RelativeName())
 

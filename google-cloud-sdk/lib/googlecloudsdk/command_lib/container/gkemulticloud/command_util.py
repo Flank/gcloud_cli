@@ -71,6 +71,15 @@ def NodePoolMessage(name, action=None, cluster=None, kind=None, region=None):
   return msg
 
 
+def ClientMessage(name, action=None, region=None):
+  msg = 'client [{name}]'.format(name=name)
+  if action:
+    msg = '{action} '.format(action=action) + msg
+  if region:
+    msg += ' in [{region}]'.format(region=region)
+  return msg
+
+
 def Create(resource_ref=None,
            resource_client=None,
            args=None,
@@ -133,6 +142,8 @@ def _DeletePrompt(kind, items):
     title = title.format('clusters')
   elif kind == constants.AWS_NODEPOOL_KIND or kind == constants.AZURE_NODEPOOL_KIND:
     title = title.format('node pool')
+  elif kind == constants.AZURE_CLIENT_KIND:
+    title = title.format('client')
   console_io.PromptContinue(
       message=gke_util.ConstructList(title, items),
       throw_if_unattended=True,
@@ -160,12 +171,45 @@ def Delete(resource_ref=None,
   if not validate_only:
     _DeletePrompt(kind, [message])
   async_ = getattr(args, 'async_', False)
-  op = resource_client.Delete(resource_ref, validate_only=validate_only)
+  allow_missing = getattr(args, 'allow_missing', False)
+  ignore_errors = getattr(args, 'ignore_errors', False)
+  op = resource_client.Delete(resource_ref, validate_only=validate_only,
+                              allow_missing=allow_missing,
+                              ignore_errors=ignore_errors)
   if validate_only:
     args.format = 'disable'
     return
   _LogAndWaitForOperation(op, async_, 'Deleting ' + message)
   log.DeletedResource(resource_ref, kind=kind, is_async=async_)
+
+
+def CancelOperationMessage(name, kind):
+  """Message to display after cancelling an LRO operation.
+
+  Args:
+    name: str, name of the operation.
+    kind: str, the kind of LRO operation e.g. AWS or Azure.
+
+  Returns:
+    The operation cancellation message.
+  """
+  msg = ('Cancelation of operation {0} has been requested. '
+         'Please use gcloud container {1} operations describe {2} to '
+         'check if the operation has been cancelled successfully.')
+  return msg.format(name, kind, name)
+
+
+def CancelOperationPrompt(op_name):
+  """Prompt the user before cancelling an LRO operation.
+
+  Args:
+    op_name: str, name of the operation.
+  """
+  message = 'The operation {0} will be cancelled.'
+  console_io.PromptContinue(
+      message=message.format(op_name),
+      throw_if_unattended=True,
+      cancel_on_no=True)
 
 
 def Import(location_ref=None,
@@ -198,4 +242,4 @@ def Import(location_ref=None,
   async_ = getattr(args, 'async_', False)
   _LogAndWaitForOperation(op, async_, message)
   op_target = _GetOperationTarget(op)
-  log.CreatedResource(op_target, kind=kind, is_async=async_)
+  log.ImportResource(op_target, kind=kind, is_async=async_)

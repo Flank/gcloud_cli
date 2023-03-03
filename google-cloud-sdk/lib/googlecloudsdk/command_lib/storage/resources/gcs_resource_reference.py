@@ -66,6 +66,9 @@ class GcsBucketResource(resource_reference.BucketResource):
   """API-specific subclass for handling metadata.
 
   Additional GCS Attributes:
+    autoclass_enabled_time (datetime|None): Datetime autoclass feature was
+      enabled on bucket. None means the feature is disabled.
+    custom_placement_config (dict|None): Dual Region of a bucket.
     default_acl (dict|None): Default object ACLs for the bucket.
     default_kms_key (str|None): Default KMS key for objects in the bucket.
     location_type (str|None): Region, dual-region, etc.
@@ -81,8 +84,10 @@ class GcsBucketResource(resource_reference.BucketResource):
   def __init__(self,
                storage_url_object,
                acl=None,
+               autoclass_enabled_time=None,
                cors_config=None,
                creation_time=None,
+               custom_placement_config=None,
                default_acl=None,
                default_event_based_hold=None,
                default_kms_key=None,
@@ -126,6 +131,8 @@ class GcsBucketResource(resource_reference.BucketResource):
         versioning_enabled=versioning_enabled,
         website_config=website_config,
     )
+    self.autoclass_enabled_time = autoclass_enabled_time
+    self.custom_placement_config = custom_placement_config
     self.default_acl = default_acl
     self.default_kms_key = default_kms_key
     self.location_type = location_type
@@ -136,10 +143,21 @@ class GcsBucketResource(resource_reference.BucketResource):
     self.uniform_bucket_level_access = uniform_bucket_level_access
 
   @property
+  def data_locations(self):
+    if self.custom_placement_config:
+      return self.custom_placement_config.get('dataLocations')
+    return None
+
+  @property
   def retention_period(self):
     if self.retention_policy and self.retention_policy.get('retentionPeriod'):
       return int(self.retention_policy['retentionPeriod'])
     return None
+
+  @property
+  def retention_policy_is_locked(self):
+    return (self.retention_policy and
+            self.retention_policy.get('isLocked', False))
 
   def get_displayable_bucket_data(self):
     """Returns the DisplaybleBucketData instance."""
@@ -185,19 +203,41 @@ class GcsBucketResource(resource_reference.BucketResource):
         website_config=_message_to_dict(self.metadata.website))
 
   def __eq__(self, other):
-    return (super(GcsBucketResource, self).__eq__(other) and
-            self.default_acl == other.default_acl and
-            self.default_kms_key == other.default_kms_key and
-            self.location_type == other.location_type and
-            self.project_number == other.project_number and
-            self.public_access_prevention == other.public_access_prevention and
-            self.rpo == other.rpo and
-            self.satisfies_pzs == other.satisfies_pzs and
-            self.uniform_bucket_level_access
-            == other.uniform_bucket_level_access)
+    return (
+        super(GcsBucketResource, self).__eq__(other) and
+        self.autoclass_enabled_time == other.autoclass_enabled_time and
+        self.custom_placement_config == other.custom_placement_config and
+        self.default_acl == other.default_acl and
+        self.default_kms_key == other.default_kms_key and
+        self.location_type == other.location_type and
+        self.project_number == other.project_number and
+        self.public_access_prevention == other.public_access_prevention and
+        self.rpo == other.rpo and self.satisfies_pzs == other.satisfies_pzs and
+        self.uniform_bucket_level_access == other.uniform_bucket_level_access)
 
   def get_json_dump(self):
     return _get_json_dump(self)
+
+
+class GcsHmacKeyResource:
+  """Holds HMAC key metadata."""
+
+  def __init__(self, metadata):
+    self.metadata = metadata
+
+  @property
+  def access_id(self):
+    key_metadata = getattr(self.metadata, 'metadata', None)
+    return getattr(key_metadata, 'accessId', None)
+
+  @property
+  def secret(self):
+    return getattr(self.metadata, 'secret', None)
+
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return NotImplemented
+    return self.metadata == other.metadata
 
 
 class GcsObjectResource(resource_reference.ObjectResource):
@@ -218,9 +258,9 @@ class GcsObjectResource(resource_reference.ObjectResource):
                content_type=None,
                crc32c_hash=None,
                creation_time=None,
-               custom_metadata=None,
+               custom_fields=None,
                custom_time=None,
-               decryption_key_hash=None,
+               decryption_key_hash_sha256=None,
                encryption_algorithm=None,
                etag=None,
                event_based_hold=None,
@@ -247,9 +287,9 @@ class GcsObjectResource(resource_reference.ObjectResource):
         content_type,
         crc32c_hash,
         creation_time,
-        custom_metadata,
+        custom_fields,
         custom_time,
-        decryption_key_hash,
+        decryption_key_hash_sha256,
         encryption_algorithm,
         etag,
         event_based_hold,
@@ -316,4 +356,4 @@ class GcsObjectResource(resource_reference.ObjectResource):
 
   def is_encrypted(self):
     cmek_in_metadata = self.metadata.kmsKeyName if self.metadata else False
-    return cmek_in_metadata or self.decryption_key_hash
+    return cmek_in_metadata or self.decryption_key_hash_sha256

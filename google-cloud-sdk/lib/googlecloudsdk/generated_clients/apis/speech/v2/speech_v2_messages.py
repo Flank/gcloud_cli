@@ -71,11 +71,13 @@ class BatchRecognizeFileResult(_messages.Message):
 
   Fields:
     error: Error if one was encountered.
+    metadata: A RecognitionResponseMetadata attribute.
     uri: The Cloud Storage URI to which recognition results were written.
   """
 
   error = _messages.MessageField('Status', 1)
-  uri = _messages.StringField(2)
+  metadata = _messages.MessageField('RecognitionResponseMetadata', 2)
+  uri = _messages.StringField(3)
 
 
 class BatchRecognizeMetadata(_messages.Message):
@@ -137,7 +139,7 @@ class BatchRecognizeRequest(_messages.Message):
       provided, config completely overrides and replaces the config in the
       recognizer for this recognition request.
     files: Audio files with file metadata for ASR. The maximum number of files
-      allowed to be specified is 1.
+      allowed to be specified is 5.
     recognitionOutputConfig: Configuration options for where to output the
       transcripts of each file.
     recognizer: Required. Resource name of the recognizer to be used for ASR.
@@ -159,6 +161,8 @@ class BatchRecognizeResponse(_messages.Message):
 
   Fields:
     results: Map from filename to the final result for that file.
+    totalBilledDuration: When available, billed audio seconds for the
+      corresponding request.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -186,6 +190,7 @@ class BatchRecognizeResponse(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   results = _messages.MessageField('ResultsValue', 1)
+  totalBilledDuration = _messages.StringField(2)
 
 
 class BatchRecognizeTranscriptionMetadata(_messages.Message):
@@ -477,7 +482,7 @@ class ExplicitDecodingConfig(_messages.Message):
       recognition. Supported for the following encodings: * LINEAR16:
       Headerless 16-bit signed little-endian PCM samples. * MULAW: Headerless
       8-bit companded mulaw samples. * ALAW: Headerless 8-bit companded alaw
-      samples.
+      samples. The maximum allowed value is 8.
     encoding: Required. Encoding of the audio data sent for recognition.
     sampleRateHertz: Sample rate in Hertz of the audio data sent for
       recognition. Valid values are: 8000-48000. 16000 is optimal. For best
@@ -533,6 +538,19 @@ class ListCustomClassesResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
+class ListLocationsResponse(_messages.Message):
+  r"""The response message for Locations.ListLocations.
+
+  Fields:
+    locations: A list of locations that matches the specified filter in the
+      request.
+    nextPageToken: The standard List next-page token.
+  """
+
+  locations = _messages.MessageField('Location', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListOperationsResponse(_messages.Message):
   r"""The response message for Operations.ListOperations.
 
@@ -572,6 +590,86 @@ class ListRecognizersResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   recognizers = _messages.MessageField('Recognizer', 2, repeated=True)
+
+
+class Location(_messages.Message):
+  r"""A resource that represents Google Cloud Platform location.
+
+  Messages:
+    LabelsValue: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    MetadataValue: Service-specific metadata. For example the available
+      capacity at the given location.
+
+  Fields:
+    displayName: The friendly name for this location, typically a nearby city
+      name. For example, "Tokyo".
+    labels: Cross-service attributes for the location. For example
+      {"cloud.googleapis.com/region": "us-east1"}
+    locationId: The canonical id for this location. For example: `"us-east1"`.
+    metadata: Service-specific metadata. For example the available capacity at
+      the given location.
+    name: Resource name for the location, which may vary between
+      implementations. For example: `"projects/example-project/locations/us-
+      east1"`
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Cross-service attributes for the location. For example
+    {"cloud.googleapis.com/region": "us-east1"}
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class MetadataValue(_messages.Message):
+    r"""Service-specific metadata. For example the available capacity at the
+    given location.
+
+    Messages:
+      AdditionalProperty: An additional property for a MetadataValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a MetadataValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  displayName = _messages.StringField(1)
+  labels = _messages.MessageField('LabelsValue', 2)
+  locationId = _messages.StringField(3)
+  metadata = _messages.MessageField('MetadataValue', 4)
+  name = _messages.StringField(5)
 
 
 class Operation(_messages.Message):
@@ -721,7 +819,6 @@ class OperationMetadata(_messages.Message):
       Operation.
     undeleteRecognizerRequest: The UndeleteRecognizerRequest that spawned the
       Operation.
-    updateConfigRequest: The UpdateConfigRequest that spawned the Operation.
     updateCustomClassRequest: The UpdateCustomClassRequest that spawned the
       Operation.
     updatePhraseSetRequest: The UpdatePhraseSetRequest that spawned the
@@ -748,11 +845,10 @@ class OperationMetadata(_messages.Message):
   undeleteCustomClassRequest = _messages.MessageField('UndeleteCustomClassRequest', 15)
   undeletePhraseSetRequest = _messages.MessageField('UndeletePhraseSetRequest', 16)
   undeleteRecognizerRequest = _messages.MessageField('UndeleteRecognizerRequest', 17)
-  updateConfigRequest = _messages.MessageField('UpdateConfigRequest', 18)
-  updateCustomClassRequest = _messages.MessageField('UpdateCustomClassRequest', 19)
-  updatePhraseSetRequest = _messages.MessageField('UpdatePhraseSetRequest', 20)
-  updateRecognizerRequest = _messages.MessageField('UpdateRecognizerRequest', 21)
-  updateTime = _messages.StringField(22)
+  updateCustomClassRequest = _messages.MessageField('UpdateCustomClassRequest', 18)
+  updatePhraseSetRequest = _messages.MessageField('UpdatePhraseSetRequest', 19)
+  updateRecognizerRequest = _messages.MessageField('UpdateRecognizerRequest', 20)
+  updateTime = _messages.StringField(21)
 
 
 class Phrase(_messages.Message):
@@ -773,8 +869,8 @@ class Phrase(_messages.Message):
       enabled, so negative boost values will return an error. Boost values
       must be between 0 and 20. Any values outside that range will return an
       error. We recommend using a binary search approach to finding the
-      optimal value for your use case. Speech recognition will skip PhraseSets
-      with a boost value of 0.
+      optimal value for your use case as well as adding phrases both with and
+      without boost to your requests.
     value: The phrase itself.
   """
 
@@ -804,7 +900,8 @@ class PhraseSet(_messages.Message):
       The higher the boost, the higher the chance of false positive
       recognition as well. Valid `boost` values are between 0 (exclusive) and
       20. We recommend using a binary search approach to finding the optimal
-      value for your use case.
+      value for your use case as well as adding phrases both with and without
+      boost to your requests.
     createTime: Output only. Creation time.
     deleteTime: Output only. The time at which this resource was requested for
       deletion.
@@ -1104,7 +1201,19 @@ class Recognizer(_messages.Message):
       transcribing audio after the first utterance is detected and completed.
       When using this model, SEPARATE_RECOGNITION_PER_CHANNEL is not
       supported; multi-channel audio is accepted, but only the first channel
-      will be processed and transcribed.
+      will be processed and transcribed. - `telephony` Best for audio that
+      originated from a phone call (typically recorded at an 8khz sampling
+      rate). - `medical_conversation` For conversations between a medical
+      provider-for example, a doctor or nurse-and a patient. Use this model
+      when both a provider and a patient are speaking. Words uttered by each
+      speaker are automatically detected and labeled in the returned
+      transcript. For supported features please see [medical models
+      documentation](https://cloud.google.com/speech-to-text/docs/medical-
+      models). - `medical_dictation` For dictated notes spoken by a single
+      medical provider-for example, a doctor dictating notes about a patient's
+      blood test results. For supported features please see [medical models
+      documentation](https://cloud.google.com/speech-to-text/docs/medical-
+      models).
     name: Output only. The resource name of the Recognizer. Format:
       `projects/{project}/locations/{location}/recognizers/{recognizer}`.
     reconciling: Output only. Whether or not this Recognizer is in the process
@@ -1182,9 +1291,9 @@ class SpeakerDiarizationConfig(_messages.Message):
       the correct number of speakers.
     minSpeakerCount: Required. Minimum number of speakers in the conversation.
       This range gives you more flexibility by allowing the system to
-      automatically determine the correct number of speakers. If not set, the
-      default value is 2. To fix the number of speakers detected in the audio,
-      set `min_speaker_count` = `max_speaker_count`.
+      automatically determine the correct number of speakers. To fix the
+      number of speakers detected in the audio, set `min_speaker_count` =
+      `max_speaker_count`.
   """
 
   maxSpeakerCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1204,6 +1313,34 @@ class SpeechAdaptation(_messages.Message):
 
   customClasses = _messages.MessageField('CustomClass', 1, repeated=True)
   phraseSets = _messages.MessageField('AdaptationPhraseSet', 2, repeated=True)
+
+
+class SpeechProjectsLocationsConfigGetRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsConfigGetRequest object.
+
+  Fields:
+    name: Required. The name of the config to retrieve. There is exactly one
+      config resource per project per location. The expected format is
+      `projects/{project}/locations/{location}/config`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsConfigUpdateRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsConfigUpdateRequest object.
+
+  Fields:
+    config: A Config resource to be passed as the request body.
+    name: Output only. The name of the config resource. There is exactly one
+      config resource per project per location. The expected format is
+      `projects/{project}/locations/{location}/config`.
+    updateMask: The list of fields to be updated.
+  """
+
+  config = _messages.MessageField('Config', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class SpeechProjectsLocationsCustomClassesCreateRequest(_messages.Message):
@@ -1304,16 +1441,34 @@ class SpeechProjectsLocationsCustomClassesPatchRequest(_messages.Message):
   validateOnly = _messages.BooleanField(4)
 
 
-class SpeechProjectsLocationsGetConfigRequest(_messages.Message):
-  r"""A SpeechProjectsLocationsGetConfigRequest object.
+class SpeechProjectsLocationsGetRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsGetRequest object.
 
   Fields:
-    name: Required. The name of the config to retrieve. There is exactly one
-      config resource per project per location. The expected format is
-      `projects/{project}/locations/{location}/config`.
+    name: Resource name for the location.
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsListRequest object.
+
+  Fields:
+    filter: A filter to narrow down results to a preferred subset. The
+      filtering language accepts strings like `"displayName=tokyo"`, and is
+      documented in more detail in [AIP-160](https://google.aip.dev/160).
+    name: The resource that owns the locations collection, if applicable.
+    pageSize: The maximum number of results to return. If not set, the service
+      selects a default.
+    pageToken: A page token received from the `next_page_token` field in the
+      response. Send that page token to receive the subsequent page.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
 
 
 class SpeechProjectsLocationsOperationsGetRequest(_messages.Message):
@@ -1548,22 +1703,6 @@ class SpeechProjectsLocationsRecognizersRecognizeRequest(_messages.Message):
 
   recognizeRequest = _messages.MessageField('RecognizeRequest', 1)
   recognizer = _messages.StringField(2, required=True)
-
-
-class SpeechProjectsLocationsUpdateConfigRequest(_messages.Message):
-  r"""A SpeechProjectsLocationsUpdateConfigRequest object.
-
-  Fields:
-    config: A Config resource to be passed as the request body.
-    name: Output only. The name of the config resource. There is exactly one
-      config resource per project per location. The expected format is
-      `projects/{project}/locations/{location}/config`.
-    updateMask: The list of fields to be updated.
-  """
-
-  config = _messages.MessageField('Config', 1)
-  name = _messages.StringField(2, required=True)
-  updateMask = _messages.StringField(3)
 
 
 class SpeechRecognitionAlternative(_messages.Message):
@@ -1817,20 +1956,6 @@ class UndeleteRecognizerRequest(_messages.Message):
   etag = _messages.StringField(1)
   name = _messages.StringField(2)
   validateOnly = _messages.BooleanField(3)
-
-
-class UpdateConfigRequest(_messages.Message):
-  r"""Request message for the UpdateConfig method.
-
-  Fields:
-    config: Required. The config to update. The config's `name` field is used
-      to identify the config to be updated. The expected format is
-      `projects/{project}/locations/{location}/config`.
-    updateMask: The list of fields to be updated.
-  """
-
-  config = _messages.MessageField('Config', 1)
-  updateMask = _messages.StringField(2)
 
 
 class UpdateCustomClassRequest(_messages.Message):

@@ -1,5 +1,6 @@
-- release_tracks: [ALPHA]
-  hidden: true
+- release_tracks: [ALPHA, BETA, GA]
+  GA:
+    hidden: true
   help_text:
     brief: List fleet scopes.
     description: List scopes in a fleet.
@@ -9,11 +10,15 @@
         $ {command}
 
   request:
-    collection: gkehub.projects.locations.workspaces
+    collection: gkehub.projects.locations.scopes
     modify_request_hooks:
-    - googlecloudsdk.command_lib.container.fleet.workspaces.util:SetParentCollection
+    - googlecloudsdk.command_lib.container.fleet.scopes.util:SetParentCollection
     ALPHA:
       api_version: v1alpha
+    BETA:
+      api_version: v1beta
+    GA:
+      api_version: v1
 
   arguments:
     resource:

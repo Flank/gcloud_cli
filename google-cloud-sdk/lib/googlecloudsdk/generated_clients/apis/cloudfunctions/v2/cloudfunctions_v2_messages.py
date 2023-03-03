@@ -95,12 +95,22 @@ class Binding(_messages.Message):
       special identifier that represents anyone who is on the internet; with
       or without a Google account. * `allAuthenticatedUsers`: A special
       identifier that represents anyone who is authenticated with a Google
-      account or a service account. * `user:{emailid}`: An email address that
-      represents a specific Google account. For example, `alice@example.com` .
-      * `serviceAccount:{emailid}`: An email address that represents a service
-      account. For example, `my-other-app@appspot.gserviceaccount.com`. *
+      account or a service account. Does not include identities that come from
+      external identity providers (IdPs) through identity federation. *
+      `user:{emailid}`: An email address that represents a specific Google
+      account. For example, `alice@example.com` . *
+      `serviceAccount:{emailid}`: An email address that represents a Google
+      service account. For example, `my-other-
+      app@appspot.gserviceaccount.com`. *
+      `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`:
+      An identifier for a [Kubernetes service
+      account](https://cloud.google.com/kubernetes-engine/docs/how-
+      to/kubernetes-service-accounts). For example, `my-
+      project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -117,9 +127,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -133,6 +141,15 @@ class BuildConfig(_messages.Message):
   r"""Describes the Build step of the function that builds a container from
   the given source.
 
+  Enums:
+    DockerRegistryValueValuesEnum: Optional. Docker Registry to use for this
+      deployment. This configuration is only applicable to 1st Gen functions,
+      2nd Gen functions can only use Artifact Registry. If `docker_repository`
+      field is specified, this field will be automatically set as
+      `ARTIFACT_REGISTRY`. If unspecified, it currently defaults to
+      `CONTAINER_REGISTRY`. This field may be overridden by the backend for
+      eligible deployments.
+
   Messages:
     EnvironmentVariablesValue: User-provided build-time environment variables
       for the function
@@ -140,8 +157,15 @@ class BuildConfig(_messages.Message):
   Fields:
     build: Output only. The Cloud Build name of the latest successful
       deployment of the function.
-    dockerRepository: Optional. User managed repository created in Artifact
-      Registry optionally with a customer managed encryption key. This is the
+    buildpackStack: Specifies one of the Google provided buildpack stacks.
+    dockerRegistry: Optional. Docker Registry to use for this deployment. This
+      configuration is only applicable to 1st Gen functions, 2nd Gen functions
+      can only use Artifact Registry. If `docker_repository` field is
+      specified, this field will be automatically set as `ARTIFACT_REGISTRY`.
+      If unspecified, it currently defaults to `CONTAINER_REGISTRY`. This
+      field may be overridden by the backend for eligible deployments.
+    dockerRepository: User managed repository created in Artifact Registry
+      optionally with a customer managed encryption key. This is the
       repository to which the function docker image will be pushed after it is
       built by Cloud Build. If unspecified, GCF will create and use a
       repository named 'gcf-artifacts' for every deployed region. It must
@@ -160,8 +184,8 @@ class BuildConfig(_messages.Message):
     runtime: The runtime in which to run the function. Required when deploying
       a new function, optional when updating an existing function. For a
       complete list of possible choices, see the [`gcloud` command reference](
-      https://cloud.google.com/sdk/gcloud/reference/functions/deploy#--runtime
-      ).
+      https://cloud.google.com/sdk/gcloud/reference/functions/deploy#--
+      runtime).
     source: The location of the function source code.
     sourceProvenance: Output only. A permanent fixed identifier for source.
     workerPool: Name of the Cloud Build Custom Worker Pool that should be used
@@ -175,6 +199,28 @@ class BuildConfig(_messages.Message):
       Custom Workers Builder (roles/cloudbuild.customworkers.builder) in the
       project.
   """
+
+  class DockerRegistryValueValuesEnum(_messages.Enum):
+    r"""Optional. Docker Registry to use for this deployment. This
+    configuration is only applicable to 1st Gen functions, 2nd Gen functions
+    can only use Artifact Registry. If `docker_repository` field is specified,
+    this field will be automatically set as `ARTIFACT_REGISTRY`. If
+    unspecified, it currently defaults to `CONTAINER_REGISTRY`. This field may
+    be overridden by the backend for eligible deployments.
+
+    Values:
+      DOCKER_REGISTRY_UNSPECIFIED: Unspecified.
+      CONTAINER_REGISTRY: Docker images will be stored in multi-regional
+        Container Registry repositories named `gcf`.
+      ARTIFACT_REGISTRY: Docker images will be stored in regional Artifact
+        Registry repositories. By default, GCF will create and use
+        repositories named `gcf-artifacts` in every region in which a function
+        is deployed. But the repository to use can also be specified by the
+        user using the `docker_repository` field.
+    """
+    DOCKER_REGISTRY_UNSPECIFIED = 0
+    CONTAINER_REGISTRY = 1
+    ARTIFACT_REGISTRY = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class EnvironmentVariablesValue(_messages.Message):
@@ -203,13 +249,15 @@ class BuildConfig(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   build = _messages.StringField(1)
-  dockerRepository = _messages.StringField(2)
-  entryPoint = _messages.StringField(3)
-  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 4)
-  runtime = _messages.StringField(5)
-  source = _messages.MessageField('Source', 6)
-  sourceProvenance = _messages.MessageField('SourceProvenance', 7)
-  workerPool = _messages.StringField(8)
+  buildpackStack = _messages.StringField(2)
+  dockerRegistry = _messages.EnumField('DockerRegistryValueValuesEnum', 3)
+  dockerRepository = _messages.StringField(4)
+  entryPoint = _messages.StringField(5)
+  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 6)
+  runtime = _messages.StringField(7)
+  source = _messages.MessageField('Source', 8)
+  sourceProvenance = _messages.MessageField('SourceProvenance', 9)
+  workerPool = _messages.StringField(10)
 
 
 class CloudfunctionsProjectsLocationsFunctionsCreateRequest(_messages.Message):
@@ -315,7 +363,10 @@ class CloudfunctionsProjectsLocationsFunctionsListRequest(_messages.Message):
     orderBy: The sorting order of the resources returned. Value should be a
       comma separated list of fields. The default sorting oder is ascending.
       See https://google.aip.dev/132#ordering.
-    pageSize: Maximum number of functions to return per call.
+    pageSize: Maximum number of functions to return per call. The largest
+      allowed page_size is 1,000, if the page_size is omitted or specified as
+      greater than 1,000 then it will be replaced as 1,000. The size of the
+      list response can be less than specified when used with filters.
     pageToken: The value returned by the last `ListFunctionsResponse`;
       indicates that this is a continuation of a prior `ListFunctions` call,
       and that the system should return the next page of data.
@@ -570,7 +621,8 @@ class Function(_messages.Message):
   response to an event. It encapsulates function and trigger configurations.
 
   Enums:
-    EnvironmentValueValuesEnum: Describe whether the function is gen1 or gen2.
+    EnvironmentValueValuesEnum: Describe whether the function is 1st Gen or
+      2nd Gen.
     StateValueValuesEnum: Output only. State of the function.
 
   Messages:
@@ -579,10 +631,17 @@ class Function(_messages.Message):
   Fields:
     buildConfig: Describes the Build step of the function that builds a
       container from the given source.
+    buildpackStack: Specifies a Google provided Buildpack Stack -- pair of
+      base images (for building and runtime) that include a curated set of
+      pre-installed packages.
     description: User-provided description of a function.
-    environment: Describe whether the function is gen1 or gen2.
+    environment: Describe whether the function is 1st Gen or 2nd Gen.
     eventTrigger: An Eventarc trigger managed by Google Cloud Functions that
       fires events in response to a condition in another service.
+    kmsKeyName: Resource name of a KMS crypto key (managed by the user) used
+      to encrypt/decrypt function resources. It must match the pattern `projec
+      ts/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto
+      _key}`.
     labels: Labels associated with this Cloud Function.
     name: A user-defined name of the function. Function names must be unique
       globally and match pattern `projects/*/locations/*/functions/*`
@@ -594,7 +653,7 @@ class Function(_messages.Message):
   """
 
   class EnvironmentValueValuesEnum(_messages.Enum):
-    r"""Describe whether the function is gen1 or gen2.
+    r"""Describe whether the function is 1st Gen or 2nd Gen.
 
     Values:
       ENVIRONMENT_UNSPECIFIED: Unspecified
@@ -650,15 +709,17 @@ class Function(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   buildConfig = _messages.MessageField('BuildConfig', 1)
-  description = _messages.StringField(2)
-  environment = _messages.EnumField('EnvironmentValueValuesEnum', 3)
-  eventTrigger = _messages.MessageField('EventTrigger', 4)
-  labels = _messages.MessageField('LabelsValue', 5)
-  name = _messages.StringField(6)
-  serviceConfig = _messages.MessageField('ServiceConfig', 7)
-  state = _messages.EnumField('StateValueValuesEnum', 8)
-  stateMessages = _messages.MessageField('GoogleCloudFunctionsV2StateMessage', 9, repeated=True)
-  updateTime = _messages.StringField(10)
+  buildpackStack = _messages.StringField(2)
+  description = _messages.StringField(3)
+  environment = _messages.EnumField('EnvironmentValueValuesEnum', 4)
+  eventTrigger = _messages.MessageField('EventTrigger', 5)
+  kmsKeyName = _messages.StringField(6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  serviceConfig = _messages.MessageField('ServiceConfig', 9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+  stateMessages = _messages.MessageField('GoogleCloudFunctionsV2StateMessage', 11, repeated=True)
+  updateTime = _messages.StringField(12)
 
 
 class GenerateDownloadUrlRequest(_messages.Message):
@@ -677,7 +738,24 @@ class GenerateDownloadUrlResponse(_messages.Message):
 
 
 class GenerateUploadUrlRequest(_messages.Message):
-  r"""Request of `GenerateSourceUploadUrl` method."""
+  r"""Request of `GenerateSourceUploadUrl` method.
+
+  Fields:
+    kmsKeyName: Resource name of a KMS crypto key (managed by the user) used
+      to encrypt/decrypt function source code objects in intermediate Cloud
+      Storage buckets. When you generate an upload url and upload your source
+      code, it gets copied to an intermediate Cloud Storage bucket. The source
+      code is then copied to a versioned directory in the sources bucket in
+      the consumer project during the function deployment. It must match the
+      pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cry
+      ptoKeys/{crypto_key}`. The Google Cloud Functions service account
+      (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) must
+      be granted the role 'Cloud KMS CryptoKey Encrypter/Decrypter
+      (roles/cloudkms.cryptoKeyEncrypterDecrypter)' on the
+      Key/KeyRing/Project/Organization (least access preferred).
+  """
+
+  kmsKeyName = _messages.StringField(1)
 
 
 class GenerateUploadUrlResponse(_messages.Message):
@@ -1693,11 +1771,15 @@ class SecretVolume(_messages.Message):
 
 class ServiceConfig(_messages.Message):
   r"""Describes the Service being deployed. Currently Supported : Cloud Run
-  (fully managed).
+  (fully managed). Next tag: 23
 
   Enums:
     IngressSettingsValueValuesEnum: The ingress settings for the function,
       controlling what traffic can reach it.
+    SecurityLevelValueValuesEnum: Security level configure whether the
+      function only accepts https. This configuration is only applicable to
+      1st Gen functions with Http trigger. By default https is optional for
+      1st Gen functions; 2nd Gen functions are https ONLY.
     VpcConnectorEgressSettingsValueValuesEnum: The egress settings for the
       connector, controlling what traffic is diverted through it.
 
@@ -1711,6 +1793,10 @@ class ServiceConfig(_messages.Message):
       the revision being deployed will serve 100% of traffic, ignoring any
       traffic split settings, if any. On GetFunction, true will be returned if
       the latest revision is serving 100% of traffic.
+    availableCpu: The number of CPUs used in a single container instance.
+      Default value is calculated from available memory. Supports the same
+      values as Cloud Run, see https://cloud.google.com/run/docs/reference/res
+      t/v1/Container#resourcerequirements Example: "1" indicates 1 vCPU
     availableMemory: The amount of memory available for a function. Defaults
       to 256M. Supported units are k, M, G, Mi, Gi. If no unit is supplied the
       value is interpreted as bytes. See https://github.com/kubernetes/kuberne
@@ -1729,6 +1815,8 @@ class ServiceConfig(_messages.Message):
       tolerate. See the [Max
       Instances](https://cloud.google.com/functions/docs/max-instances) Guide
       for more details.
+    maxInstanceRequestConcurrency: Sets the maximum number of concurrent
+      requests that each instance can receive. Defaults to 1.
     minInstanceCount: The limit on the minimum number of function instances
       that may coexist at a given time. Function instances are kept in idle
       state for a short period after they finished executing the request to
@@ -1740,6 +1828,10 @@ class ServiceConfig(_messages.Message):
     revision: Output only. The name of service revision.
     secretEnvironmentVariables: Secret environment variables configuration.
     secretVolumes: Secret volumes configuration.
+    securityLevel: Security level configure whether the function only accepts
+      https. This configuration is only applicable to 1st Gen functions with
+      Http trigger. By default https is optional for 1st Gen functions; 2nd
+      Gen functions are https ONLY.
     service: Output only. Name of the service associated with a Function. The
       format of this field is
       `projects/{project}/locations/{region}/services/{service}`
@@ -1771,6 +1863,25 @@ class ServiceConfig(_messages.Message):
     ALLOW_ALL = 1
     ALLOW_INTERNAL_ONLY = 2
     ALLOW_INTERNAL_AND_GCLB = 3
+
+  class SecurityLevelValueValuesEnum(_messages.Enum):
+    r"""Security level configure whether the function only accepts https. This
+    configuration is only applicable to 1st Gen functions with Http trigger.
+    By default https is optional for 1st Gen functions; 2nd Gen functions are
+    https ONLY.
+
+    Values:
+      SECURITY_LEVEL_UNSPECIFIED: Unspecified.
+      SECURE_ALWAYS: Requests for a URL that match this handler that do not
+        use HTTPS are automatically redirected to the HTTPS URL with the same
+        path. Query parameters are reserved for the redirect.
+      SECURE_OPTIONAL: Both HTTP and HTTPS requests with URLs that match the
+        handler succeed without redirects. The application can examine the
+        request to determine which protocol was used and respond accordingly.
+    """
+    SECURITY_LEVEL_UNSPECIFIED = 0
+    SECURE_ALWAYS = 1
+    SECURE_OPTIONAL = 2
 
   class VpcConnectorEgressSettingsValueValuesEnum(_messages.Enum):
     r"""The egress settings for the connector, controlling what traffic is
@@ -1815,20 +1926,23 @@ class ServiceConfig(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   allTrafficOnLatestRevision = _messages.BooleanField(1)
-  availableMemory = _messages.StringField(2)
-  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 3)
-  ingressSettings = _messages.EnumField('IngressSettingsValueValuesEnum', 4)
-  maxInstanceCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  minInstanceCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  revision = _messages.StringField(7)
-  secretEnvironmentVariables = _messages.MessageField('SecretEnvVar', 8, repeated=True)
-  secretVolumes = _messages.MessageField('SecretVolume', 9, repeated=True)
-  service = _messages.StringField(10)
-  serviceAccountEmail = _messages.StringField(11)
-  timeoutSeconds = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  uri = _messages.StringField(13)
-  vpcConnector = _messages.StringField(14)
-  vpcConnectorEgressSettings = _messages.EnumField('VpcConnectorEgressSettingsValueValuesEnum', 15)
+  availableCpu = _messages.StringField(2)
+  availableMemory = _messages.StringField(3)
+  environmentVariables = _messages.MessageField('EnvironmentVariablesValue', 4)
+  ingressSettings = _messages.EnumField('IngressSettingsValueValuesEnum', 5)
+  maxInstanceCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  maxInstanceRequestConcurrency = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  minInstanceCount = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  revision = _messages.StringField(9)
+  secretEnvironmentVariables = _messages.MessageField('SecretEnvVar', 10, repeated=True)
+  secretVolumes = _messages.MessageField('SecretVolume', 11, repeated=True)
+  securityLevel = _messages.EnumField('SecurityLevelValueValuesEnum', 12)
+  service = _messages.StringField(13)
+  serviceAccountEmail = _messages.StringField(14)
+  timeoutSeconds = _messages.IntegerField(15, variant=_messages.Variant.INT32)
+  uri = _messages.StringField(16)
+  vpcConnector = _messages.StringField(17)
+  vpcConnectorEgressSettings = _messages.EnumField('VpcConnectorEgressSettingsValueValuesEnum', 18)
 
 
 class SetIamPolicyRequest(_messages.Message):

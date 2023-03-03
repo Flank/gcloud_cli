@@ -380,7 +380,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -397,9 +399,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -986,10 +986,10 @@ class CreateTaskRequest(_messages.Message):
       de-duplication. If a task's ID is identical to that of an existing task
       or a task that was deleted or completed recently then the call will fail
       with ALREADY_EXISTS. If the task's queue was created using Cloud Tasks,
-      then another task with the same name can't be created for ~1hour after
+      then another task with the same name can't be created for ~1 hour after
       the original task was deleted or completed. If the task's queue was
       created using queue.yaml or queue.xml, then another task with the same
-      name can't be created for ~9days after the original task was deleted or
+      name can't be created for ~9 days after the original task was deleted or
       completed. Because there is an extra lookup cost to identify duplicate
       task names, these CreateTask calls have significantly increased latency.
       Using hashed strings for the task id or for the prefix of the task id is
@@ -1203,13 +1203,13 @@ class HttpRequest(_messages.Message):
       task is created. These headers represent a subset of the headers that
       will accompany the task's HTTP request. Some HTTP request headers will
       be ignored or replaced. A partial list of headers that will be ignored
-      or replaced is: * Any header that is prefixed with "X-Google-Cloud-
-      Tasks-" will be treated as service header. Service headers define
-      properties of the task and are predefined in CloudTask. * Host: This
-      will be computed by Cloud Tasks and derived from HttpRequest.url. *
-      Content-Length: This will be computed by Cloud Tasks. * User-Agent: This
-      will be set to `"Google-Cloud-Tasks"`. * `X-Google-*`: Google use only.
-      * `X-AppEngine-*`: Google use only. `Content-Type` won't be set by Cloud
+      or replaced is: * Any header that is prefixed with "X-CloudTasks-" will
+      be treated as service header. Service headers define properties of the
+      task and are predefined in CloudTask. * Host: This will be computed by
+      Cloud Tasks and derived from HttpRequest.url. * Content-Length: This
+      will be computed by Cloud Tasks. * User-Agent: This will be set to
+      `"Google-Cloud-Tasks"`. * `X-Google-*`: Google use only. *
+      `X-AppEngine-*`: Google use only. `Content-Type` won't be set by Cloud
       Tasks. You can explicitly set `Content-Type` to a media type when the
       task is created. For example, `Content-Type` can be set to
       `"application/octet-stream"` or `"application/json"`. Headers which can
@@ -1225,18 +1225,18 @@ class HttpRequest(_messages.Message):
       is created. These headers represent a subset of the headers that will
       accompany the task's HTTP request. Some HTTP request headers will be
       ignored or replaced. A partial list of headers that will be ignored or
-      replaced is: * Any header that is prefixed with "X-Google-Cloud-Tasks-"
-      will be treated as service header. Service headers define properties of
-      the task and are predefined in CloudTask. * Host: This will be computed
-      by Cloud Tasks and derived from HttpRequest.url. * Content-Length: This
-      will be computed by Cloud Tasks. * User-Agent: This will be set to
-      `"Google-Cloud-Tasks"`. * `X-Google-*`: Google use only. *
-      `X-AppEngine-*`: Google use only. `Content-Type` won't be set by Cloud
-      Tasks. You can explicitly set `Content-Type` to a media type when the
-      task is created. For example, `Content-Type` can be set to
-      `"application/octet-stream"` or `"application/json"`. Headers which can
-      have multiple values (according to RFC2616) can be specified using
-      comma-separated values. The size of the headers must be less than 80KB.
+      replaced is: * Any header that is prefixed with "X-CloudTasks-" will be
+      treated as service header. Service headers define properties of the task
+      and are predefined in CloudTask. * Host: This will be computed by Cloud
+      Tasks and derived from HttpRequest.url. * Content-Length: This will be
+      computed by Cloud Tasks. * User-Agent: This will be set to `"Google-
+      Cloud-Tasks"`. * `X-Google-*`: Google use only. * `X-AppEngine-*`:
+      Google use only. `Content-Type` won't be set by Cloud Tasks. You can
+      explicitly set `Content-Type` to a media type when the task is created.
+      For example, `Content-Type` can be set to `"application/octet-stream"`
+      or `"application/json"`. Headers which can have multiple values
+      (according to RFC2616) can be specified using comma-separated values.
+      The size of the headers must be less than 80KB.
     httpMethod: The HTTP method to use for the request. The default is POST.
     oauthToken: If specified, an [OAuth
       token](https://developers.google.com/identity/protocols/OAuth2) will be
@@ -1287,14 +1287,14 @@ class HttpRequest(_messages.Message):
     created. These headers represent a subset of the headers that will
     accompany the task's HTTP request. Some HTTP request headers will be
     ignored or replaced. A partial list of headers that will be ignored or
-    replaced is: * Any header that is prefixed with "X-Google-Cloud-Tasks-"
-    will be treated as service header. Service headers define properties of
-    the task and are predefined in CloudTask. * Host: This will be computed by
-    Cloud Tasks and derived from HttpRequest.url. * Content-Length: This will
-    be computed by Cloud Tasks. * User-Agent: This will be set to `"Google-
-    Cloud-Tasks"`. * `X-Google-*`: Google use only. * `X-AppEngine-*`: Google
-    use only. `Content-Type` won't be set by Cloud Tasks. You can explicitly
-    set `Content-Type` to a media type when the task is created. For example,
+    replaced is: * Any header that is prefixed with "X-CloudTasks-" will be
+    treated as service header. Service headers define properties of the task
+    and are predefined in CloudTask. * Host: This will be computed by Cloud
+    Tasks and derived from HttpRequest.url. * Content-Length: This will be
+    computed by Cloud Tasks. * User-Agent: This will be set to `"Google-Cloud-
+    Tasks"`. * `X-Google-*`: Google use only. * `X-AppEngine-*`: Google use
+    only. `Content-Type` won't be set by Cloud Tasks. You can explicitly set
+    `Content-Type` to a media type when the task is created. For example,
     `Content-Type` can be set to `"application/octet-stream"` or
     `"application/json"`. Headers which can have multiple values (according to
     RFC2616) can be specified using comma-separated values. The size of the
@@ -1334,9 +1334,9 @@ class HttpTarget(_messages.Message):
 
   Enums:
     HttpMethodValueValuesEnum: The HTTP method to use for the request. When
-      specified, it will override HttpRequest for the task. Note that if the
-      value is set to HttpMethod the HttpRequest of the task will be ignored
-      at execution time.
+      specified, it overrides HttpRequest for the task. Note that if the value
+      is set to HttpMethod the HttpRequest of the task will be ignored at
+      execution time.
 
   Fields:
     headerOverrides: HTTP target headers. This map contains the header field
@@ -1344,13 +1344,13 @@ class HttpTarget(_messages.Message):
       and/or task is created. These headers represent a subset of the headers
       that will accompany the task's HTTP request. Some HTTP request headers
       will be ignored or replaced. A partial list of headers that will be
-      ignored or replaced is: * Any header that is prefixed with "X-Google-
-      Cloud-Tasks-" will be treated as service header. Service headers define
-      properties of the task and are predefined in CloudTask. * Host: This
-      will be computed by Cloud Tasks and derived from HttpRequest.url. *
+      ignored or replaced is: * Any header that is prefixed with
+      "X-CloudTasks-" will be treated as service header. Service headers
+      define properties of the task and are predefined in CloudTask. * Host:
+      This will be computed by Cloud Tasks and derived from HttpRequest.url. *
       Content-Length: This will be computed by Cloud Tasks. * User-Agent: This
-      will be set to `"Google-Cloud-Tasks"`. * `X-Google-*`: Google use only.
-      * `X-AppEngine-*`: Google use only. `Content-Type` won't be set by Cloud
+      will be set to `"Google-CloudTasks"`. * `X-Google-*`: Google use only. *
+      `X-AppEngine-*`: Google use only. `Content-Type` won't be set by Cloud
       Tasks. You can explicitly set `Content-Type` to a media type when the
       task is created. For example, `Content-Type` can be set to
       `"application/octet-stream"` or `"application/json"`. Headers which can
@@ -1358,7 +1358,7 @@ class HttpTarget(_messages.Message):
       comma-separated values. The size of the headers must be less than 80KB.
       Queue-level headers to override headers of all the tasks in the queue.
     httpMethod: The HTTP method to use for the request. When specified, it
-      will override HttpRequest for the task. Note that if the value is set to
+      overrides HttpRequest for the task. Note that if the value is set to
       HttpMethod the HttpRequest of the task will be ignored at execution
       time.
     oauthToken: If specified, an [OAuth
@@ -1372,14 +1372,14 @@ class HttpTarget(_messages.Message):
       HTTP request. This type of authorization can be used for many scenarios,
       including calling Cloud Run, or endpoints where you intend to validate
       the token yourself.
-    uriOverride: Uri override. When specified modifies the execution Uri for
+    uriOverride: Uri override. When specified, overrides the execution Uri for
       all the tasks in the queue.
   """
 
   class HttpMethodValueValuesEnum(_messages.Enum):
-    r"""The HTTP method to use for the request. When specified, it will
-    override HttpRequest for the task. Note that if the value is set to
-    HttpMethod the HttpRequest of the task will be ignored at execution time.
+    r"""The HTTP method to use for the request. When specified, it overrides
+    HttpRequest for the task. Note that if the value is set to HttpMethod the
+    HttpRequest of the task will be ignored at execution time.
 
     Values:
       HTTP_METHOD_UNSPECIFIED: HTTP method unspecified
@@ -1661,6 +1661,16 @@ class OidcToken(_messages.Message):
   serviceAccountEmail = _messages.StringField(2)
 
 
+class PathOverride(_messages.Message):
+  r"""PathOverride. Path message defines path override for HTTP targets.
+
+  Fields:
+    path: The URI path (e.g., /users/1234). Default is an empty string.
+  """
+
+  path = _messages.StringField(1)
+
+
 class PauseQueueRequest(_messages.Message):
   r"""Request message for PauseQueue."""
 
@@ -1771,6 +1781,17 @@ class PullTarget(_messages.Message):
 
 class PurgeQueueRequest(_messages.Message):
   r"""Request message for PurgeQueue."""
+
+
+class QueryOverride(_messages.Message):
+  r"""QueryOverride. Query message defines query override for HTTP targets.
+
+  Fields:
+    queryParams: The query parameters (e.g., qparam1=123&qparam2=456). Default
+      is an empty string.
+  """
+
+  queryParams = _messages.StringField(1)
 
 
 class Queue(_messages.Message):
@@ -2399,27 +2420,39 @@ class UriOverride(_messages.Message):
   be partially or fully overridden depending on the configured values.
 
   Enums:
-    SchemeValueValuesEnum: Scheme override. When specified, the Uri scheme is
-      replaced by the provided value.
+    SchemeValueValuesEnum: Scheme override. When specified, the task URI
+      scheme is replaced by the provided value (HTTP or HTTPS).
+    UriOverrideEnforceModeValueValuesEnum: URI Override Enforce Mode When
+      specified, determines the Target UriOverride mode. If not specified, it
+      defaults to ALWAYS.
 
   Fields:
-    host: Host override. When specified, the host part of url will be
-      overridden. For example, if the original Uri is
-      "https://www.google.com", and host is set to "example.net", the
-      overridden Uri will be "https://example.net".
-    path: Uri path. Will be used as the path for the current Uri (replaces any
-      existing path of the task url).
-    port: Port override. When specified, the port part of Uri will be replaced
-      by the provided value. For instance, for a Uri http://www.google.com/foo
-      and port=123 the overridden Uri becomes http://www.google.com:123/foo.
-    query: Uri Query. Will replace the query part of the task uri.
-    scheme: Scheme override. When specified, the Uri scheme is replaced by the
-      provided value.
+    host: Host override. When specified, replaces the host part of the task
+      URL. For example, if the task URL is "https://www.google.com," and host
+      value is set to "example.net", the overridden URI will be changed to
+      "https://example.net." Host value cannot be an empty string
+      (INVALID_ARGUMENT).
+    pathOverride: URI path. When specified, replaces the existing path of the
+      task URL. Setting the path value to an empty string clears the URI path
+      segment.
+    port: Port override. When specified, replaces the port part of the task
+      URI. For instance, for a URI http://www.google.com/foo and port=123, the
+      overridden URI becomes http://www.google.com:123/foo. Note that the port
+      value must be a positive integer. Setting the port to 0 (Zero) clears
+      the URI port.
+    queryOverride: URI Query. When specified, replaces the query part of the
+      task URI. Setting the query value to an empty string clears the URI
+      query segment.
+    scheme: Scheme override. When specified, the task URI scheme is replaced
+      by the provided value (HTTP or HTTPS).
+    uriOverrideEnforceMode: URI Override Enforce Mode When specified,
+      determines the Target UriOverride mode. If not specified, it defaults to
+      ALWAYS.
   """
 
   class SchemeValueValuesEnum(_messages.Enum):
-    r"""Scheme override. When specified, the Uri scheme is replaced by the
-    provided value.
+    r"""Scheme override. When specified, the task URI scheme is replaced by
+    the provided value (HTTP or HTTPS).
 
     Values:
       SCHEME_UNSPECIFIED: Scheme unspecified. Defaults to HTTPS.
@@ -2432,11 +2465,28 @@ class UriOverride(_messages.Message):
     HTTP = 1
     HTTPS = 2
 
+  class UriOverrideEnforceModeValueValuesEnum(_messages.Enum):
+    r"""URI Override Enforce Mode When specified, determines the Target
+    UriOverride mode. If not specified, it defaults to ALWAYS.
+
+    Values:
+      URI_OVERRIDE_ENFORCE_MODE_UNSPECIFIED: OverrideMode Unspecified.
+        Defaults to ALWAYS.
+      IF_NOT_EXISTS: In the IF_NOT_EXISTS mode, queue-level configuration is
+        only applied where task-level configuration does not exist.
+      ALWAYS: In the ALWAYS mode, queue-level configuration overrides all
+        task-level configuration
+    """
+    URI_OVERRIDE_ENFORCE_MODE_UNSPECIFIED = 0
+    IF_NOT_EXISTS = 1
+    ALWAYS = 2
+
   host = _messages.StringField(1)
-  path = _messages.StringField(2)
+  pathOverride = _messages.MessageField('PathOverride', 2)
   port = _messages.IntegerField(3)
-  query = _messages.StringField(4)
+  queryOverride = _messages.MessageField('QueryOverride', 4)
   scheme = _messages.EnumField('SchemeValueValuesEnum', 5)
+  uriOverrideEnforceMode = _messages.EnumField('UriOverrideEnforceModeValueValuesEnum', 6)
 
 
 encoding.AddCustomJsonFieldMapping(

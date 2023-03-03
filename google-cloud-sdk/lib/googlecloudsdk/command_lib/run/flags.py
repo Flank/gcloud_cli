@@ -325,7 +325,7 @@ def AddStartupCpuBoostFlag(parser):
       '--cpu-boost',
       action=arg_parsers.StoreTrueFalseAction,
       help='Whether to allocate extra CPU to containers on startup. '
-      'This can reduce the percieved latency of a cold start request.')
+      'This can reduce the perceived latency of a cold start request.')
 
 
 def AddTokenFlag(parser):
@@ -503,6 +503,8 @@ def AddMapFlagsNoFile(parser,
     value_type: A function to apply to map values.
     key_metavar: Metavariable to list for the key.
     value_metavar: Metavariable to list for the value.
+  Returns:
+    A mutually exclusive group for the map flags.
   """
   if not long_name:
     long_name = flag_name
@@ -535,6 +537,7 @@ def AddMapFlagsNoFile(parser,
       value_type=value_type,
       key_metavar=key_metavar,
       value_metavar=value_metavar)
+  return group
 
 
 def AddSetEnvVarsFlag(parser):
@@ -550,8 +553,48 @@ def AddSetEnvVarsFlag(parser):
 
 
 def AddMutexEnvVarsFlags(parser):
-  """Add flags for creating updating and deleting env vars."""
-  env_vars_util.AddUpdateEnvVarsFlags(parser)
+  """Add flags for setting, updating and deleting env vars."""
+  group = AddMapFlagsNoFile(
+      parser,
+      'env-vars',
+      long_name='environment variables',
+      key_type=env_vars_util.EnvVarKeyType,
+      value_type=env_vars_util.EnvVarValueType)
+  group.add_argument(
+      '--env-vars-file',
+      metavar='FILE_PATH',
+      type=map_util.ArgDictFile(
+          key_type=env_vars_util.EnvVarKeyType,
+          value_type=env_vars_util.EnvVarValueType),
+      help=('''Path to a local YAML file with definitions for all environment
+            variables. All existing environment variables will be removed before
+            the new environment variables are added. Example YAML content:
+
+              ```
+              KEY_1: "value1"
+              KEY_2: "value 2"
+              ```
+            '''))
+
+
+def AddMutexEnvVarsFlagsForCreate(parser):
+  """Add flags for setting env vars."""
+  group = parser.add_mutually_exclusive_group()
+  AddSetEnvVarsFlag(group)
+  group.add_argument(
+      '--env-vars-file',
+      metavar='FILE_PATH',
+      type=map_util.ArgDictFile(
+          key_type=env_vars_util.EnvVarKeyType,
+          value_type=env_vars_util.EnvVarValueType),
+      help=('''Path to a local YAML file with definitions for all environment
+            variables. Example YAML content:
+
+              ```
+              KEY_1: "value1"
+              KEY_2: "value 2"
+              ```
+            '''))
 
 
 def AddMemoryFlag(parser):
@@ -597,19 +640,27 @@ def AddTimeoutFlag(parser):
       '10 seconds.')
 
 
-def AddServiceAccountFlag(parser):
-  parser.add_argument(
-      '--service-account',
-      help='Service account associated with the revision of the service. '
+def AddServiceAccountFlag(parser, managed_only=False):
+  """Add the --service-account flag."""
+  help_text = (
+      'Service account associated with the revision of the service. '
       'The service account represents the identity of '
       'the running revision, and determines what permissions the revision has. '
-      'For the {} platform, this is the email address of an IAM '
-      'service account. For the Kubernetes-based platforms ({}, {}), this is '
-      'the name of a Kubernetes service account in the same namespace as the '
-      'service. If not provided, the revision will use the default service '
-      'account of the project, or default Kubernetes namespace service account '
-      'respectively.'.format(platforms.PLATFORM_MANAGED, platforms.PLATFORM_GKE,
-                             platforms.PLATFORM_KUBERNETES))
+  )
+  if managed_only:
+    help_text += 'This is the email address of an IAM service account.'
+  else:
+    help_text += (
+        'For the {} platform, this is the email address of an IAM service '
+        'account. For the Kubernetes-based platforms ({}, {}), this is the '
+        'name of a Kubernetes service account in the same namespace as the '
+        'service. If not provided, the revision will use the default service '
+        'account of the project, or default Kubernetes namespace service '
+        'account respectively.'.format(platforms.PLATFORM_MANAGED,
+                                       platforms.PLATFORM_GKE,
+                                       platforms.PLATFORM_KUBERNETES))
+
+  parser.add_argument('--service-account', help=help_text)
 
 
 def AddPlatformArg(parser, managed_only=False, anthos_only=False):
@@ -958,7 +1009,8 @@ def AddParallelismFlag(parser):
 
 
 def AddTasksFlag(parser):
-  """Add job number of tasks flag which maps to job.spec.template.spec.task_count."""
+  """Add job number of tasks flag which maps to job.spec.template.spec.task_count.
+  """
   parser.add_argument(
       '--tasks',
       type=arg_parsers.BoundedInt(lower_bound=1),
@@ -972,7 +1024,7 @@ def AddMaxRetriesFlag(parser):
   parser.add_argument(
       '--max-retries',
       type=arg_parsers.BoundedInt(lower_bound=0),
-      help='Number of times an task is allowed to restart in case of '
+      help='Number of times a task is allowed to restart in case of '
       'failure before being failed permanently. This applies per-task, not '
       'per-job. If set to 0, tasks will only run once and never be '
       'retried on failure.')
@@ -1076,22 +1128,17 @@ def AddVpcNetworkTagsFlags(parser, resource_kind='Service'):
           kind=resource_kind))
 
 
-def AddCustomAudiencesFlag(parser, with_clear=True):
-  """Add custom audiences flag."""
-  policy_group = parser
-  if with_clear:
-    policy_group = parser.add_mutually_exclusive_group(hidden=True)
-    policy_group.add_argument(
-        '--clear-custom-audiences',
-        default=False,
-        hidden=True,
-        action='store_true',
-        help='Remove any previously set custom audiences.')
-  policy_group.add_argument(
-      '--custom-audiences',
-      hidden=True,
-      help='A non-empty JSON array of non-empty audience strings that can be used in the audience field of ID token for authenticated requests.'
-  )
+def AddCustomAudiencesFlag(parser):
+  """Add flags for setting custom audiences."""
+  repeated.AddPrimitiveArgs(
+      parser,
+      'Service',
+      'custom-audiences',
+      'custom audiences',
+      auto_group_help=False,
+      additional_help='These flags modify the custom audiences that can be '
+      'used in the audience field of ID token for '
+      'authenticated requests.')
 
 
 def AddSessionAffinityFlag(parser):
@@ -1100,6 +1147,16 @@ def AddSessionAffinityFlag(parser):
       '--session-affinity',
       action=arg_parsers.StoreTrueFalseAction,
       help='Whether to enable session affinity for connections to the service.')
+
+
+def AddRuntimeFlag(parser):
+  """Add flags for Wasm runtime."""
+  parser.add_argument(
+      '--runtime',
+      metavar='RUNTIME',
+      hidden=True,
+      help='The runtime to use. "wasm" for WebAssembly runtime, '
+      '"default" for the default Linux runtime.')
 
 
 def _HasChanges(args, flags):
@@ -1170,6 +1227,15 @@ def _HasTrafficChanges(args):
   """True iff any of the traffic flags are set."""
   traffic_flags = ['to_revisions', 'to_tags', 'to_latest']
   return _HasChanges(args, traffic_flags) or _HasTrafficTagsChanges(args)
+
+
+def _HasCustomAudiencesChanges(args):
+  """True iff any of the custom audiences flags are set."""
+  instances_flags = [
+      'add_custom_audiences', 'set_custom_audiences', 'remove_custom_audiences',
+      'clear_custom_audiences'
+  ]
+  return _HasChanges(args, instances_flags)
 
 
 def _GetEnvChanges(args):
@@ -1347,7 +1413,7 @@ def _GetTrafficChanges(args):
     clear_other_tags = False
   by_tag = False
   if args.to_latest:
-    # Mutually exlcusive flag with to-revisions, to-tags
+    # Mutually exclusive flag with to-revisions, to-tags
     new_percentages = {traffic.LATEST_REVISION_KEY: 100}
   elif args.to_revisions:
     new_percentages = args.to_revisions
@@ -1378,7 +1444,8 @@ def _GetIngressChanges(args):
 
 
 def _PrependClientNameAndVersionChange(args, changes):
-  """Set client name and version regardless of whether or not it was specified."""
+  """Set client name and version regardless of whether or not it was specified.
+  """
   if 'client_name' in args:
     is_either_specified = (
         args.IsSpecified('client_name') or args.IsSpecified('client_version'))
@@ -1392,7 +1459,8 @@ def _PrependClientNameAndVersionChange(args, changes):
 
 
 def _GetConfigurationChanges(args):
-  """Returns a list of changes shared by multiple resources, based on the flags set."""
+  """Returns a list of changes shared by multiple resources, based on the flags set.
+  """
   changes = []
 
   # FlagIsExplicitlySet can't be used here because args.image is also set from
@@ -1499,14 +1567,6 @@ def _GetConfigurationChanges(args):
     changes.append(
         config_changes.DeleteTemplateAnnotationChange(
             container_resource.ENCRYPTION_KEY_SHUTDOWN_HOURS_ANNOTATION))
-  if FlagIsExplicitlySet(args, 'custom_audiences'):
-    changes.append(
-        config_changes.SetAnnotationChange(
-            k8s_object.CUSTOM_AUDIENCES_ANNOTATION, args.custom_audiences))
-  if FlagIsExplicitlySet(args, 'clear_custom_audiences'):
-    changes.append(
-        config_changes.SetAnnotationChange(
-            k8s_object.CUSTOM_AUDIENCES_ANNOTATION))
   if FlagIsExplicitlySet(args, 'description'):
     changes.append(
         config_changes.SetAnnotationChange(k8s_object.DESCRIPTION_ANNOTATION,
@@ -1521,6 +1581,8 @@ def _GetConfigurationChanges(args):
             FlagIsExplicitlySet(args, 'network'), args.network,
             FlagIsExplicitlySet(args, 'subnet'), args.subnet,
             FlagIsExplicitlySet(args, 'network_tags'), args.network_tags))
+  if _HasCustomAudiencesChanges(args):
+    changes.append(config_changes.CustomAudiencesChanges(args))
   return changes
 
 
@@ -1573,6 +1635,9 @@ def GetServiceConfigurationChanges(args):
       changes.append(
           config_changes.DeleteTemplateAnnotationChange(
               revision.SESSION_AFFINITY_ANNOTATION))
+  if FlagIsExplicitlySet(args, 'runtime'):
+    changes.append(
+        config_changes.RuntimeChange(runtime=args.runtime))
 
   _PrependClientNameAndVersionChange(args, changes)
   return changes
@@ -2009,10 +2074,26 @@ def VerifyGKEFlags(args, release_track, product):
             platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
                 platforms.PLATFORM_MANAGED]))
 
-  if FlagIsExplicitlySet(args, 'custom_audiences'):
+  if FlagIsExplicitlySet(args, 'set_custom_audiences'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
-            flag='--custom-audiences',
+            flag='--set-custom-audiences',
+            platform=platforms.PLATFORM_MANAGED,
+            platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
+                platforms.PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'add_custom_audiences'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--add-custom-audiences',
+            platform=platforms.PLATFORM_MANAGED,
+            platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
+                platforms.PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'remove_custom_audiences'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--remove-custom-audiences',
             platform=platforms.PLATFORM_MANAGED,
             platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
                 platforms.PLATFORM_MANAGED]))
@@ -2051,7 +2132,8 @@ def VerifyGKEFlags(args, release_track, product):
 
 
 def VerifyKubernetesFlags(args, release_track, product):
-  """Raise ConfigurationError if args includes OnePlatform or GKE only arguments."""
+  """Raise ConfigurationError if args includes OnePlatform or GKE only arguments.
+  """
   error_msg = ('The `{flag}` flag is not supported with Cloud Run for Anthos '
                'deployed on VMware. Specify `--platform {platform}` or run '
                '`gcloud config set run/platform {platform}` to work with '
@@ -2182,10 +2264,26 @@ def VerifyKubernetesFlags(args, release_track, product):
             platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
                 platforms.PLATFORM_MANAGED]))
 
-  if FlagIsExplicitlySet(args, 'custom_audiences'):
+  if FlagIsExplicitlySet(args, 'set_custom_audiences'):
     raise serverless_exceptions.ConfigurationError(
         error_msg.format(
-            flag='--custom-audiences',
+            flag='--set-custom-audiences',
+            platform=platforms.PLATFORM_MANAGED,
+            platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
+                platforms.PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'add_custom_audiences'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--add-custom-audiences',
+            platform=platforms.PLATFORM_MANAGED,
+            platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
+                platforms.PLATFORM_MANAGED]))
+
+  if FlagIsExplicitlySet(args, 'remove_custom_audiences'):
+    raise serverless_exceptions.ConfigurationError(
+        error_msg.format(
+            flag='--remove-custom-audiences',
             platform=platforms.PLATFORM_MANAGED,
             platform_desc=platforms.PLATFORM_SHORT_DESCRIPTIONS[
                 platforms.PLATFORM_MANAGED]))
@@ -2299,7 +2397,7 @@ def AddTaskFilterFlags(parser):
       action=arg_parsers.ExtendConstAction,
       dest='filter_flags',
       const=['Succeeded', 'Failed', 'Cancelled'],
-      help='Include suceeded, failed, and cancelled tasks.')
+      help='Include succeeded, failed, and cancelled tasks.')
   parser.add_argument(
       '--no-completed',
       action=arg_parsers.ExtendConstAction,
@@ -2311,7 +2409,7 @@ def AddTaskFilterFlags(parser):
       action=arg_parsers.ExtendConstAction,
       dest='filter_flags',
       const=['Succeeded', 'Failed', 'Cancelled', 'Running'],
-      help='Include running, suceeded, failed, and cancelled tasks.')
+      help='Include running, succeeded, failed, and cancelled tasks.')
   parser.add_argument(
       '--no-started',
       action=arg_parsers.ExtendConstAction,
@@ -2343,7 +2441,7 @@ def AddSourceAndImageFlags(parser, image='gcr.io/cloudrun/hello:latest'):
       'directory on a local disk or a gzipped archive file (.tar.gz) in '
       'Google Cloud Storage. If the source is a local directory, this '
       'command skips the files specified in the `--ignore-file`. If '
-      '`--ignore-file` is not specified, use`.gcloudignore` file. If a '
+      '`--ignore-file` is not specified, use `.gcloudignore` file. If a '
       '`.gcloudignore` file is absent and a `.gitignore` file is present in '
       'the local source directory, gcloud will use a generated Git-compatible '
       '`.gcloudignore` file that respects your .gitignored files. The global '

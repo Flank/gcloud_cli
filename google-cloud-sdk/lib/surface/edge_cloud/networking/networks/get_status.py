@@ -33,6 +33,7 @@ EXAMPLES = """\
    """
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 class GetStatus(base.Command):
   """Get the status of a specified Distributed Cloud Edge Network network.
 
@@ -47,6 +48,6 @@ class GetStatus(base.Command):
     resource_args.AddNetworkResourceArg(parser, 'to get status', True)
 
   def Run(self, args):
-    networks_client = networks.NetworksClient()
+    networks_client = networks.NetworksClient(self.ReleaseTrack())
     network_ref = args.CONCEPTS.network.Parse()
     return networks_client.GetStatus(network_ref)

@@ -27,9 +27,9 @@ from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Read(base.Command):
-  """Read logs for a service."""
+  """Read logs for a Cloud Run service."""
 
   detailed_help = {
       'DESCRIPTION':
@@ -74,7 +74,7 @@ class Read(base.Command):
     filters.append('resource.type = %s \n' % 'cloud_run_revision')
     filters.append('resource.labels.service_name = %s \n' % args.service)
     filters.append('resource.labels.location = %s \n' %
-                   flags.GetRegion(args, prompt=False))
+                   flags.GetRegion(args, prompt=True))
     filters.append('severity >= DEFAULT \n')
     filters += read_logs_lib.MakeTimestampFilters(args)
 

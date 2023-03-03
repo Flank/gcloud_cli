@@ -20,8 +20,9 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.gkeonprem import bare_metal_clusters
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.container.bare_metal import cluster_flags as flags
 from googlecloudsdk.command_lib.container.bare_metal import constants
-from googlecloudsdk.command_lib.container.bare_metal import flags
+
 
 _EXAMPLES = """
 To lists all clusters managed in location ``us-west1'', run:
@@ -30,7 +31,6 @@ $ {command} --location=us-west1
 """
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class List(base.ListCommand):
   """List Anthos clusters on bare metal."""
@@ -39,7 +39,7 @@ class List(base.ListCommand):
   @staticmethod
   def Args(parser):
     """Gathers command line arguments for the list command."""
-    flags.AddLocationResourceArg(parser, 'to list')
+    flags.AddLocationResourceArg(parser, verb='to list')
     parser.display_info.AddFormat(constants.BARE_METAL_CLUSTERS_FORMAT)
 
   def Run(self, args):

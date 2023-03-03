@@ -42,8 +42,7 @@ class Run(base.ListCommand):
   """Invoke a test in Firebase Test Lab for iOS and view test results."""
 
   detailed_help = {
-      'DESCRIPTION':
-          """\
+      'DESCRIPTION': """\
           *{command}* invokes and monitors tests in Firebase Test Lab for iOS.
 
           The currently supported iOS test frameworks are XCTest and XCUITest.
@@ -59,8 +58,7 @@ class Run(base.ListCommand):
           and/or within an argument file. Run *$ gcloud topic arg-files* for
           more information about argument files.
           """,
-      'EXAMPLES':
-          """\
+      'EXAMPLES': """\
           To invoke an XCTest lasting up to five minutes against the default
           device environment, run:
 
@@ -78,6 +76,11 @@ class Run(base.ListCommand):
           To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 
             $ {command} --test=XCTEST_ZIP --xcode-version=9.4.1
+
+          To help you identify and locate your test matrix in the Firebase
+          console, run:
+
+            $ {command} --test=XCTEST_ZIP --client-details=matrixLabel="Example matrix label"
 
           All test arguments for a given test may alternatively be stored in an
           argument group within a YAML-formatted argument file. The _ARG_FILE_
@@ -123,7 +126,7 @@ class Run(base.ListCommand):
     # TODO(b/79369595): expand libs to share more code with android run command.
     if args.async_ and not args.IsSpecified('format'):
       args.format = """
-          value(format('Final test results will be available at [{0}].', []))
+          value(format('Final test results will be available at [ {0} ].', []))
       """
     log.status.Print('\nHave questions, feedback, or issues? Get support by '
                      'emailing:\n  ftl-ios-feedback@google.com\n')
@@ -156,6 +159,8 @@ class Run(base.ListCommand):
           file_to_upload,
           None,
           destination_object=util.GetRelativeDevicePath(path))
+    if getattr(args, 'robo_script', None):
+      bucket_ops.UploadFileToGcs(args.robo_script, 'application/json')
     bucket_ops.LogGcsResultsUrl()
 
     tr_history_picker = history_picker.ToolResultsHistoryPicker(
@@ -177,7 +182,7 @@ class Run(base.ListCommand):
       log.status.Print('')
       if args.async_:
         return url
-      log.status.Print('Test results will be streamed to [{0}].'.format(url))
+      log.status.Print('Test results will be streamed to [ {0} ].'.format(url))
 
       # If we have exactly one testExecution, show detailed progress info.
       if len(supported_executions) == 1 and args.num_flaky_test_attempts == 0:
@@ -185,7 +190,7 @@ class Run(base.ListCommand):
       else:
         monitor.MonitorTestMatrixProgress()
 
-    log.status.Print('\nMore details are available at [{0}].'.format(url))
+    log.status.Print('\nMore details are available at [ {0} ].'.format(url))
     # Fetch the per-dimension test outcomes list, and also the "rolled-up"
     # matrix outcome from the Tool Results service.
     summary_fetcher = results_summary.ToolResultsSummaryFetcher(
@@ -220,8 +225,7 @@ def PickHistoryName(args):
 class RunBeta(Run):
   """Invoke a test in Firebase Test Lab for iOS and view test results."""
   detailed_help = {
-      'DESCRIPTION':
-          """\
+      'DESCRIPTION': """\
           *{command}* invokes and monitors tests in Firebase Test Lab for iOS.
 
           Two types of iOS tests are currently supported:
@@ -244,8 +248,12 @@ class RunBeta(Run):
           and/or within an argument file. Run *$ gcloud topic arg-files* for
           more information about argument files.
         """,
-      'EXAMPLES':
-          """\
+      'EXAMPLES': """\
+          To help you identify and locate your test matrix in the Firebase
+          console, run:
+
+            $ {command} --test=XCTEST_ZIP --client-details=matrixLabel="Example matrix label"
+
           To invoke an XCTest lasting up to five minutes against the default
           device environment, run:
 
@@ -263,6 +271,11 @@ class RunBeta(Run):
           To run your XCTest using a specific version of Xcode, say 9.4.1, run:
 
             $ {command} --test=XCTEST_ZIP --xcode-version=9.4.1
+
+          To help you identify and locate your test matrix in the Firebase
+          console, run:
+
+            $ {command} --test=XCTEST_ZIP --client-details=matrixLabel="Example matrix label"
 
           To run an iOS game loop, specify the *--type* and *--app* flags:
 

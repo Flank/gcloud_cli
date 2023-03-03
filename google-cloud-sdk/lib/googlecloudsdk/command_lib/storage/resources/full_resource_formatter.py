@@ -22,6 +22,7 @@ import abc
 import collections
 import datetime
 
+from googlecloudsdk.api_lib.storage import errors
 from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.command_lib.storage.resources import resource_util
 
@@ -57,6 +58,7 @@ BucketDisplayTitlesAndDefaults = collections.namedtuple(
         'default_storage_class',
         'location_type',
         'location',
+        'data_locations',
         'versioning_enabled',
         'logging_config',
         'website_config',
@@ -71,6 +73,9 @@ BucketDisplayTitlesAndDefaults = collections.namedtuple(
         'update_time',
         'metageneration',
         'uniform_bucket_level_access',
+        'public_access_prevention',
+        'rpo',
+        'autoclass_enabled_time',
         'satisfies_pzs',
         ACL_KEY,
         'default_acl',
@@ -98,11 +103,11 @@ ObjectDisplayTitlesAndDefaults = collections.namedtuple(
         'component_count',
         'custom_time',
         'noncurrent_time',
-        'custom_metadata',
+        'custom_fields',
         'crc32c_hash',
         'md5_hash',
         'encryption_algorithm',
-        'decryption_key_hash',
+        'decryption_key_hash_sha256',
         'etag',
         'generation',
         'metageneration',
@@ -117,28 +122,30 @@ def _get_formatted_line(display_name, value, default_value=None):
       return resource_util.get_metadata_json_section_string(display_name, value)
     elif isinstance(value, datetime.datetime):
       return resource_util.get_padded_metadata_time_line(display_name, value)
-    else:
+    elif isinstance(value, errors.CloudApiError):
       return resource_util.get_padded_metadata_key_value_line(
-          display_name, value)
+          display_name, str(value))
+    return resource_util.get_padded_metadata_key_value_line(display_name, value)
   elif default_value is not None:
     return resource_util.get_padded_metadata_key_value_line(
         display_name, default_value)
   return None
 
 
-def get_formatted_string(url,
-                         resource,
-                         display_titles_and_defaults,
-                         show_acl=True,
-                         show_version_in_url=False):
+def get_formatted_string(
+    resource,
+    display_titles_and_defaults,
+    show_acl=True,
+    show_version_in_url=False,
+):
   """Returns the formatted string representing the resource.
 
   Args:
-    url (StorageUrl): URL representing the resource.
-    resource (resource_reference.ObjectResource):
-      Object holding resource metadata that needs to be displayed.
-    display_titles_and_defaults (ObjectDisplayTitlesAndDefaults): Holds the
-      display titles and default values for each field present in the Resource.
+    resource (resource_reference.Resource): Object holding resource metadata
+      that needs to be displayed.
+    display_titles_and_defaults ([Bucket|Object]DisplayTitlesAndDefaults): Holds
+      the display titles and default values for each field present in the
+      Resource.
     show_acl (bool): Include ACLs list in resource display.
     show_version_in_url (bool): Display extended URL with versioning info.
 
@@ -170,9 +177,9 @@ def get_formatted_string(url,
       lines.append(line)
 
   if show_version_in_url:
-    url_string = url.url_string
+    url_string = resource.storage_url.url_string
   else:
-    url_string = url.versionless_url_string
+    url_string = resource.storage_url.versionless_url_string
   return ('{url_string}:\n'
           '{fields}').format(
               url_string=url_string,
@@ -185,33 +192,40 @@ class FullResourceFormatter(six.with_metaclass(abc.ABCMeta, object)):
   This FullResourceFormatter is specifically used for ls -L output formatting.
   """
 
-  def format_bucket(self, url, bucket_resource):
+  def format_bucket(self, bucket_resource):
     """Returns a formatted string representing the BucketResource.
 
     Args:
-      url (StorageUrl): URL representing the object.
-      bucket_resource (resource_reference.BucketResource): A
-        BucketResource instance.
+      bucket_resource (resource_reference.BucketResource): A BucketResource
+        instance.
 
     Returns:
       Formatted multi-line string representing the BucketResource.
     """
     raise NotImplementedError('format_bucket must be overridden.')
 
-  def format_object(self,
-                    url,
-                    object_resource,
-                    show_acl=True,
-                    show_version_in_url=False):
+  def format_object(
+      self, object_resource, show_acl=True, show_version_in_url=False, **kwargs
+  ):
     """Returns a formatted string representing the ObjectResource.
 
     Args:
-      url (StorageUrl): URL representing the object.
       object_resource (resource_reference.Resource): A Resource instance.
       show_acl (bool): Include ACLs list in resource display.
       show_version_in_url (bool): Display extended URL with versioning info.
+      **kwargs (dict): Unused. May apply to other resource format functions.
 
     Returns:
       Formatted multi-line string represnting the ObjectResource.
     """
     raise NotImplementedError('format_object must be overridden.')
+
+  def format(self, resource, **kwargs):
+    """Type-checks resource and returns a formatted metadata string."""
+    if isinstance(resource, resource_reference.BucketResource):
+      return self.format_bucket(resource)
+    if isinstance(resource, resource_reference.ObjectResource):
+      return self.format_object(resource, **kwargs)
+    raise NotImplementedError(
+        '{} does not support {}'.format(self.__class__, type(resource))
+    )

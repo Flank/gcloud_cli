@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container.gkeonprem import bare_metal_clusters as apis
 from googlecloudsdk.api_lib.container.gkeonprem import operations
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.container.bare_metal import flags
+from googlecloudsdk.command_lib.container.bare_metal import cluster_flags as flags
 
 _EXAMPLES = """
 To unenroll a cluster named `my-cluster` managed in location `us-west1`,
@@ -41,7 +41,7 @@ class Unenroll(base.Command):
   @staticmethod
   def Args(parser):
     """Registers flags for this command."""
-    flags.AddClusterResourceArg(parser, 'to unenroll')
+    flags.AddClusterResourceArg(parser, verb='to unenroll')
     flags.AddForceCluster(parser)
     flags.AddAllowMissingCluster(parser)
     base.ASYNC_FLAG.AddToParser(parser)

@@ -57,6 +57,33 @@ def AddCommonTestRunArgs(parser):
       dest='async_',
       help='Invoke a test asynchronously without waiting for test results.')
   parser.add_argument(
+      '--client-details',
+      type=arg_parsers.ArgDict(),
+      metavar='KEY=VALUE',
+      help="""\
+      Comma-separated, KEY=VALUE map of additional details to attach to the test
+      matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix to
+      provide additional context about the tests being run. When consuming the
+      test results, such as in Cloud Functions or a CI system, these details can
+      add additional context such as a link to the corresponding pull request.
+
+      Example:
+
+      ```
+      --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
+      ```
+
+      To help you identify and locate your test matrix in the Firebase console,
+      use the matrixLabel key.
+
+      Example:
+
+      ```
+      --client-details=matrixLabel="Example matrix label"
+      ```
+      """,
+  )
+  parser.add_argument(
       '--num-flaky-test-attempts',
       metavar='int',
       type=arg_validate.NONNEGATIVE_INT_PARSER,
@@ -66,7 +93,8 @@ def AddCommonTestRunArgs(parser):
       initially fails but succeeds on any reattempt is reported as FLAKY.\n
       The maximum number of reruns allowed is 10. (Default: 0, which implies
       no reruns.) All additional attempts are executed in parallel.
-      """)
+      """,
+  )
   parser.add_argument(
       '--record-video',
       action='store_true',
@@ -367,7 +395,8 @@ def AddIosTestArgs(parser):
   parser.add_argument(
       '--type',
       category=base.COMMONLY_USED_FLAGS,
-      choices=['xctest', 'game-loop'],
+      choices=['xctest', 'game-loop', 'robo'],
+      # TODO(b/260103145): Include links to test documentation
       help='The type of iOS test to run.')
   parser.add_argument(
       '--test',
@@ -431,7 +460,7 @@ def AddIosTestArgs(parser):
       help='The path to the application archive (.ipa file) for game-loop '
            'testing. The path may be in the local filesystem or in Google '
            'Cloud Storage using gs:// notation. This flag is only valid when '
-           '*--type=game-loop* is also set.'
+           '*--type* is *game-loop* or *robo*.'
   )
 
   # The following args are specific to iOS xctest tests.
@@ -457,23 +486,7 @@ def AddBetaArgs(parser):
   Args:
     parser: An argparse parser used to add args that follow a command.
   """
-  parser.add_argument(
-      '--client-details',
-      type=arg_parsers.ArgDict(),
-      metavar='KEY=VALUE',
-      help="""\
-      Comma-separated, KEY=VALUE map of additional details to attach to the test
-      matrix. Arbitrary KEY=VALUE pairs may be attached to a test matrix to
-      provide additional context about the tests being run. When consuming the
-      test results, such as in Cloud Functions or a CI system, these details can
-      add additional context such as a link to the corresponding pull request.
-
-      Example:
-
-      ```
-      --client-details=buildNumber=1234,pullRequest=https://example.com/link/to/pull-request
-      ```
-      """)
+  del parser  # Unused by AddBetaArgs
 
 
 def AddGaArgs(parser):
@@ -510,7 +523,7 @@ def AddAndroidBetaArgs(parser):
       greater than the total number of test cases. When you select one or more
       physical devices, the number of shards specified must be <= 50. When you
       select one or more ARM virtual devices, the number of shards specified
-      must be <= 50. When you select only x86 virtual devices, the number of
+      must be <= 100. When you select only x86 virtual devices, the number of
       shards specified must be <= 500.
       """)
   sharding_options.add_argument(
@@ -522,7 +535,7 @@ def AddAndroidBetaArgs(parser):
       each shard (a group of test cases). Each time this flag is repeated, it
       creates a new shard. The shards are run in parallel on separate devices.
       You can repeat this flag up to 50 times when you select one or more
-      physical devices, up to 50 times when you select one or more ARM virtual
+      physical devices, up to 100 times when you select one or more ARM virtual
       devices, and up to 500 times when you select only x86 virtual devices.
 
       Note: If you include the flags *--environment-variable* or
@@ -635,6 +648,19 @@ def AddIosBetaArgs(parser):
            'valid when *--type=game-loop* is also set.'
   )
 
+  # The following args are specific to iOS Robo tests.
+
+  parser.add_argument(
+      '--robo-script',
+      help="""\
+      The path to a Robo Script JSON file. The path may be in the local
+      filesystem or in Google Cloud Storage using gs:// notation. You can
+      guide the Robo test to perform specific actions by specifying a Robo
+      Script with this argument. Learn more at
+      https://firebase.google.com/docs/test-lab/robo-ux-test#scripting.
+      This flag is only valid when *--type=robo* is also set.
+      """)
+
 
 def AddMatrixArgs(parser):
   """Register the repeatable args which define the axes for a test matrix.
@@ -677,7 +703,7 @@ def AddMatrixArgs(parser):
       metavar='MODEL_ID',
       help='The list of MODEL_IDs to test against (default: one device model '
       'determined by the Firebase Test Lab device catalog; see TAGS listed '
-      'by the `$ {parent_command} devices list` command).')
+      'by the `$ {parent_command} models list` command).')
   parser.add_argument(
       '--os-version-ids',
       '-v',

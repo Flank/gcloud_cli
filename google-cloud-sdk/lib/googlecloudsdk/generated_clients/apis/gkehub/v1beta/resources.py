@@ -63,6 +63,39 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  PROJECTS_LOCATIONS_MEMBERSHIPS_BINDINGS = (
+      'projects.locations.memberships.bindings',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/memberships/'
+              '{membershipsId}/bindings/{bindingsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_NAMESPACES = (
+      'projects.locations.namespaces',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/namespaces/'
+              '{namespacesId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_NAMESPACES_RBACROLEBINDINGS = (
+      'projects.locations.namespaces.rbacrolebindings',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/namespaces/'
+              '{namespacesId}/rbacrolebindings/{rbacrolebindingsId}',
+      },
+      ['name'],
+      True
+  )
   PROJECTS_LOCATIONS_OPERATIONS = (
       'projects.locations.operations',
       '{+name}',
@@ -70,6 +103,17 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/operations/'
               '{operationsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_SCOPES = (
+      'projects.locations.scopes',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/scopes/'
+              '{scopesId}',
       },
       ['name'],
       True

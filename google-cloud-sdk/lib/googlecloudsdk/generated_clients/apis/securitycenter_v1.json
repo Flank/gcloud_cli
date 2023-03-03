@@ -529,7 +529,7 @@
           "$ref": "Indicator"
         },
         "vulnerability": {
-          "description": "Represents vulnerability specific fields like cve, cvss scores etc. CVE stands for Common Vulnerabilities and Exposures (https:\/\/cve.mitre.org\/about\/)",
+          "description": "Represents vulnerability-specific fields like CVE and CVSS scores. CVE stands for Common Vulnerabilities and Exposures (https:\/\/cve.mitre.org\/about\/)",
           "$ref": "Vulnerability"
         },
         "muteUpdateTime": {
@@ -625,6 +625,17 @@
         "database": {
           "description": "Database associated with the finding.",
           "$ref": "Database"
+        },
+        "files": {
+          "description": "File associated with the finding.",
+          "type": "array",
+          "items": {
+            "$ref": "File"
+          }
+        },
+        "kernelRootkit": {
+          "description": "Kernel Rootkit signature.",
+          "$ref": "KernelRootkit"
         }
       }
     },
@@ -652,11 +663,11 @@
     },
     "Indicator": {
       "id": "Indicator",
-      "description": "Represents what's commonly known as an Indicator of compromise (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. Reference: https:\/\/en.wikipedia.org\/wiki\/Indicator_of_compromise",
+      "description": "Represents what's commonly known as an _indicator of compromise_ (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. For more information, see [Indicator of compromise](https:\/\/en.wikipedia.org\/wiki\/Indicator_of_compromise).",
       "type": "object",
       "properties": {
         "ipAddresses": {
-          "description": "List of ip addresses associated to the Finding.",
+          "description": "The list of IP addresses that are associated with the finding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -939,7 +950,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "External System Name e.g. jira, demisto, etc. e.g.: `organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira`",
+          "description": "Full resource name of the external system, for example: \"organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\"",
           "type": "string"
         },
         "assignees": {
@@ -1047,7 +1058,8 @@
               "T1562",
               "T1046",
               "T1134",
-              "T1548"
+              "T1548",
+              "T1078.001"
             ],
             "enum": [
               "TECHNIQUE_UNSPECIFIED",
@@ -1084,7 +1096,8 @@
               "IMPAIR_DEFENSES",
               "NETWORK_SERVICE_DISCOVERY",
               "ACCESS_TOKEN_MANIPULATION",
-              "ABUSE_ELEVATION_CONTROL_MECHANISM"
+              "ABUSE_ELEVATION_CONTROL_MECHANISM",
+              "DEFAULT_ACCOUNTS"
             ]
           }
         },
@@ -1169,7 +1182,8 @@
               "T1562",
               "T1046",
               "T1134",
-              "T1548"
+              "T1548",
+              "T1078.001"
             ],
             "enum": [
               "TECHNIQUE_UNSPECIFIED",
@@ -1206,7 +1220,8 @@
               "IMPAIR_DEFENSES",
               "NETWORK_SERVICE_DISCOVERY",
               "ACCESS_TOKEN_MANIPULATION",
-              "ABUSE_ELEVATION_CONTROL_MECHANISM"
+              "ABUSE_ELEVATION_CONTROL_MECHANISM",
+              "DEFAULT_ACCOUNTS"
             ]
           }
         },
@@ -1234,7 +1249,7 @@
           "$ref": "Geolocation"
         },
         "userAgentFamily": {
-          "description": "What kind of user agent is associated, e.g. operating system shells, embedded or stand-alone applications, etc.",
+          "description": "What kind of user agent is associated, for example operating system shells, embedded or stand-alone applications, etc.",
           "type": "string"
         },
         "serviceName": {
@@ -1260,8 +1275,8 @@
             "$ref": "ServiceAccountDelegationInfo"
           }
         },
-        "username": {
-          "description": "A string representing a username. This is likely not an IAM principal. For instance, this may be the system user name if the finding is VM-related, or this may be some type of application login user name, depending on the type of finding.",
+        "userName": {
+          "description": "A string that represents the username of a user, user account, or other entity involved in the access event. What the entity is and what its role in the access event is depends on the finding that this field appears in. The entity is likely not an IAM principal, but could be a user that is logged into an operating system, if the finding is VM-related, or a user that is logged into some type of application that is involved in the access event.",
           "type": "string"
         }
       }
@@ -1459,11 +1474,11 @@
     },
     "Contact": {
       "id": "Contact",
-      "description": "Representa a single contact's email address",
+      "description": "The email address of a contact.",
       "type": "object",
       "properties": {
         "email": {
-          "description": "An email address e.g. \"person123@company.com\"",
+          "description": "An email address. For example, \"`person123@company.com`\".",
           "type": "string"
         }
       }
@@ -1601,7 +1616,7 @@
     },
     "Kubernetes": {
       "id": "Kubernetes",
-      "description": "Kubernetes related attributes.",
+      "description": "Kubernetes-related attributes.",
       "type": "object",
       "properties": {
         "pods": {
@@ -1753,7 +1768,7 @@
           "$ref": "Role"
         },
         "subjects": {
-          "description": "Represents the subjects(s) bound to the role. Not always available for PATCH requests.",
+          "description": "Represents one or more subjects that are bound to the role. Not always available for PATCH requests.",
           "type": "array",
           "items": {
             "$ref": "Subject"
@@ -1857,6 +1872,49 @@
         }
       }
     },
+    "KernelRootkit": {
+      "id": "KernelRootkit",
+      "description": "Kernel mode rootkit signatures.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Rootkit name when available.",
+          "type": "string"
+        },
+        "unexpectedCodeModification": {
+          "description": "True when unexpected modifications of kernel code memory are present.",
+          "type": "boolean"
+        },
+        "unexpectedReadOnlyDataModification": {
+          "description": "True when unexpected modifications of kernel read-only data memory are present.",
+          "type": "boolean"
+        },
+        "unexpectedFtraceHandler": {
+          "description": "True when `ftrace` points are present with callbacks pointing to regions that are not in the expected kernel or module code range.",
+          "type": "boolean"
+        },
+        "unexpectedKprobeHandler": {
+          "description": "True when `kprobe` points are present with callbacks pointing to regions that are not in the expected kernel or module code range.",
+          "type": "boolean"
+        },
+        "unexpectedKernelCodePages": {
+          "description": "True when kernel code pages that are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedSystemCallHandler": {
+          "description": "True when system call handlers that are are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedInterruptHandler": {
+          "description": "True when interrupt handlers that are are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedProcessesInRunqueue": {
+          "description": "True when unexpected processes in the scheduler run queue are present. Such processes are in the run queue, but not in the process task list.",
+          "type": "boolean"
+        }
+      }
+    },
     "GoogleCloudSecuritycenterV1MuteConfig": {
       "id": "GoogleCloudSecuritycenterV1MuteConfig",
       "description": "A mute config is a Cloud SCC resource that contains the configuration to mute create\/update events of findings.",
@@ -1903,7 +1961,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\".",
+          "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\", \"folders\/{folder_id}\/notificationConfigs\/notify_public_bucket\", or \"projects\/{project_id}\/notificationConfigs\/notify_public_bucket\".",
           "type": "string"
         },
         "description": {
@@ -1958,24 +2016,24 @@
           "type": "string"
         },
         "createTime": {
-          "description": "Output only. The time at which the big query export was created. This field is set by the server and will be ignored if provided on export on creation.",
+          "description": "Output only. The time at which the BigQuery export was created. This field is set by the server and will be ignored if provided on export on creation.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
-          "description": "Output only. The most recent time at which the big export was updated. This field is set by the server and will be ignored if provided on export creation or update.",
+          "description": "Output only. The most recent time at which the BigQuery export was updated. This field is set by the server and will be ignored if provided on export creation or update.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "mostRecentEditor": {
-          "description": "Output only. Email address of the user who last edited the big query export. This field is set by the server and will be ignored if provided on export creation or update.",
+          "description": "Output only. Email address of the user who last edited the BigQuery export. This field is set by the server and will be ignored if provided on export creation or update.",
           "readOnly": true,
           "type": "string"
         },
         "principal": {
-          "description": "Output only. The service account that needs permission to create table, upload data to the big query dataset.",
+          "description": "Output only. The service account that needs permission to create table and upload data to the BigQuery dataset.",
           "readOnly": true,
           "type": "string"
         }
@@ -2045,7 +2103,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2941,6 +2999,251 @@
         }
       }
     },
+    "EventThreatDetectionCustomModule": {
+      "id": "EventThreatDetectionCustomModule",
+      "description": "An event threat detection custom module is a Cloud SCC resource that contains the configuration and enablement state of a custom module, which enables ETD to write certain findings to Cloud SCC. ",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Immutable. The resource name of the ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+          "type": "string"
+        },
+        "config": {
+          "description": "Config for the module. For the resident module, its config value is defined at this level. For the inherited module, its config value is inherited from the ancestor module.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object."
+          }
+        },
+        "ancestorModule": {
+          "description": "Output only. The closest ancestor module that this module inherits the enablement state from. The format is the same as the EventThreatDetectionCustomModule resource name.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "enablementState": {
+          "description": "The state of enablement for the module at the given level of the hierarchy.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified enablement state.",
+            "The module is enabled at the given level.",
+            "The module is disabled at the given level.",
+            "When the enablement state is inherited."
+          ],
+          "enum": [
+            "ENABLEMENT_STATE_UNSPECIFIED",
+            "ENABLED",
+            "DISABLED",
+            "INHERITED"
+          ]
+        },
+        "type": {
+          "description": "Type for the module. e.g. CONFIGURABLE_BAD_IP.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The human readable name to be displayed for the module.",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description for the module.",
+          "type": "string"
+        },
+        "updateTime": {
+          "description": "Output only. The time the module was last updated.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastEditor": {
+          "description": "Output only. The editor the module was last updated by.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "ListDescendantEventThreatDetectionCustomModulesResponse": {
+      "id": "ListDescendantEventThreatDetectionCustomModulesResponse",
+      "description": "Response for listing current and descendant resident EventThreatDetectionCustomModules.",
+      "type": "object",
+      "properties": {
+        "eventThreatDetectionCustomModules": {
+          "description": "Custom modules belonging to the requested parent.",
+          "type": "array",
+          "items": {
+            "$ref": "EventThreatDetectionCustomModule"
+          }
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      }
+    },
+    "ListEventThreatDetectionCustomModulesResponse": {
+      "id": "ListEventThreatDetectionCustomModulesResponse",
+      "description": "Response for listing EventThreatDetectionCustomModules.",
+      "type": "object",
+      "properties": {
+        "eventThreatDetectionCustomModules": {
+          "description": "Custom modules belonging to the requested parent.",
+          "type": "array",
+          "items": {
+            "$ref": "EventThreatDetectionCustomModule"
+          }
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      }
+    },
+    "ValidateEventThreatDetectionCustomModuleRequest": {
+      "id": "ValidateEventThreatDetectionCustomModuleRequest",
+      "description": "Request to validate an EventThreatDetectionCustomModule.",
+      "type": "object",
+      "properties": {
+        "rawText": {
+          "description": "Required. The raw text of the module's contents. Used to generate error messages.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Required. The type of the module (e.g. CONFIGURABLE_BAD_IP).",
+          "type": "string"
+        }
+      }
+    },
+    "ValidateEventThreatDetectionCustomModuleResponse": {
+      "id": "ValidateEventThreatDetectionCustomModuleResponse",
+      "description": "Response to validating an Event Threat Detection Custom Module.",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "description": "A list of errors returned by the validator. If the list is empty, there were no errors.",
+          "$ref": "CustomModuleValidationErrors"
+        }
+      }
+    },
+    "CustomModuleValidationErrors": {
+      "id": "CustomModuleValidationErrors",
+      "description": "A list of zero or more errors encountered while validating the uploaded configuration of an Event Threat Detection Custom Module.",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "CustomModuleValidationError"
+          }
+        }
+      }
+    },
+    "CustomModuleValidationError": {
+      "id": "CustomModuleValidationError",
+      "description": "An error encountered while validating the uploaded configuration of an Event Threat Detection Custom Module.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "A description of the error, suitable for human consumption. Required.",
+          "type": "string"
+        },
+        "fieldPath": {
+          "description": "The path, in RFC 8901 JSON Pointer format, to the field that failed validation. This may be left empty if no specific field is affected.",
+          "type": "string"
+        },
+        "start": {
+          "description": "The initial position of the error in the uploaded text version of the module. This field may be omitted if no specific position applies, or if one could not be computed.",
+          "$ref": "Position"
+        },
+        "end": {
+          "description": "The end position of the error in the uploaded text version of the module. This field may be omitted if no specific position applies, or if one could not be computed..",
+          "$ref": "Position"
+        }
+      }
+    },
+    "Position": {
+      "id": "Position",
+      "description": "A position in the uploaded text version of a module.",
+      "type": "object",
+      "properties": {
+        "lineNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "columnNumber": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "EffectiveEventThreatDetectionCustomModule": {
+      "id": "EffectiveEventThreatDetectionCustomModule",
+      "description": "An EffectiveEventThreatDetectionCustomModule is the representation of EventThreatDetectionCustomModule at a given level taking hierarchy into account and resolving various fields accordingly. e.g. if the module is enabled at the ancestor level, effective modules at all descendant levels will have enablement_state set to enabled. Similarly, if module.inherited is set, then effective module's config will contain the ancestor's config details. EffectiveEventThreatDetectionCustomModule is read-only.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Output only. The resource name of the effective ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\".",
+          "readOnly": true,
+          "type": "string"
+        },
+        "config": {
+          "description": "Output only. Config for the effective module.",
+          "readOnly": true,
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object."
+          }
+        },
+        "enablementState": {
+          "description": "Output only. The effective state of enablement for the module at the given level of the hierarchy.",
+          "readOnly": true,
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified enablement state.",
+            "The module is enabled at the given level.",
+            "The module is disabled at the given level."
+          ],
+          "enum": [
+            "ENABLEMENT_STATE_UNSPECIFIED",
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "type": {
+          "description": "Output only. Type for the module. e.g. CONFIGURABLE_BAD_IP.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Output only. The human readable name to be displayed for the module.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "description": {
+          "description": "Output only. The description for the module.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "ListEffectiveEventThreatDetectionCustomModulesResponse": {
+      "id": "ListEffectiveEventThreatDetectionCustomModulesResponse",
+      "description": "Response for listing EffectiveEventThreatDetectionCustomModules.",
+      "type": "object",
+      "properties": {
+        "effectiveEventThreatDetectionCustomModules": {
+          "description": "Effective custom modules belonging to the requested parent.",
+          "type": "array",
+          "items": {
+            "$ref": "EffectiveEventThreatDetectionCustomModule"
+          }
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      }
+    },
     "GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse": {
       "id": "GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse",
       "description": "Response of asset discovery run",
@@ -2981,6 +3284,45 @@
       "description": "A resource that is exposed as a result of a finding.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Exposed Resource Name e.g.: `organizations\/123\/attackExposureResults\/456\/exposedResources\/789`",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The name of the resource that is exposed. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "The resource type of the exposed resource. See: https:\/\/cloud.google.com\/asset-inventory\/docs\/supported-asset-types",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Human readable name of the resource that is exposed.",
+          "type": "string"
+        },
+        "methods": {
+          "description": "The ways in which this resource is exposed. Examples: Read, Write",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resourceValue": {
+          "description": "How valuable this resource is.",
+          "type": "string",
+          "enumDescriptions": [
+            "The resource value isn't specified.",
+            "This is a low value resource.",
+            "This is a medium value resource.",
+            "This is a high value resource."
+          ],
+          "enum": [
+            "RESOURCE_VALUE_UNSPECIFIED",
+            "RESOURCE_VALUE_LOW",
+            "RESOURCE_VALUE_MEDIUM",
+            "RESOURCE_VALUE_HIGH"
+          ]
+        }
       }
     },
     "GoogleCloudSecuritycenterV1ExposurePath": {
@@ -2988,6 +3330,88 @@
       "description": "A path that an attacker could take to reach an exposed resource.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Exposure Path Name e.g.: `organizations\/123\/attackExposureResults\/456\/exposurePaths\/789`",
+          "type": "string"
+        },
+        "pathNodes": {
+          "description": "A list of nodes that exist in this exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "PathNode"
+          }
+        },
+        "edges": {
+          "description": "A list of the edges between nodes in this exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "Edge"
+          }
+        },
+        "exposedResource": {
+          "description": "The leaf node of this exposure path.",
+          "$ref": "GoogleCloudSecuritycenterV1ExposedResource"
+        }
+      }
+    },
+    "PathNode": {
+      "id": "PathNode",
+      "description": "Represents one point that an attacker passes through in this exposure path.",
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "The name of the resource at this point in the exposure path. The format of the name is: https:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "The resource type of this resource. See: https:\/\/cloud.google.com\/asset-inventory\/docs\/supported-asset-types",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Human readable name of this resource.",
+          "type": "string"
+        },
+        "associatedFindings": {
+          "description": "The findings associated with this node in the exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "AssociatedFinding"
+          }
+        }
+      }
+    },
+    "AssociatedFinding": {
+      "id": "AssociatedFinding",
+      "description": "A finding that is associated with this node in the exposure path.",
+      "type": "object",
+      "properties": {
+        "canonicalFindingName": {
+          "description": "Canonical name of the associated findings. Example: organizations\/123\/sources\/456\/findings\/789",
+          "type": "string"
+        },
+        "findingCategory": {
+          "description": "The additional taxonomy group within findings from a given source.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Full resource name of the finding.",
+          "type": "string"
+        }
+      }
+    },
+    "Edge": {
+      "id": "Edge",
+      "description": "Represents a connection between a source node and a destination node in this exposure path.",
+      "type": "object",
+      "properties": {
+        "source": {
+          "description": "This is the resource name of the source node.",
+          "type": "string"
+        },
+        "destination": {
+          "description": "This is the resource name of the destination node.",
+          "type": "string"
+        }
       }
     },
     "GoogleCloudSecuritycenterV1NotificationMessage": {
@@ -3113,6 +3537,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "resourceType": {
+          "description": "Apply resource_value only to resources that match resource_type. resource_type will be checked with \"AND\" of other resources. E.g. \"storage.googleapis.com\/Bucket\" with resource_value \"HIGH\" will apply \"HIGH\" value only to \"storage.googleapis.com\/Bucket\" resources.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Project or folder to scope this config to. For example, \"project\/456\" would apply this config only to resources in \"project\/456\" scope will be checked with \"AND\" of other resources.",
+          "type": "string"
         }
       }
     },
@@ -3798,6 +4230,163 @@
             }
           }
         },
+        "notificationConfigs": {
+          "methods": {
+            "create": {
+              "id": "securitycenter.folders.notificationConfigs.create",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/folders/{foldersId}/notificationConfigs",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the new notification config's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "pattern": "^folders\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "configId": {
+                  "description": "Required. Unique identifier provided by the client within the parent scope. It must be between 1 and 128 characters and contain alphanumeric characters, underscores, or hyphens only.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Creates a notification config."
+            },
+            "delete": {
+              "id": "securitycenter.folders.notificationConfigs.delete",
+              "path": "v1/{+name}",
+              "flatPath": "v1/folders/{foldersId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "DELETE",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to delete. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
+                  "pattern": "^folders\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "Empty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Deletes a notification config."
+            },
+            "get": {
+              "id": "securitycenter.folders.notificationConfigs.get",
+              "path": "v1/{+name}",
+              "flatPath": "v1/folders/{foldersId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "GET",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to get. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
+                  "pattern": "^folders\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Gets a notification config."
+            },
+            "list": {
+              "id": "securitycenter.folders.notificationConfigs.list",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/folders/{foldersId}/notificationConfigs",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "description": "Required. The name of the parent in which to list the notification configurations. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "pattern": "^folders\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "pageToken": {
+                  "description": "The value returned by the last `ListNotificationConfigsResponse`; indicates that this is a continuation of a prior `ListNotificationConfigs` call, and that the system should return the next page of data.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return in a single response. Default is 10, minimum is 1, maximum is 1000.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "ListNotificationConfigsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Lists notification configs."
+            },
+            "patch": {
+              "id": "securitycenter.folders.notificationConfigs.patch",
+              "path": "v1/{+name}",
+              "flatPath": "v1/folders/{foldersId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "PATCH",
+              "parameters": {
+                "name": {
+                  "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\", \"folders\/{folder_id}\/notificationConfigs\/notify_public_bucket\", or \"projects\/{project_id}\/notificationConfigs\/notify_public_bucket\".",
+                  "pattern": "^folders\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "updateMask": {
+                  "description": "The FieldMask to use when updating the notification config. If empty all mutable fields will be updated.",
+                  "location": "query",
+                  "type": "string",
+                  "format": "google-fieldmask"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": " Updates a notification config. The following update fields are allowed: description, pubsub_topic, streaming_config.filter"
+            }
+          }
+        },
         "bigQueryExports": {
           "methods": {
             "get": {
@@ -3807,7 +4396,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. Name of the BigQuery export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^folders\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -3823,7 +4412,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Gets a big query export."
+              "description": "Gets a BigQuery export."
             },
             "create": {
               "id": "securitycenter.folders.bigQueryExports.create",
@@ -3832,7 +4421,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the new big query export's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource of the new BigQuery export. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^folders\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -3856,7 +4445,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a big query export."
+              "description": "Creates a BigQuery export."
             },
             "delete": {
               "id": "securitycenter.folders.bigQueryExports.delete",
@@ -3865,7 +4454,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. The name of the BigQuery export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^folders\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -3881,7 +4470,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes an existing big query export."
+              "description": "Deletes an existing BigQuery export."
             },
             "patch": {
               "id": "securitycenter.folders.bigQueryExports.patch",
@@ -3964,7 +4553,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization to groupBy. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent to group the assets by. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^folders\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -3992,7 +4581,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization assets should belong to. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^folders\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -4100,7 +4689,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^folders\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -4233,7 +4822,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^folders\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -4261,7 +4850,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^folders\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -4368,7 +4957,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "External System Name e.g. jira, demisto, etc. e.g.: `organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira`",
+                          "description": "Full resource name of the external system, for example: \"organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\"",
                           "pattern": "^folders\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+\/externalSystems\/[^\/]+$",
                           "location": "path",
                           "required": true,
@@ -4396,6 +4985,294 @@
                       "description": "Updates external system. This is for a given finding."
                     }
                   }
+                }
+              }
+            }
+          }
+        },
+        "eventThreatDetectionSettings": {
+          "methods": {
+            "validateCustomModule": {
+              "id": "securitycenter.folders.eventThreatDetectionSettings.validateCustomModule",
+              "path": "v1/{+parent}:validateCustomModule",
+              "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings:validateCustomModule",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the parent to validate the Custom Module under. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                  "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleRequest"
+              },
+              "response": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Validates the given Event Threat Detection Custom Module."
+            }
+          }
+          ,
+          "resources": {
+            "customModules": {
+              "methods": {
+                "create": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.create",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The new custom module's parent. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates an ETD custom module at the given level. Creating a module has a side-effect of creating modules at all descendants."
+                },
+                "delete": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.delete",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to delete. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes an ETD custom module. Deletion at resident level also deletes modules at all descendants. Deletion at any other level is not supported."
+                },
+                "get": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to get. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an ETD custom module. Retrieves the module at the given level."
+                },
+                "listDescendant": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.listDescendant",
+                  "path": "v1/{+parent}/customModules:listDescendant",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules:listDescendant",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListDescendantEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDescendantEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListDescendantEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists current and descendant resident ETD custom modules. Retrieve all resident modules at the given level and descendant levels."
+                },
+                "list": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.list",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists ETD custom modules. Retrieve all resident and inherited modules at the given level (no descendants)."
+                },
+                "patch": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.customModules.patch",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "PATCH",
+                  "parameters": {
+                    "name": {
+                      "description": "Immutable. The resource name of the ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "updateMask": {
+                      "description": "The list of fields to be updated. If empty all mutable fields will be updated.",
+                      "location": "query",
+                      "type": "string",
+                      "format": "google-fieldmask"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Updates an ETD custom module at the given level. All config fields can be updated when updating the module at resident level. Only enablement state can be updated when updating the module at inherited levels. Updating the module has a side-effect that it updates all descendants that are inherited from this module."
+                }
+              }
+            },
+            "effectiveCustomModules": {
+              "methods": {
+                "get": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.effectiveCustomModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/effectiveCustomModules/{effectiveCustomModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name of the effective ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings\/effectiveCustomModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EffectiveEventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an effective ETD custom module. Retrieves the effective module at the given level."
+                },
+                "list": {
+                  "id": "securitycenter.folders.eventThreatDetectionSettings.effectiveCustomModules.list",
+                  "path": "v1/{+parent}/effectiveCustomModules",
+                  "flatPath": "v1/folders/{foldersId}/eventThreatDetectionSettings/effectiveCustomModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^folders\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEffectiveEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEffectiveEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEffectiveEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists effective ETD custom modules. Retrieve all effective inherited and resident modules at the given level (no descendants)."
                 }
               }
             }
@@ -4879,6 +5756,163 @@
             }
           }
         },
+        "notificationConfigs": {
+          "methods": {
+            "create": {
+              "id": "securitycenter.projects.notificationConfigs.create",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/projects/{projectsId}/notificationConfigs",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the new notification config's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "pattern": "^projects\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "configId": {
+                  "description": "Required. Unique identifier provided by the client within the parent scope. It must be between 1 and 128 characters and contain alphanumeric characters, underscores, or hyphens only.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Creates a notification config."
+            },
+            "delete": {
+              "id": "securitycenter.projects.notificationConfigs.delete",
+              "path": "v1/{+name}",
+              "flatPath": "v1/projects/{projectsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "DELETE",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to delete. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
+                  "pattern": "^projects\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "Empty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Deletes a notification config."
+            },
+            "get": {
+              "id": "securitycenter.projects.notificationConfigs.get",
+              "path": "v1/{+name}",
+              "flatPath": "v1/projects/{projectsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "GET",
+              "parameters": {
+                "name": {
+                  "description": "Required. Name of the notification config to get. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
+                  "pattern": "^projects\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Gets a notification config."
+            },
+            "list": {
+              "id": "securitycenter.projects.notificationConfigs.list",
+              "path": "v1/{+parent}/notificationConfigs",
+              "flatPath": "v1/projects/{projectsId}/notificationConfigs",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "description": "Required. The name of the parent in which to list the notification configurations. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "pattern": "^projects\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "pageToken": {
+                  "description": "The value returned by the last `ListNotificationConfigsResponse`; indicates that this is a continuation of a prior `ListNotificationConfigs` call, and that the system should return the next page of data.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return in a single response. Default is 10, minimum is 1, maximum is 1000.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "ListNotificationConfigsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Lists notification configs."
+            },
+            "patch": {
+              "id": "securitycenter.projects.notificationConfigs.patch",
+              "path": "v1/{+name}",
+              "flatPath": "v1/projects/{projectsId}/notificationConfigs/{notificationConfigsId}",
+              "httpMethod": "PATCH",
+              "parameters": {
+                "name": {
+                  "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\", \"folders\/{folder_id}\/notificationConfigs\/notify_public_bucket\", or \"projects\/{project_id}\/notificationConfigs\/notify_public_bucket\".",
+                  "pattern": "^projects\/[^\/]+\/notificationConfigs\/[^\/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "updateMask": {
+                  "description": "The FieldMask to use when updating the notification config. If empty all mutable fields will be updated.",
+                  "location": "query",
+                  "type": "string",
+                  "format": "google-fieldmask"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "request": {
+                "$ref": "NotificationConfig"
+              },
+              "response": {
+                "$ref": "NotificationConfig"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": " Updates a notification config. The following update fields are allowed: description, pubsub_topic, streaming_config.filter"
+            }
+          }
+        },
         "bigQueryExports": {
           "methods": {
             "get": {
@@ -4888,7 +5922,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. Name of the BigQuery export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^projects\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -4904,7 +5938,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Gets a big query export."
+              "description": "Gets a BigQuery export."
             },
             "create": {
               "id": "securitycenter.projects.bigQueryExports.create",
@@ -4913,7 +5947,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the new big query export's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource of the new BigQuery export. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^projects\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -4937,7 +5971,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a big query export."
+              "description": "Creates a BigQuery export."
             },
             "delete": {
               "id": "securitycenter.projects.bigQueryExports.delete",
@@ -4946,7 +5980,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. The name of the BigQuery export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^projects\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -4962,7 +5996,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes an existing big query export."
+              "description": "Deletes an existing BigQuery export."
             },
             "patch": {
               "id": "securitycenter.projects.bigQueryExports.patch",
@@ -5045,7 +6079,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization to groupBy. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent to group the assets by. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^projects\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -5073,7 +6107,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization assets should belong to. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^projects\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -5181,7 +6215,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^projects\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -5314,7 +6348,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^projects\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -5342,7 +6376,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^projects\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -5449,7 +6483,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "External System Name e.g. jira, demisto, etc. e.g.: `organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira`",
+                          "description": "Full resource name of the external system, for example: \"organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\"",
                           "pattern": "^projects\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+\/externalSystems\/[^\/]+$",
                           "location": "path",
                           "required": true,
@@ -5477,6 +6511,294 @@
                       "description": "Updates external system. This is for a given finding."
                     }
                   }
+                }
+              }
+            }
+          }
+        },
+        "eventThreatDetectionSettings": {
+          "methods": {
+            "validateCustomModule": {
+              "id": "securitycenter.projects.eventThreatDetectionSettings.validateCustomModule",
+              "path": "v1/{+parent}:validateCustomModule",
+              "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings:validateCustomModule",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the parent to validate the Custom Module under. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                  "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleRequest"
+              },
+              "response": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Validates the given Event Threat Detection Custom Module."
+            }
+          }
+          ,
+          "resources": {
+            "customModules": {
+              "methods": {
+                "create": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.create",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The new custom module's parent. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates an ETD custom module at the given level. Creating a module has a side-effect of creating modules at all descendants."
+                },
+                "delete": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.delete",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to delete. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes an ETD custom module. Deletion at resident level also deletes modules at all descendants. Deletion at any other level is not supported."
+                },
+                "get": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to get. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an ETD custom module. Retrieves the module at the given level."
+                },
+                "listDescendant": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.listDescendant",
+                  "path": "v1/{+parent}/customModules:listDescendant",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules:listDescendant",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListDescendantEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDescendantEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListDescendantEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists current and descendant resident ETD custom modules. Retrieve all resident modules at the given level and descendant levels."
+                },
+                "list": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.list",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists ETD custom modules. Retrieve all resident and inherited modules at the given level (no descendants)."
+                },
+                "patch": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.customModules.patch",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "PATCH",
+                  "parameters": {
+                    "name": {
+                      "description": "Immutable. The resource name of the ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "updateMask": {
+                      "description": "The list of fields to be updated. If empty all mutable fields will be updated.",
+                      "location": "query",
+                      "type": "string",
+                      "format": "google-fieldmask"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Updates an ETD custom module at the given level. All config fields can be updated when updating the module at resident level. Only enablement state can be updated when updating the module at inherited levels. Updating the module has a side-effect that it updates all descendants that are inherited from this module."
+                }
+              }
+            },
+            "effectiveCustomModules": {
+              "methods": {
+                "get": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.effectiveCustomModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/effectiveCustomModules/{effectiveCustomModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name of the effective ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings\/effectiveCustomModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EffectiveEventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an effective ETD custom module. Retrieves the effective module at the given level."
+                },
+                "list": {
+                  "id": "securitycenter.projects.eventThreatDetectionSettings.effectiveCustomModules.list",
+                  "path": "v1/{+parent}/effectiveCustomModules",
+                  "flatPath": "v1/projects/{projectsId}/eventThreatDetectionSettings/effectiveCustomModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^projects\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEffectiveEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEffectiveEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEffectiveEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists effective ETD custom modules. Retrieve all effective inherited and resident modules at the given level (no descendants)."
                 }
               }
             }
@@ -6075,7 +7397,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. Resource name of the parent of sources to list. Its format should be \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6331,7 +7653,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^organizations\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -6359,7 +7681,7 @@
                   "httpMethod": "POST",
                   "parameters": {
                     "name": {
-                      "description": "Required. The relative resource name of the finding. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/finding\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/finding\/{finding_id}\".",
+                      "description": "Required. The [relative resource name](https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name) of the finding. Example: \"organizations\/{organization_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"folders\/{folder_id}\/sources\/{source_id}\/findings\/{finding_id}\", \"projects\/{project_id}\/sources\/{source_id}\/findings\/{finding_id}\".",
                       "pattern": "^organizations\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -6466,7 +7788,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "External System Name e.g. jira, demisto, etc. e.g.: `organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira`",
+                          "description": "Full resource name of the external system, for example: \"organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\"",
                           "pattern": "^organizations\/[^\/]+\/sources\/[^\/]+\/findings\/[^\/]+\/externalSystems\/[^\/]+$",
                           "location": "path",
                           "required": true,
@@ -6665,14 +7987,14 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the new notification config's parent. Its format is \"organizations\/[organization_id]\" or \"projects\/[project_id]\".",
+                  "description": "Required. Resource name of the new notification config's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
                   "type": "string"
                 },
                 "configId": {
-                  "description": "Required. Unique identifier provided by the client within the parent scope. It must be between 1 and 128 characters, and contains alphanumeric characters, underscores or hyphens only.",
+                  "description": "Required. Unique identifier provided by the client within the parent scope. It must be between 1 and 128 characters and contain alphanumeric characters, underscores, or hyphens only.",
                   "location": "query",
                   "type": "string"
                 }
@@ -6698,7 +8020,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the notification config to delete. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\".",
+                  "description": "Required. Name of the notification config to delete. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
                   "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6723,7 +8045,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the notification config to get. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\".",
+                  "description": "Required. Name of the notification config to get. Its format is \"organizations\/[organization_id]\/notificationConfigs\/[config_id]\", \"folders\/[folder_id]\/notificationConfigs\/[config_id]\", or \"projects\/[project_id]\/notificationConfigs\/[config_id]\".",
                   "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6748,7 +8070,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization to list notification configs. Its format is \"organizations\/[organization_id]\" or \"projects\/[project_id]\".",
+                  "description": "Required. The name of the parent in which to list the notification configurations. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6784,7 +8106,7 @@
               "httpMethod": "PATCH",
               "parameters": {
                 "name": {
-                  "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\".",
+                  "description": "The relative resource name of this notification config. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#relative_resource_name Example: \"organizations\/{organization_id}\/notificationConfigs\/notify_public_bucket\", \"folders\/{folder_id}\/notificationConfigs\/notify_public_bucket\", or \"projects\/{project_id}\/notificationConfigs\/notify_public_bucket\".",
                   "pattern": "^organizations\/[^\/]+\/notificationConfigs\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6822,7 +8144,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. Name of the BigQuery export to retrieve. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^organizations\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6838,7 +8160,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Gets a big query export."
+              "description": "Gets a BigQuery export."
             },
             "create": {
               "id": "securitycenter.organizations.bigQueryExports.create",
@@ -6847,7 +8169,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Resource name of the new big query export's parent. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource of the new BigQuery export. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6871,7 +8193,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Creates a big query export."
+              "description": "Creates a BigQuery export."
             },
             "delete": {
               "id": "securitycenter.organizations.bigQueryExports.delete",
@@ -6880,7 +8202,7 @@
               "httpMethod": "DELETE",
               "parameters": {
                 "name": {
-                  "description": "Required. Name of the big query export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
+                  "description": "Required. The name of the BigQuery export to delete. Its format is organizations\/{organization}\/bigQueryExports\/{export_id}, folders\/{folder}\/bigQueryExports\/{export_id}, or projects\/{project}\/bigQueryExports\/{export_id}",
                   "pattern": "^organizations\/[^\/]+\/bigQueryExports\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -6896,7 +8218,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes an existing big query export."
+              "description": "Deletes an existing BigQuery export."
             },
             "patch": {
               "id": "securitycenter.organizations.bigQueryExports.patch",
@@ -6979,7 +8301,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization to groupBy. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent to group the assets by. Its format is \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -7007,7 +8329,7 @@
               "httpMethod": "GET",
               "parameters": {
                 "parent": {
-                  "description": "Required. Name of the organization assets should belong to. Its format is \"organizations\/[organization_id], folders\/[folder_id], or projects\/[project_id]\".",
+                  "description": "Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: \"organizations\/[organization_id]\", \"folders\/[folder_id]\", or \"projects\/[project_id]\".",
                   "pattern": "^organizations\/[^\/]+$",
                   "location": "path",
                   "required": true,
@@ -7131,6 +8453,294 @@
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
               "description": "Updates security marks."
+            }
+          }
+        },
+        "eventThreatDetectionSettings": {
+          "methods": {
+            "validateCustomModule": {
+              "id": "securitycenter.organizations.eventThreatDetectionSettings.validateCustomModule",
+              "path": "v1/{+parent}:validateCustomModule",
+              "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings:validateCustomModule",
+              "httpMethod": "POST",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the parent to validate the Custom Module under. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                  "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "request": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleRequest"
+              },
+              "response": {
+                "$ref": "ValidateEventThreatDetectionCustomModuleResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Validates the given Event Threat Detection Custom Module."
+            }
+          }
+          ,
+          "resources": {
+            "customModules": {
+              "methods": {
+                "create": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.create",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. The new custom module's parent. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates an ETD custom module at the given level. Creating a module has a side-effect of creating modules at all descendants."
+                },
+                "delete": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.delete",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to delete. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes an ETD custom module. Deletion at resident level also deletes modules at all descendants. Deletion at any other level is not supported."
+                },
+                "get": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the custom module to get. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an ETD custom module. Retrieves the module at the given level."
+                },
+                "listDescendant": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.listDescendant",
+                  "path": "v1/{+parent}/customModules:listDescendant",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules:listDescendant",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListDescendantEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDescendantEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListDescendantEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists current and descendant resident ETD custom modules. Retrieve all resident modules at the given level and descendant levels."
+                },
+                "list": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.list",
+                  "path": "v1/{+parent}/customModules",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists ETD custom modules. Retrieve all resident and inherited modules at the given level (no descendants)."
+                },
+                "patch": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.customModules.patch",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/customModules/{customModulesId}",
+                  "httpMethod": "PATCH",
+                  "parameters": {
+                    "name": {
+                      "description": "Immutable. The resource name of the ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/customModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/customModules\/{module}\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings\/customModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "updateMask": {
+                      "description": "The list of fields to be updated. If empty all mutable fields will be updated.",
+                      "location": "query",
+                      "type": "string",
+                      "format": "google-fieldmask"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "response": {
+                    "$ref": "EventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Updates an ETD custom module at the given level. All config fields can be updated when updating the module at resident level. Only enablement state can be updated when updating the module at inherited levels. Updating the module has a side-effect that it updates all descendants that are inherited from this module."
+                }
+              }
+            },
+            "effectiveCustomModules": {
+              "methods": {
+                "get": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.effectiveCustomModules.get",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/effectiveCustomModules/{effectiveCustomModulesId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name of the effective ETD custom module. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"folders\/{folder}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\". * \"projects\/{project}\/eventThreatDetectionSettings\/effectiveCustomModules\/{module}\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings\/effectiveCustomModules\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "EffectiveEventThreatDetectionCustomModule"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets an effective ETD custom module. Retrieves the effective module at the given level."
+                },
+                "list": {
+                  "id": "securitycenter.organizations.eventThreatDetectionSettings.effectiveCustomModules.list",
+                  "path": "v1/{+parent}/effectiveCustomModules",
+                  "flatPath": "v1/organizations/{organizationsId}/eventThreatDetectionSettings/effectiveCustomModules",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "parent": {
+                      "description": "Required. Name of the parent to list custom modules. Its format is: * \"organizations\/{organization}\/eventThreatDetectionSettings\". * \"folders\/{folder}\/eventThreatDetectionSettings\". * \"projects\/{project}\/eventThreatDetectionSettings\".",
+                      "pattern": "^organizations\/[^\/]+\/eventThreatDetectionSettings$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListEffectiveEventThreatDetectionCustomModules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEffectiveEventThreatDetectionCustomModules` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The maximum number of modules to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListEffectiveEventThreatDetectionCustomModulesResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists effective ETD custom modules. Retrieve all effective inherited and resident modules at the given level (no descendants)."
+                }
+              }
             }
           }
         }

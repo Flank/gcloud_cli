@@ -551,6 +551,45 @@
       "description": "A resource that is exposed as a result of a finding.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Exposed Resource Name e.g.: `organizations\/123\/attackExposureResults\/456\/exposedResources\/789`",
+          "type": "string"
+        },
+        "resource": {
+          "description": "The name of the resource that is exposed. See: https:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "The resource type of the exposed resource. See: https:\/\/cloud.google.com\/asset-inventory\/docs\/supported-asset-types",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Human readable name of the resource that is exposed.",
+          "type": "string"
+        },
+        "methods": {
+          "description": "The ways in which this resource is exposed. Examples: Read, Write",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resourceValue": {
+          "description": "How valuable this resource is.",
+          "type": "string",
+          "enumDescriptions": [
+            "The resource value isn't specified.",
+            "This is a low value resource.",
+            "This is a medium value resource.",
+            "This is a high value resource."
+          ],
+          "enum": [
+            "RESOURCE_VALUE_UNSPECIFIED",
+            "RESOURCE_VALUE_LOW",
+            "RESOURCE_VALUE_MEDIUM",
+            "RESOURCE_VALUE_HIGH"
+          ]
+        }
       }
     },
     "GoogleCloudSecuritycenterV1ExposurePath": {
@@ -558,6 +597,88 @@
       "description": "A path that an attacker could take to reach an exposed resource.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Exposure Path Name e.g.: `organizations\/123\/attackExposureResults\/456\/exposurePaths\/789`",
+          "type": "string"
+        },
+        "pathNodes": {
+          "description": "A list of nodes that exist in this exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "PathNode"
+          }
+        },
+        "edges": {
+          "description": "A list of the edges between nodes in this exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "Edge"
+          }
+        },
+        "exposedResource": {
+          "description": "The leaf node of this exposure path.",
+          "$ref": "GoogleCloudSecuritycenterV1ExposedResource"
+        }
+      }
+    },
+    "PathNode": {
+      "id": "PathNode",
+      "description": "Represents one point that an attacker passes through in this exposure path.",
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "The name of the resource at this point in the exposure path. The format of the name is: https:\/\/cloud.google.com\/apis\/design\/resource_names#full_resource_name",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "The resource type of this resource. See: https:\/\/cloud.google.com\/asset-inventory\/docs\/supported-asset-types",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Human readable name of this resource.",
+          "type": "string"
+        },
+        "associatedFindings": {
+          "description": "The findings associated with this node in the exposure path.",
+          "type": "array",
+          "items": {
+            "$ref": "AssociatedFinding"
+          }
+        }
+      }
+    },
+    "AssociatedFinding": {
+      "id": "AssociatedFinding",
+      "description": "A finding that is associated with this node in the exposure path.",
+      "type": "object",
+      "properties": {
+        "canonicalFindingName": {
+          "description": "Canonical name of the associated findings. Example: organizations\/123\/sources\/456\/findings\/789",
+          "type": "string"
+        },
+        "findingCategory": {
+          "description": "The additional taxonomy group within findings from a given source.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Full resource name of the finding.",
+          "type": "string"
+        }
+      }
+    },
+    "Edge": {
+      "id": "Edge",
+      "description": "Represents a connection between a source node and a destination node in this exposure path.",
+      "type": "object",
+      "properties": {
+        "source": {
+          "description": "This is the resource name of the source node.",
+          "type": "string"
+        },
+        "destination": {
+          "description": "This is the resource name of the destination node.",
+          "type": "string"
+        }
       }
     },
     "GoogleCloudSecuritycenterV1ExternalSystem": {
@@ -566,7 +687,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "External System Name e.g. jira, demisto, etc. e.g.: `organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira` `projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira`",
+          "description": "Full resource name of the external system, for example: \"organizations\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"folders\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\", \"projects\/1234\/sources\/5678\/findings\/123456\/externalSystems\/jira\"",
           "type": "string"
         },
         "assignees": {
@@ -653,24 +774,24 @@
           "type": "string"
         },
         "createTime": {
-          "description": "Output only. The time at which the big query export was created. This field is set by the server and will be ignored if provided on export on creation.",
+          "description": "Output only. The time at which the BigQuery export was created. This field is set by the server and will be ignored if provided on export on creation.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "updateTime": {
-          "description": "Output only. The most recent time at which the big export was updated. This field is set by the server and will be ignored if provided on export creation or update.",
+          "description": "Output only. The most recent time at which the BigQuery export was updated. This field is set by the server and will be ignored if provided on export creation or update.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
         },
         "mostRecentEditor": {
-          "description": "Output only. Email address of the user who last edited the big query export. This field is set by the server and will be ignored if provided on export creation or update.",
+          "description": "Output only. Email address of the user who last edited the BigQuery export. This field is set by the server and will be ignored if provided on export creation or update.",
           "readOnly": true,
           "type": "string"
         },
         "principal": {
-          "description": "Output only. The service account that needs permission to create table, upload data to the big query dataset.",
+          "description": "Output only. The service account that needs permission to create table and upload data to the BigQuery dataset.",
           "readOnly": true,
           "type": "string"
         }
@@ -819,7 +940,7 @@
           "$ref": "Indicator"
         },
         "vulnerability": {
-          "description": "Represents vulnerability specific fields like cve, cvss scores etc. CVE stands for Common Vulnerabilities and Exposures (https:\/\/cve.mitre.org\/about\/)",
+          "description": "Represents vulnerability-specific fields like CVE and CVSS scores. CVE stands for Common Vulnerabilities and Exposures (https:\/\/cve.mitre.org\/about\/)",
           "$ref": "Vulnerability"
         },
         "muteUpdateTime": {
@@ -915,6 +1036,17 @@
         "database": {
           "description": "Database associated with the finding.",
           "$ref": "Database"
+        },
+        "files": {
+          "description": "File associated with the finding.",
+          "type": "array",
+          "items": {
+            "$ref": "File"
+          }
+        },
+        "kernelRootkit": {
+          "description": "Kernel Rootkit signature.",
+          "$ref": "KernelRootkit"
         }
       }
     },
@@ -942,11 +1074,11 @@
     },
     "Indicator": {
       "id": "Indicator",
-      "description": "Represents what's commonly known as an Indicator of compromise (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. Reference: https:\/\/en.wikipedia.org\/wiki\/Indicator_of_compromise",
+      "description": "Represents what's commonly known as an _indicator of compromise_ (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. For more information, see [Indicator of compromise](https:\/\/en.wikipedia.org\/wiki\/Indicator_of_compromise).",
       "type": "object",
       "properties": {
         "ipAddresses": {
-          "description": "List of ip addresses associated to the Finding.",
+          "description": "The list of IP addresses that are associated with the finding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1306,7 +1438,8 @@
               "T1562",
               "T1046",
               "T1134",
-              "T1548"
+              "T1548",
+              "T1078.001"
             ],
             "enum": [
               "TECHNIQUE_UNSPECIFIED",
@@ -1343,7 +1476,8 @@
               "IMPAIR_DEFENSES",
               "NETWORK_SERVICE_DISCOVERY",
               "ACCESS_TOKEN_MANIPULATION",
-              "ABUSE_ELEVATION_CONTROL_MECHANISM"
+              "ABUSE_ELEVATION_CONTROL_MECHANISM",
+              "DEFAULT_ACCOUNTS"
             ]
           }
         },
@@ -1428,7 +1562,8 @@
               "T1562",
               "T1046",
               "T1134",
-              "T1548"
+              "T1548",
+              "T1078.001"
             ],
             "enum": [
               "TECHNIQUE_UNSPECIFIED",
@@ -1465,7 +1600,8 @@
               "IMPAIR_DEFENSES",
               "NETWORK_SERVICE_DISCOVERY",
               "ACCESS_TOKEN_MANIPULATION",
-              "ABUSE_ELEVATION_CONTROL_MECHANISM"
+              "ABUSE_ELEVATION_CONTROL_MECHANISM",
+              "DEFAULT_ACCOUNTS"
             ]
           }
         },
@@ -1493,7 +1629,7 @@
           "$ref": "Geolocation"
         },
         "userAgentFamily": {
-          "description": "What kind of user agent is associated, e.g. operating system shells, embedded or stand-alone applications, etc.",
+          "description": "What kind of user agent is associated, for example operating system shells, embedded or stand-alone applications, etc.",
           "type": "string"
         },
         "serviceName": {
@@ -1519,8 +1655,8 @@
             "$ref": "ServiceAccountDelegationInfo"
           }
         },
-        "username": {
-          "description": "A string representing a username. This is likely not an IAM principal. For instance, this may be the system user name if the finding is VM-related, or this may be some type of application login user name, depending on the type of finding.",
+        "userName": {
+          "description": "A string that represents the username of a user, user account, or other entity involved in the access event. What the entity is and what its role in the access event is depends on the finding that this field appears in. The entity is likely not an IAM principal, but could be a user that is logged into an operating system, if the finding is VM-related, or a user that is logged into some type of application that is involved in the access event.",
           "type": "string"
         }
       }
@@ -1718,11 +1854,11 @@
     },
     "Contact": {
       "id": "Contact",
-      "description": "Representa a single contact's email address",
+      "description": "The email address of a contact.",
       "type": "object",
       "properties": {
         "email": {
-          "description": "An email address e.g. \"person123@company.com\"",
+          "description": "An email address. For example, \"`person123@company.com`\".",
           "type": "string"
         }
       }
@@ -1860,7 +1996,7 @@
     },
     "Kubernetes": {
       "id": "Kubernetes",
-      "description": "Kubernetes related attributes.",
+      "description": "Kubernetes-related attributes.",
       "type": "object",
       "properties": {
         "pods": {
@@ -2012,7 +2148,7 @@
           "$ref": "Role"
         },
         "subjects": {
-          "description": "Represents the subjects(s) bound to the role. Not always available for PATCH requests.",
+          "description": "Represents one or more subjects that are bound to the role. Not always available for PATCH requests.",
           "type": "array",
           "items": {
             "$ref": "Subject"
@@ -2113,6 +2249,49 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "KernelRootkit": {
+      "id": "KernelRootkit",
+      "description": "Kernel mode rootkit signatures.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Rootkit name when available.",
+          "type": "string"
+        },
+        "unexpectedCodeModification": {
+          "description": "True when unexpected modifications of kernel code memory are present.",
+          "type": "boolean"
+        },
+        "unexpectedReadOnlyDataModification": {
+          "description": "True when unexpected modifications of kernel read-only data memory are present.",
+          "type": "boolean"
+        },
+        "unexpectedFtraceHandler": {
+          "description": "True when `ftrace` points are present with callbacks pointing to regions that are not in the expected kernel or module code range.",
+          "type": "boolean"
+        },
+        "unexpectedKprobeHandler": {
+          "description": "True when `kprobe` points are present with callbacks pointing to regions that are not in the expected kernel or module code range.",
+          "type": "boolean"
+        },
+        "unexpectedKernelCodePages": {
+          "description": "True when kernel code pages that are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedSystemCallHandler": {
+          "description": "True when system call handlers that are are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedInterruptHandler": {
+          "description": "True when interrupt handlers that are are not in the expected kernel or module code regions are present.",
+          "type": "boolean"
+        },
+        "unexpectedProcessesInRunqueue": {
+          "description": "True when unexpected processes in the scheduler run queue are present. Such processes are in the run queue, but not in the process task list.",
+          "type": "boolean"
         }
       }
     },
@@ -2235,6 +2414,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "resourceType": {
+          "description": "Apply resource_value only to resources that match resource_type. resource_type will be checked with \"AND\" of other resources. E.g. \"storage.googleapis.com\/Bucket\" with resource_value \"HIGH\" will apply \"HIGH\" value only to \"storage.googleapis.com\/Bucket\" resources.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Project or folder to scope this config to. For example, \"project\/456\" would apply this config only to resources in \"project\/456\" scope will be checked with \"AND\" of other resources.",
+          "type": "string"
         }
       }
     },
@@ -2544,7 +2731,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the ContainerThreatDetectionSettings resource."
+          "description": "Get the ContainerThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetContainerThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateContainerThreatDetectionSettings for this purpose."
         },
         "updateContainerThreatDetectionSettings": {
           "id": "securitycenter.organizations.updateContainerThreatDetectionSettings",
@@ -2603,7 +2790,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the EventThreatDetectionSettings resource."
+          "description": "Get the EventThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetEventThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateEventThreatDetectionSettings for this purpose."
         },
         "updateEventThreatDetectionSettings": {
           "id": "securitycenter.organizations.updateEventThreatDetectionSettings",
@@ -2662,7 +2849,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the SecurityHealthAnalyticsSettings resource."
+          "description": "Get the SecurityHealthAnalyticsSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetSecurityHealthAnalyticsSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateSecurityHealthAnalyticsSettings for this purpose."
         },
         "updateSecurityHealthAnalyticsSettings": {
           "id": "securitycenter.organizations.updateSecurityHealthAnalyticsSettings",
@@ -2721,7 +2908,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the VirtualMachineThreatDetectionSettings resource."
+          "description": "Get the VirtualMachineThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetVirtualMachineThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateVirtualMachineThreatDetectionSettings for this purpose."
         },
         "updateVirtualMachineThreatDetectionSettings": {
           "id": "securitycenter.organizations.updateVirtualMachineThreatDetectionSettings",
@@ -2780,7 +2967,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the RapidVulnerabilityDetectionSettings resource."
+          "description": "Get the RapidVulnerabilityDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetRapidVulnerabilityDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateRapidVulnerabilityDetectionSettings for this purpose."
         },
         "updateRapidVulnerabilityDetectionSettings": {
           "id": "securitycenter.organizations.updateRapidVulnerabilityDetectionSettings",
@@ -2839,7 +3026,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the WebSecurityScannerSettings resource."
+          "description": "Get the WebSecurityScannerSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetWebSecurityScannerSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateWebSecurityScannerSettings for this purpose."
         },
         "updateWebSecurityScannerSettings": {
           "id": "securitycenter.organizations.updateWebSecurityScannerSettings",
@@ -2903,7 +3090,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -2932,7 +3119,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -2961,7 +3148,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -2990,7 +3177,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3019,7 +3206,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3048,7 +3235,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         }
@@ -3129,7 +3316,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the ContainerThreatDetectionSettings resource."
+          "description": "Get the ContainerThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetContainerThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateContainerThreatDetectionSettings for this purpose."
         },
         "updateContainerThreatDetectionSettings": {
           "id": "securitycenter.folders.updateContainerThreatDetectionSettings",
@@ -3188,7 +3375,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the EventThreatDetectionSettings resource."
+          "description": "Get the EventThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetEventThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateEventThreatDetectionSettings for this purpose."
         },
         "updateEventThreatDetectionSettings": {
           "id": "securitycenter.folders.updateEventThreatDetectionSettings",
@@ -3247,7 +3434,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the SecurityHealthAnalyticsSettings resource."
+          "description": "Get the SecurityHealthAnalyticsSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetSecurityHealthAnalyticsSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateSecurityHealthAnalyticsSettings for this purpose."
         },
         "updateSecurityHealthAnalyticsSettings": {
           "id": "securitycenter.folders.updateSecurityHealthAnalyticsSettings",
@@ -3306,7 +3493,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the VirtualMachineThreatDetectionSettings resource."
+          "description": "Get the VirtualMachineThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetVirtualMachineThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateVirtualMachineThreatDetectionSettings for this purpose."
         },
         "updateVirtualMachineThreatDetectionSettings": {
           "id": "securitycenter.folders.updateVirtualMachineThreatDetectionSettings",
@@ -3365,7 +3552,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the RapidVulnerabilityDetectionSettings resource."
+          "description": "Get the RapidVulnerabilityDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetRapidVulnerabilityDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateRapidVulnerabilityDetectionSettings for this purpose."
         },
         "updateRapidVulnerabilityDetectionSettings": {
           "id": "securitycenter.folders.updateRapidVulnerabilityDetectionSettings",
@@ -3424,7 +3611,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the WebSecurityScannerSettings resource."
+          "description": "Get the WebSecurityScannerSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetWebSecurityScannerSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateWebSecurityScannerSettings for this purpose."
         },
         "updateWebSecurityScannerSettings": {
           "id": "securitycenter.folders.updateWebSecurityScannerSettings",
@@ -3488,7 +3675,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3517,7 +3704,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3546,7 +3733,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3575,7 +3762,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3604,7 +3791,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -3633,7 +3820,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         }
@@ -3714,7 +3901,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the ContainerThreatDetectionSettings resource."
+          "description": "Get the ContainerThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetContainerThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateContainerThreatDetectionSettings for this purpose."
         },
         "updateContainerThreatDetectionSettings": {
           "id": "securitycenter.projects.updateContainerThreatDetectionSettings",
@@ -3773,7 +3960,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the EventThreatDetectionSettings resource."
+          "description": "Get the EventThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetEventThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateEventThreatDetectionSettings for this purpose."
         },
         "updateEventThreatDetectionSettings": {
           "id": "securitycenter.projects.updateEventThreatDetectionSettings",
@@ -3832,7 +4019,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the SecurityHealthAnalyticsSettings resource."
+          "description": "Get the SecurityHealthAnalyticsSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetSecurityHealthAnalyticsSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateSecurityHealthAnalyticsSettings for this purpose."
         },
         "updateSecurityHealthAnalyticsSettings": {
           "id": "securitycenter.projects.updateSecurityHealthAnalyticsSettings",
@@ -3891,7 +4078,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the VirtualMachineThreatDetectionSettings resource."
+          "description": "Get the VirtualMachineThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetVirtualMachineThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateVirtualMachineThreatDetectionSettings for this purpose."
         },
         "updateVirtualMachineThreatDetectionSettings": {
           "id": "securitycenter.projects.updateVirtualMachineThreatDetectionSettings",
@@ -3950,7 +4137,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the RapidVulnerabilityDetectionSettings resource."
+          "description": "Get the RapidVulnerabilityDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetRapidVulnerabilityDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateRapidVulnerabilityDetectionSettings for this purpose."
         },
         "updateRapidVulnerabilityDetectionSettings": {
           "id": "securitycenter.projects.updateRapidVulnerabilityDetectionSettings",
@@ -4009,7 +4196,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Get the WebSecurityScannerSettings resource."
+          "description": "Get the WebSecurityScannerSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetWebSecurityScannerSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateWebSecurityScannerSettings for this purpose."
         },
         "updateWebSecurityScannerSettings": {
           "id": "securitycenter.projects.updateWebSecurityScannerSettings",
@@ -4075,7 +4262,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Get the ContainerThreatDetectionSettings resource."
+                  "description": "Get the ContainerThreatDetectionSettings resource. In the returned settings response, a missing field only indicates that it was not explicitly set, so no assumption should be made about these fields. In other words, GetContainerThreatDetectionSettings does not calculate the effective service settings for the resource, which accounts for inherited settings and defaults. Instead, use CalculateContainerThreatDetectionSettings for this purpose."
                 },
                 "updateContainerThreatDetectionSettings": {
                   "id": "securitycenter.projects.locations.clusters.updateContainerThreatDetectionSettings",
@@ -4139,7 +4326,7 @@
                       "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
-                      "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+                      "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
                     }
                   }
                 }
@@ -4172,7 +4359,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective ContainerThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -4201,7 +4388,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective EventThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -4230,7 +4417,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective SecurityHealthAnalyticsSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -4259,7 +4446,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective VirtualMachineThreatDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -4288,7 +4475,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective RapidVulnerabilityDetectionSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         },
@@ -4317,7 +4504,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings."
+              "description": "Calculates the effective WebSecurityScannerSettings based on its level in the resource hierarchy and its settings. Settings provided closer to the target resource take precedence over those further away (e.g. folder will override organization level settings). The default SCC setting for the detector service defaults can be overridden at organization, folder and project levels. No assumptions should be made about the SCC defaults as it is considered an internal implementation detail."
             }
           }
         }

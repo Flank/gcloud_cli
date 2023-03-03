@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
 import os
 
 from googlecloudsdk.api_lib.storage import cloud_api
@@ -34,8 +35,10 @@ from googlecloudsdk.command_lib.storage.resources import resource_util
 from googlecloudsdk.command_lib.storage.tasks.cp import copy_task_factory
 from googlecloudsdk.command_lib.storage.tasks.cp import copy_util
 from googlecloudsdk.core import log
+from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import platforms
 
-
+_ONE_TB_IN_BYTES = 1099511627776
 _RELATIVE_PATH_SYMBOLS = frozenset(['.', '..'])
 
 
@@ -193,6 +196,33 @@ def _is_expanded_url_valid_parent_dir(expanded_url):
       ])
 
 
+def _sanitize_destination_resource_if_needed(destination_resource):
+  """Returns the destination resource with invalid characters replaced.
+
+  The invalid characters are only replaced if the destination URL is a FileUrl
+  and the platform is Windows. This is required because Cloud URLs may have
+  certain characters that are not allowed in file paths on Windows.
+
+  Args:
+    destination_resource (Resource): The destination resource.
+
+  Returns:
+    The destination resource with invalid characters replaced from the
+    destination path.
+  """
+  if (
+      isinstance(destination_resource.storage_url, storage_url.FileUrl)
+      and properties.VALUES.storage.convert_incompatible_windows_path_characters.GetBool()
+      and platforms.OperatingSystem.IsWindows()
+  ):
+    sanitized_destination_resource = copy.deepcopy(destination_resource)
+    sanitized_destination_resource.storage_url.object_name = (
+        platforms.MakePathWindowsCompatible(
+            sanitized_destination_resource.storage_url.object_name))
+    return sanitized_destination_resource
+  return destination_resource
+
+
 class CopyTaskIterator:
   """Iterates over each expanded source and creates an appropriate copy task."""
 
@@ -234,6 +264,8 @@ class CopyTaskIterator:
     self._all_versions = source_name_iterator.all_versions
     self._has_multiple_top_level_sources = (
         source_name_iterator.has_multiple_top_level_resources)
+    self._has_cloud_source = False
+    self._has_local_source = False
     self._source_name_iterator = (
         plurality_checkable_iterator.PluralityCheckableIterator(
             source_name_iterator))
@@ -293,9 +325,11 @@ class CopyTaskIterator:
       if resource.is_container():
         return
       if isinstance(resource, resource_reference.FileObjectResource):
+        self._has_local_source = True
         size = os.path.getsize(resource.storage_url.object_name)
       elif (isinstance(resource, resource_reference.ObjectResource) and
             resource.size is not None):
+        self._has_cloud_source = True
         size = resource.size
       else:
         raise errors.ValueCannotBeDeterminedError
@@ -372,8 +406,7 @@ class CopyTaskIterator:
 
       log.status.Print('Copying {} to {}'.format(
           source_url_string, destination_url.versionless_url_string))
-      if self._task_status_queue:
-        self._update_workload_estimation(source.resource)
+      self._update_workload_estimation(source.resource)
 
       yield copy_task_factory.get_copy_task(
           source.resource,
@@ -393,6 +426,17 @@ class CopyTaskIterator:
           item_count=self._total_file_count,
           size=self._total_size)
 
+    if (self._total_size > _ONE_TB_IN_BYTES and self._has_cloud_source and
+        not self._has_local_source and
+        destination_url.scheme is storage_url.ProviderPrefix.GCS and
+        properties.VALUES.storage.suggest_transfer.GetBool()):
+      log.status.Print(
+          'For large copies, consider the `gcloud transfer jobs create ...`'
+          ' command. Learn more at'
+          '\nhttps://cloud.google.com/storage-transfer-service'
+          '\nRun `gcloud config set storage/suggest_transfer False` to'
+          ' disable this message.')
+
   def _get_copy_destination(self, raw_destination, source):
     """Returns the final destination StorageUrl instance."""
     completion_is_necessary = (
@@ -407,9 +451,13 @@ class CopyTaskIterator:
           source.expanded_url.is_stdio):
         raise errors.Error(
             'Destination object name needed when source is stdin.')
-      return self._complete_destination(raw_destination, source)
+      destination_resource = self._complete_destination(raw_destination, source)
     else:
-      return raw_destination
+      destination_resource = raw_destination
+
+    sanitized_destination_resource = _sanitize_destination_resource_if_needed(
+        destination_resource)
+    return sanitized_destination_resource
 
   def _complete_destination(self, destination_container, source):
     """Gets a valid copy destination incorporating part of the source's name.

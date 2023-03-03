@@ -18,13 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import contextlib
-import itertools
-
 from apitools.base.py import list_pager
-from googlecloudsdk.api_lib.functions.v1 import util as api_v1_util
 from googlecloudsdk.api_lib.functions.v2 import util as api_util
-from googlecloudsdk.command_lib.functions.v1.list import command
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -47,50 +42,31 @@ def _YieldFromLocations(locations, project, limit, messages, client):
   def _ReadAttrAndLogUnreachable(message, attribute):
     if message.unreachable:
       log.warning(
-          'The following regions were fully or partially unreachable '
-          'for query: %s', ', '.join(message.unreachable))
+          (
+              'The following regions were fully or partially unreachable '
+              'for query: %s'
+          ),
+          ', '.join(message.unreachable),
+      )
     return getattr(message, attribute)
 
   for location in locations:
     location_ref = resources.REGISTRY.Parse(
         location,
         params={'projectsId': project},
-        collection='cloudfunctions.projects.locations')
+        collection='cloudfunctions.projects.locations',
+    )
     for function in list_pager.YieldFromList(
         service=client.projects_locations_functions,
         request=messages.CloudfunctionsProjectsLocationsFunctionsListRequest(
-            parent=location_ref.RelativeName(), filter='environment="GEN_2"'),
+            parent=location_ref.RelativeName(), filter='environment="GEN_2"'
+        ),
         limit=limit,
         field='functions',
         batch_size_attribute='pageSize',
-        get_field_func=_ReadAttrAndLogUnreachable):
+        get_field_func=_ReadAttrAndLogUnreachable,
+    ):
       yield function
-
-
-@contextlib.contextmanager
-def _OverrideEndpointOverrides(api_name, override):
-  """Context manager to override an API's endpoint overrides for a while.
-
-  Usage:
-    with _OverrideEndpointOverrides(api_name, override):
-      client = apis.GetClientInstance(api_name, api_version)
-
-
-  Args:
-    api_name: str, Name of the API to modify. E.g. "cloudfunctions"
-    override: str, New value for the endpoint.
-
-  Yields:
-    None.
-  """
-  endpoint_property = getattr(properties.VALUES.api_endpoint_overrides,
-                              api_name)
-  old_endpoint = endpoint_property.Get()
-  try:
-    endpoint_property.Set(override)
-    yield
-  finally:
-    endpoint_property.Set(old_endpoint)
 
 
 def Run(args, release_track):
@@ -100,19 +76,4 @@ def Run(args, release_track):
   project = properties.VALUES.core.project.GetOrFail()
   limit = args.limit
 
-  list_v2_generator = _YieldFromLocations(args.regions, project, limit,
-                                          messages, client)
-
-  # Currently GCF v2 exists in staging so users of GCF v2 have in their config
-  # the api_endpoint_overrides of cloudfunctions.
-  # To list GCF v1 resources use _OverrideEndpointOverrides to forcibly
-  # overwrites's the user config's override with the original v1 endpoint.
-  with _OverrideEndpointOverrides('cloudfunctions',
-                                  'https://cloudfunctions.googleapis.com/'):
-    client = api_v1_util.GetApiClientInstance()
-    messages = api_v1_util.GetApiMessagesModule()
-    list_v1_generator = command.YieldFromLocations(args.regions, project, limit,
-                                                   messages, client)
-
-  combined_generator = itertools.chain(list_v2_generator, list_v1_generator)
-  return combined_generator
+  return _YieldFromLocations(args.regions, project, limit, messages, client)

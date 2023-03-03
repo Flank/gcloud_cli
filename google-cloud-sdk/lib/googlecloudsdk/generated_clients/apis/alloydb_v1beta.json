@@ -7,7 +7,7 @@
   "version": "v1beta",
   "revision": "0",
   "title": "AlloyDB API",
-  "description": "",
+  "description": "AlloyDB for PostgreSQL is an open source-compatible database service that provides a powerful option for migrating, modernizing, or building commercial-grade applications. It offers full compatibility with standard PostgreSQL, and is more than 4x faster for transactional workloads and up to 100x faster for analytical queries than standard PostgreSQL in our performance tests. AlloyDB for PostgreSQL offers a 99.99 percent availability SLA inclusive of maintenance. AlloyDB is optimized for the most demanding use cases, allowing you to build new applications that require high transaction throughput, large database sizes, or multiple read resources; scale existing PostgreSQL workloads with no application changes; and modernize legacy proprietary databases. ",
   "ownerDomain": "google.com",
   "ownerName": "Google",
   "icons": {
@@ -197,13 +197,6 @@
       "properties": {
       }
     },
-    "CancelOperationRequest": {
-      "id": "CancelOperationRequest",
-      "description": "The request message for Operations.CancelOperation.",
-      "type": "object",
-      "properties": {
-      }
-    },
     "ListClustersResponse": {
       "id": "ListClustersResponse",
       "description": "Message for response to listing Clusters",
@@ -231,7 +224,7 @@
     },
     "Cluster": {
       "id": "Cluster",
-      "description": "A cluster is a collection of regional AlloyDB resources. It can include a primary instance and one or more read pool instances. All cluster resources share a storage layer, which scales as needed. NEXT_ID: 27",
+      "description": "A cluster is a collection of regional AlloyDB resources. It can include a primary instance and one or more read pool instances. All cluster resources share a storage layer, which scales as needed.",
       "type": "object",
       "properties": {
         "backupSource": {
@@ -245,7 +238,7 @@
           "$ref": "MigrationSource"
         },
         "name": {
-          "description": "Output only. The name of the cluster resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id} where the cluster ID segment should satisfy the regex expression \"[a-z0-9-]+\". For more details see https:\/\/google.aip.dev\/122. The prefix of the cluster resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
+          "description": "Output only. The name of the cluster resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id} where the cluster ID segment should satisfy the regex expression `[a-z0-9-]+`. For more details see https:\/\/google.aip.dev\/122. The prefix of the cluster resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
           "readOnly": true,
           "type": "string"
         },
@@ -296,7 +289,8 @@
             "The cluster is being deleted.",
             "The creation of the cluster failed.",
             "The cluster is bootstrapping with data from some other source. Direct mutations to the cluster (e.g. adding read pool) are not allowed.",
-            "The cluster is under maintenance. AlloyDB regularly performs maintenance and upgrades on customer clusters. Updates on the cluster are not allowed while the cluster is in this state."
+            "The cluster is under maintenance. AlloyDB regularly performs maintenance and upgrades on customer clusters. Updates on the cluster are not allowed while the cluster is in this state.",
+            "The cluster is being promoted."
           ],
           "enum": [
             "STATE_UNSPECIFIED",
@@ -307,7 +301,8 @@
             "DELETING",
             "FAILED",
             "BOOTSTRAPPING",
-            "MAINTENANCE"
+            "MAINTENANCE",
+            "PROMOTING"
           ]
         },
         "clusterType": {
@@ -316,11 +311,13 @@
           "type": "string",
           "enumDescriptions": [
             "The type of the cluster is unknown.",
-            "Primary cluster that support read and write operations."
+            "Primary cluster that support read and write operations.",
+            "Secondary cluster that is replicating from another region. This only supports read."
           ],
           "enum": [
             "CLUSTER_TYPE_UNSPECIFIED",
-            "PRIMARY"
+            "PRIMARY",
+            "SECONDARY"
           ]
         },
         "databaseVersion": {
@@ -363,7 +360,7 @@
           "$ref": "UserPassword"
         },
         "automatedBackupPolicy": {
-          "description": "The automated backup policy for this cluster. If no policy is provided then the default policy will be used. The default policy takes one backup a day, has a backup window of 1 hour, and retains backups for 14 days. For more information on the defaults, consult the documentation for the message type.",
+          "description": "The automated backup policy for this cluster. If no policy is provided then the default policy will be used. If backups are supported for the cluster, the default policy takes one backup a day, has a backup window of 1 hour, and retains backups for 14 days. For more information on the defaults, consult the documentation for the message type.",
           "$ref": "AutomatedBackupPolicy"
         },
         "sslConfig": {
@@ -383,9 +380,23 @@
           "description": "Optional. Point-in-time recovery configuration for this cluster. By default, PITR is enabled and logs are retained for 14 days.",
           "$ref": "PitrConfig"
         },
+        "continuousBackupConfig": {
+          "description": "Optional. Continuous backup configuration for this cluster.",
+          "$ref": "ContinuousBackupConfig"
+        },
+        "continuousBackupInfo": {
+          "description": "Output only. Continuous backup properties for this cluster.",
+          "readOnly": true,
+          "$ref": "ContinuousBackupInfo"
+        },
         "secondaryConfig": {
           "description": "Cross Region replication config specific to SECONDARY cluster.",
           "$ref": "SecondaryConfig"
+        },
+        "primaryConfig": {
+          "description": "Output only. Cross Region replication config specific to PRIMARY cluster.",
+          "readOnly": true,
+          "$ref": "PrimaryConfig"
         }
       }
     },
@@ -394,6 +405,11 @@
       "description": "Message describing a BackupSource.",
       "type": "object",
       "properties": {
+        "backupUid": {
+          "description": "Output only. The system-generated UID of the backup which was used to create this resource. The UID is generated when the backup is created, and it is retained until the backup is deleted.",
+          "readOnly": true,
+          "type": "string"
+        },
         "backupName": {
           "description": "Required. The name of the backup resource with the format: * projects\/{project}\/locations\/{region}\/backups\/{backup_id}",
           "type": "string"
@@ -402,7 +418,7 @@
     },
     "MigrationSource": {
       "id": "MigrationSource",
-      "description": "Subset of the source instance configuration that is available when reading the cluster resource. NEXT_ID: 4",
+      "description": "Subset of the source instance configuration that is available when reading the cluster resource.",
       "type": "object",
       "properties": {
         "hostPort": {
@@ -447,7 +463,7 @@
     },
     "AutomatedBackupPolicy": {
       "id": "AutomatedBackupPolicy",
-      "description": "Message describing the user-specified automated backup policy. All fields in the automated backup policy are optional. Defaults for each field are provided if they are not set. NEXT_ID: 9",
+      "description": "Message describing the user-specified automated backup policy. All fields in the automated backup policy are optional. Defaults for each field are provided if they are not set.",
       "type": "object",
       "properties": {
         "weeklySchedule": {
@@ -628,7 +644,7 @@
     },
     "EncryptionInfo": {
       "id": "EncryptionInfo",
-      "description": "EncryptionInfo describes the encryption information of a cluster or a backup. NEXT_ID: 3",
+      "description": "EncryptionInfo describes the encryption information of a cluster or a backup.",
       "type": "object",
       "properties": {
         "encryptionType": {
@@ -658,7 +674,7 @@
     },
     "PitrConfig": {
       "id": "PitrConfig",
-      "description": "PitrConfig describes the point-in-time recovery configurations of a cluster. NEXT_ID: 4",
+      "description": "Deprecated, use ContinuousBackupConfig instead.",
       "type": "object",
       "properties": {
         "enabled": {
@@ -678,6 +694,72 @@
         }
       }
     },
+    "ContinuousBackupConfig": {
+      "id": "ContinuousBackupConfig",
+      "description": "ContinuousBackupConfig describes the continuous backups recovery configurations of a cluster.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether ContinuousBackup is enabled.",
+          "type": "boolean"
+        },
+        "recoveryWindowDays": {
+          "description": "The number of days backups and logs will be retained, which determines the window of time that data is recoverable for. If not set, it defaults to 14 days.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "encryptionConfig": {
+          "description": "The encryption config can be specified to encrypt the backups with a customer-managed encryption key (CMEK). When this field is not specified, the backup will then use default encryption scheme to protect the user data.",
+          "$ref": "EncryptionConfig"
+        }
+      }
+    },
+    "ContinuousBackupInfo": {
+      "id": "ContinuousBackupInfo",
+      "description": "ContinuousBackupInfo describes the continuous backup properties of a cluster.",
+      "type": "object",
+      "properties": {
+        "encryptionInfo": {
+          "description": "Output only. The encryption information for the WALs and backups required for ContinuousBackup.",
+          "readOnly": true,
+          "$ref": "EncryptionInfo"
+        },
+        "enabledTime": {
+          "description": "Output only. When ContinuousBackup was most recently enabled. Set to null if ContinuousBackup is not enabled.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "schedule": {
+          "description": "Output only. Days of the week on which a continuous backup is taken. Output only field. Ignored if passed into the request.",
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enumDescriptions": [
+              "The day of the week is unspecified.",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "enum": [
+              "DAY_OF_WEEK_UNSPECIFIED",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          }
+        }
+      }
+    },
     "SecondaryConfig": {
       "id": "SecondaryConfig",
       "description": "Configuration information for the secondary cluster. This should be set if and only if the cluster is of type SECONDARY.",
@@ -686,6 +768,21 @@
         "primaryClusterName": {
           "description": "The name of the primary cluster name with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}",
           "type": "string"
+        }
+      }
+    },
+    "PrimaryConfig": {
+      "id": "PrimaryConfig",
+      "description": "Configuration for the primary cluster. It has the list of clusters that are replicating from this cluster. This should be set if and only if the cluster is of type PRIMARY.",
+      "type": "object",
+      "properties": {
+        "secondaryClusterNames": {
+          "description": "Output only. Names of the clusters that are replicating from this cluster.",
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -721,6 +818,10 @@
           "description": "Point in time recovery source. PITR needs to be enabled in the source cluster for this operation to succeed.",
           "$ref": "PitrSource"
         },
+        "continuousBackupSource": {
+          "description": "ContinuousBackup source. Continuous backup needs to be enabled in the source cluster for this operation to succeed.",
+          "$ref": "ContinuousBackupSource"
+        },
         "clusterId": {
           "description": "Required. ID of the requesting object.",
           "type": "string"
@@ -741,11 +842,27 @@
     },
     "PitrSource": {
       "id": "PitrSource",
-      "description": "Message describing a PitrSource.",
+      "description": "Deprecated, use ContinuousBackupSource instead.",
       "type": "object",
       "properties": {
         "cluster": {
           "description": "Required. The source cluster from which to restore. This cluster must have PITR enabled for this operation to succeed. For the required format, see the comment on the Cluster.name field.",
+          "type": "string"
+        },
+        "pointInTime": {
+          "description": "Required. The point in time to restore to.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "ContinuousBackupSource": {
+      "id": "ContinuousBackupSource",
+      "description": "Message describing a ContinuousBackupSource.",
+      "type": "object",
+      "properties": {
+        "cluster": {
+          "description": "Required. The source cluster from which to restore. This cluster must have continuous backup enabled for this operation to succeed. For the required format, see the comment on the Cluster.name field.",
           "type": "string"
         },
         "pointInTime": {
@@ -782,11 +899,11 @@
     },
     "Instance": {
       "id": "Instance",
-      "description": "An Instance is a computing unit that an end customer can connect to. It's the main unit of computing resources in AlloyDB. NEXT ID: 22",
+      "description": "An Instance is a computing unit that an end customer can connect to. It's the main unit of computing resources in AlloyDB.",
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. The name of the instance resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}\/instances\/{instance_id} where the cluster and instance ID segments should satisfy the regex expression \"[a-z]([a-z0-9-]{0,61}[a-z0-9])?\", e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the instance resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}",
+          "description": "Output only. The name of the instance resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}\/instances\/{instance_id} where the cluster and instance ID segments should satisfy the regex expression `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`, e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the instance resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}",
           "readOnly": true,
           "type": "string"
         },
@@ -909,6 +1026,10 @@
             "$ref": "Node"
           }
         },
+        "queryInsightsConfig": {
+          "description": "Configuration for query insights.",
+          "$ref": "QueryInsightsInstanceConfig"
+        },
         "readPoolConfig": {
           "description": "Read pool specific config.",
           "$ref": "ReadPoolConfig"
@@ -968,6 +1089,31 @@
         "state": {
           "description": "Determined by state of the compute VM and postgres-service health. Compute VM state can have values listed in https:\/\/cloud.google.com\/compute\/docs\/instances\/instance-life-cycle and postgres-service health can have values: HEALTHY and UNHEALTHY.",
           "type": "string"
+        }
+      }
+    },
+    "QueryInsightsInstanceConfig": {
+      "id": "QueryInsightsInstanceConfig",
+      "description": "QueryInsights Instance specific configuration.",
+      "type": "object",
+      "properties": {
+        "recordApplicationTags": {
+          "description": "Record application tags for an instance. This flag is turned \"on\" by default.",
+          "type": "boolean"
+        },
+        "recordClientAddress": {
+          "description": "Record client address for an instance. Client address is PII information. This flag is turned \"on\" by default.",
+          "type": "boolean"
+        },
+        "queryStringLength": {
+          "description": "Query string length. The default value is 1024. Any integer between 256 and 4500 is considered valid.",
+          "type": "integer",
+          "format": "uint32"
+        },
+        "queryPlansPerMinute": {
+          "description": "Number of query execution plans captured by Insights per minute for all queries combined. The default value is 5. Any integer between 0 and 20 is considered valid.",
+          "type": "integer",
+          "format": "uint32"
         }
       }
     },
@@ -1039,11 +1185,11 @@
     },
     "Backup": {
       "id": "Backup",
-      "description": "Message describing Backup object NEXT ID: 18",
+      "description": "Message describing Backup object",
       "type": "object",
       "properties": {
         "name": {
-          "description": "Output only. The name of the backup resource with the format: * projects\/{project}\/locations\/{region}\/backups\/{backup_id} where the cluster and backup ID segments should satisfy the regex expression \"[a-z]([a-z0-9-]{0,61}[a-z0-9])?\", e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the backup resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
+          "description": "Output only. The name of the backup resource with the format: * projects\/{project}\/locations\/{region}\/backups\/{backup_id} where the cluster and backup ID segments should satisfy the regex expression `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`, e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the backup resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
           "readOnly": true,
           "type": "string"
         },
@@ -1106,16 +1252,23 @@
           "enumDescriptions": [
             "Backup Type is unknown.",
             "ON_DEMAND backups that were triggered by the customer (e.g., not AUTOMATED).",
-            "AUTOMATED backups triggered by the automated backups scheduler pursuant to an automated backup policy."
+            "AUTOMATED backups triggered by the automated backups scheduler pursuant to an automated backup policy.",
+            "CONTINUOUS backups triggered by the automated backups scheduler due to a continuous backup policy."
           ],
           "enum": [
             "TYPE_UNSPECIFIED",
             "ON_DEMAND",
-            "AUTOMATED"
+            "AUTOMATED",
+            "CONTINUOUS"
           ]
         },
         "description": {
           "description": "User-provided description of the backup.",
+          "type": "string"
+        },
+        "clusterUid": {
+          "description": "Output only. The system-generated UID of the cluster which was used to create this resource.",
+          "readOnly": true,
           "type": "string"
         },
         "clusterName": {
@@ -1152,6 +1305,12 @@
           "readOnly": true,
           "type": "string",
           "format": "int64"
+        },
+        "expiryTime": {
+          "description": "Output only. The time at which after the backup is eligible to be garbage collected. It is the duration specified by the backup's retention policy, added to the backup's create_time.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -1187,7 +1346,7 @@
           "$ref": "IntegerRestrictions"
         },
         "name": {
-          "description": "The name of the flag resource, following GCP conventions, e.g.: * projects\/{project}\/locations\/{location}\/flags\/{flag} This field currently has no semantic meaning.",
+          "description": "The name of the flag resource, following Google Cloud conventions, e.g.: * projects\/{project}\/locations\/{location}\/flags\/{flag} This field currently has no semantic meaning.",
           "type": "string"
         },
         "flagName": {
@@ -1281,6 +1440,11 @@
         "pemCsr": {
           "description": "Optional. A pem-encoded X.509 certificate signing request (CSR).",
           "type": "string"
+        },
+        "certDuration": {
+          "description": "Optional. An optional hint to the endpoint to generate the client certificate with the requested duration. The duration can be from 1 hour to 24 hours. The endpoint may or may not honor the hint. If the hint is left unspecified or is not honored, then the endpoint will pick an appropriate default duration.",
+          "type": "string",
+          "format": "google-duration"
         }
       }
     },
@@ -1614,9 +1778,6 @@
                   "parameterOrder": [
                     "name"
                   ],
-                  "request": {
-                    "$ref": "CancelOperationRequest"
-                  },
                   "response": {
                     "$ref": "Empty"
                   },
@@ -1750,7 +1911,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only. The name of the cluster resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id} where the cluster ID segment should satisfy the regex expression \"[a-z0-9-]+\". For more details see https:\/\/google.aip.dev\/122. The prefix of the cluster resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
+                      "description": "Output only. The name of the cluster resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id} where the cluster ID segment should satisfy the regex expression `[a-z0-9-]+`. For more details see https:\/\/google.aip.dev\/122. The prefix of the cluster resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/clusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -1962,7 +2123,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Generate a client certificate signed by a Cluster CA."
+                  "description": "Generate a client certificate signed by a Cluster CA. The sole purpose of this endpoint is to support the Auth Proxy client and the endpoint's behavior is subject to change without notice, so do not rely on its behavior remaining constant. Future changes will not break the Auth Proxy client."
                 }
               }
               ,
@@ -2148,7 +2309,7 @@
                       "httpMethod": "PATCH",
                       "parameters": {
                         "name": {
-                          "description": "Output only. The name of the instance resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}\/instances\/{instance_id} where the cluster and instance ID segments should satisfy the regex expression \"[a-z]([a-z0-9-]{0,61}[a-z0-9])?\", e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the instance resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}",
+                          "description": "Output only. The name of the instance resource with the format: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}\/instances\/{instance_id} where the cluster and instance ID segments should satisfy the regex expression `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`, e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the instance resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}\/clusters\/{cluster_id}",
                           "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/clusters\/[^\/]+\/instances\/[^\/]+$",
                           "location": "path",
                           "required": true,
@@ -2443,7 +2604,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "Output only. The name of the backup resource with the format: * projects\/{project}\/locations\/{region}\/backups\/{backup_id} where the cluster and backup ID segments should satisfy the regex expression \"[a-z]([a-z0-9-]{0,61}[a-z0-9])?\", e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the backup resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
+                      "description": "Output only. The name of the backup resource with the format: * projects\/{project}\/locations\/{region}\/backups\/{backup_id} where the cluster and backup ID segments should satisfy the regex expression `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`, e.g. 1-63 characters of lowercase letters, numbers, and dashes, starting with a letter, and ending with a letter or number. For more details see https:\/\/google.aip.dev\/122. The prefix of the backup resource name is the name of the parent resource: * projects\/{project}\/locations\/{region}",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/backups\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2536,7 +2697,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The name of the parent resource. The required format is: * projects\/{project}\/locations\/{location} Regardless of the parent specified here, as long it is contains a valid project and location, the service will return a static list of supported flags resources. Note that we do not not yet support region-specific flags (see b\/211502903).",
+                      "description": "Required. The name of the parent resource. The required format is: * projects\/{project}\/locations\/{location} Regardless of the parent specified here, as long it is contains a valid project and location, the service will return a static list of supported flags resources. Note that we do not yet support region-specific flags.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,

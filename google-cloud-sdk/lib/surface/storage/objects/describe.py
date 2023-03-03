@@ -20,9 +20,11 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.storage import api_factory
 from googlecloudsdk.api_lib.storage import cloud_api
+from googlecloudsdk.api_lib.storage import request_config_factory
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import encryption_util
 from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import errors_util
 from googlecloudsdk.command_lib.storage import flags
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import wildcard_iterator
@@ -54,7 +56,10 @@ class Describe(base.DescribeCommand):
   @staticmethod
   def Args(parser):
     parser.add_argument('url', help='Specifies URL of object to describe.')
+    flags.add_additional_headers_flag(parser)
     flags.add_encryption_flags(parser, command_only_reads_data=True)
+    flags.add_fetch_encrypted_object_hashes_flag(parser, is_list=False)
+    flags.add_raw_display_flag(parser)
 
   def Run(self, args):
     encryption_util.initialize_key_store(args)
@@ -63,10 +68,40 @@ class Describe(base.DescribeCommand):
           'Describe does not accept wildcards because it returns a single'
           ' resource. Please use the `ls` or `objects list` command for'
           ' retrieving multiple resources.')
+
     url = storage_url.storage_url_from_string(args.url)
-    object_resource = api_factory.get_api(url.scheme).get_object_metadata(
+    errors_util.raise_error_if_not_cloud_object(args.command_path, url)
+
+    client = api_factory.get_api(url.scheme)
+    resource = client.get_object_metadata(
         url.bucket_name,
         url.object_name,
-        fields_scope=cloud_api.FieldsScope.FULL)
+        generation=url.generation,
+        fields_scope=cloud_api.FieldsScope.FULL,
+    )
+
+    if (args.fetch_encrypted_object_hashes and
+        cloud_api.Capability.ENCRYPTION in client.capabilities and
+        not (resource.md5_hash and resource.crc32c_hash) and
+        resource.decryption_key_hash_sha256):
+      request_config = request_config_factory.get_request_config(
+          resource.storage_url,
+          decryption_key_hash_sha256=resource.decryption_key_hash_sha256,
+          error_on_missing_key=True)
+      final_resource = client.get_object_metadata(
+          resource.bucket,
+          resource.name,
+          fields_scope=cloud_api.FieldsScope.FULL,
+          generation=resource.generation,
+          request_config=request_config,
+      )
+    else:
+      final_resource = resource
+
     # MakeSerializable will omit all the None values.
-    return resource_projector.MakeSerializable(object_resource.metadata)
+    serialized_resource = resource_projector.MakeSerializable(
+        final_resource.metadata
+    )
+    return serialized_resource
+
+    # TODO(b/249985723): Return standardized resource.

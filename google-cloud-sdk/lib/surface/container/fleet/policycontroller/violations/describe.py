@@ -51,20 +51,12 @@ class Describe(calliope_base.DescribeCommand):
         help=('The constraint template name and constraint name joined '
               + 'by a slash, e.g. "k8srequiredlabels/all-must-have-owner".')
     )
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(
-          parser,
-          plural=True,
-          membership_help=(
-              'The membership names from which to return violations, separated '
-              'by commas if multiple are supplied.'))
-    else:
-      parser.add_argument(
-          '--memberships',
-          type=str,
-          help=(
-              'A single membership name for which to describe violations of '
-              'a constraint.'))
+    resources.AddMembershipResourceArg(
+        parser,
+        plural=True,
+        membership_help=(
+            'The membership names from which to return violations, separated '
+            'by commas if multiple are supplied.'))
 
   def Run(self, args):
     calliope_base.EnableUserProjectQuota()
@@ -78,14 +70,22 @@ class Describe(calliope_base.DescribeCommand):
     constraint_name = args.CONSTRAINT_NAME.lower()
 
     if args.memberships is not None:
-      if resources.UseRegionalMemberships(self.ReleaseTrack()):
-        memberships = args.memberships
-      else:
-        memberships = args.memberships.split(',')
+      memberships = args.memberships
       if len(memberships) != 1:
         raise exceptions.Error('Please specify a single membership name.')
+      # Look up membership constraint; exception will be thrown if not found.
+      constraint = status_api_utils.GetMembershipConstraint(
+          client, messages, constraint_name, project_id, memberships[0],
+          self.ReleaseTrack())
     else:
       memberships = []
+      # Look up fleet constraint; exception will be thrown if not found.
+      constraint = status_api_utils.GetFleetConstraint(client, messages,
+                                                       constraint_name,
+                                                       project_id)
+
+    if constraint['violationCount'] == 0:
+      return None
 
     return violations.ListMembershipViolations(
         messages,

@@ -285,6 +285,33 @@ class MetastoreV1beta(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def Cancel(self, request, global_params=None):
+      r"""Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to Code.CANCELLED.
+
+      Args:
+        request: (MetastoreProjectsLocationsOperationsCancelRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Empty) The response message.
+      """
+      config = self.GetMethodConfig('Cancel')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Cancel.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel',
+        http_method='POST',
+        method_id='metastore.projects.locations.operations.cancel',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta/{+name}:cancel',
+        request_field='cancelOperationRequest',
+        request_type_name='MetastoreProjectsLocationsOperationsCancelRequest',
+        response_type_name='Empty',
+        supports_download=False,
+    )
+
     def Delete(self, request, global_params=None):
       r"""Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED.
 
@@ -875,6 +902,33 @@ class MetastoreV1beta(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def AlterLocation(self, request, global_params=None):
+      r"""Alter metadata resource location. The metadata resource can be a database, table, or partition. This functionality only updates the parent directory for the respective metadata resource and does not transfer any existing data to the new location.
+
+      Args:
+        request: (MetastoreProjectsLocationsServicesAlterLocationRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AlterLocation')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AlterLocation.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta/projects/{projectsId}/locations/{locationsId}/services/{servicesId}:alterLocation',
+        http_method='POST',
+        method_id='metastore.projects.locations.services.alterLocation',
+        ordered_params=['service'],
+        path_params=['service'],
+        query_params=[],
+        relative_path='v1beta/{+service}:alterLocation',
+        request_field='alterMetadataResourceLocationRequest',
+        request_type_name='MetastoreProjectsLocationsServicesAlterLocationRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def Create(self, request, global_params=None):
       r"""Creates a metastore service in a project and location.
 
@@ -1037,6 +1091,33 @@ class MetastoreV1beta(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def MoveTableToDatabase(self, request, global_params=None):
+      r"""Move a table to another database.
+
+      Args:
+        request: (MetastoreProjectsLocationsServicesMoveTableToDatabaseRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('MoveTableToDatabase')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    MoveTableToDatabase.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta/projects/{projectsId}/locations/{locationsId}/services/{servicesId}:moveTableToDatabase',
+        http_method='POST',
+        method_id='metastore.projects.locations.services.moveTableToDatabase',
+        ordered_params=['service'],
+        path_params=['service'],
+        query_params=[],
+        relative_path='v1beta/{+service}:moveTableToDatabase',
+        request_field='moveTableToDatabaseRequest',
+        request_type_name='MetastoreProjectsLocationsServicesMoveTableToDatabaseRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def Patch(self, request, global_params=None):
       r"""Updates the parameters of a single service.
 
@@ -1060,6 +1141,33 @@ class MetastoreV1beta(base_api.BaseApiClient):
         relative_path='v1beta/{+name}',
         request_field='service',
         request_type_name='MetastoreProjectsLocationsServicesPatchRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def QueryMetadata(self, request, global_params=None):
+      r"""Query DPMS metadata.
+
+      Args:
+        request: (MetastoreProjectsLocationsServicesQueryMetadataRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('QueryMetadata')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    QueryMetadata.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta/projects/{projectsId}/locations/{locationsId}/services/{servicesId}:queryMetadata',
+        http_method='POST',
+        method_id='metastore.projects.locations.services.queryMetadata',
+        ordered_params=['service'],
+        path_params=['service'],
+        query_params=[],
+        relative_path='v1beta/{+service}:queryMetadata',
+        request_field='queryMetadataRequest',
+        request_type_name='MetastoreProjectsLocationsServicesQueryMetadataRequest',
         response_type_name='Operation',
         supports_download=False,
     )

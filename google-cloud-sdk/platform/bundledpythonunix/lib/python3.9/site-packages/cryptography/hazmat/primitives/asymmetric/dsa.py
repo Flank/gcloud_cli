@@ -6,8 +6,6 @@
 import abc
 import typing
 
-from cryptography import utils
-from cryptography.hazmat.backends import _get_backend
 from cryptography.hazmat.primitives import _serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import (
     AsymmetricSignatureContext,
@@ -137,7 +135,7 @@ class DSAPublicKey(metaclass=abc.ABCMeta):
         signature: bytes,
         data: bytes,
         algorithm: typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm],
-    ):
+    ) -> None:
         """
         Verifies the signature of the data.
         """
@@ -161,13 +159,16 @@ class DSAParameterNumbers(object):
         self._q = q
         self._g = g
 
-    p = utils.read_only_property("_p")
-    q = utils.read_only_property("_q")
-    g = utils.read_only_property("_g")
+    p = property(lambda self: self._p)
+    q = property(lambda self: self._q)
+    g = property(lambda self: self._g)
 
-    def parameters(self, backend=None) -> DSAParameters:
-        backend = _get_backend(backend)
-        return backend.load_dsa_parameter_numbers(self)
+    def parameters(self, backend: typing.Any = None) -> DSAParameters:
+        from cryptography.hazmat.backends.openssl.backend import (
+            backend as ossl,
+        )
+
+        return ossl.load_dsa_parameter_numbers(self)
 
     def __eq__(self, other):
         if not isinstance(other, DSAParameterNumbers):
@@ -198,12 +199,15 @@ class DSAPublicNumbers(object):
         self._y = y
         self._parameter_numbers = parameter_numbers
 
-    y = utils.read_only_property("_y")
-    parameter_numbers = utils.read_only_property("_parameter_numbers")
+    y = property(lambda self: self._y)
+    parameter_numbers = property(lambda self: self._parameter_numbers)
 
-    def public_key(self, backend=None) -> DSAPublicKey:
-        backend = _get_backend(backend)
-        return backend.load_dsa_public_numbers(self)
+    def public_key(self, backend: typing.Any = None) -> DSAPublicKey:
+        from cryptography.hazmat.backends.openssl.backend import (
+            backend as ossl,
+        )
+
+        return ossl.load_dsa_public_numbers(self)
 
     def __eq__(self, other):
         if not isinstance(other, DSAPublicNumbers):
@@ -236,12 +240,15 @@ class DSAPrivateNumbers(object):
         self._public_numbers = public_numbers
         self._x = x
 
-    x = utils.read_only_property("_x")
-    public_numbers = utils.read_only_property("_public_numbers")
+    x = property(lambda self: self._x)
+    public_numbers = property(lambda self: self._public_numbers)
 
-    def private_key(self, backend=None) -> DSAPrivateKey:
-        backend = _get_backend(backend)
-        return backend.load_dsa_private_numbers(self)
+    def private_key(self, backend: typing.Any = None) -> DSAPrivateKey:
+        from cryptography.hazmat.backends.openssl.backend import (
+            backend as ossl,
+        )
+
+        return ossl.load_dsa_private_numbers(self)
 
     def __eq__(self, other):
         if not isinstance(other, DSAPrivateNumbers):
@@ -255,17 +262,23 @@ class DSAPrivateNumbers(object):
         return not self == other
 
 
-def generate_parameters(key_size: int, backend=None) -> DSAParameters:
-    backend = _get_backend(backend)
-    return backend.generate_dsa_parameters(key_size)
+def generate_parameters(
+    key_size: int, backend: typing.Any = None
+) -> DSAParameters:
+    from cryptography.hazmat.backends.openssl.backend import backend as ossl
+
+    return ossl.generate_dsa_parameters(key_size)
 
 
-def generate_private_key(key_size: int, backend=None) -> DSAPrivateKey:
-    backend = _get_backend(backend)
-    return backend.generate_dsa_private_key_and_parameters(key_size)
+def generate_private_key(
+    key_size: int, backend: typing.Any = None
+) -> DSAPrivateKey:
+    from cryptography.hazmat.backends.openssl.backend import backend as ossl
+
+    return ossl.generate_dsa_private_key_and_parameters(key_size)
 
 
-def _check_dsa_parameters(parameters: DSAParameterNumbers):
+def _check_dsa_parameters(parameters: DSAParameterNumbers) -> None:
     if parameters.p.bit_length() not in [1024, 2048, 3072, 4096]:
         raise ValueError(
             "p must be exactly 1024, 2048, 3072, or 4096 bits long"
@@ -277,7 +290,7 @@ def _check_dsa_parameters(parameters: DSAParameterNumbers):
         raise ValueError("g, p don't satisfy 1 < g < p.")
 
 
-def _check_dsa_private_numbers(numbers: DSAPrivateNumbers):
+def _check_dsa_private_numbers(numbers: DSAPrivateNumbers) -> None:
     parameters = numbers.public_numbers.parameter_numbers
     _check_dsa_parameters(parameters)
     if numbers.x <= 0 or numbers.x >= parameters.q:

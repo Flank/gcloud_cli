@@ -25,12 +25,10 @@ from __future__ import unicode_literals
 
 import copy
 import os
-import textwrap
 
 from googlecloudsdk.api_lib.storage import api_factory
 from googlecloudsdk.api_lib.storage import cloud_api
-from googlecloudsdk.command_lib.storage import errors
-from googlecloudsdk.command_lib.storage import fast_crc32c_util as fast_crc32c
+from googlecloudsdk.command_lib.storage import fast_crc32c_util
 from googlecloudsdk.command_lib.storage import manifest_util
 from googlecloudsdk.command_lib.storage import posix_util
 from googlecloudsdk.command_lib.storage import storage_url
@@ -45,54 +43,7 @@ from googlecloudsdk.command_lib.storage.tasks.cp import finalize_sliced_download
 from googlecloudsdk.command_lib.storage.tasks.rm import delete_object_task
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
-from googlecloudsdk.core.util import platforms
 from googlecloudsdk.core.util import scaled_integer
-
-
-def _get_hash_check_warning_base():
-  # Create the text in a function so that we can test it easily.
-  google_crc32c_install_step = fast_crc32c.get_google_crc32c_install_command()
-  gcloud_crc32c_install_step = 'gcloud components install gcloud-crc32c'
-  return textwrap.dedent(
-      """\
-      This download {{}} since fast hash calculation tools
-      are not installed. You can change this by running:
-      \t$ {crc32c_step}
-      You can also modify the "storage/check_hashes" config setting.""".format(
-          crc32c_step=google_crc32c_install_step
-          if google_crc32c_install_step else gcloud_crc32c_install_step))
-
-
-_HASH_CHECK_WARNING_BASE = _get_hash_check_warning_base()
-_NO_HASH_CHECK_WARNING = _HASH_CHECK_WARNING_BASE.format(
-    'will not be validated')
-_SLOW_HASH_CHECK_WARNING = _HASH_CHECK_WARNING_BASE.format('may be slow')
-_NO_HASH_CHECK_ERROR = _HASH_CHECK_WARNING_BASE.format('was skipped')
-
-
-def _log_or_raise_crc32c_issues(resource):
-  """Informs user about non-standard hashing behavior.
-
-  Args:
-    resource (resource_reference.ObjectResource): For checking if object has
-      known hash to validate against.
-
-  Raises:
-    errors.Error: gcloud storage set to fail if performance-optimized digesters
-      could not be created.
-  """
-  if (not resource.crc32c_hash or fast_crc32c.is_fast_crc32c_available()):
-    # If resource.crc32c not available, no hash will be verified.
-    # If a binary crc32c libary is available, hashing behavior will be standard.
-    return
-
-  check_hashes = properties.VALUES.storage.check_hashes.Get()
-  if check_hashes == properties.CheckHashes.ALWAYS.value:
-    log.warning(_SLOW_HASH_CHECK_WARNING)
-  elif check_hashes == properties.CheckHashes.IF_FAST_ELSE_SKIP.value:
-    log.warning(_NO_HASH_CHECK_WARNING)
-  elif check_hashes == properties.CheckHashes.IF_FAST_ELSE_FAIL.value:
-    raise errors.Error(_NO_HASH_CHECK_ERROR)
 
 
 def _should_perform_sliced_download(source_resource, destination_resource):
@@ -162,7 +113,7 @@ class FileDownloadTask(copy_util.CopyTaskWithExitHandler):
             properties.VALUES.storage.resumable_threshold.Get())):
       self._strategy = cloud_api.DownloadStrategy.RESUMABLE
     else:
-      self._strategy = cloud_api.DownloadStrategy.ONE_SHOT
+      self._strategy = cloud_api.DownloadStrategy.RETRIABLE_IN_FLIGHT
 
     self.parallel_processing_key = (
         self._destination_resource.storage_url.url_string)
@@ -171,18 +122,10 @@ class FileDownloadTask(copy_util.CopyTaskWithExitHandler):
     temporary_resource = copy.deepcopy(self._destination_resource)
     temporary_resource.storage_url.object_name += (
         storage_url.TEMPORARY_FILE_SUFFIX)
-    if ((properties.VALUES.storage.convert_incompatible_windows_path_characters
-         .GetBool()) and platforms.OperatingSystem.Current()
-        == platforms.OperatingSystem.WINDOWS):
-      temporary_resource.storage_url.object_name = (
-          platforms.MakePathWindowsCompatible(
-              temporary_resource.storage_url.object_name))
     return temporary_resource
 
   def _get_sliced_download_tasks(self):
     """Creates all tasks necessary for a sliced download."""
-    _log_or_raise_crc32c_issues(self._source_resource)
-
     component_offsets_and_lengths = (
         copy_component_util.get_component_offsets_and_lengths(
             self._source_resource.size,
@@ -227,6 +170,10 @@ class FileDownloadTask(copy_util.CopyTaskWithExitHandler):
 
   def execute(self, task_status_queue=None):
     """Creates appropriate download tasks."""
+    posix_util.raise_if_invalid_file_permissions(
+        self._user_request_args, self._source_resource
+    )
+
     destination_url = self._destination_resource.storage_url
     # We need to call os.remove here for two reasons:
     # 1. It saves on disk space during a transfer.
@@ -254,6 +201,7 @@ class FileDownloadTask(copy_util.CopyTaskWithExitHandler):
 
     if _should_perform_sliced_download(self._source_resource,
                                        self._destination_resource):
+      fast_crc32c_util.log_or_raise_crc32c_issues()
       download_component_task_list, finalize_sliced_download_task_list = (
           self._get_sliced_download_tasks())
 
@@ -294,19 +242,26 @@ class FileDownloadTask(copy_util.CopyTaskWithExitHandler):
     ).execute(task_status_queue=task_status_queue)
 
     temporary_file_url = self._temporary_destination_resource.storage_url
+    server_encoding = task_util.get_first_matching_message_payload(
+        part_download_task_output.messages, task.Topic.API_DOWNLOAD_RESULT
+    )
+
     download_util.decompress_or_rename_file(
         self._source_resource,
         temporary_file_url.object_name,
         destination_url.object_name,
-        do_not_decompress_flag=self._do_not_decompress)
+        do_not_decompress_flag=self._do_not_decompress,
+        server_encoding=server_encoding)
     # For sliced download, cleanup is done in the finalized sliced download task
     # We perform cleanup here for all other types in case some corrupt files
     # were left behind.
     tracker_file_util.delete_download_tracker_files(temporary_file_url)
 
     posix_util.set_posix_attributes_on_file_if_valid(
-        self._user_request_args, part_download_task_output.messages,
-        self._source_resource, self._destination_resource)
+        self._user_request_args,
+        self._source_resource,
+        self._destination_resource,
+    )
 
     if self._print_created_message:
       log.status.Print('Created: {}'.format(destination_url))

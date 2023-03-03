@@ -25,10 +25,11 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.addresses import flags
+import ipaddr
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
-def _Args(cls, parser, support_psc_google_apis, support_ipv6_reservation):
+def _Args(cls, parser, support_psc_google_apis):
   """Argument parsing."""
 
   cls.ADDRESSES_ARG = flags.AddressArgument(required=False)
@@ -40,7 +41,7 @@ def _Args(cls, parser, support_psc_google_apis, support_ipv6_reservation):
   flags.AddNetworkTier(parser)
   flags.AddPrefixLength(parser)
   flags.AddPurpose(parser, support_psc_google_apis)
-  flags.AddIPv6EndPointType(parser, support_ipv6_reservation)
+  flags.AddIPv6EndPointType(parser)
 
   cls.SUBNETWORK_ARG = flags.SubnetworkArgument()
   cls.SUBNETWORK_ARG.AddArgument(parser)
@@ -101,15 +102,13 @@ class Create(base.CreateCommand):
   NETWORK_ARG = None
 
   _support_psc_google_apis = True
-  _support_ipv6_reservation = False
 
   @classmethod
   def Args(cls, parser):
     _Args(
         cls,
         parser,
-        support_psc_google_apis=cls._support_psc_google_apis,
-        support_ipv6_reservation=cls._support_ipv6_reservation)
+        support_psc_google_apis=cls._support_psc_google_apis)
 
   def ConstructNetworkTier(self, messages, args):
     if args.network_tier:
@@ -191,7 +190,34 @@ class Create(base.CreateCommand):
           'must be GCE_ENDPOINT or SHARED_LOADBALANCER_VIP for regional '
           'internal addresses.')
 
+  # TODO(b/266237285): Need to remove exceptions and break down function.
   def GetAddress(self, messages, args, address, address_ref, resource_parser):
+    """Get and validate address setting.
+
+    Retrieve address resource from input arguments and validate the address
+    configuration for both external/internal IP address reservation/promotion.
+
+    Args:
+      messages: The client message proto includes all required GCE API fields.
+      args: argparse.Namespace, An object that contains the values for the
+        arguments specified in the .Args() method.
+      address: Address object.
+      address_ref: Reference of the address.
+      resource_parser: A resource parser used to parse resource name into url.
+
+    Returns:
+      An address resource proto message.
+
+    Raises:
+      ConflictingArgumentsException: If both network and subnetwork fields are
+      set.
+      MinimumArgumentException: Missing network or subnetwork with purpose
+      field.
+      InvalidArgumentException: The input argument is not set correctly or
+      unable to be parsed.
+      RequiredArgumentException: The required argument is missing from user
+      input.
+    """
     network_tier = self.ConstructNetworkTier(messages, args)
 
     if args.ip_version or (address is None and address_ref.Collection()
@@ -221,7 +247,7 @@ class Create(base.CreateCommand):
         args.subnet_region = address_ref.region
       subnetwork_url = flags.SubnetworkArgument().ResolveAsResource(
           args, resource_parser).SelfLink()
-      if not (self._support_ipv6_reservation and args.endpoint_type):
+      if not args.endpoint_type:
         # External IPv6 reservation does not need purpose field.
         purpose = messages.Address.PurposeValueValuesEnum(args.purpose or
                                                           'GCE_ENDPOINT')
@@ -244,8 +270,9 @@ class Create(base.CreateCommand):
             'VPC_PEERING': messages.Address.PurposeValueValuesEnum.VPC_PEERING
         }
         if self._support_psc_google_apis:
-          supported_purposes[
-              'PRIVATE_SERVICE_CONNECT'] = messages.Address.PurposeValueValuesEnum.PRIVATE_SERVICE_CONNECT
+          supported_purposes['PRIVATE_SERVICE_CONNECT'] = (
+              messages.Address.PurposeValueValuesEnum.PRIVATE_SERVICE_CONNECT
+          )
 
         if purpose not in supported_purposes.values():
           raise exceptions.InvalidArgumentException(
@@ -254,27 +281,41 @@ class Create(base.CreateCommand):
                   supported_purposes.keys())))
 
     ipv6_endpoint_type = None
-    if self._support_ipv6_reservation and args.endpoint_type:
+    if args.endpoint_type:
       ipv6_endpoint_type = messages.Address.Ipv6EndpointTypeValueValuesEnum(
           args.endpoint_type)
 
     address_type = None
-    if self._support_ipv6_reservation and args.endpoint_type:
+    if args.endpoint_type:
       address_type = messages.Address.AddressTypeValueValuesEnum.EXTERNAL
     elif subnetwork_url or network_url:
       address_type = messages.Address.AddressTypeValueValuesEnum.INTERNAL
 
+    if address is not None:
+      try:
+        ip_address = ipaddr.IPAddress(address)
+      except ValueError:
+        raise exceptions.InvalidArgumentException(
+            '--addresses', 'Invalid IP address {e}'.format(e=address)
+        )
+
     if args.prefix_length:
-      if self._support_ipv6_reservation and address and not address_type:
+      if address and not address_type:
         # This is address promotion.
         address_type = messages.Address.AddressTypeValueValuesEnum.EXTERNAL
-      elif (purpose != messages.Address.PurposeValueValuesEnum.VPC_PEERING and
-            purpose !=
-            messages.Address.PurposeValueValuesEnum.IPSEC_INTERCONNECT):
+      elif (
+          (address is None or ip_address.version != 6)
+          and purpose != messages.Address.PurposeValueValuesEnum.VPC_PEERING
+          and purpose
+          != messages.Address.PurposeValueValuesEnum.IPSEC_INTERCONNECT
+      ):
         raise exceptions.InvalidArgumentException(
-            '--prefix-length', 'can only be used with '
-            '[--purpose VPC_PEERING/IPSEC_INTERCONNECT] or External IPv6 reservation. Found {e}'
-            .format(e=purpose))
+            '--prefix-length',
+            'can only be used with [--purpose VPC_PEERING/IPSEC_INTERCONNECT]'
+            ' or Internal/External IPv6 reservation. Found {e}'.format(
+                e=purpose
+            ),
+        )
 
     if not args.prefix_length:
       if purpose == messages.Address.PurposeValueValuesEnum.VPC_PEERING:
@@ -286,32 +327,18 @@ class Create(base.CreateCommand):
             '--prefix-length', 'prefix length is needed for reserving IP ranges'
             ' for HA VPN over Cloud Interconnect.')
 
-    if self._support_ipv6_reservation:
-      return messages.Address(
-          address=address,
-          prefixLength=args.prefix_length,
-          description=args.description,
-          networkTier=network_tier,
-          ipVersion=ip_version,
-          name=address_ref.Name(),
-          addressType=address_type,
-          purpose=purpose,
-          subnetwork=subnetwork_url,
-          network=network_url,
-          ipv6EndpointType=ipv6_endpoint_type)
-    else:
-      return messages.Address(
-          address=address,
-          prefixLength=args.prefix_length,
-          description=args.description,
-          networkTier=network_tier,
-          ipVersion=ip_version,
-          name=address_ref.Name(),
-          addressType=(messages.Address.AddressTypeValueValuesEnum.INTERNAL
-                       if subnetwork_url or network_url else None),
-          purpose=purpose,
-          subnetwork=subnetwork_url,
-          network=network_url)
+    return messages.Address(
+        address=address,
+        prefixLength=args.prefix_length,
+        description=args.description,
+        networkTier=network_tier,
+        ipVersion=ip_version,
+        name=address_ref.Name(),
+        addressType=address_type,
+        purpose=purpose,
+        subnetwork=subnetwork_url,
+        network=network_url,
+        ipv6EndpointType=ipv6_endpoint_type)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -367,7 +394,6 @@ class CreateBeta(Create):
   """
 
   _support_psc_google_apis = True
-  _support_ipv6_reservation = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -422,4 +448,3 @@ class CreateAlpha(Create):
   """
 
   _support_psc_google_apis = True
-  _support_ipv6_reservation = True

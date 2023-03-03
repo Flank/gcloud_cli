@@ -189,7 +189,7 @@
             "type": "object",
             "properties": {
               "role": {
-                "description": "Required. An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER <=> roles\/bigquery.dataOwner WRITER <=> roles\/bigquery.dataEditor READER <=> roles\/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to \"roles\/bigquery.dataOwner\", it will be returned back as \"OWNER\".",
+                "description": "An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER <=> roles\/bigquery.dataOwner WRITER <=> roles\/bigquery.dataEditor READER <=> roles\/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to \"roles\/bigquery.dataOwner\", it will be returned back as \"OWNER\".",
                 "type": "string"
               },
               "userByEmail": {
@@ -261,9 +261,27 @@
           "description": "Optional. The source when the dataset is of type LINKED.",
           "$ref": "LinkedDatasetSource"
         },
+        "isCaseInsensitive": {
+          "description": "Optional. TRUE if the dataset and its table names are case-insensitive, otherwise FALSE. By default, this is FALSE, which means the dataset and its table names are case-sensitive. This field does not affect routine references.",
+          "type": "boolean"
+        },
         "defaultCollation": {
           "description": "Optional. Defines the default collation specification of future tables created in the dataset. If a table is created in this dataset without table-level default collation, then the table inherits the dataset default collation, which is applied to the string fields that do not have explicit collation specified. A change to this field affects only tables created afterwards, and does not alter the existing tables. The following values are supported: * 'und:ci': undetermined locale, case insensitive. * '': empty string. Default to case-sensitive behavior.",
           "type": "string"
+        },
+        "defaultRoundingMode": {
+          "description": "Optional. Defines the default rounding mode specification of new tables created within this dataset. During table creation, if this field is specified, the table within this dataset will inherit the default rounding mode of the dataset. Setting the default rounding mode on a table overrides this option. Existing tables in the dataset are unaffected. If columns are defined during that table creation, they will immediately inherit the table's default rounding_mode, unless otherwise specified.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified will default to using ROUND_HALF_AWAY_FROM_ZERO.",
+            "ROUND_HALF_AWAY_FROM_ZERO rounds half values away from zero when applying precision and scale upon writing of NUMERIC and BIGNUMERIC values. For Scale: 0 1.1, 1.2, 1.3, 1.4 => 1 1.5, 1.6, 1.7, 1.8, 1.9 => 2",
+            "ROUND_HALF_EVEN rounds half values to the nearest even when applying precision and scale upon writing of NUMERIC and BIGNUMERIC values. For Scale: 0 1.1, 1.2, 1.3, 1.4 => 1 1.5 => 2 1.6, 1.7, 1.8, 1.9 => 2 2.5 => 2"
+          ],
+          "enum": [
+            "ROUNDING_MODE_UNSPECIFIED",
+            "ROUND_HALF_AWAY_FROM_ZERO",
+            "ROUND_HALF_EVEN"
+          ]
         },
         "maxTimeTravelHours": {
           "description": "Optional. Defines the time travel window in hours. The value can be from 48 to 168 hours (2 to 7 days). The default value is 168 hours if this is not set.",
@@ -361,11 +379,13 @@
             "type": "string",
             "enumDescriptions": [
               "Do not use. You must set a target type explicitly.",
-              "This entry applies to views in the dataset."
+              "This entry applies to views in the dataset.",
+              "This entry applies to routines in the dataset."
             ],
             "enum": [
               "TARGET_TYPE_UNSPECIFIED",
-              "VIEWS"
+              "VIEWS",
+              "ROUTINES"
             ]
           }
         }
@@ -541,7 +561,9 @@
             "Wide-and-deep classifier model.",
             "Wide-and-deep regressor model.",
             "Autoencoder model.",
-            "New name for the ARIMA model."
+            "New name for the ARIMA model.",
+            "Random Forest regressor model.",
+            "Random Forest classifier model."
           ],
           "enum": [
             "MODEL_TYPE_UNSPECIFIED",
@@ -561,7 +583,9 @@
             "DNN_LINEAR_COMBINED_CLASSIFIER",
             "DNN_LINEAR_COMBINED_REGRESSOR",
             "AUTOENCODER",
-            "ARIMA_PLUS"
+            "ARIMA_PLUS",
+            "RANDOM_FOREST_REGRESSOR",
+            "RANDOM_FOREST_CLASSIFIER"
           ]
         },
         "trainingRuns": {
@@ -2964,7 +2988,7 @@
           "$ref": "ParquetOptions"
         },
         "objectMetadata": {
-          "description": "Optional. Object Metadata Type used to create Object Tables. When making an Object Table, source_format should be omitted. Currently DIRECTORY is the only supported Object Metadata type. This would produce an Object Table containing a Directory Listing of Objects found at the source_uris.",
+          "description": "Optional. ObjectMetadata is used to create Object Tables. Object Tables contain a listing of objects (with their metadata) found at the source_uris. If ObjectMetadata is set, source_format should be omitted. Currently SIMPLE is the only supported Object Metadata type.",
           "type": "string",
           "enumDescriptions": [
             "Unspecified by default.",
@@ -3134,7 +3158,7 @@
           "type": "boolean"
         },
         "encoding": {
-          "description": "Optional. The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.",
+          "description": "Optional. The character encoding of the data. The supported values are UTF-8, ISO-8859-1, UTF-16BE, UTF-16LE, UTF-32BE, and UTF-32LE. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.",
           "type": "string"
         },
         "preserveAsciiControlCharacters": {
@@ -3572,7 +3596,7 @@
           "format": "int32"
         },
         "encoding": {
-          "description": "Optional. The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.",
+          "description": "Optional. The character encoding of the data. The supported values are UTF-8, ISO-8859-1, UTF-16BE, UTF-16LE, UTF-32BE, and UTF-32LE. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the `quote` and `fieldDelimiter` properties. If you don't specify an encoding, or if you specify a UTF-8 encoding when the CSV file is not UTF-8 encoded, BigQuery attempts to convert the data to UTF-8. Generally, your data loads successfully, but it may not match byte-for-byte what you expect. To avoid this, specify the correct encoding by using the `--encoding` flag. If BigQuery can't convert a character other than the ASCII `0` character, BigQuery converts the character to the standard Unicode replacement character: \uFFFD.",
           "type": "string"
         },
         "quote": {
@@ -4594,7 +4618,9 @@
             "Wide-and-deep classifier model.",
             "Wide-and-deep regressor model.",
             "Autoencoder model.",
-            "New name for the ARIMA model."
+            "New name for the ARIMA model.",
+            "Random Forest regressor model.",
+            "Random Forest classifier model."
           ],
           "enum": [
             "MODEL_TYPE_UNSPECIFIED",
@@ -4614,7 +4640,9 @@
             "DNN_LINEAR_COMBINED_CLASSIFIER",
             "DNN_LINEAR_COMBINED_REGRESSOR",
             "AUTOENCODER",
-            "ARIMA_PLUS"
+            "ARIMA_PLUS",
+            "RANDOM_FOREST_REGRESSOR",
+            "RANDOM_FOREST_CLASSIFIER"
           ]
         },
         "trainingType": {
@@ -4712,6 +4740,25 @@
             "FULL"
           ]
         },
+        "accelerationMode": {
+          "description": "Output only. Specifies which mode of BI Engine acceleration was performed (if any).",
+          "readOnly": true,
+          "type": "string",
+          "enumDescriptions": [
+            "BiEngineMode type not specified.",
+            "BI Engine acceleration was attempted but disabled. bi_engine_reasons specifies a more detailed reason.",
+            "Some inputs were accelerated using BI Engine. See bi_engine_reasons for why parts of the query were not accelerated.",
+            "All of the query inputs were accelerated using BI Engine.",
+            "All of the query was accelerated using BI Engine."
+          ],
+          "enum": [
+            "BI_ENGINE_ACCELERATION_MODE_UNSPECIFIED",
+            "BI_ENGINE_DISABLED",
+            "PARTIAL_INPUT",
+            "FULL_INPUT",
+            "FULL_QUERY"
+          ]
+        },
         "biEngineReasons": {
           "description": "In case of DISABLED or PARTIAL bi_engine_mode, these contain the explanatory reasons as to why BI Engine could not accelerate. In case the full query was accelerated, this field is not populated.",
           "type": "array",
@@ -4734,7 +4781,6 @@
             "BiEngineReason not specified.",
             "No reservation available for BI Engine acceleration.",
             "Not enough memory available for BI Engine acceleration.",
-            "Data is not-cached and could not be accelerated by BI Engine.",
             "This particular SQL text is not supported for acceleration by BI Engine.",
             "Input too large for acceleration by BI Engine.",
             "Catch-all code for all other cases for partial or disabled acceleration.",
@@ -4744,7 +4790,6 @@
             "CODE_UNSPECIFIED",
             "NO_RESERVATION",
             "INSUFFICIENT_RESERVATION",
-            "UNCACHED",
             "UNSUPPORTED_SQL_TEXT",
             "INPUT_TOO_LARGE",
             "OTHER_REASON",
@@ -4794,7 +4839,7 @@
           "format": "int64"
         },
         "bytesTransferred": {
-          "description": "Output only. The number of bytes of source data copied over the network for a LOAD query. If the query is charged for data transferred on the network, the user may be separately billed for these bytes.",
+          "description": "Output only. This field is deprecated. The number of bytes of source data copied over the network for a `LOAD` query. `transferred_bytes` has the canonical value for physical transferred bytes, which is used for BigQuery Omni billing.",
           "readOnly": true,
           "type": "string",
           "format": "int64"
@@ -4853,8 +4898,10 @@
             "Indicates the query has been secured by data masking, and thus search indexes are not applicable.",
             "Indicates that the search index and the search function call do not have the same text analyzer.",
             "Indicates the base table is too small (below a certain threshold). The index does not provide noticeable search performance gains when the base table is too small.",
-            "Indicates that the base table is too large for indexing, thus the index is not available to be used in the query.",
-            "Indicates an internal error that causes the search index to be unused."
+            "Indicates that the total size of indexed base tables in your organization exceeds your region's limit and the index is not used in the query. To index larger base tables, you can use your own reservation for index-management jobs.",
+            "Indicates that the esitmated performance gain from using the search index is too low for the given search query.",
+            "Indicates an internal error that causes the search index to be unused.",
+            "Indicates that the reason search indexes cannot be used in the query is not covered by any of the other IndexUnusedReason options."
           ],
           "enum": [
             "CODE_UNSPECIFIED",
@@ -4871,7 +4918,9 @@
             "MISMATCHED_TEXT_ANALYZER",
             "BASE_TABLE_TOO_SMALL",
             "BASE_TABLE_TOO_LARGE",
-            "INTERNAL_ERROR"
+            "ESTIMATED_PERFORMANCE_GAIN_TOO_LOW",
+            "INTERNAL_ERROR",
+            "OTHER_REASON"
           ]
         },
         "message": {
@@ -5636,7 +5685,7 @@
           }
         },
         "totalItems": {
-          "description": "The total number of projects in the list. A wrapper is used here because the field should still be in the response when the value is 0.",
+          "description": "The total number of projects in the page. A wrapper is used here because the field should still be in the response when the value is 0.",
           "type": "integer",
           "format": "int32"
         }
@@ -5712,7 +5761,7 @@
           "format": "int64"
         },
         "language": {
-          "description": "Optional. Defaults to \"SQL\".",
+          "description": "Optional. Defaults to \"SQL\" if remote_function_options field is absent, not set otherwise.",
           "type": "string",
           "enumDescriptions": [
             "",
@@ -5739,7 +5788,7 @@
           "$ref": "StandardSqlDataType"
         },
         "returnTableType": {
-          "description": "Optional. Can be set only if routine_type = \"TABLE_VALUED_FUNCTION\". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specificed in return table type, at query time.",
+          "description": "Optional. Can be set only if routine_type = \"TABLE_VALUED_FUNCTION\". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specified in return table type, at query time.",
           "$ref": "StandardSqlTableType"
         },
         "importedLibraries": {
@@ -5896,7 +5945,7 @@
           }
         },
         "mainFileUri": {
-          "description": "The main file URI of the Spark application. Exactly one of the definition_body field and the main_file_uri field must be set.",
+          "description": "The main file\/jar URI of the Spark application. Exactly one of the definition_body field and the main_file_uri field must be set for Python. Exactly one of main_class and main_file_uri field should be set for Java\/Scala language type.",
           "type": "string"
         },
         "pyFileUris": {
@@ -5934,7 +5983,7 @@
       "type": "object",
       "properties": {
         "routines": {
-          "description": "Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.",
+          "description": "Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, language, and remote_function_options.",
           "type": "array",
           "items": {
             "$ref": "Routine"
@@ -6146,6 +6195,20 @@
           "description": "Optional. Defines the default collation specification of new STRING fields in the table. During table creation or update, if a STRING field is added to this table without explicit collation specified, then the table inherits the table default collation. A change to this field affects only fields added afterwards, and does not alter the existing fields. The following values are supported: * 'und:ci': undetermined locale, case insensitive. * '': empty string. Default to case-sensitive behavior.",
           "type": "string"
         },
+        "defaultRoundingMode": {
+          "description": "Optional. Defines the default rounding mode specification of new DECIMAL fields (NUMERIC OR BIGNUMERIC) in the table. During table creation or update, if a DECIMAL field is added to this table without an explicit rounding mode specified, then the field inherits the table default rounding mode. Changing this field doesn't affect existing fields.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified will default to using ROUND_HALF_AWAY_FROM_ZERO.",
+            "ROUND_HALF_AWAY_FROM_ZERO rounds half values away from zero when applying precision and scale upon writing of NUMERIC and BIGNUMERIC values. For Scale: 0 1.1, 1.2, 1.3, 1.4 => 1 1.5, 1.6, 1.7, 1.8, 1.9 => 2",
+            "ROUND_HALF_EVEN rounds half values to the nearest even when applying precision and scale upon writing of NUMERIC and BIGNUMERIC values. For Scale: 0 1.1, 1.2, 1.3, 1.4 => 1 1.5 => 2 1.6, 1.7, 1.8, 1.9 => 2 2.5 => 2"
+          ],
+          "enum": [
+            "ROUNDING_MODE_UNSPECIFIED",
+            "ROUND_HALF_AWAY_FROM_ZERO",
+            "ROUND_HALF_EVEN"
+          ]
+        },
         "cloneDefinition": {
           "description": "Output only. Contains information about the clone. This value is set via the clone operation.",
           "readOnly": true,
@@ -6268,7 +6331,7 @@
           "format": "google-datetime"
         },
         "lastRefreshStatus": {
-          "description": "Output only. Error result of the last refresh job. If present, indicates that the last refresh was unsuccessful.",
+          "description": "Output only. Error result of the last automatic refresh job. If present, indicates that the last automatic refresh was unsuccessful.",
           "readOnly": true,
           "$ref": "ErrorProto"
         }
@@ -6554,7 +6617,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"

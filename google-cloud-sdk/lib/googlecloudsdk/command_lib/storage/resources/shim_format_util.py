@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.storage import errors
 from googlecloudsdk.command_lib.storage.resources import resource_util
 from googlecloudsdk.core.util import scaled_integer
 
@@ -53,6 +54,11 @@ def _gsutil_format_byte_values(byte_count):
   return '{:g} {}'.format(rounded_number, final_unit_string)
 
 
+def _gsutil_format_datetime_string(datetime_object):
+  """Returns datetime in gsutil format, e.g. 'Tue, 08 Jun 2021 21:15:33 GMT'."""
+  return datetime_object.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+
 def get_human_readable_byte_value(byte_count, use_gsutil_style=False):
   """Generates a string for bytes with human-readable units.
 
@@ -69,12 +75,25 @@ def get_human_readable_byte_value(byte_count, use_gsutil_style=False):
   return scaled_integer.FormatBinaryNumber(byte_count, decimal_places=2)
 
 
+def replace_autoclass_value_with_prefixed_time(bucket_resource,
+                                               use_gsutil_time_style=False):
+  """Converts raw datetime to 'Enabled on [formatted string]'."""
+  datetime_object = getattr(bucket_resource, 'autoclass_enabled_time', None)
+  if not datetime_object:
+    return
+  if use_gsutil_time_style:
+    datetime_string = _gsutil_format_datetime_string(datetime_object)
+  else:
+    datetime_string = resource_util.get_formatted_timestamp_in_utc(
+        datetime_object)
+  bucket_resource.autoclass_enabled_time = 'Enabled on ' + datetime_string
+
+
 def replace_bucket_values_with_present_string(bucket_resource):
   """Updates fields with complex data to a simple 'Present' string."""
   for field in _BUCKET_FIELDS_WITH_PRESENT_VALUE:
     value = getattr(bucket_resource, field)
-    # Checking for string because these fields might have error strings.
-    if value and not isinstance(value, str):
+    if value and not isinstance(value, errors.CloudApiError):
       setattr(bucket_resource, field, PRESENT_STRING)
 
 
@@ -83,7 +102,7 @@ def replace_object_values_with_encryption_string(object_resource,
   """Updates fields to reflect that they are encrypted."""
   if object_resource.encryption_algorithm is None:
     return
-  # crc32c_hash may be set to DO_NOT_DISPLAY.
+  # crc32c_hash may be set to NOT_SUPPORTED_DO_NOT_DISPLAY.
   for key in ('md5_hash', 'crc32c_hash'):
     if getattr(object_resource, key) is None:
       setattr(object_resource, key, encrypted_marker_string)
@@ -102,13 +121,12 @@ def replace_time_values_with_gsutil_style_strings(resource):
   ):
     gcloud_datetime = getattr(resource, key, None)
     if gcloud_datetime is not None:
-      setattr(resource, key,
-              gcloud_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT'))
+      setattr(resource, key, _gsutil_format_datetime_string(gcloud_datetime))
 
 
-def reformat_custom_metadata_for_gsutil(object_resource):
+def reformat_custom_fields_for_gsutil(object_resource):
   """Reformats custom metadata full format string in gsutil style."""
-  metadata = object_resource.custom_metadata
+  metadata = object_resource.custom_fields
   if not metadata:
     return
 
@@ -122,4 +140,4 @@ def reformat_custom_metadata_for_gsutil(object_resource):
   for k, v in iterable_metadata:
     metadata_lines.append(
         resource_util.get_padded_metadata_key_value_line(k, v, extra_indent=2))
-  object_resource.custom_metadata = '\n' + '\n'.join(metadata_lines)
+  object_resource.custom_fields = '\n' + '\n'.join(metadata_lines)

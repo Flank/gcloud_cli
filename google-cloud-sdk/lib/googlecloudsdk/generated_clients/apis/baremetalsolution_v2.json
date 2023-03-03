@@ -250,6 +250,20 @@
           "description": "Output only. Text field about info for logging in.",
           "readOnly": true,
           "type": "string"
+        },
+        "workloadProfile": {
+          "description": "The workload profile for the instance.",
+          "type": "string",
+          "enumDescriptions": [
+            "The workload profile is in an unknown state.",
+            "The workload profile is generic.",
+            "The workload profile is hana."
+          ],
+          "enum": [
+            "WORKLOAD_PROFILE_UNSPECIFIED",
+            "WORKLOAD_PROFILE_GENERIC",
+            "WORKLOAD_PROFILE_HANA"
+          ]
         }
       }
     },
@@ -275,14 +289,16 @@
             "The LUN is being created.",
             "The LUN is being updated.",
             "The LUN is ready for use.",
-            "The LUN has been requested to be deleted."
+            "The LUN has been requested to be deleted.",
+            "The LUN is in cool off state. It will be deleted after `expire_time`."
           ],
           "enum": [
             "STATE_UNSPECIFIED",
             "CREATING",
             "UPDATING",
             "READY",
-            "DELETING"
+            "DELETING",
+            "COOL_OFF"
           ]
         },
         "sizeGb": {
@@ -331,6 +347,12 @@
         "wwid": {
           "description": "The WWID for this LUN.",
           "type": "string"
+        },
+        "expireTime": {
+          "description": "Output only. Time after which LUN will be fully deleted. It is filled only for LUNs in COOL_OFF state.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -370,14 +392,16 @@
             "The storage volume is being created.",
             "The storage volume is ready for use.",
             "The storage volume has been requested to be deleted.",
-            "The storage volume is being updated."
+            "The storage volume is being updated.",
+            "The storage volume is in cool off state. It will be deleted after `expire_time`."
           ],
           "enum": [
             "STATE_UNSPECIFIED",
             "CREATING",
             "READY",
             "DELETING",
-            "UPDATING"
+            "UPDATING",
+            "COOL_OFF"
           ]
         },
         "requestedSizeGib": {
@@ -493,6 +517,30 @@
         "notes": {
           "description": "Input only. User-specified notes for new Volume. Used to provision Volumes that require manual intervention.",
           "type": "string"
+        },
+        "workloadProfile": {
+          "description": "The workload profile for the volume.",
+          "type": "string",
+          "enumDescriptions": [
+            "The workload profile is in an unknown state.",
+            "The workload profile is generic.",
+            "The workload profile is hana."
+          ],
+          "enum": [
+            "WORKLOAD_PROFILE_UNSPECIFIED",
+            "GENERIC",
+            "HANA"
+          ]
+        },
+        "storageAggregatePool": {
+          "description": "Input only. Name of the storage aggregate pool to allocate the volume in. Can be used only for VOLUME_PERFORMANCE_TIER_ASSIGNED volumes.",
+          "type": "string"
+        },
+        "expireTime": {
+          "description": "Output only. Time after which volume will be fully deleted. It is filled only for volumes in COOLOFF state.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -877,6 +925,17 @@
         }
       }
     },
+    "RenameInstanceRequest": {
+      "id": "RenameInstanceRequest",
+      "description": "Message requesting rename of a server.",
+      "type": "object",
+      "properties": {
+        "newName": {
+          "description": "Required. The new `name` of the instance. Format: {instancename}",
+          "type": "string"
+        }
+      }
+    },
     "ResetInstanceRequest": {
       "id": "ResetInstanceRequest",
       "description": "Message requesting to reset a server.",
@@ -918,8 +977,15 @@
       "type": "object",
       "properties": {
         "volume": {
-          "description": "Required. Name of the Volume to attach.",
+          "description": "Name of the Volume to attach.",
           "type": "string"
+        },
+        "volumes": {
+          "description": "Names of the multiple Volumes to attach. The volumes attaching will be an additive operation and will have no effect on existing attached volumes.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -929,12 +995,19 @@
       "type": "object",
       "properties": {
         "volume": {
-          "description": "Required. Name of the Volume to detach.",
+          "description": "Name of the Volume to detach.",
           "type": "string"
         },
         "skipReboot": {
           "description": "If true, performs Volume unmapping without instance reboot.",
           "type": "boolean"
+        },
+        "volumes": {
+          "description": "Names of the multiple Volumes to detach. The detaching of volumes will have no effect on other existing attached volumes.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1059,6 +1132,13 @@
           "type": "integer",
           "format": "int32"
         }
+      }
+    },
+    "EvictVolumeRequest": {
+      "id": "EvictVolumeRequest",
+      "description": "Request for skip volume cooloff and delete it.",
+      "type": "object",
+      "properties": {
       }
     },
     "AllocateLunsRequest": {
@@ -1346,6 +1426,13 @@
             "type": "string"
           }
         }
+      }
+    },
+    "EvictLunRequest": {
+      "id": "EvictLunRequest",
+      "description": "Request for skip lun cooloff and delete it.",
+      "type": "object",
+      "properties": {
       }
     },
     "NfsShare": {
@@ -2108,6 +2195,10 @@
             "VOLUME_PERFORMANCE_TIER_ASSIGNED",
             "VOLUME_PERFORMANCE_TIER_HT"
           ]
+        },
+        "storageAggregatePool": {
+          "description": "Input only. Name of the storage aggregate pool to allocate the volume in. Can be used only for VOLUME_PERFORMANCE_TIER_ASSIGNED volumes.",
+          "type": "string"
         }
       }
     },
@@ -2338,50 +2429,6 @@
           }
         }
       }
-    },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
-      "description": "Represents the metadata from a long-running operation.",
-      "type": "object",
-      "properties": {
-        "createTime": {
-          "description": "Output only. The time the operation was created.",
-          "readOnly": true,
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Output only. The time the operation finished running.",
-          "readOnly": true,
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "target": {
-          "description": "Output only. Server-defined resource path for the target of the operation.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "verb": {
-          "description": "Output only. Name of the action executed by the operation.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "statusMessage": {
-          "description": "Output only. Human-readable status of the operation, if any.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "requestedCancellation": {
-          "description": "Output only. Identifies whether the user requested the cancellation of the operation. Operations that have been successfully cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
-          "readOnly": true,
-          "type": "boolean"
-        },
-        "apiVersion": {
-          "description": "Output only. API version used with the operation.",
-          "readOnly": true,
-          "type": "string"
-        }
-      }
     }
   },
   "resources": {
@@ -2559,6 +2606,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Update details of a single server."
+                },
+                "rename": {
+                  "id": "baremetalsolution.projects.locations.instances.rename",
+                  "path": "v2/{+name}:rename",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}:rename",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The `name` field is used to identify the instance. Format: projects\/{project}\/locations\/{location}\/instances\/{instance}",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/instances\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "RenameInstanceRequest"
+                  },
+                  "response": {
+                    "$ref": "Instance"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "RenameInstance sets a new name for an instance."
                 },
                 "create": {
                   "id": "baremetalsolution.projects.locations.instances.create",
@@ -3082,6 +3157,11 @@
                       "location": "path",
                       "required": true,
                       "type": "string"
+                    },
+                    "force": {
+                      "description": "If true, will put into cooloff all volume's luns as well. Luns must not be attached to any Instances. If false operation will fail if a volume has active (not in cooloff) luns.",
+                      "location": "query",
+                      "type": "boolean"
                     }
                   },
                   "parameterOrder": [
@@ -3094,6 +3174,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Delete a volume. Volume shouldn't have any Luns."
+                },
+                "evict": {
+                  "id": "baremetalsolution.projects.locations.volumes.evict",
+                  "path": "v2/{+name}:evict",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/volumes/{volumesId}:evict",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The name of the Volume.",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/volumes\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "request": {
+                    "$ref": "EvictVolumeRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Skips volume's cooloff and deletes it now. Volume must be in cooloff state."
                 },
                 "allocateLuns": {
                   "id": "baremetalsolution.projects.locations.volumes.allocateLuns",
@@ -3387,6 +3495,34 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Delete a Lun. Lun shouldn't be attached to any Instances."
+                    },
+                    "evict": {
+                      "id": "baremetalsolution.projects.locations.volumes.luns.evict",
+                      "path": "v2/{+name}:evict",
+                      "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/volumes/{volumesId}/luns/{lunsId}:evict",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The name of the lun.",
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/volumes\/[^\/]+\/luns\/[^\/]+$",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "EvictLunRequest"
+                      },
+                      "response": {
+                        "$ref": "Operation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Skips lun's cooloff and deletes it now. Lun must be in cooloff state."
                     }
                   }
                 }

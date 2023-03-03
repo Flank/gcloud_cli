@@ -96,6 +96,10 @@ class BatchTranslateDocumentRequest(_messages.Message):
       requested for a language pair, then default google model (nmt) is used.
 
   Fields:
+    customizedAttribution: Optional. This flag is to support user customized
+      attribution. If not provided, the default is `Machine Translated by
+      Google`. Customized attribution should follow rules in
+      https://cloud.google.com/translate/attribution#attribution_and_logos
     formatConversions: Optional.
     glossaries: Optional. Glossaries to be applied. It's keyed by target
       language code.
@@ -113,11 +117,11 @@ class BatchTranslateDocumentRequest(_messages.Message):
     outputConfig: Required. Output configuration. If 2 input configs match to
       the same file (that is, same input path), we don't generate output for
       duplicate inputs.
-    sourceLanguageCode: Required. The BCP-47 language code of the input
+    sourceLanguageCode: Required. The ISO-639 language code of the input
       document if known, for example, "en-US" or "sr-Latn". Supported language
       codes are listed in [Language
       Support](https://cloud.google.com/translate/docs/languages).
-    targetLanguageCodes: Required. The BCP-47 language code to use for
+    targetLanguageCodes: Required. The ISO-639 language code to use for
       translation of the input document. Specify up to 10 language codes here.
   """
 
@@ -203,13 +207,14 @@ class BatchTranslateDocumentRequest(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  formatConversions = _messages.MessageField('FormatConversionsValue', 1)
-  glossaries = _messages.MessageField('GlossariesValue', 2)
-  inputConfigs = _messages.MessageField('BatchDocumentInputConfig', 3, repeated=True)
-  models = _messages.MessageField('ModelsValue', 4)
-  outputConfig = _messages.MessageField('BatchDocumentOutputConfig', 5)
-  sourceLanguageCode = _messages.StringField(6)
-  targetLanguageCodes = _messages.StringField(7, repeated=True)
+  customizedAttribution = _messages.StringField(1)
+  formatConversions = _messages.MessageField('FormatConversionsValue', 2)
+  glossaries = _messages.MessageField('GlossariesValue', 3)
+  inputConfigs = _messages.MessageField('BatchDocumentInputConfig', 4, repeated=True)
+  models = _messages.MessageField('ModelsValue', 5)
+  outputConfig = _messages.MessageField('BatchDocumentOutputConfig', 6)
+  sourceLanguageCode = _messages.StringField(7)
+  targetLanguageCodes = _messages.StringField(8, repeated=True)
 
 
 class BatchTranslateTextRequest(_messages.Message):
@@ -361,6 +366,61 @@ class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
 
+class Dataset(_messages.Message):
+  r"""A dataset that hosts the examples (sentence pairs) used for translation
+  models.
+
+  Fields:
+    createTime: Output only. Timestamp when this dataset was created.
+    displayName: The name of the dataset to show in the interface. The name
+      can be up to 32 characters long and can consist only of ASCII Latin
+      letters A-Z and a-z, underscores (_), and ASCII digits 0-9.
+    exampleCount: Output only. The number of examples in the dataset.
+    name: The resource name of the dataset, in form of `projects/{project-
+      number-or-id}/locations/{location_id}/datasets/{dataset_id}`
+    sourceLanguageCode: The BCP-47 language code of the source language.
+    targetLanguageCode: The BCP-47 language code of the target language.
+    testExampleCount: Output only. Number of test examples (sentence pairs).
+    trainExampleCount: Output only. Number of training examples (sentence
+      pairs).
+    updateTime: Output only. Timestamp when this dataset was last updated.
+    validateExampleCount: Output only. Number of validation examples (sentence
+      pairs).
+  """
+
+  createTime = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  exampleCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  name = _messages.StringField(4)
+  sourceLanguageCode = _messages.StringField(5)
+  targetLanguageCode = _messages.StringField(6)
+  testExampleCount = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  trainExampleCount = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  updateTime = _messages.StringField(9)
+  validateExampleCount = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+
+
+class DatasetInputConfig(_messages.Message):
+  r"""Input configuration for datasets.
+
+  Fields:
+    inputFiles: Files containing the sentence pairs to be imported to the
+      dataset.
+  """
+
+  inputFiles = _messages.MessageField('InputFile', 1, repeated=True)
+
+
+class DatasetOutputConfig(_messages.Message):
+  r"""Output configuration for datasets.
+
+  Fields:
+    gcsDestination: Google Cloud Storage destination to write the output.
+  """
+
+  gcsDestination = _messages.MessageField('GcsOutputDestination', 1)
+
+
 class DetectLanguageRequest(_messages.Message):
   r"""The request message for language detection.
 
@@ -445,8 +505,8 @@ class DetectedLanguage(_messages.Message):
 
   Fields:
     confidence: The confidence of the detection result for this language.
-    languageCode: The BCP-47 language code of source content in the request,
-      detected automatically.
+    languageCode: The ISO-639 language code of the source content in the
+      request, detected automatically.
   """
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
@@ -552,6 +612,35 @@ class Empty(_messages.Message):
 
 
 
+class Example(_messages.Message):
+  r"""A sentence pair.
+
+  Fields:
+    name: Output only. The resource name of the example, in form of
+      `projects/{project-number-or-
+      id}/locations/{location_id}/datasets/{dataset_id}/examples/{example_id}'
+    sourceText: Sentence in source language.
+    targetText: Sentence in target language.
+    usage: Output only. Usage of the sentence pair. Options are
+      TRAIN|VALIDATION|TEST.
+  """
+
+  name = _messages.StringField(1)
+  sourceText = _messages.StringField(2)
+  targetText = _messages.StringField(3)
+  usage = _messages.StringField(4)
+
+
+class ExportDataRequest(_messages.Message):
+  r"""Request message for ExportData.
+
+  Fields:
+    outputConfig: Required. The config for the output content.
+  """
+
+  outputConfig = _messages.MessageField('DatasetOutputConfig', 1)
+
+
 class GcsDestination(_messages.Message):
   r"""The Google Cloud Storage location for the output content.
 
@@ -561,6 +650,30 @@ class GcsDestination(_messages.Message):
       'output_uri_prefix' must end with "/" and start with "gs://". One
       'output_uri_prefix' can only be used by one batch translation job at a
       time. Otherwise an INVALID_ARGUMENT (400) error is returned.
+  """
+
+  outputUriPrefix = _messages.StringField(1)
+
+
+class GcsInputSource(_messages.Message):
+  r"""The Google Cloud Storage location for the input content.
+
+  Fields:
+    inputUri: Required. Source data URI. For example,
+      `gs://my_bucket/my_object`.
+  """
+
+  inputUri = _messages.StringField(1)
+
+
+class GcsOutputDestination(_messages.Message):
+  r"""The Google Cloud Storage location for the output content.
+
+  Fields:
+    outputUriPrefix: Required. Google Cloud Storage URI to output directory.
+      For example, `gs://bucket/directory`. The requesting user must have
+      write permission to the bucket. The directory will be created if it
+      doesn't exist.
   """
 
   outputUriPrefix = _messages.StringField(1)
@@ -578,7 +691,7 @@ class GcsSource(_messages.Message):
 
 
 class Glossary(_messages.Message):
-  r"""Represents a glossary built from user provided data.
+  r"""Represents a glossary built from user-provided data.
 
   Fields:
     displayName: Optional. The display name of the glossary.
@@ -630,12 +743,12 @@ class GlossaryInputConfig(_messages.Message):
       [google.rpc.Code.INVALID_ARGUMENT] for unsupported URI-s and file
       formats. Wildcards are not allowed. This must be a single file in one of
       the following formats: For unidirectional glossaries: - TSV/CSV
-      (`.tsv`/`.csv`): 2 column file, tab- or comma-separated. The first
-      column is source text. The second column is target text. The file must
-      not contain headers. That is, the first row is data, not column names. -
-      TMX (`.tmx`): TMX file with parallel data defining source/target term
-      pairs. For equivalent term sets glossaries: - CSV (`.csv`): Multi-column
-      CSV file defining equivalent glossary terms in multiple languages. See
+      (`.tsv`/`.csv`): Two column file, tab- or comma-separated. The first
+      column is source text. The second column is target text. No headers in
+      this file. The first row contains data and not column names. - TMX
+      (`.tmx`): TMX file with parallel data defining source/target term pairs.
+      For equivalent term sets glossaries: - CSV (`.csv`): Multi-column CSV
+      file defining equivalent glossary terms in multiple languages. See
       documentation for more information -
       [glossaries](https://cloud.google.com/translate/docs/advanced/glossary).
   """
@@ -680,6 +793,16 @@ class GlossaryTermsSet(_messages.Message):
   terms = _messages.MessageField('GlossaryTerm', 1, repeated=True)
 
 
+class ImportDataRequest(_messages.Message):
+  r"""Request message for ImportData.
+
+  Fields:
+    inputConfig: Required. The config for the input content.
+  """
+
+  inputConfig = _messages.MessageField('DatasetInputConfig', 1)
+
+
 class InputConfig(_messages.Message):
   r"""Input configuration for BatchTranslateText request.
 
@@ -707,14 +830,27 @@ class InputConfig(_messages.Message):
   mimeType = _messages.StringField(2)
 
 
+class InputFile(_messages.Message):
+  r"""An input file.
+
+  Fields:
+    gcsSource: Google Cloud Storage file source.
+    usage: Optional. Usage of the file contents. Options are
+      TRAIN|VALIDATION|TEST, or UNASSIGNED (by default) for auto split.
+  """
+
+  gcsSource = _messages.MessageField('GcsInputSource', 1)
+  usage = _messages.StringField(2)
+
+
 class LanguageCodePair(_messages.Message):
   r"""Used with unidirectional glossaries.
 
   Fields:
-    sourceLanguageCode: Required. The BCP-47 language code of the input text,
+    sourceLanguageCode: Required. The ISO-639 language code of the input text,
       for example, "en-US". Expected to be an exact match for
       GlossaryTerm.language_code.
-    targetLanguageCode: Required. The BCP-47 language code for translation
+    targetLanguageCode: Required. The ISO-639 language code for translation
       output, for example, "zh-CN". Expected to be an exact match for
       GlossaryTerm.language_code.
   """
@@ -727,12 +863,40 @@ class LanguageCodesSet(_messages.Message):
   r"""Used with equivalent term set glossaries.
 
   Fields:
-    languageCodes: The BCP-47 language code(s) for terms defined in the
+    languageCodes: The ISO-639 language code(s) for terms defined in the
       glossary. All entries are unique. The list contains at least two
       entries. Expected to be an exact match for GlossaryTerm.language_code.
   """
 
   languageCodes = _messages.StringField(1, repeated=True)
+
+
+class ListDatasetsResponse(_messages.Message):
+  r"""Response message for ListDatasets.
+
+  Fields:
+    datasets: The datasets read.
+    nextPageToken: A token to retrieve next page of results. Pass this token
+      to the page_token field in the ListDatasetsRequest to obtain the
+      corresponding page.
+  """
+
+  datasets = _messages.MessageField('Dataset', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListExamplesResponse(_messages.Message):
+  r"""Response message for ListExamples.
+
+  Fields:
+    examples: The sentence pairs.
+    nextPageToken: A token to retrieve next page of results. Pass this token
+      to the page_token field in the ListExamplesRequest to obtain the
+      corresponding page.
+  """
+
+  examples = _messages.MessageField('Example', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
 
 
 class ListGlossariesResponse(_messages.Message):
@@ -773,6 +937,20 @@ class ListLocationsResponse(_messages.Message):
   """
 
   locations = _messages.MessageField('Location', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListModelsResponse(_messages.Message):
+  r"""Response message for ListModels.
+
+  Fields:
+    models: The models read.
+    nextPageToken: A token to retrieve next page of results. Pass this token
+      to the page_token field in the ListModelsRequest to obtain the
+      corresponding page.
+  """
+
+  models = _messages.MessageField('Model', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -867,6 +1045,48 @@ class Location(_messages.Message):
   locationId = _messages.StringField(3)
   metadata = _messages.MessageField('MetadataValue', 4)
   name = _messages.StringField(5)
+
+
+class Model(_messages.Message):
+  r"""A trained translation model.
+
+  Fields:
+    createTime: Output only. Timestamp when the model resource was created,
+      which is also when the training started.
+    dataset: The dataset from which the model is trained, in form of
+      `projects/{project-number-or-
+      id}/locations/{location_id}/datasets/{dataset_id}`
+    deployTime: Output only. Timestamp when the model training finished and
+      ready to be used for translation.
+    displayName: The name of the model to show in the interface. The name can
+      be up to 32 characters long and can consist only of ASCII Latin letters
+      A-Z and a-z, underscores (_), and ASCII digits 0-9.
+    name: The resource name of the model, in form of `projects/{project-
+      number-or-id}/locations/{location_id}/models/{model_id}`
+    sourceLanguageCode: Output only. The BCP-47 language code of the source
+      language.
+    targetLanguageCode: Output only. The BCP-47 language code of the target
+      language.
+    testExampleCount: Output only. Number of examples (sentence pairs) used to
+      test the model.
+    trainExampleCount: Output only. Number of examples (sentence pairs) used
+      to train the model.
+    updateTime: Output only. Timestamp when this model was last updated.
+    validateExampleCount: Output only. Number of examples (sentence pairs)
+      used to validate the model.
+  """
+
+  createTime = _messages.StringField(1)
+  dataset = _messages.StringField(2)
+  deployTime = _messages.StringField(3)
+  displayName = _messages.StringField(4)
+  name = _messages.StringField(5)
+  sourceLanguageCode = _messages.StringField(6)
+  targetLanguageCode = _messages.StringField(7)
+  testExampleCount = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  trainExampleCount = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  updateTime = _messages.StringField(10)
+  validateExampleCount = _messages.IntegerField(11, variant=_messages.Variant.INT32)
 
 
 class Operation(_messages.Message):
@@ -1008,18 +1228,18 @@ class OutputConfig(_messages.Message):
       applied on the output bucket that may avoid file updating.
       (https://cloud.google.com/storage/docs/bucket-lock#retention-policy) The
       format of translations_file (for target language code 'trg') is:
-      gs://translation_test/a_b_c_'trg'_translations.[extension] If the input
-      file extension is tsv, the output has the following columns: Column 1:
-      ID of the request provided in the input, if it's not provided in the
-      input, then the input row number is used (0-based). Column 2: source
-      sentence. Column 3: translation without applying a glossary. Empty
-      string if there is an error. Column 4 (only present if a glossary is
-      provided in the request): translation after applying the glossary. Empty
-      string if there is an error applying the glossary. Could be same string
-      as column 3 if there is no glossary applied. If input file extension is
-      a txt or html, the translation is directly written to the output file.
-      If glossary is requested, a separate glossary_translations_file has
-      format of
+      `gs://translation_test/a_b_c_'trg'_translations.[extension]` If the
+      input file extension is tsv, the output has the following columns:
+      Column 1: ID of the request provided in the input, if it's not provided
+      in the input, then the input row number is used (0-based). Column 2:
+      source sentence. Column 3: translation without applying a glossary.
+      Empty string if there is an error. Column 4 (only present if a glossary
+      is provided in the request): translation after applying the glossary.
+      Empty string if there is an error applying the glossary. Could be same
+      string as column 3 if there is no glossary applied. If input file
+      extension is a txt or html, the translation is directly written to the
+      output file. If glossary is requested, a separate
+      glossary_translations_file has format of
       gs://translation_test/a_b_c_'trg'_glossary_translations.[extension] The
       format of errors file (for target language code 'trg') is:
       gs://translation_test/a_b_c_'trg'_errors.[extension] If the input file
@@ -1156,14 +1376,14 @@ class SupportedLanguage(_messages.Message):
   to one supported language.
 
   Fields:
-    displayName: Human readable name of the language localized in the display
+    displayName: Human-readable name of the language localized in the display
       language specified in the request.
     languageCode: Supported language code, generally consisting of its ISO
-      639-1 identifier, for example, 'en', 'ja'. In certain cases, BCP-47
+      639-1 identifier, for example, 'en', 'ja'. In certain cases, ISO-639
       codes including language and region identifiers are returned (for
-      example, 'zh-TW' and 'zh-CN')
-    supportSource: Can be used as source language.
-    supportTarget: Can be used as target language.
+      example, 'zh-TW' and 'zh-CN').
+    supportSource: Can be used as a source language.
+    supportTarget: Can be used as a target language.
   """
 
   displayName = _messages.StringField(1)
@@ -1206,9 +1426,16 @@ class TranslateDocumentRequest(_messages.Message):
       output format. If not provided the translated file will only be returned
       through a byte-stream and its output mime type will be the same as the
       input file's mime type.
+    enableShadowRemovalNativePdf: Optional. If true, use the text removal
+      server to remove the shadow text on background image for native pdf
+      translation. Shadow removal feature can only be enabled when
+      is_translate_native_pdf_only: false && pdf_native_only: false
     glossaryConfig: Optional. Glossary to be applied. The glossary must be
       within the same region (have the same location-id) as the model,
       otherwise an INVALID_ARGUMENT (400) error is returned.
+    isTranslateNativePdfOnly: Optional. is_translate_native_pdf_only field for
+      external customers. If true, the page limit of online native pdf
+      translation is 300 and only native pdf pages will be translated.
     labels: Optional. The labels with user-defined metadata for the request.
       Label keys and values can be no longer than 63 characters (Unicode
       codepoints), can only contain lowercase letters, numeric characters,
@@ -1222,14 +1449,14 @@ class TranslateDocumentRequest(_messages.Message):
       id}` - General (built-in) models: `projects/{project-number-or-
       id}/locations/{location-id}/models/general/nmt`, If not provided, the
       default Google model (NMT) will be used for translation.
-    sourceLanguageCode: Optional. The BCP-47 language code of the input
+    sourceLanguageCode: Optional. The ISO-639 language code of the input
       document if known, for example, "en-US" or "sr-Latn". Supported language
       codes are listed in Language Support. If the source language isn't
       specified, the API attempts to identify the source language
       automatically and returns the source language within the response.
       Source language must be specified if the request contains a glossary or
       a custom model.
-    targetLanguageCode: Required. The BCP-47 language code to use for
+    targetLanguageCode: Required. The ISO-639 language code to use for
       translation of the input document, set to one of the language codes
       listed in Language Support.
   """
@@ -1267,11 +1494,13 @@ class TranslateDocumentRequest(_messages.Message):
   customizedAttribution = _messages.StringField(1)
   documentInputConfig = _messages.MessageField('DocumentInputConfig', 2)
   documentOutputConfig = _messages.MessageField('DocumentOutputConfig', 3)
-  glossaryConfig = _messages.MessageField('TranslateTextGlossaryConfig', 4)
-  labels = _messages.MessageField('LabelsValue', 5)
-  model = _messages.StringField(6)
-  sourceLanguageCode = _messages.StringField(7)
-  targetLanguageCode = _messages.StringField(8)
+  enableShadowRemovalNativePdf = _messages.BooleanField(4)
+  glossaryConfig = _messages.MessageField('TranslateTextGlossaryConfig', 5)
+  isTranslateNativePdfOnly = _messages.BooleanField(6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  model = _messages.StringField(8)
+  sourceLanguageCode = _messages.StringField(9)
+  targetLanguageCode = _messages.StringField(10)
 
 
 class TranslateDocumentResponse(_messages.Message):
@@ -1378,6 +1607,106 @@ class TranslateProjectsLocationsBatchTranslateTextRequest(_messages.Message):
 
   batchTranslateTextRequest = _messages.MessageField('BatchTranslateTextRequest', 1)
   parent = _messages.StringField(2, required=True)
+
+
+class TranslateProjectsLocationsDatasetsCreateRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsCreateRequest object.
+
+  Fields:
+    dataset: A Dataset resource to be passed as the request body.
+    parent: Required. The project name.
+  """
+
+  dataset = _messages.MessageField('Dataset', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class TranslateProjectsLocationsDatasetsDeleteRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsDeleteRequest object.
+
+  Fields:
+    name: Required. The name of the dataset to delete.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class TranslateProjectsLocationsDatasetsExamplesListRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsExamplesListRequest object.
+
+  Fields:
+    filter: Optional. An expression for filtering the examples that will be
+      returned. Example filter: * `usage=TRAIN`
+    pageSize: Optional. Requested page size. The server can return fewer
+      results than requested.
+    pageToken: Optional. A token identifying a page of results for the server
+      to return. Typically obtained from next_page_token field in the response
+      of a ListExamples call.
+    parent: Required. Name of the parent dataset. In form of
+      `projects/{project-number-or-id}/locations/{location-
+      id}/datasets/{dataset-id}`
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class TranslateProjectsLocationsDatasetsExportDataRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsExportDataRequest object.
+
+  Fields:
+    dataset: Required. Name of the dataset. In form of `projects/{project-
+      number-or-id}/locations/{location-id}/datasets/{dataset-id}`
+    exportDataRequest: A ExportDataRequest resource to be passed as the
+      request body.
+  """
+
+  dataset = _messages.StringField(1, required=True)
+  exportDataRequest = _messages.MessageField('ExportDataRequest', 2)
+
+
+class TranslateProjectsLocationsDatasetsGetRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsGetRequest object.
+
+  Fields:
+    name: Required. The resource name of the dataset to retrieve.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class TranslateProjectsLocationsDatasetsImportDataRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsImportDataRequest object.
+
+  Fields:
+    dataset: Required. Name of the dataset. In form of `projects/{project-
+      number-or-id}/locations/{location-id}/datasets/{dataset-id}`
+    importDataRequest: A ImportDataRequest resource to be passed as the
+      request body.
+  """
+
+  dataset = _messages.StringField(1, required=True)
+  importDataRequest = _messages.MessageField('ImportDataRequest', 2)
+
+
+class TranslateProjectsLocationsDatasetsListRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsDatasetsListRequest object.
+
+  Fields:
+    pageSize: Optional. Requested page size. The server can return fewer
+      results than requested.
+    pageToken: Optional. A token identifying a page of results for the server
+      to return. Typically obtained from next_page_token field in the response
+      of a ListDatasets call.
+    parent: Required. Name of the parent project. In form of
+      `projects/{project-number-or-id}/locations/{location-id}`
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class TranslateProjectsLocationsDetectLanguageRequest(_messages.Message):
@@ -1598,6 +1927,60 @@ class TranslateProjectsLocationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class TranslateProjectsLocationsModelsCreateRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsModelsCreateRequest object.
+
+  Fields:
+    model: A Model resource to be passed as the request body.
+    parent: Required. The project name, in form of
+      `projects/{project}/locations/{location}`
+  """
+
+  model = _messages.MessageField('Model', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class TranslateProjectsLocationsModelsDeleteRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsModelsDeleteRequest object.
+
+  Fields:
+    name: Required. The name of the model to delete.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class TranslateProjectsLocationsModelsGetRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsModelsGetRequest object.
+
+  Fields:
+    name: Required. The resource name of the model to retrieve.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class TranslateProjectsLocationsModelsListRequest(_messages.Message):
+  r"""A TranslateProjectsLocationsModelsListRequest object.
+
+  Fields:
+    filter: Optional. An expression for filtering the models that will be
+      returned. Supported filter: `dataset_id=${dataset_id}`
+    pageSize: Optional. Requested page size. The server can return fewer
+      results than requested.
+    pageToken: Optional. A token identifying a page of results for the server
+      to return. Typically obtained from next_page_token field in the response
+      of a ListModels call.
+    parent: Required. Name of the parent project. In form of
+      `projects/{project-number-or-id}/locations/{location-id}`
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+
+
 class TranslateProjectsLocationsOperationsCancelRequest(_messages.Message):
   r"""A TranslateProjectsLocationsOperationsCancelRequest object.
 
@@ -1720,16 +2103,16 @@ class TranslateProjectsTranslateTextRequest(_messages.Message):
 
 
 class TranslateTextGlossaryConfig(_messages.Message):
-  r"""Configures which glossary should be used for a specific target language,
-  and defines options for applying that glossary.
+  r"""Configures which glossary is used for a specific target language and
+  defines options for applying that glossary.
 
   Fields:
     glossary: Required. The `glossary` to be applied for this translation. The
-      format depends on glossary: - User provided custom glossary:
+      format depends on the glossary: - User-provided custom glossary:
       `projects/{project-number-or-id}/locations/{location-
       id}/glossaries/{glossary-id}`
-    ignoreCase: Optional. Indicates match is case-insensitive. Default value
-      is false if missing.
+    ignoreCase: Optional. Indicates match is case insensitive. The default
+      value is `false` if missing.
   """
 
   glossary = _messages.StringField(1)
@@ -1750,8 +2133,8 @@ class TranslateTextRequest(_messages.Message):
 
   Fields:
     contents: Required. The content of the input in string format. We
-      recommend the total content be less than 30k codepoints. The max length
-      of this field is 1024. Use BatchTranslateText for larger text.
+      recommend the total content be less than 30,000 codepoints. The max
+      length of this field is 1024. Use BatchTranslateText for larger text.
     glossaryConfig: Optional. Glossary to be applied. The glossary must be
       within the same region (have the same location-id) as the model,
       otherwise an INVALID_ARGUMENT (400) error is returned.
@@ -1773,12 +2156,12 @@ class TranslateTextRequest(_messages.Message):
       regionalized) requests, use `location-id` `global`. For example,
       `projects/{project-number-or-id}/locations/global/models/general/nmt`.
       If not provided, the default Google model (NMT) will be used
-    sourceLanguageCode: Optional. The BCP-47 language code of the input text
+    sourceLanguageCode: Optional. The ISO-639 language code of the input text
       if known, for example, "en-US" or "sr-Latn". Supported language codes
       are listed in Language Support. If the source language isn't specified,
       the API attempts to identify the source language automatically and
       returns the source language within the response.
-    targetLanguageCode: Required. The BCP-47 language code to use for
+    targetLanguageCode: Required. The ISO-639 language code to use for
       translation of the input text, set to one of the language codes listed
       in Language Support.
   """
@@ -1841,7 +2224,7 @@ class Translation(_messages.Message):
   r"""A single translation response.
 
   Fields:
-    detectedLanguageCode: The BCP-47 language code of source text in the
+    detectedLanguageCode: The ISO-639 language code of source text in the
       initial request, detected automatically, if no source language was
       passed within the initial request. If the source language was passed,
       auto-detection of the language does not occur and this field is empty.

@@ -60,8 +60,7 @@ $ {command} my-cluster --location=us-west1 --platform-version=PLATFORM_VERSION -
 """
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 class Register(base.CreateCommand):
   """Register an Attached cluster."""
 
@@ -82,6 +81,8 @@ class Register(base.CreateCommand):
     flags.AddValidateOnly(parser, 'cluster to create')
     flags.AddFleetProject(parser)
     flags.AddDescription(parser)
+    flags.AddLogging(parser, True)
+    flags.AddMonitoringConfig(parser, True)
 
     parser.display_info.AddFormat(constants.ATTACHED_CLUSTERS_FORMAT)
 

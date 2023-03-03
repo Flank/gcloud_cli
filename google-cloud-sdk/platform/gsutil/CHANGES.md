@@ -1,3 +1,77 @@
+Release 5.20 (release date: 2023-02-02)
+======================================
+Other Changes
+------------------
+- Small help updates to acl examples and the cp -j flag (#1667)
+Release 5.19 (release date: 2023-01-26)
+======================================
+Bug Fixes
+------------------
+- Make reauth check opt-in and silence non-auth-related exceptions. (#1664)
+- Fix rpo get shim for s3 buckets (#1659)
+
+Other Changes
+------------------
+- Several documentation updates and clarifications.
+
+Release 5.18 (release date: 2023-01-12)
+======================================
+New Features
+------------------
+- Add shim support for DefAcl get & set (#1654)
+- Add shim support for rpo set (#1650)
+- Add shim support for the rpo flag in the mb command (#1649)
+- Add shim support for ACL commands (#1638)
+- Add shim support for custom dual regions (#1645)
+- Add shim support for the hash command (#1644)
+- Add rsync -y option to compliment -x (#1642)
+- Add shim support for retention commands (#1641)
+- Add shim support for additional headers (#1634)
+- Add shim support for labels commands (#1636)
+- Add shim support for CORS commands (#1635)
+- Add shim support for IAM commands (#1627)
+
+Bug Fixes
+------------------
+- Handle reauth challenges gracefully in transfer commands. (#1655)
+- Shim gsutil ls behavior of always attempting to fetch hashes. (#1640)
+
+Other Changes
+------------------
+- Add a warning about the deprecation of the OAuth2 flow. (#1658)
+- Several documentation updates and clarifications.
+
+Release 5.17 (release date: 2022-12-01)
+======================================
+New Features
+------------------
+- Shim autoclass command (#1618)
+- Updating WrappedCredentials to allow for External Account Authorized User Credentials (#1617)
+
+Bug Fixes
+------------------
+- Fix rsync -x test to address issue #1615 (#1629, #1623)
+
+Other Changes
+------------------
+- Pin httplib2 to 0.20.4 version (#1628)
+- Several documentation updates and clarifications.
+
+Release 5.16 (release date: 2022-10-27)
+======================================
+New Features
+------------------
+- Shim lifecycle command. (#1610)
+- Shim bucketpolicy only and ubla commands (#1608)
+ 
+Bug Fixes
+------------------
+- Fixed rsync -x test for Windows and updated docs to match (#1609)
+ 
+Other Changes
+------------------
+- Update google auth dependency for interactive mode, and url validation (#1614)
+
 Release 5.15 (release date: 2022-10-18)
 ======================================
 Bug Fixes

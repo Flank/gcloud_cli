@@ -103,7 +103,7 @@ def _IsAlpha(release_track):
   return release_track == base.ReleaseTrack.ALPHA
 
 
-def _IsBetaOrNewer(release_track):
+def IsBetaOrNewer(release_track):
   return release_track == base.ReleaseTrack.BETA or _IsAlpha(release_track)
 
 
@@ -297,11 +297,20 @@ class _BaseInstances(object):
       settings.ipConfiguration.privateNetwork = reducers.PrivateNetworkUrl(
           args.network)
 
+    if args.IsKnownAndSpecified('enable_google_private_path'):
+      if not settings.ipConfiguration:
+        settings.ipConfiguration = sql_messages.IpConfiguration()
+      settings.ipConfiguration.enablePrivatePathForGoogleCloudServices = args.enable_google_private_path
+
     if args.deletion_protection is not None:
       settings.deletionProtectionEnabled = args.deletion_protection
 
+    if args.IsSpecified('connector_enforcement'):
+      settings.connectorEnforcement = _ParseConnectorEnforcement(
+          sql_messages, args.connector_enforcement)
+
     # BETA args.
-    if _IsBetaOrNewer(release_track):
+    if IsBetaOrNewer(release_track):
       if args.IsSpecified('storage_auto_increase_limit'):
         # Resize limit should be settable if the original instance has resize
         # turned on, or if the instance to be created has resize flag.
@@ -317,15 +326,28 @@ class _BaseInstances(object):
               'using [--storage-auto-increase-limit], '
               '[--storage-auto-increase] must be enabled.')
 
-      if ('enable_google_private_path' in args) and args.IsSpecified(
-          'enable_google_private_path'):
+      if args.IsKnownAndSpecified('enable_private_service_connect'):
         if not settings.ipConfiguration:
           settings.ipConfiguration = sql_messages.IpConfiguration()
-        settings.ipConfiguration.enablePrivatePathForGoogleCloudServices = args.enable_google_private_path
+        if not settings.ipConfiguration.pscConfig:
+          settings.ipConfiguration.pscConfig = sql_messages.PscConfig()
+        settings.ipConfiguration.pscConfig.pscEnabled = (
+            args.enable_private_service_connect)
 
-      if args.IsSpecified('connector_enforcement'):
-        settings.connectorEnforcement = _ParseConnectorEnforcement(
-            sql_messages, args.connector_enforcement)
+      if args.IsSpecified('allowed_psc_projects'):
+        if not settings.ipConfiguration:
+          settings.ipConfiguration = sql_messages.IpConfiguration()
+        if not settings.ipConfiguration.pscConfig:
+          settings.ipConfiguration.pscConfig = sql_messages.PscConfig()
+        settings.ipConfiguration.pscConfig.allowedConsumerProjects = (
+            args.allowed_psc_projects)
+
+      if args.IsKnownAndSpecified('clear_allowed_psc_projects'):
+        if not settings.ipConfiguration:
+          settings.ipConfiguration = sql_messages.IpConfiguration()
+        if not settings.ipConfiguration.pscConfig:
+          settings.ipConfiguration.pscConfig = sql_messages.PscConfig()
+        settings.ipConfiguration.pscConfig.allowedConsumerProjects = []
 
     if _IsAlpha(release_track):
       if args.IsSpecified('workload_tier'):
@@ -427,7 +449,7 @@ class _BaseInstances(object):
       settings.timeZone = args.time_zone
 
     # BETA args.
-    if _IsBetaOrNewer(release_track):
+    if IsBetaOrNewer(release_track):
       settings.userLabels = labels_util.ParseCreateArgs(
           args, sql_messages.Settings.UserLabelsValue)
 
@@ -557,7 +579,7 @@ class _BaseInstances(object):
         upload_interval=args.audit_upload_interval)
 
     # BETA args.
-    if _IsBetaOrNewer(release_track):
+    if IsBetaOrNewer(release_track):
       labels_diff = labels_util.ExplicitNullificationDiff.FromUpdateArgs(args)
       labels_update = labels_diff.Apply(sql_messages.Settings.UserLabelsValue,
                                         instance.settings.userLabels)
@@ -628,7 +650,7 @@ class _BaseInstances(object):
     instance_resource.rootPassword = args.root_password
 
     # BETA: Set the host port and return early if external master instance.
-    if _IsBetaOrNewer(release_track) and args.IsSpecified('source_ip_address'):
+    if IsBetaOrNewer(release_track) and args.IsSpecified('source_ip_address'):
       on_premises_configuration = reducers.OnPremisesConfiguration(
           sql_messages, args.source_ip_address, args.source_port)
       instance_resource.onPremisesConfiguration = on_premises_configuration
@@ -658,7 +680,7 @@ class _BaseInstances(object):
       instance_resource.settings.collation = args.collation
 
     # BETA: Config for creating a replica of an external primary instance.
-    if _IsBetaOrNewer(release_track) and args.IsSpecified('master_username'):
+    if IsBetaOrNewer(release_track) and args.IsSpecified('master_username'):
       # Ensure that the primary instance name is specified.
       if not args.IsSpecified('master_instance_name'):
         raise exceptions.RequiredArgumentException(

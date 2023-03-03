@@ -18,32 +18,53 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import json
+import os
 
+from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import posix_util
 from googlecloudsdk.command_lib.storage import user_request_args_factory
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.cache import function_result_cache
 from googlecloudsdk.core.util import files
 
+import six
+
 
 @function_result_cache.lru(maxsize=None)
-def cached_read_json_file(file_path):
-  """Convert JSON file to an in-memory dict."""
-  with files.FileReader(file_path) as file_reader:
-    return json.load(file_reader)
+def cached_read_yaml_json_file(file_path):
+  """Converts JSON or YAML file to an in-memory dict.
+
+  Args:
+    file_path (str): Path for the file to parse passed in by the user.
+
+  Returns:
+    parsed (dict): Parsed value from the provided file_path.
+
+  Raises:
+    InvalidUrlError: The provided file_path either failed to load or be parsed
+      as a dict.
+  """
+  expanded_file_path = os.path.realpath(os.path.expanduser(file_path))
+  try:
+    # Since json is a subset of yaml, parse file as yaml.
+    parsed = yaml.load(files.ReadFileContents(expanded_file_path))
+    if isinstance(parsed, dict) or isinstance(parsed, list):
+      return parsed
+  except yaml.YAMLParseError as e:
+    raise errors.InvalidUrlError(
+        'Found invalid JSON/YAML file {}\n\nOriginal Error: {}'.format(
+            file_path, six.text_type(e)
+        )
+    )
+
+  raise errors.InvalidUrlError(
+      'Found invalid JSON/YAML file {}'.format(file_path)
+  )
 
 
-def get_label_pairs_from_file(file_path):
-  """Convert JSON file to a list of label keys and values."""
-  # Expected JSON file format: Dict<str: str>
-  labels_dict = cached_read_json_file(file_path)
-  # {'key1': 'val1', 'key2': 'val2', ...} -> [('key1', 'val1'), ...]
-  return list(labels_dict.items())
-
-
-def get_updated_custom_metadata(existing_custom_metadata,
-                                request_config,
-                                file_path=None):
+def get_updated_custom_fields(existing_custom_fields,
+                              request_config,
+                              file_path=None):
   """Returns a dictionary containing new custom metadata for an object.
 
   Assumes that the custom metadata setter, clear flag, and a group containing
@@ -52,7 +73,7 @@ def get_updated_custom_metadata(existing_custom_metadata,
   member of this group, meaning it can be set with any of these flags.
 
   Args:
-    existing_custom_metadata (dict): Existing custom metadata provided by an
+    existing_custom_fields (dict): Existing custom metadata provided by an
       API.
     request_config (request_config): May contain custom metadata fields that
       should be modified.
@@ -70,10 +91,9 @@ def get_updated_custom_metadata(existing_custom_metadata,
     return
 
   should_parse_file_posix = request_config.system_posix_data and file_path
-  if (not should_parse_file_posix and
-      not resource_args.custom_metadata_to_set and
-      not resource_args.custom_metadata_to_remove and
-      not resource_args.custom_metadata_to_update):
+  if (not should_parse_file_posix and not resource_args.custom_fields_to_set and
+      not resource_args.custom_fields_to_remove and
+      not resource_args.custom_fields_to_update):
     return
 
   posix_metadata = {}
@@ -82,26 +102,26 @@ def get_updated_custom_metadata(existing_custom_metadata,
     posix_util.update_custom_metadata_dict_with_posix_attributes(
         posix_metadata, posix_attributes)
 
-  if resource_args.custom_metadata_to_set == user_request_args_factory.CLEAR:
+  if resource_args.custom_fields_to_set == user_request_args_factory.CLEAR:
     # Providing preserve POSIX and clear flags means that an object's metadata
     # should only include POSIX information.
     return posix_metadata
 
   # POSIX metadata overrides existing values but is overridden by fields
   # provided in update, remove, and set flags.
-  if resource_args.custom_metadata_to_set:
-    posix_metadata.update(resource_args.custom_metadata_to_set)
+  if resource_args.custom_fields_to_set:
+    posix_metadata.update(resource_args.custom_fields_to_set)
     return posix_metadata
 
-  custom_metadata = dict(existing_custom_metadata, **posix_metadata)
+  custom_fields = dict(existing_custom_fields, **posix_metadata)
 
   # Removes fields before updating them to avoid metadata loss.
-  if resource_args.custom_metadata_to_remove:
-    for key in resource_args.custom_metadata_to_remove:
-      if key in custom_metadata:
-        del custom_metadata[key]
+  if resource_args.custom_fields_to_remove:
+    for key in resource_args.custom_fields_to_remove:
+      if key in custom_fields:
+        del custom_fields[key]
 
-  if resource_args.custom_metadata_to_update:
-    custom_metadata.update(resource_args.custom_metadata_to_update)
+  if resource_args.custom_fields_to_update:
+    custom_fields.update(resource_args.custom_fields_to_update)
 
-  return custom_metadata
+  return custom_fields

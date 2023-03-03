@@ -431,6 +431,14 @@
         "managedConfig": {
           "description": "ManagedConfig configuration for the cluster.",
           "$ref": "ManagedConfig"
+        },
+        "concurrentOpsConfig": {
+          "description": "Allows enabling concurrent ops for supported operations on this cluster. This flag is for EAP users only. Concurrent ops will become the only option, and thus having an opt in\/out is only applicable pre-GA. Once the feature is GA, \"disabling\" concurrent ops will have no effect and the flag will be removed in the future.",
+          "$ref": "ConcurrentOpsConfig"
+        },
+        "securityPostureConfig": {
+          "description": "Enable\/Disable Security Posture API features for the cluster.",
+          "$ref": "SecurityPostureConfig"
         }
       }
     },
@@ -467,7 +475,7 @@
           }
         },
         "imageType": {
-          "description": "The image type to use for this node. Note that for a given image type, the latest version of it will be used.",
+          "description": "The image type to use for this node. Note that for a given image type, the latest version of it will be used. Please see https:\/\/cloud.google.com\/kubernetes-engine\/docs\/concepts\/node-images for available image types.",
           "type": "string"
         },
         "nodeImageConfig": {
@@ -589,6 +597,14 @@
         "windowsNodeConfig": {
           "description": "Parameters that can be configured on Windows nodes.",
           "$ref": "WindowsNodeConfig"
+        },
+        "localNvmeSsdBlockConfig": {
+          "description": "Parameters for using raw-block Local NVMe SSDs.",
+          "$ref": "LocalNvmeSsdBlockConfig"
+        },
+        "ephemeralStorageLocalSsdConfig": {
+          "description": "Parameters for the node ephemeral storage using Local SSDs. If unspecified, ephemeral storage is backed by the boot disk.",
+          "$ref": "EphemeralStorageLocalSsdConfig"
         }
       }
     },
@@ -684,7 +700,7 @@
     },
     "NodeTaint": {
       "id": "NodeTaint",
-      "description": "Kubernetes taint is comprised of three fields: key, value, and effect. Effect can only be one of three types: NoSchedule, PreferNoSchedule or NoExecute. See [here](https:\/\/kubernetes.io\/docs\/concepts\/configuration\/taint-and-toleration) for more information, including usage and the valid values.",
+      "description": "Kubernetes taint is composed of three fields: key, value, and effect. Effect can only be one of three types: NoSchedule, PreferNoSchedule or NoExecute. See [here](https:\/\/kubernetes.io\/docs\/concepts\/configuration\/taint-and-toleration) for more information, including usage and the valid values.",
       "type": "object",
       "properties": {
         "key": {
@@ -792,6 +808,20 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "cgroupMode": {
+          "description": "cgroup_mode specifies the cgroup mode to be used on the node.",
+          "type": "string",
+          "enumDescriptions": [
+            "CGROUP_MODE_UNSPECIFIED is when unspecified cgroup configuration is used. The default for the GKE node OS image will be used.",
+            "CGROUP_MODE_V1 specifies to use cgroupv1 for the cgroup configuration on the node image.",
+            "CGROUP_MODE_V2 specifies to use cgroupv2 for the cgroup configuration on the node image."
+          ],
+          "enum": [
+            "CGROUP_MODE_UNSPECIFIED",
+            "CGROUP_MODE_V1",
+            "CGROUP_MODE_V2"
+          ]
         }
       }
     },
@@ -839,6 +869,10 @@
           "description": "The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.",
           "type": "string",
           "format": "int64"
+        },
+        "enableNestedVirtualization": {
+          "description": "Whether or not to enable nested virtualization (defaults to false).",
+          "type": "boolean"
         }
       }
     },
@@ -925,6 +959,30 @@
             "OS_VERSION_LTSC2019",
             "OS_VERSION_LTSC2022"
           ]
+        }
+      }
+    },
+    "LocalNvmeSsdBlockConfig": {
+      "id": "LocalNvmeSsdBlockConfig",
+      "description": "LocalNvmeSsdBlockConfig contains configuration for using raw-block local NVMe SSD.",
+      "type": "object",
+      "properties": {
+        "localSsdCount": {
+          "description": "The number of raw-block local NVMe SSD disks to be attached to the node. Each local SSD is 375 GB in size. If zero, it means no raw-block local NVMe SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https:\/\/cloud.google.com\/compute\/docs\/disks\/local-ssd for more information.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "EphemeralStorageLocalSsdConfig": {
+      "id": "EphemeralStorageLocalSsdConfig",
+      "description": "EphemeralStorageLocalSsdConfig contains configuration for the node ephemeral storage using Local SSD.",
+      "type": "object",
+      "properties": {
+        "localSsdCount": {
+          "description": "Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. Each local SSD is 375 GB in size. If zero, it means to disable using local SSDs as ephemeral storage. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https:\/\/cloud.google.com\/compute\/docs\/disks\/local-ssd for more information.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -1175,7 +1233,7 @@
           "type": "string"
         },
         "version": {
-          "description": "The version of the Kubernetes of this node.",
+          "description": "The version of Kubernetes running on this NodePool's nodes. If unspecified, it defaults as described [here](https:\/\/cloud.google.com\/kubernetes-engine\/versioning#specifying_node_version).",
           "type": "string"
         },
         "instanceGroupUrls": {
@@ -1238,6 +1296,10 @@
         "upgradeSettings": {
           "description": "Upgrade settings control disruption and speed of the upgrade.",
           "$ref": "UpgradeSettings"
+        },
+        "placementPolicy": {
+          "description": "Specifies the node placement policy.",
+          "$ref": "PlacementPolicy"
         },
         "updateInfo": {
           "description": "Output only. [Output only] Update info contains relevant information during a node pool update.",
@@ -1548,7 +1610,7 @@
           "description": "Update strategy of the node pool.",
           "type": "string",
           "enumDescriptions": [
-            "Default value.",
+            "Default value if unset. GKE internally defaults the update strategy to SURGE for unspecified strategies.",
             "ROLLING is the synonymous with SURGE. Deprecate this value and use SURGE instead.",
             "blue-green upgrade.",
             "SURGE is the traditional way of upgrade a node pool. max_surge and max_unavailable determines the level of upgrade parallelism."
@@ -1592,7 +1654,7 @@
       "type": "object",
       "properties": {
         "batchPercentage": {
-          "description": "Percentage of the bool pool nodes to drain in a batch. The range of this field should be (0.0, 1.0].",
+          "description": "Percentage of the blue pool nodes to drain in a batch. The range of this field should be (0.0, 1.0].",
           "type": "number",
           "format": "float"
         },
@@ -1622,6 +1684,29 @@
           "description": "Percentage of the maximum number of nodes that can be unavailable during during the upgrade process.",
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "PlacementPolicy": {
+      "id": "PlacementPolicy",
+      "description": "PlacementPolicy defines the placement policy used by the node pool.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of placement.",
+          "type": "string",
+          "enumDescriptions": [
+            "TYPE_UNSPECIFIED specifies no requirements on nodes placement.",
+            "COMPACT specifies node placement in the same availability domain to ensure low communication latency."
+          ],
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "COMPACT"
+          ]
+        },
+        "tpuTopology": {
+          "description": "TPU placement topology for pod slice node pool. https:\/\/cloud.google.com\/tpu\/docs\/types-topologies#tpu_topologies",
+          "type": "string"
         }
       }
     },
@@ -1811,6 +1896,35 @@
         "podCidrOverprovisionConfig": {
           "description": "Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is doubled and then rounded off to next power of 2 to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (\/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (\/27) when overprovisioning is disabled.",
           "$ref": "PodCIDROverprovisionConfig"
+        },
+        "subnetIpv6CidrBlock": {
+          "description": "Output only. [Output only] The subnet's IPv6 CIDR block used by nodes and pods.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "servicesIpv6CidrBlock": {
+          "description": "Output only. [Output only] The services IPv6 CIDR block for the cluster.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "additionalPodRangesConfig": {
+          "description": "Output only. [Output only] The additional pod ranges that are added to the cluster. These pod ranges can be used by new node pools to allocate pod IPs automatically. Once the range is removed it will not show up in IPAllocationPolicy.",
+          "readOnly": true,
+          "$ref": "AdditionalPodRangesConfig"
+        }
+      }
+    },
+    "AdditionalPodRangesConfig": {
+      "id": "AdditionalPodRangesConfig",
+      "description": "AdditionalPodRangesConfig is the configuration for additional pod secondary ranges supporting the ClusterUpdate message.",
+      "type": "object",
+      "properties": {
+        "podRangeNames": {
+          "description": "Name for pod secondary ipv4 range which has the actual range defined ahead.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1831,7 +1945,7 @@
           }
         },
         "gcpPublicCidrsAccessEnabled": {
-          "description": "Whether master is accessbile via Google Compute Engine Public IPs.",
+          "description": "Whether master is accessbile via Google Compute Engine Public IP addresses.",
           "type": "boolean"
         }
       }
@@ -1970,17 +2084,21 @@
           "type": "boolean"
         },
         "evaluationMode": {
-          "description": "Mode of operation for binauthz policy evaluation. Currently the only options are equivalent to enable\/disable. If unspecified, defaults to DISABLED.",
+          "description": "Mode of operation for binauthz policy evaluation. If unspecified, defaults to DISABLED.",
           "type": "string",
           "enumDescriptions": [
             "Default value",
             "Disable BinaryAuthorization",
-            "Enforce Kubernetes admission requests with BinaryAuthorization using the project's singleton policy. This is equivalent to setting the enabled boolean to true."
+            "Enforce Kubernetes admission requests with BinaryAuthorization using the project's singleton policy. This is equivalent to setting the enabled boolean to true.",
+            "Use Binary Authorization in monitoring mode with the policy specified in binary_authorization.policy.",
+            "Use Binary Authorization in monitoring mode with the policy specified in binary_authorization.policy and enforce admission with the project's singleton policy."
           ],
           "enum": [
             "EVALUATION_MODE_UNSPECIFIED",
             "DISABLED",
-            "PROJECT_SINGLETON_POLICY_ENFORCE"
+            "PROJECT_SINGLETON_POLICY_ENFORCE",
+            "MONITORING",
+            "MONITORING_AND_PROJECT_SINGLETON_POLICY_ENFORCE"
           ]
         },
         "policy": {
@@ -2078,7 +2196,7 @@
           "$ref": "NodeManagement"
         },
         "minCpuPlatform": {
-          "description": "Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read [how to specify min CPU platform](https:\/\/cloud.google.com\/compute\/docs\/instances\/specify-min-cpu-platform). This field is deprecated, min_cpu_platform should be specified using https:\/\/cloud.google.com\/requested-min-cpu-platform label selector on the pod. To unset the min cpu platform field pass \"automatic\" as field value.",
+          "description": "Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read [how to specify min CPU platform](https:\/\/cloud.google.com\/compute\/docs\/instances\/specify-min-cpu-platform). This field is deprecated, min_cpu_platform should be specified using `cloud.google.com\/requested-min-cpu-platform` label selector on the pod. To unset the min cpu platform field pass \"automatic\" as field value.",
           "type": "string"
         },
         "diskSizeGb": {
@@ -2099,7 +2217,7 @@
           "type": "string"
         },
         "imageType": {
-          "description": "The image type to use for NAP created node.",
+          "description": "The image type to use for NAP created node. Please see https:\/\/cloud.google.com\/kubernetes-engine\/docs\/concepts\/node-images for available image types.",
           "type": "string"
         }
       }
@@ -2154,7 +2272,7 @@
             "Default value. Same as DISABLED",
             "No private access to or from Google Services",
             "Enables private IPv6 access to Google Services from GKE",
-            "Enables priate IPv6 access to and from Google Services"
+            "Enables private IPv6 access to and from Google Services"
           ],
           "enum": [
             "PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED",
@@ -2178,6 +2296,10 @@
         "enableMultiNetworking": {
           "description": "Whether multi-networking is enabled for this cluster.",
           "type": "boolean"
+        },
+        "networkPerformanceConfig": {
+          "description": "Network bandwidth tier configuration.",
+          "$ref": "ClusterNetworkPerformanceConfig"
         }
       }
     },
@@ -2216,10 +2338,12 @@
           "type": "string",
           "enumDescriptions": [
             "Default value, will be inferred as cluster scope.",
+            "DNS records are accessible from within the cluster.",
             "DNS records are accessible from within the VPC."
           ],
           "enum": [
             "DNS_SCOPE_UNSPECIFIED",
+            "CLUSTER_SCOPE",
             "VPC_SCOPE"
           ]
         },
@@ -2259,6 +2383,37 @@
             "CHANNEL_DISABLED",
             "CHANNEL_EXPERIMENTAL",
             "CHANNEL_STANDARD"
+          ]
+        }
+      }
+    },
+    "ClusterNetworkPerformanceConfig": {
+      "id": "ClusterNetworkPerformanceConfig",
+      "description": "Configuration of network bandwidth tiers",
+      "type": "object",
+      "properties": {
+        "totalEgressBandwidthTier": {
+          "description": "Specifies the total network bandwidth tier for NodePools in the cluster.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value",
+            "Higher bandwidth, actual values based on VM size."
+          ],
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "TIER_1"
+          ]
+        },
+        "externalIpEgressBandwidthTier": {
+          "description": "Specifies the network bandwidth tier for NodePools in this cluster for traffic to external\/public IP addresses.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value",
+            "Higher bandwidth, actual values based on VM size."
+          ],
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "TIER_1"
           ]
         }
       }
@@ -2353,7 +2508,7 @@
           "$ref": "PrivateClusterMasterGlobalAccessConfig"
         },
         "privateEndpointSubnetwork": {
-          "description": "Subnetwork in cluster's network where master's endpoint will be provisioned. Specified in projects\/*\/regions\/*\/subnetworks\/* format.",
+          "description": "Subnet to provision the master's private endpoint during cluster creation. Specified in projects\/*\/regions\/*\/subnetworks\/* format.",
           "type": "string"
         }
       }
@@ -2447,16 +2602,6 @@
         "workloadPool": {
           "description": "The workload pool to attach all Kubernetes service accounts to.",
           "type": "string"
-        },
-        "tuneGkeMetadataServerMemory": {
-          "description": "If non-zero, set the memory requests and limits of gke-metadata-server to this value in bytes. If zero, gke-metadata-server will use default values.",
-          "type": "string",
-          "format": "int64"
-        },
-        "tuneGkeMetadataServerCpu": {
-          "description": "If non-zero, set the cpu requests and limits of gke-metadata-server to this value in millicores. If zero, gke-metadata-server will use default values.",
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -2660,7 +2805,13 @@
               "workloads",
               "kube-apiserver",
               "kube-scheduler",
-              "kube-controller-manager"
+              "kube-controller-manager",
+              "Storage",
+              "Horizontal Pod Autoscaling",
+              "Pod",
+              "DaemonSet",
+              "Deployment",
+              "Statefulset"
             ],
             "enum": [
               "COMPONENT_UNSPECIFIED",
@@ -2668,7 +2819,13 @@
               "WORKLOADS",
               "APISERVER",
               "SCHEDULER",
-              "CONTROLLER_MANAGER"
+              "CONTROLLER_MANAGER",
+              "STORAGE",
+              "HPA",
+              "POD",
+              "DAEMONSET",
+              "DEPLOYMENT",
+              "STATEFULSET"
             ]
           }
         }
@@ -2720,11 +2877,11 @@
           "type": "string"
         },
         "membership": {
-          "description": "The full resource name of the registered fleet membership of the cluster, in the format `\/\/gkehub.googleapis.com\/projects\/*\/locations\/*\/memberships\/*`.",
+          "description": "[Output only] The full resource name of the registered fleet membership of the cluster, in the format `\/\/gkehub.googleapis.com\/projects\/*\/locations\/*\/memberships\/*`.",
           "type": "string"
         },
         "preRegistered": {
-          "description": "Whether the cluster has been previously registered. Setting `pre_registered` as true will port the existing `membership` and `project` back to the cluster. Specifing `pre_registered` is only applicable during UPDATE but not CREATE. If `pre_registered` is set to true, `membership` must be specified. Once set, `pre_registered` cannot be modified.",
+          "description": "[Output only] Whether the cluster has been registered through the fleet API.",
           "type": "boolean"
         }
       }
@@ -2746,6 +2903,50 @@
             "TYPE_UNSPECIFIED",
             "DISABLED",
             "AUTOFLEET"
+          ]
+        }
+      }
+    },
+    "ConcurrentOpsConfig": {
+      "id": "ConcurrentOpsConfig",
+      "description": "Configures operations using concurrent ops.",
+      "type": "object",
+      "properties": {
+        "enableConcurrentCreateNodePool": {
+          "description": "Enables concurrent ops for supported CreateNodePool cases. Some fields may still use legacy ops.",
+          "type": "boolean"
+        },
+        "enableConcurrentDeleteNodePool": {
+          "description": "Enables concurrent ops for supported DeleteNodePool cases. Some fields may still use legacy ops.",
+          "type": "boolean"
+        },
+        "enableConcurrentUpdateNodePoolVersion": {
+          "description": "Enables concurrent ops for UpdateNodePool with only the version field. Some cluster features may still use legacy ops.",
+          "type": "boolean"
+        },
+        "enableConcurrentRollbackNodePool": {
+          "description": "Enables concurrent ops for supported RollbackNodePool cases. Some fields may still use legacy ops.",
+          "type": "boolean"
+        }
+      }
+    },
+    "SecurityPostureConfig": {
+      "id": "SecurityPostureConfig",
+      "description": "SecurityPostureConfig defines the flags needed to enable\/disable features for the Security Posture API.",
+      "type": "object",
+      "properties": {
+        "mode": {
+          "description": "Sets which mode to use for Security Posture features.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value not specified.",
+            "Disables Security Posture features on the cluster.",
+            "Applies Security Posture features on the cluster."
+          ],
+          "enum": [
+            "MODE_UNSPECIFIED",
+            "DISABLED",
+            "BASIC"
           ]
         }
       }
@@ -3159,7 +3360,7 @@
             "Default value. Same as DISABLED",
             "No private access to or from Google Services",
             "Enables private IPv6 access to Google Services from GKE",
-            "Enables priate IPv6 access to and from Google Services"
+            "Enables private IPv6 access to and from Google Services"
           ],
           "enum": [
             "PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED",
@@ -3193,7 +3394,7 @@
           "$ref": "ServiceExternalIPsConfig"
         },
         "desiredEnablePrivateEndpoint": {
-          "description": "Enable\/Disable private endpoint for the cluster.",
+          "description": "Enable\/Disable private endpoint for the cluster's master.",
           "type": "boolean"
         },
         "desiredMasterVersion": {
@@ -3253,6 +3454,14 @@
         "removedAdditionalPodRangesConfig": {
           "description": "The additional pod ranges that are to be removed from the cluster. The pod ranges specified here must have been specified earlier in the 'additional_pod_ranges_config' argument.",
           "$ref": "AdditionalPodRangesConfig"
+        },
+        "desiredConcurrentOpsConfig": {
+          "description": "Desired value for the cluster's concurrent_ops_config.",
+          "$ref": "ConcurrentOpsConfig"
+        },
+        "desiredSecurityPostureConfig": {
+          "description": "Enable\/Disable Security Posture API features for the cluster.",
+          "$ref": "SecurityPostureConfig"
         }
       }
     },
@@ -3275,20 +3484,6 @@
         "enabled": {
           "description": "Enables l4 ILB subsetting for this cluster.",
           "type": "boolean"
-        }
-      }
-    },
-    "AdditionalPodRangesConfig": {
-      "id": "AdditionalPodRangesConfig",
-      "description": "AdditionalPodRangesConfig is the configuration for additional pod secondary ranges supporting the ClusterUpdate message.",
-      "type": "object",
-      "properties": {
-        "podRangeNames": {
-          "description": "Name for pod secondary ipv4 range which has the actual range defined ahead.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -3318,7 +3513,7 @@
           "type": "string"
         },
         "imageType": {
-          "description": "Required. The desired image type for the node pool.",
+          "description": "Required. The desired image type for the node pool. Please see https:\/\/cloud.google.com\/kubernetes-engine\/docs\/concepts\/node-images for available image types.",
           "type": "string"
         },
         "name": {

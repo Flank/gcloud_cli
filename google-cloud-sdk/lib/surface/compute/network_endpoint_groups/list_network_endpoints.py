@@ -36,8 +36,7 @@ in zone ``us-central1-a'':
 }
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
-                    base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class ListNetworkEndpoints(base.ListCommand):
   """List network endpoints in a network endpoint group."""
 
@@ -49,14 +48,14 @@ class ListNetworkEndpoints(base.ListCommand):
           networkEndpoint.port,
           networkEndpoint.fqdn
         )"""
-  support_global_scope = True
+  support_regional_scope = False
 
   @classmethod
   def Args(cls, parser):
     parser.display_info.AddFormat(cls.display_info_format)
     base.URI_FLAG.RemoveFromParser(parser)
     flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=cls.support_global_scope).AddArgument(parser)
+        support_regional_scope=cls.support_regional_scope).AddArgument(parser)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -64,7 +63,7 @@ class ListNetworkEndpoints(base.ListCommand):
     messages = client.messages
 
     neg_ref = flags.MakeNetworkEndpointGroupsArg(
-        support_global_scope=self.support_global_scope).ResolveAsResource(
+        support_regional_scope=self.support_regional_scope).ResolveAsResource(
             args,
             holder.resources,
             scope_lister=compute_flags.GetDefaultScopeLister(client))
@@ -76,12 +75,20 @@ class ListNetworkEndpoints(base.ListCommand):
         args.filter, defaults=defaults)
 
     if hasattr(neg_ref, 'zone'):
-      request = messages.ComputeNetworkEndpointGroupsListNetworkEndpointsRequest(
+      request = (
+          messages.ComputeNetworkEndpointGroupsListNetworkEndpointsRequest(
+              networkEndpointGroup=neg_ref.Name(),
+              project=neg_ref.project,
+              zone=neg_ref.zone,
+              filter=filter_expr))
+      service = client.apitools_client.networkEndpointGroups
+    elif self.support_regional_scope and hasattr(neg_ref, 'region'):
+      request = messages.ComputeRegionNetworkEndpointGroupsListNetworkEndpointsRequest(
           networkEndpointGroup=neg_ref.Name(),
           project=neg_ref.project,
-          zone=neg_ref.zone,
+          region=neg_ref.region,
           filter=filter_expr)
-      service = client.apitools_client.networkEndpointGroups
+      service = client.apitools_client.regionNetworkEndpointGroups
     else:
       request = messages.ComputeGlobalNetworkEndpointGroupsListNetworkEndpointsRequest(
           networkEndpointGroup=neg_ref.Name(),
@@ -96,3 +103,9 @@ class ListNetworkEndpoints(base.ListCommand):
         field='items',
         limit=args.limit,
         batch_size=None)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class AlphaListNetworkEndpoints(ListNetworkEndpoints):
+  """List network endpoints in a network endpoint group."""
+  support_regional_scope = True

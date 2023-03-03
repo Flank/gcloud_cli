@@ -26,23 +26,20 @@ from googlecloudsdk.command_lib.container.fleet.features import base
 from googlecloudsdk.command_lib.container.fleet.mesh import utils
 
 
-def _RunUpdate(cmd, args, resource=False):
+def _RunUpdate(cmd, args):
   """Runs the update command implementation that is common across release tracks.
 
   Args:
     cmd: the release track specific command
     args: the args passed to the command
-    resource: whether the membership args are resource args
   """
-  if resource:
-    # Deprecated non-resource arg
-    if args.IsKnownAndSpecified('membership'):
-      resource = False
-      memberships = utils.ParseMemberships(args)
-    else:
-      memberships = base.ParseMembershipsPlural(args, prompt=True, search=True)
-  else:
+  # Deprecated non-resource arg
+  if args.IsKnownAndSpecified('membership'):
+    resource = False
     memberships = utils.ParseMemberships(args)
+  else:
+    resource = True
+    memberships = base.ParseMembershipsPlural(args, prompt=True, search=True)
   f = cmd.GetFeature()
   membership_specs = {}
   for membership in memberships:
@@ -88,14 +85,14 @@ def _RunUpdate(cmd, args, resource=False):
 class UpdateAlpha(base.UpdateCommand):
   """Update the configuration of the Service Mesh Feature.
 
-  Update the Service Mesh Feature Spec of a Membership.
+  Update the Service Mesh Feature Spec of a membership.
 
   ## EXAMPLES
 
-  To update the control plane management of comma separated Memberships like
-  `membership1,membership2`, run:
+  To update the control plane management of comma separated memberships like
+  `MEMBERSHIP1,MEMBERSHIP2`, run:
 
-    $ {command} --memberships=membership1,membership2
+    $ {command} --memberships=MEMBERSHIP1,MEMBERSHIP2
       --control-plane=CONTROL_PLANE
   """
 
@@ -104,19 +101,11 @@ class UpdateAlpha(base.UpdateCommand):
   @staticmethod
   def Args(parser):
     group = parser.add_mutually_exclusive_group()
-    if resources.UseRegionalMemberships(calliope_base.ReleaseTrack.ALPHA):
-      resources.AddMembershipResourceArg(
-          group,
-          plural=True,
-          membership_help='Membership names to update, separated by commas if '
-          'multiple are supplied.')
-    else:
-      group.add_argument(
-          '--memberships',
-          type=str,
-          help='Membership names to update, separated by commas if multiple '
-          'are supplied.',
-      )
+    resources.AddMembershipResourceArg(
+        group,
+        plural=True,
+        membership_help='Membership names to update, separated by commas if '
+        'multiple are supplied.')
     group.add_argument(
         '--membership',
         type=str,
@@ -137,9 +126,7 @@ class UpdateAlpha(base.UpdateCommand):
         help='The control plane management to update to.')
 
   def Run(self, args):
-    _RunUpdate(
-        self, args,
-        resources.UseRegionalMemberships(calliope_base.ReleaseTrack.ALPHA))
+    _RunUpdate(self, args)
 
 
 @calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.GA)
@@ -162,20 +149,12 @@ class UpdateGA(base.UpdateCommand):
   @staticmethod
   def Args(parser):
     group = parser.add_mutually_exclusive_group()
-    if resources.UseRegionalMemberships(calliope_base.ReleaseTrack.GA):
-      resources.AddMembershipResourceArg(
-          group,
-          plural=True,
-          membership_help=('Membership names to update, separated by commas if '
-                           'multiple are supplied.'),
-      )
-    else:
-      group.add_argument(
-          '--memberships',
-          type=str,
-          help=('Membership names to update, separated by commas '
-                'if multiple are supplied.'),
-      )
+    resources.AddMembershipResourceArg(
+        group,
+        plural=True,
+        membership_help=('Membership names to update, separated by commas if '
+                         'multiple are supplied.'),
+    )
     group = parser.add_argument_group(required=True)
     group.add_argument(
         '--management',
@@ -187,5 +166,4 @@ class UpdateGA(base.UpdateCommand):
         help='Control plane management to update to.')
 
   def Run(self, args):
-    _RunUpdate(self, args,
-               resources.UseRegionalMemberships(calliope_base.ReleaseTrack.GA))
+    _RunUpdate(self, args)

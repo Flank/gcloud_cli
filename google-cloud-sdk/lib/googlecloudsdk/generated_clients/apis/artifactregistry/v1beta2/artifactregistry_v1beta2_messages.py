@@ -173,7 +173,7 @@ class ArtifactregistryProjectsLocationsRepositoriesFilesGetRequest(_messages.Mes
   r"""A ArtifactregistryProjectsLocationsRepositoriesFilesGetRequest object.
 
   Fields:
-    name: The name of the file to retrieve.
+    name: Required. The name of the file to retrieve.
   """
 
   name = _messages.StringField(1, required=True)
@@ -194,8 +194,8 @@ class ArtifactregistryProjectsLocationsRepositoriesFilesListRequest(_messages.Me
     pageSize: The maximum number of files to return.
     pageToken: The next_page_token value returned from a previous list
       request, if any.
-    parent: The name of the repository whose files will be listed. For
-      example: "projects/p1/locations/us-central1/repositories/repo1
+    parent: Required. The name of the repository whose files will be listed.
+      For example: "projects/p1/locations/us-central1/repositories/repo1
   """
 
   filter = _messages.StringField(1)
@@ -595,7 +595,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -612,9 +614,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -678,14 +678,14 @@ class GoogleDevtoolsArtifactregistryV1beta2File(_messages.Message):
   Versions.
 
   Fields:
-    createTime: The time when the File was created.
+    createTime: Output only. The time when the File was created.
     hashes: The hashes of the file content.
     name: The name of the file, for example: "projects/p1/locations/us-
       central1/repositories/repo1/files/a%2Fb%2Fc.txt". If the file ID part
       contains slashes, they are escaped.
     owner: The name of the Package or Version that owns this file, if any.
     sizeBytes: The size of the File in bytes.
-    updateTime: The time when the File was last updated.
+    updateTime: Output only. The time when the File was last updated.
   """
 
   createTime = _messages.StringField(1)
@@ -1287,6 +1287,8 @@ class Repository(_messages.Message):
       configuration for the repositories of maven type.
     name: The name of the repository, for example: "projects/p1/locations/us-
       central1/repositories/repo1".
+    satisfiesPzs: Output only. If set, the repository satisfies physical zone
+      separation.
     sizeBytes: Output only. The size, in bytes, of all artifact storage in
       this repository. Repositories that are generally available or in public
       preview use this to calculate storage costs.
@@ -1349,8 +1351,9 @@ class Repository(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 5)
   mavenConfig = _messages.MessageField('MavenRepositoryConfig', 6)
   name = _messages.StringField(7)
-  sizeBytes = _messages.IntegerField(8)
-  updateTime = _messages.StringField(9)
+  satisfiesPzs = _messages.BooleanField(8)
+  sizeBytes = _messages.IntegerField(9)
+  updateTime = _messages.StringField(10)
 
 
 class SetIamPolicyRequest(_messages.Message):

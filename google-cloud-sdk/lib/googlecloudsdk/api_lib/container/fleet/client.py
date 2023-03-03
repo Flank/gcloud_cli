@@ -35,6 +35,7 @@ class HubClient(object):
   is a thin wrapper around the base client, and does not handle any exceptions.
 
   Fields:
+    release_track: The release track of the command [ALPHA, BETA, GA].
     client: The raw GKE Hub API client for the specified release track.
     messages: The matching messages module for the client.
     resourceless_waiter: A waiter.CloudOperationPollerNoResources for polling
@@ -43,6 +44,7 @@ class HubClient(object):
   """
 
   def __init__(self, release_track=base.ReleaseTrack.GA):
+    self.release_track = release_track
     self.client = util.GetClientInstance(release_track)
     self.messages = util.GetMessagesModule(release_track)
     self.resourceless_waiter = waiter.CloudOperationPollerNoResources(
@@ -167,6 +169,25 @@ class HubClient(object):
         (p.key, p.value) for p in proto_map_value.additionalProperties)
 
   @staticmethod
+  def ToPyDefaultDict(default_factory, proto_map_value):
+    """Helper to convert proto map Values to default dictionaries.
+
+    encoding.MessageToPyValue recursively converts values to dicts, while this
+    method leaves the map values as proto objects.
+
+    Args:
+      default_factory: Pass-through to collections.defaultdict.
+      proto_map_value: The map field "Value". For example, the `Feature.labels`
+        value (of type `Features.LabelsValue`). Can be None.
+
+    Returns:
+      An defaultdict of the map's keys/values.
+    """
+    return collections.defaultdict(default_factory,
+                                   {} if proto_map_value is None else
+                                   HubClient.ToPyDict(proto_map_value))
+
+  @staticmethod
   def ToProtoMap(map_value_cls, value):
     """encoding.DictToAdditionalPropertyMessage wrapper to match ToPyDict."""
     return encoding.DictToAdditionalPropertyMessage(
@@ -176,6 +197,10 @@ class HubClient(object):
     """Convenience wrapper for ToProtoMap for Feature.membershipSpecs."""
     return self.ToProtoMap(self.messages.Feature.MembershipSpecsValue, spec_map)
 
+  def ToScopeSpecs(self, spec_map):
+    """Convenience wrapper for ToProtoMap for Feature.scopeSpecs."""
+    return self.ToProtoMap(self.messages.Feature.ScopeSpecsValue, spec_map)
+
 
 class FleetClient(object):
   """Client for the Fleet API with related helper methods.
@@ -184,6 +209,7 @@ class FleetClient(object):
   is a thin wrapper around the base client, and does not handle any exceptions.
 
   Fields:
+    release_track: The release track of the command [ALPHA, BETA, GA].
     client: The raw Fleet API client for the specified release track.
     messages: The matching messages module for the client.
     resourceless_waiter: A waiter.CloudOperationPollerNoResources for polling
@@ -192,13 +218,16 @@ class FleetClient(object):
   """
 
   def __init__(self, release_track=base.ReleaseTrack.ALPHA):
+    self.release_track = release_track
     self.client = util.GetClientInstance(release_track)
     self.messages = util.GetMessagesModule(release_track)
     self.resourceless_waiter = waiter.CloudOperationPollerNoResources(
         operation_service=self.client.projects_locations_operations)
-    self.fleet_waiter = waiter.CloudOperationPoller(
-        result_service=self.client.projects_locations_fleets,
-        operation_service=self.client.projects_locations_operations)
+
+    if release_track == base.ReleaseTrack.ALPHA:
+      self.fleet_waiter = waiter.CloudOperationPoller(
+          result_service=self.client.projects_locations_fleets,
+          operation_service=self.client.projects_locations_operations)
 
   def GetFleet(self, project):
     """Gets a fleet resource from the Fleet API.
@@ -315,11 +344,12 @@ class FleetClient(object):
         name=util.NamespaceResourceName(project, name))
     return self.client.projects_locations_namespaces.Get(req)
 
-  def CreateNamespace(self, name, project):
+  def CreateNamespace(self, name, scope, project):
     """Creates a namespace resource from the GKEHub API.
 
     Args:
       name: the namespace name.
+      scope: the scope containing the namespace.
       project: the project containing the namespace.
 
     Returns:
@@ -329,7 +359,8 @@ class FleetClient(object):
       apitools.base.py.HttpError: if the request returns an HTTP error
     """
     namespace = self.messages.Namespace(
-        name=util.NamespaceResourceName(project, name))
+        name=util.NamespaceResourceName(project, name), scope=scope
+    )
     req = self.messages.GkehubProjectsLocationsNamespacesCreateRequest(
         namespace=namespace,
         namespaceId=name,
@@ -353,12 +384,14 @@ class FleetClient(object):
         name=util.NamespaceResourceName(project, name))
     return self.client.projects_locations_namespaces.Delete(req)
 
-  def UpdateNamespace(self, name, project):
+  def UpdateNamespace(self, name, scope, project, mask):
     """Updates a namespace resource in the fleet.
 
     Args:
       name: the namespace name.
+      scope: the scope containing the namespace.
       project: the project containing the namespace.
+      mask: a mask of the fields to update.
 
     Returns:
       An operation
@@ -368,13 +401,13 @@ class FleetClient(object):
     """
     # Namespace containing fields with updated value(s)
     namespace = self.messages.Namespace(
-        name=util.NamespaceResourceName(project, name))
-    # Fields to be updated (currently no fields, only update_time is changed)
-    mask = ''
+        name=util.NamespaceResourceName(project, name), scope=scope
+    )
     req = self.messages.GkehubProjectsLocationsNamespacesPatchRequest(
         namespace=namespace,
         name=util.NamespaceResourceName(project, name),
-        updateMask=mask)
+        updateMask=mask,
+    )
     return self.client.projects_locations_namespaces.Patch(req)
 
   def ListNamespaces(self, project):
@@ -517,3 +550,119 @@ class FleetClient(object):
         req,
         field='rbacrolebindings',
         batch_size_attribute=None)
+
+  def GetMembershipBinding(self, name):
+    """Gets a Membership-Binding resource from the GKEHub API.
+
+    Args:
+      name: the full membership-binding resource name.
+
+    Returns:
+      A Membership-Binding resource
+
+    Raises:
+      apitools.base.py.HttpError: if the request returns an HTTP error
+    """
+    req = self.messages.GkehubProjectsLocationsMembershipsBindingsGetRequest(
+        name=name)
+    return self.client.projects_locations_memberships_bindings.Get(req)
+
+  def CreateMembershipBinding(self, name, scope, fleet):
+    """Creates a Membership-Binding resource from the GKEHub API.
+
+    Args:
+      name: the full binding resource name.
+      scope: the Scope to be associated with Binding.
+      fleet: the Fleet for which all related scopes are updated.
+
+    Returns:
+      A Membership-Binding resource
+
+    Raises:
+      apitools.base.py.HttpError: if the request returns an HTTP error
+      calliope_exceptions.RequiredArgumentException: if a required field is
+        missing
+    """
+    binding = self.messages.MembershipBinding(
+        name=name,
+        scope=scope,
+        fleet=fleet)
+    resource = resources.REGISTRY.ParseRelativeName(
+        name,
+        'gkehub.projects.locations.memberships.bindings',
+        api_version='v1alpha')
+    req = self.messages.GkehubProjectsLocationsMembershipsBindingsCreateRequest(
+        membershipBinding=binding,
+        membershipBindingId=resource.Name(),
+        parent=resource.Parent().RelativeName(),
+    )
+    return self.client.projects_locations_memberships_bindings.Create(
+        req)
+
+  def ListMembershipBindings(self, project, membership, location='global'):
+    """Lists Bindings in a Membership.
+
+    Args:
+      project: the project containing the Membership to list Bindings from.
+      membership: the Membership to list Bindings from.
+      location: the Membrship location to list Bindings
+
+    Returns:
+      A ListMembershipBindingResponse (list of bindings and next page token)
+
+    Raises:
+      apitools.base.py.HttpError: if the request returns an HTTP error
+    """
+    req = self.messages.GkehubProjectsLocationsMembershipsBindingsListRequest(
+        pageToken='',
+        parent=util.MembershipBindingParentName(project, membership, location,
+                                                self.release_track))
+    return list_pager.YieldFromList(
+        self.client.projects_locations_memberships_bindings,
+        req,
+        field='membershipBindings',
+        batch_size_attribute=None)
+
+  def UpdateMembershipBinding(self, name, scope, fleet, mask):
+    """Updates a Membership-Binding resource.
+
+    Args:
+      name: the Binding name.
+      scope: the Scope associated with binding.
+      fleet: the Fleet for which all related scopes are updated.
+      mask: a mask of the fields to update.
+
+    Returns:
+      An operation
+
+    Raises:
+      apitools.base.py.HttpError: if the request returns an HTTP error
+    """
+    # Binding containing fields with updated value(s)
+    binding = self.messages.MembershipBinding(
+        name=name,
+        scope=scope,
+        fleet=fleet
+    )
+    req = self.messages.GkehubProjectsLocationsMembershipsBindingsPatchRequest(
+        membershipBinding=binding,
+        name=binding.name,
+        updateMask=mask)
+    return self.client.projects_locations_memberships_bindings.Patch(req)
+
+  def DeleteMembershipBinding(self, name):
+    """Deletes a Membership-Binding resource.
+
+    Args:
+      name: the resource name of the Binding.
+
+    Returns:
+      An operation
+
+    Raises:
+      apitools.base.py.HttpError: if the request returns an HTTP error
+    """
+    req = self.messages.GkehubProjectsLocationsMembershipsBindingsDeleteRequest(
+        name=name)
+    return self.client.projects_locations_memberships_bindings.Delete(
+        req)

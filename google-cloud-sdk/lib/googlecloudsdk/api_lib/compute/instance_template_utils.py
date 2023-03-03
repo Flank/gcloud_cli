@@ -45,7 +45,14 @@ def CreateNetworkInterfaceMessage(resources,
                                   stack_type=None,
                                   ipv6_network_tier=None,
                                   nic_type=None,
-                                  ipv6_public_ptr_domain=None):
+                                  ipv6_public_ptr_domain=None,
+                                  ipv6_address=None,
+                                  ipv6_prefix_length=None,
+                                  external_ipv6_address=None,
+                                  external_ipv6_prefix_length=None,
+                                  internal_ipv6_address=None,
+                                  internal_ipv6_prefix_length=None,
+                                  network_attachment=None):
   """Creates and returns a new NetworkInterface message.
 
   Args:
@@ -77,7 +84,21 @@ def CreateNetworkInterfaceMessage(resources,
                * GVNIC
                * VIRTIO_NET
     ipv6_public_ptr_domain: a string represents the custom PTR domain assigned
-        to the interface.
+      to the interface.
+    ipv6_address: a string represents the external IPv6 address reserved to the
+      interface.
+    ipv6_prefix_length: a string represents the external IPv6 address
+      prefix length reserved to the interface.
+    external_ipv6_address: a string represents the external IPv6 address
+      reserved to the interface.
+    external_ipv6_prefix_length: a string represents the external IPv6 address
+      prefix length reserved to the interface.
+    internal_ipv6_address: a string represents the internal IPv6 address
+      reserved to the interface.
+    internal_ipv6_prefix_length:  the internal IPv6 address prefix
+      length of the internal IPv6 address reserved to the interface.
+    network_attachment: URL of a network attachment to connect the interface to.
+
   Returns:
     network_interface: a NetworkInterface message object
   """
@@ -86,7 +107,10 @@ def CreateNetworkInterfaceMessage(resources,
   network_interface = messages.NetworkInterface()
   if subnet is not None:
     subnet_ref = subnet_flags.SubnetworkResolver().ResolveResources(
-        [subnet], compute_scope.ScopeEnum.REGION, subnet_region, resources,
+        [subnet],
+        compute_scope.ScopeEnum.REGION,
+        subnet_region,
+        resources,
         scope_lister=scope_lister)[0]
     network_interface.subnetwork = subnet_ref.SelfLink()
   if network is not None:
@@ -95,7 +119,9 @@ def CreateNetworkInterfaceMessage(resources,
         params={'project': properties.VALUES.core.project.GetOrFail},
         collection='compute.networks')
     network_interface.network = network_ref.SelfLink()
-  elif subnet is None:
+  # A network interface referencing a network attachment cannot have
+  # a subnetwork or a network set.
+  elif subnet is None and network_attachment is None:
     network_ref = resources.Parse(
         constants.DEFAULT_NETWORK,
         params={'project': properties.VALUES.core.project.GetOrFail},
@@ -120,11 +146,12 @@ def CreateNetworkInterfaceMessage(resources,
       access_config.natIP = address
 
     if network_tier is not None:
-      access_config.networkTier = (messages.AccessConfig.
-                                   NetworkTierValueValuesEnum(network_tier))
+      access_config.networkTier = (
+          messages.AccessConfig.NetworkTierValueValuesEnum(network_tier))
 
     network_interface.accessConfigs = [access_config]
 
+  ipv6_access_config = None
   if ipv6_network_tier is not None or ipv6_public_ptr_domain is not None:
     ipv6_access_config = messages.AccessConfig(
         name=constants.DEFAULT_IPV6_ACCESS_CONFIG_NAME,
@@ -138,6 +165,38 @@ def CreateNetworkInterfaceMessage(resources,
   if ipv6_public_ptr_domain is not None:
     ipv6_access_config.publicPtrDomainName = ipv6_public_ptr_domain
 
+  # external_ipv6_address has higher priority than ipv6_address.
+  if external_ipv6_address is None:
+    external_ipv6_address = ipv6_address
+
+  # external_ipv6_prefix_length has higher priority than ipv6_prefix_length.
+  if external_ipv6_prefix_length is None:
+    external_ipv6_prefix_length = ipv6_prefix_length
+
+  if external_ipv6_address is not None:
+    if ipv6_access_config is None:
+      ipv6_access_config = messages.AccessConfig(
+          name=constants.DEFAULT_IPV6_ACCESS_CONFIG_NAME,
+          type=messages.AccessConfig.TypeValueValuesEnum.DIRECT_IPV6)
+      network_interface.ipv6AccessConfigs = [ipv6_access_config]
+
+    ipv6_access_config.externalIpv6 = external_ipv6_address
+
+  if external_ipv6_prefix_length is not None:
+    if ipv6_access_config is None:
+      ipv6_access_config = messages.AccessConfig(
+          name=constants.DEFAULT_IPV6_ACCESS_CONFIG_NAME,
+          type=messages.AccessConfig.TypeValueValuesEnum.DIRECT_IPV6)
+      network_interface.ipv6AccessConfigs = [ipv6_access_config]
+
+    ipv6_access_config.externalIpv6PrefixLength = external_ipv6_prefix_length
+
+  if internal_ipv6_address is not None:
+    network_interface.ipv6Address = internal_ipv6_address
+
+  if internal_ipv6_prefix_length is not None:
+    network_interface.internalIpv6PrefixLength = internal_ipv6_prefix_length
+
   if alias_ip_ranges_string:
     network_interface.aliasIpRanges = (
         alias_ip_range_utils.CreateAliasIpRangeMessagesFromString(
@@ -146,6 +205,9 @@ def CreateNetworkInterfaceMessage(resources,
   if nic_type is not None:
     network_interface.nicType = (
         messages.NetworkInterface.NicTypeValueValuesEnum(nic_type))
+
+  if network_attachment is not None:
+    network_interface.networkAttachment = network_attachment
 
   return network_interface
 
@@ -168,8 +230,12 @@ def CreateNetworkInterfaceMessages(resources, scope_lister, messages,
   if network_interface_arg:
     for interface in network_interface_arg:
       address = interface.get('address', None)
+      # A network interface referencing a network attachment cannot have
+      # an access config.
+      has_no_address = 'no-address' in interface or interface.get(
+          'network-attachment', None)
       # pylint: disable=g-explicit-bool-comparison
-      if address == '':
+      if address == '' or (address is None and (not has_no_address)):
         address = EPHEMERAL_ADDRESS
 
       network_tier = interface.get('network-tier', None)
@@ -191,7 +257,18 @@ def CreateNetworkInterfaceMessages(resources, scope_lister, messages,
               stack_type=interface.get('stack-type', None),
               ipv6_network_tier=interface.get('ipv6-network-tier', None),
               ipv6_public_ptr_domain=interface.get('ipv6-public-ptr-domain',
-                                                   None)))
+                                                   None),
+              ipv6_address=interface.get('ipv6-address', None),
+              ipv6_prefix_length=interface.get('ipv6-prefix-length', None),
+              external_ipv6_address=interface.get('external-ipv6-address',
+                                                  None),
+              external_ipv6_prefix_length=interface.get(
+                  'external-ipv6-prefix-length', None),
+              internal_ipv6_address=interface.get('internal-ipv6-address',
+                                                  None),
+              internal_ipv6_prefix_length=interface.get(
+                  'internal-ipv6-prefix-length', None),
+              network_attachment=interface.get('network-attachment')))
   return result
 
 
@@ -205,15 +282,16 @@ def CreateDiskMessages(args,
                        support_kms=False,
                        support_multi_writer=False,
                        support_provisioned_throughput=False,
-                       match_container_mount_disks=False
-                       ):
+                       match_container_mount_disks=False,
+                       support_replica_zones=False):
   """Create disk messages for a single instance template."""
   container_mount_disk = (
       args.container_mount_disk if match_container_mount_disks else [])
 
   persistent_disks = (
       CreatePersistentAttachedDiskMessages(
-          client.messages, args.disk or [],
+          client.messages,
+          args.disk or [],
           container_mount_disk=container_mount_disk))
 
   persistent_create_disks = (
@@ -224,7 +302,8 @@ def CreateDiskMessages(args,
           getattr(args, 'create_disk', []),
           support_kms=support_kms,
           support_multi_writer=support_multi_writer,
-          support_provisioned_throughput=support_provisioned_throughput))
+          support_provisioned_throughput=support_provisioned_throughput,
+          support_replica_zones=support_replica_zones))
 
   if create_boot_disk:
     boot_disk_list = [
@@ -258,11 +337,18 @@ def CreateDiskMessages(args,
       client.messages,
   )
 
-  return boot_disk_list + persistent_disks + persistent_create_disks + local_nvdimms + local_ssds
+  return (
+      boot_disk_list
+      + persistent_disks
+      + persistent_create_disks
+      + local_nvdimms
+      + local_ssds
+  )
 
 
 def CreatePersistentAttachedDiskMessages(
-    messages, disks, container_mount_disk=None):
+    messages, disks, container_mount_disk=None
+):
   """Returns a list of AttachedDisk messages and the boot disk's reference.
 
   Args:
@@ -318,7 +404,8 @@ def CreatePersistentCreateDiskMessages(client,
                                        support_kms=False,
                                        container_mount_disk=None,
                                        support_multi_writer=False,
-                                       support_provisioned_throughput=False):
+                                       support_provisioned_throughput=False,
+                                       support_replica_zones=False):
   """Returns a list of AttachedDisk messages.
 
   Args:
@@ -347,6 +434,7 @@ def CreatePersistentCreateDiskMessages(client,
     container_mount_disk: list of disks to be mounted to container, if any.
     support_multi_writer: if multi writer disks are supported.
     support_provisioned_throughput: if provisioned throughout is supported.
+    support_replica_zones: True if we allow creation of regional disks.
 
   Returns:
     list of API messages for attached disks
@@ -382,8 +470,8 @@ def CreatePersistentCreateDiskMessages(client,
 
     disk_key = None
     if support_kms:
-      disk_key = kms_utils.MaybeGetKmsKeyFromDict(
-          disk, client.messages, disk_key)
+      disk_key = kms_utils.MaybeGetKmsKeyFromDict(disk, client.messages,
+                                                  disk_key)
 
     device_name = instance_utils.GetDiskDeviceName(disk, name,
                                                    container_mount_disk)
@@ -396,6 +484,15 @@ def CreatePersistentCreateDiskMessages(client,
         diskType=disk.get('type'),
         provisionedIops=disk.get('provisioned-iops'))
 
+    replica_zones = disk.get('replica-zones')
+    if support_replica_zones and replica_zones:
+      normalized_zones = []
+      for zone in replica_zones:
+        zone_ref = resources.Parse(
+            zone, collection='compute.zones', params={'project': user_project})
+        normalized_zones.append(zone_ref.SelfLink())
+      init_params.replicaZones = normalized_zones
+
     policies = disk.get('disk-resource-policy')
     if policies:
       init_params.resourcePolicies = policies
@@ -406,8 +503,11 @@ def CreatePersistentCreateDiskMessages(client,
 
     disk_architecture = disk.get('architecture')
     if disk_architecture:
-      init_params.architecture = messages.AttachedDiskInitializeParams.ArchitectureValueValuesEnum(
-          disk_architecture)
+      init_params.architecture = (
+          messages.AttachedDiskInitializeParams.ArchitectureValueValuesEnum(
+              disk_architecture
+          )
+      )
 
     if support_provisioned_throughput:
       init_params.provisionedThroughput = disk.get('provisioned-throughput')

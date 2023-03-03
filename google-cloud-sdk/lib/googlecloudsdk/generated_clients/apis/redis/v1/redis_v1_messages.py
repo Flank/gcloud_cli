@@ -226,6 +226,8 @@ class Instance(_messages.Message):
     authorizedNetwork: Optional. The full name of the Google Compute Engine
       [network](https://cloud.google.com/vpc/docs/vpc) to which the instance
       is connected. If left unspecified, the `default` network will be used.
+    availableMaintenanceVersions: Optional. The available maintenance versions
+      that an instance could update to.
     connectMode: Optional. The network connect mode of the Redis instance. If
       not provided, the connect mode defaults to DIRECT_PEERING.
     createTime: Output only. The time the instance was created.
@@ -249,6 +251,8 @@ class Instance(_messages.Message):
       not provided, maintenance events can be performed at any time.
     maintenanceSchedule: Output only. Date and time of upcoming maintenance
       events which have been scheduled.
+    maintenanceVersion: Optional. The self service update maintenance version.
+      The version is date based such as "20210712_00_00".
     memorySizeGb: Required. Redis memory size in GiB.
     name: Required. Unique name of the resource in this scope including
       project and location using the form:
@@ -472,36 +476,38 @@ class Instance(_messages.Message):
   alternativeLocationId = _messages.StringField(1)
   authEnabled = _messages.BooleanField(2)
   authorizedNetwork = _messages.StringField(3)
-  connectMode = _messages.EnumField('ConnectModeValueValuesEnum', 4)
-  createTime = _messages.StringField(5)
-  currentLocationId = _messages.StringField(6)
-  customerManagedKey = _messages.StringField(7)
-  displayName = _messages.StringField(8)
-  host = _messages.StringField(9)
-  labels = _messages.MessageField('LabelsValue', 10)
-  locationId = _messages.StringField(11)
-  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 12)
-  maintenanceSchedule = _messages.MessageField('MaintenanceSchedule', 13)
-  memorySizeGb = _messages.IntegerField(14, variant=_messages.Variant.INT32)
-  name = _messages.StringField(15)
-  nodes = _messages.MessageField('NodeInfo', 16, repeated=True)
-  persistenceConfig = _messages.MessageField('PersistenceConfig', 17)
-  persistenceIamIdentity = _messages.StringField(18)
-  port = _messages.IntegerField(19, variant=_messages.Variant.INT32)
-  readEndpoint = _messages.StringField(20)
-  readEndpointPort = _messages.IntegerField(21, variant=_messages.Variant.INT32)
-  readReplicasMode = _messages.EnumField('ReadReplicasModeValueValuesEnum', 22)
-  redisConfigs = _messages.MessageField('RedisConfigsValue', 23)
-  redisVersion = _messages.StringField(24)
-  replicaCount = _messages.IntegerField(25, variant=_messages.Variant.INT32)
-  reservedIpRange = _messages.StringField(26)
-  secondaryIpRange = _messages.StringField(27)
-  serverCaCerts = _messages.MessageField('TlsCertificate', 28, repeated=True)
-  state = _messages.EnumField('StateValueValuesEnum', 29)
-  statusMessage = _messages.StringField(30)
-  suspensionReasons = _messages.EnumField('SuspensionReasonsValueListEntryValuesEnum', 31, repeated=True)
-  tier = _messages.EnumField('TierValueValuesEnum', 32)
-  transitEncryptionMode = _messages.EnumField('TransitEncryptionModeValueValuesEnum', 33)
+  availableMaintenanceVersions = _messages.StringField(4, repeated=True)
+  connectMode = _messages.EnumField('ConnectModeValueValuesEnum', 5)
+  createTime = _messages.StringField(6)
+  currentLocationId = _messages.StringField(7)
+  customerManagedKey = _messages.StringField(8)
+  displayName = _messages.StringField(9)
+  host = _messages.StringField(10)
+  labels = _messages.MessageField('LabelsValue', 11)
+  locationId = _messages.StringField(12)
+  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 13)
+  maintenanceSchedule = _messages.MessageField('MaintenanceSchedule', 14)
+  maintenanceVersion = _messages.StringField(15)
+  memorySizeGb = _messages.IntegerField(16, variant=_messages.Variant.INT32)
+  name = _messages.StringField(17)
+  nodes = _messages.MessageField('NodeInfo', 18, repeated=True)
+  persistenceConfig = _messages.MessageField('PersistenceConfig', 19)
+  persistenceIamIdentity = _messages.StringField(20)
+  port = _messages.IntegerField(21, variant=_messages.Variant.INT32)
+  readEndpoint = _messages.StringField(22)
+  readEndpointPort = _messages.IntegerField(23, variant=_messages.Variant.INT32)
+  readReplicasMode = _messages.EnumField('ReadReplicasModeValueValuesEnum', 24)
+  redisConfigs = _messages.MessageField('RedisConfigsValue', 25)
+  redisVersion = _messages.StringField(26)
+  replicaCount = _messages.IntegerField(27, variant=_messages.Variant.INT32)
+  reservedIpRange = _messages.StringField(28)
+  secondaryIpRange = _messages.StringField(29)
+  serverCaCerts = _messages.MessageField('TlsCertificate', 30, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 31)
+  statusMessage = _messages.StringField(32)
+  suspensionReasons = _messages.EnumField('SuspensionReasonsValueListEntryValuesEnum', 33, repeated=True)
+  tier = _messages.EnumField('TierValueValuesEnum', 34)
+  transitEncryptionMode = _messages.EnumField('TransitEncryptionModeValueValuesEnum', 35)
 
 
 class InstanceAuthString(_messages.Message):
@@ -889,7 +895,7 @@ class PersistenceConfig(_messages.Message):
       ONE_HOUR: Snapshot every 1 hour.
       SIX_HOURS: Snapshot every 6 hours.
       TWELVE_HOURS: Snapshot every 12 hours.
-      TWENTY_FOUR_HOURS: Snapshot every 24 horus.
+      TWENTY_FOUR_HOURS: Snapshot every 24 hours.
     """
     SNAPSHOT_PERIOD_UNSPECIFIED = 0
     ONE_HOUR = 1
@@ -901,6 +907,40 @@ class PersistenceConfig(_messages.Message):
   rdbNextSnapshotTime = _messages.StringField(2)
   rdbSnapshotPeriod = _messages.EnumField('RdbSnapshotPeriodValueValuesEnum', 3)
   rdbSnapshotStartTime = _messages.StringField(4)
+
+
+class ReconciliationOperationMetadata(_messages.Message):
+  r"""Operation metadata returned by the CLH during resource state
+  reconciliation.
+
+  Enums:
+    ExclusiveActionValueValuesEnum: Excluisive action returned by the CLH.
+
+  Fields:
+    deleteResource: DEPRECATED. Use exclusive_action instead.
+    exclusiveAction: Excluisive action returned by the CLH.
+  """
+
+  class ExclusiveActionValueValuesEnum(_messages.Enum):
+    r"""Excluisive action returned by the CLH.
+
+    Values:
+      UNKNOWN_REPAIR_ACTION: Unknown repair action.
+      DELETE: The resource has to be deleted. When using this bit, the CLH
+        should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE
+        OperationSignal in SideChannel. For more information - go/ccfe-delete-
+        on-upsert, go/ccfe-reconciliation-protocol-ug#apply_delete
+      RETRY: This resource could not be repaired but the repair should be
+        tried again at a later time. This can happen if there is a dependency
+        that needs to be resolved first- e.g. if a parent resource must be
+        repaired before a child resource.
+    """
+    UNKNOWN_REPAIR_ACTION = 0
+    DELETE = 1
+    RETRY = 2
+
+  deleteResource = _messages.BooleanField(1)
+  exclusiveAction = _messages.EnumField('ExclusiveActionValueValuesEnum', 2)
 
 
 class RedisProjectsLocationsGetRequest(_messages.Message):

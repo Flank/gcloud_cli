@@ -110,7 +110,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
 {istio}=ENABLED|DISABLED
-{application_manager}=ENABLED|DISABLED
 {backuprestore}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED
 {cloudrun}=ENABLED|DISABLED
@@ -124,7 +123,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
     dashboard=api_adapter.DASHBOARD,
     network_policy=api_adapter.NETWORK_POLICY,
     istio=api_adapter.ISTIO,
-    application_manager=api_adapter.APPLICATIONMANAGER,
     backuprestore=api_adapter.BACKUPRESTORE,
     cloudrun=api_adapter.CLOUDRUN_ADDONS[0],
     cloudbuild=api_adapter.CLOUDBUILD,
@@ -161,7 +159,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
 {ingress}=ENABLED|DISABLED
 {dashboard}=ENABLED|DISABLED
 {istio}=ENABLED|DISABLED
-{application_manager}=ENABLED|DISABLED
 {backuprestore}=ENABLED|DISABLED
 {network_policy}=ENABLED|DISABLED
 {cloudrun}=ENABLED|DISABLED
@@ -174,7 +171,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
     dashboard=api_adapter.DASHBOARD,
     network_policy=api_adapter.NETWORK_POLICY,
     istio=api_adapter.ISTIO,
-    application_manager=api_adapter.APPLICATIONMANAGER,
     backuprestore=api_adapter.BACKUPRESTORE,
     cloudrun=api_adapter.CLOUDRUN_ADDONS[0],
     configconnector=api_adapter.CONFIGCONNECTOR,
@@ -321,7 +317,7 @@ class Update(base.UpdateCommand):
     group_logging_monitoring_config = group.add_group()
     flags.AddLoggingFlag(group_logging_monitoring_config)
     flags.AddMonitoringFlag(group_logging_monitoring_config)
-    flags.AddBinauthzFlags(group, api_version='v1')
+    flags.AddBinauthzFlags(group, release_track=base.ReleaseTrack.GA)
     flags.AddEnableStackdriverKubernetesFlag(group)
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
@@ -350,11 +346,14 @@ class Update(base.UpdateCommand):
     flags.AddEnablePrivateEndpoint(group)
     flags.AddEnableGoogleCloudAccess(group)
     flags.AddLoggingVariantFlag(group)
-    flags.AddAdditionalPodIpv4RangesFlag(group)
-    flags.AddRemoveAdditionalPodIpv4RangesFlag(group)
-    flags.AddStackTypeFlag(group, hidden=True)
+    group_add_pod_ipv4_ranges = group.add_group(hidden=True)
+    flags.AddAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
+    flags.AddRemoveAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
+    flags.AddStackTypeFlag(group)
     flags.AddCostManagementConfigFlag(group, is_update=True)
     flags.AddGatewayFlags(group, hidden=False)
+    flags.AddManagedPrometheusFlags(group)
+    flags.AddSecurityPostureFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     get_default = lambda key: getattr(args, key)
@@ -397,16 +396,13 @@ class Update(base.UpdateCommand):
     opts.security_group = args.security_group
     opts.autoprovisioning_network_tags = args.autoprovisioning_network_tags
     opts.enable_image_streaming = args.enable_image_streaming
-    # TODO(b/201956384) Remove check that requires specifying scope, once
-    # cluster scope is also GA. This check is added to prevent enabling cluster
-    # scope(the default scope) by not specifying a scope value.
     opts.cluster_dns = args.cluster_dns
     opts.cluster_dns_scope = args.cluster_dns_scope
     opts.cluster_dns_domain = args.cluster_dns_domain
+    # TODO(b/201956384): Remove when cluster scope flag is released to GA.
     if opts.cluster_dns and opts.cluster_dns.lower() == 'clouddns':
-      if not opts.cluster_dns_scope:
-        raise util.Error(
-            'DNS Scope should be specified when using CloudDNS in GA.')
+      if opts.cluster_dns_scope == 'cluster':
+        opts.cluster_dns_scope = None
       console_io.PromptContinue(
           message='All the node-pools in the cluster need to be re-created '
           'by the user to start using Cloud DNS for DNS lookups. It is '
@@ -425,6 +421,9 @@ class Update(base.UpdateCommand):
     opts.stack_type = args.stack_type
     opts.enable_cost_allocation = args.enable_cost_allocation
     opts.gateway_api = args.gateway_api
+    opts.enable_managed_prometheus = args.enable_managed_prometheus
+    opts.disable_managed_prometheus = args.disable_managed_prometheus
+    opts.enable_security_posture = args.enable_security_posture
     return opts
 
   def Run(self, args):
@@ -453,7 +452,6 @@ class Update(base.UpdateCommand):
       cluster_name = cluster.name
       cluster_node_count = cluster.currentNodeCount
       cluster_zone = cluster.zone
-      self.MaybeLogDataplaneV2ScaleWarning(cluster)
     except (exceptions.HttpException, apitools_exceptions.HttpForbiddenError,
             util.Error) as error:
       if cluster_is_required:
@@ -741,19 +739,6 @@ to completion."""
         getattr(args, 'clear_cross_connect_subnetworks', False) or
         getattr(args, 'enable_google_cloud_access', False))
 
-  def MaybeLogDataplaneV2ScaleWarning(self, cluster):
-    if (cluster.networkConfig is not None and
-        cluster.networkConfig.datapathProvider is not None and
-        cluster.networkConfig.datapathProvider.name == 'ADVANCED_DATAPATH'):
-      # TODO(b/177430844): Remove once scale limits are gone
-      log.status.Print(
-          'Note: GKE Dataplane V2 has been certified to run up to 500 nodes '
-          'per cluster, including node autoscaling and surge upgrades. You '
-          'may request a cluster size of up to 1000 nodes by filing a '
-          'support ticket with GCP. For more information, please see '
-          'https://cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2'
-      )
-
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class UpdateBeta(Update):
@@ -792,7 +777,7 @@ class UpdateBeta(Update):
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
-    flags.AddBinauthzFlags(group, api_version='v1beta1')
+    flags.AddBinauthzFlags(group, release_track=base.ReleaseTrack.BETA)
     flags.AddAutoprovisioningFlags(group)
     flags.AddAutoscalingProfilesFlag(group)
     flags.AddVerticalPodAutoscalingFlags(group, experimental=True)
@@ -834,12 +819,14 @@ class UpdateBeta(Update):
     flags.AddEnablePrivateEndpoint(group)
     flags.AddEnableGoogleCloudAccess(group)
     flags.AddCostManagementConfigFlag(group, is_update=True)
-    flags.AddStackTypeFlag(group, hidden=True)
+    flags.AddStackTypeFlag(group)
     flags.AddLoggingVariantFlag(group)
-    flags.AddAdditionalPodIpv4RangesFlag(group)
-    flags.AddRemoveAdditionalPodIpv4RangesFlag(group)
+    group_add_pod_ipv4_ranges = group.add_group(hidden=True)
+    flags.AddAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
+    flags.AddRemoveAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
     flags.AddGatewayFlags(group, hidden=False)
     flags.AddFleetProjectFlag(group, is_update=True)
+    flags.AddSecurityPostureFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     get_default = lambda key: getattr(args, key)
@@ -933,14 +920,16 @@ class UpdateBeta(Update):
     opts.enable_google_cloud_access = args.enable_google_cloud_access
     opts.enable_cost_allocation = args.enable_cost_allocation
     opts.binauthz_evaluation_mode = args.binauthz_evaluation_mode
-    opts.binauthz_policy = None
+    opts.binauthz_policy = args.binauthz_policy
     opts.stack_type = args.stack_type
     opts.logging_variant = args.logging_variant
     opts.additional_pod_ipv4_ranges = args.additional_pod_ipv4_ranges
     opts.removed_additional_pod_ipv4_ranges = args.remove_additional_pod_ipv4_ranges
     opts.gateway_api = args.gateway_api
     opts.fleet_project = args.fleet_project
+    opts.enable_fleet = args.enable_fleet
     opts.clear_fleet_project = args.clear_fleet_project
+    opts.enable_security_posture = args.enable_security_posture
     return opts
 
 
@@ -983,7 +972,7 @@ class UpdateAlpha(Update):
     flags.AddDailyMaintenanceWindowFlag(group, add_unset_text=True)
     flags.AddRecurringMaintenanceWindowFlags(group, is_update=True)
     flags.AddPodSecurityPolicyFlag(group)
-    flags.AddBinauthzFlags(group, api_version='v1alpha1')
+    flags.AddBinauthzFlags(group, release_track=base.ReleaseTrack.ALPHA)
     flags.AddResourceUsageExportFlags(group, is_update=True)
     flags.AddVerticalPodAutoscalingFlags(group, experimental=True)
     flags.AddSecurityProfileForUpdateFlag(group)
@@ -1024,12 +1013,14 @@ class UpdateAlpha(Update):
     flags.AddWorkloadVulnScanningFlag(group)
     flags.AddEnablePrivateEndpoint(group)
     flags.AddEnableGoogleCloudAccess(group)
-    flags.AddStackTypeFlag(group, hidden=True)
+    flags.AddStackTypeFlag(group)
     flags.AddGatewayFlags(group, hidden=False)
     flags.AddLoggingVariantFlag(group)
-    flags.AddAdditionalPodIpv4RangesFlag(group)
-    flags.AddRemoveAdditionalPodIpv4RangesFlag(group)
+    group_add_pod_ipv4_ranges = group.add_group(hidden=True)
+    flags.AddAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
+    flags.AddRemoveAdditionalPodIpv4RangesFlag(group_add_pod_ipv4_ranges)
     flags.AddFleetProjectFlag(group, is_update=True)
+    flags.AddSecurityPostureFlag(group)
 
   def ParseUpdateOptions(self, args, locations):
     get_default = lambda key: getattr(args, key)
@@ -1117,12 +1108,14 @@ class UpdateAlpha(Update):
     opts.enable_private_endpoint = args.enable_private_endpoint
     opts.enable_google_cloud_access = args.enable_google_cloud_access
     opts.binauthz_evaluation_mode = args.binauthz_evaluation_mode
-    opts.binauthz_policy = None
+    opts.binauthz_policy = args.binauthz_policy
     opts.stack_type = args.stack_type
     opts.gateway_api = args.gateway_api
     opts.logging_variant = args.logging_variant
     opts.additional_pod_ipv4_ranges = args.additional_pod_ipv4_ranges
     opts.removed_additional_pod_ipv4_ranges = args.remove_additional_pod_ipv4_ranges
     opts.fleet_project = args.fleet_project
+    opts.enable_fleet = args.enable_fleet
     opts.clear_fleet_project = args.clear_fleet_project
+    opts.enable_security_posture = args.enable_security_posture
     return opts

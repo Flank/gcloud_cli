@@ -534,7 +534,7 @@
             "Snapshot every 1 hour.",
             "Snapshot every 6 hours.",
             "Snapshot every 12 hours.",
-            "Snapshot every 24 horus."
+            "Snapshot every 24 hours."
           ],
           "enum": [
             "SNAPSHOT_PERIOD_UNSPECIFIED",
@@ -1054,16 +1054,14 @@
             "Redis cluster is being created.",
             "Redis cluster has been created and is fully usable.",
             "Redis cluster configuration is being updated.",
-            "Redis cluster is being deleted.",
-            "Redis instance is being reparied."
+            "Redis cluster is being deleted."
           ],
           "enum": [
             "STATE_UNSPECIFIED",
             "CREATING",
             "ACTIVE",
             "UPDATING",
-            "DELETING",
-            "REPAIRING"
+            "DELETING"
           ]
         },
         "uid": {
@@ -1071,8 +1069,41 @@
           "readOnly": true,
           "type": "string"
         },
-        "totalMemorySizeGb": {
-          "description": "Optional. Redis memory size in GiB for the entire cluster.",
+        "replicaCount": {
+          "description": "Optional. The number of replica nodes per shard.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "authorizationMode": {
+          "description": "The authorization mode of the Redis cluster. If not provided, auth feature is disabled for the cluster.",
+          "type": "string",
+          "enumDescriptions": [
+            "Not set.",
+            "IAM basic authorization mode",
+            "Authorization disabled mode"
+          ],
+          "enum": [
+            "AUTH_MODE_UNSPECIFIED",
+            "AUTH_MODE_IAM_AUTH",
+            "AUTH_MODE_DISABLED"
+          ]
+        },
+        "transitEncryptionMode": {
+          "description": "Optional. The in-transit encryption for the Redis cluster. If not provided, encryption is disabled for the cluster.",
+          "type": "string",
+          "enumDescriptions": [
+            "In-transit encryption not set.",
+            "In-transit encryption disabled.",
+            "Use server managed encryption for in-transit encryption."
+          ],
+          "enum": [
+            "TRANSIT_ENCRYPTION_MODE_UNSPECIFIED",
+            "TRANSIT_ENCRYPTION_MODE_DISABLED",
+            "TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION"
+          ]
+        },
+        "sizeGb": {
+          "description": "Optional. Redis memory size in GB for the entire cluster. See b\/257175558 for comments in naming the field. Use unit GB to follow GCE conventions: https:\/\/cloud.google.com\/compute\/docs\/instances\/creating-instance-with-custom-machine-type#memory_units.",
           "type": "integer",
           "format": "int32"
         }
@@ -1087,6 +1118,42 @@
           "description": "Output only. The address of the Private Service Connect (PSC) service that the customer can use to connect this instance to their local network.",
           "readOnly": true,
           "type": "string"
+        }
+      }
+    },
+    "CertificateAuthority": {
+      "id": "CertificateAuthority",
+      "description": "Redis cluster certificate authority",
+      "type": "object",
+      "properties": {
+        "managedServerCa": {
+          "$ref": "ManagedCertificateAuthority"
+        }
+      }
+    },
+    "ManagedCertificateAuthority": {
+      "id": "ManagedCertificateAuthority",
+      "type": "object",
+      "properties": {
+        "caCerts": {
+          "description": "The PEM encoded CA certificate chains for redis managed server authentication",
+          "type": "array",
+          "items": {
+            "$ref": "CertChain"
+          }
+        }
+      }
+    },
+    "CertChain": {
+      "id": "CertChain",
+      "type": "object",
+      "properties": {
+        "certificates": {
+          "description": "The certificates that form the CA chain, from leaf to root order.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1175,6 +1242,31 @@
           "description": "Output only. API version used to start the operation.",
           "readOnly": true,
           "type": "string"
+        }
+      }
+    },
+    "ReconciliationOperationMetadata": {
+      "id": "ReconciliationOperationMetadata",
+      "description": "Operation metadata returned by the CLH during resource state reconciliation.",
+      "type": "object",
+      "properties": {
+        "deleteResource": {
+          "description": "DEPRECATED. Use exclusive_action instead.",
+          "type": "boolean"
+        },
+        "exclusiveAction": {
+          "description": "Excluisive action returned by the CLH.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unknown repair action.",
+            "The resource has to be deleted. When using this bit, the CLH should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE OperationSignal in SideChannel. For more information - go\/ccfe-delete-on-upsert, go\/ccfe-reconciliation-protocol-ug#apply_delete",
+            "This resource could not be repaired but the repair should be tried again at a later time. This can happen if there is a dependency that needs to be resolved first- e.g. if a parent resource must be repaired before a child resource."
+          ],
+          "enum": [
+            "UNKNOWN_REPAIR_ACTION",
+            "DELETE",
+            "RETRY"
+          ]
         }
       }
     },
@@ -1911,7 +2003,7 @@
                       "type": "string"
                     },
                     "clusterId": {
-                      "description": "Required. The logical name of the Redis cluster in the customer project with the following restrictions: * Must contain only lowercase letters, numbers, and hyphens. * Must start with a letter. * Must be between 1-40 characters. * Must end with a number or a letter. * Must be unique within the customer project \/ location",
+                      "description": "Required. The logical name of the Redis cluster in the customer project with the following restrictions: * Must contain only lowercase letters, numbers, and hyphens. * Must start with a letter. * Must be between 1-63 characters. * Must end with a number or a letter. * Must be unique within the customer project \/ location",
                       "location": "query",
                       "type": "string"
                     },
@@ -1934,6 +2026,31 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Creates a Redis cluster based on the specified tier and memory size. The creation is executed asynchronously and callers may check the returned operation to track its progress. Once the operation is completed the Redis cluster will be fully functional. The completed longrunning.Operation will contain the new cluster object in the response field. The returned operation is automatically deleted after a few hours, so there is no need to call DeleteOperation."
+                },
+                "getCertificateAuthority": {
+                  "id": "redis.projects.locations.clusters.getCertificateAuthority",
+                  "path": "v1alpha1/{+name}/certificateAuthority",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}/certificateAuthority",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Redis cluster certificate authority resource name using the form: `projects\/{project_id}\/locations\/{location_id}\/clusters\/{cluster_id}\/certificateAuthority` where `location_id` refers to a GCP region.",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/clusters\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "CertificateAuthority"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets the details of certificate authority information for Redis cluster."
                 }
               }
             }

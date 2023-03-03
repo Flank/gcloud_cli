@@ -30,8 +30,8 @@ MODLIBS=           $(LOCALMODLIBS) $(BASEMODLIBS)
 VERSION=	3.9
 srcdir=		.
 
-abs_srcdir=	/build/Python-3.9.12
-abs_builddir=	/build/Python-3.9.12
+abs_srcdir=	/build/Python-3.9.16
+abs_builddir=	/build/Python-3.9.16
 
 
 CC=		clang -pthread
@@ -194,7 +194,7 @@ LIPO_INTEL64_FLAGS=
 OTHER_LIBTOOL_OPT=
 
 # Environment to run shared python without installed libraries
-RUNSHARED=       LD_LIBRARY_PATH=/build/Python-3.9.12
+RUNSHARED=       LD_LIBRARY_PATH=/build/Python-3.9.16
 
 # ensurepip options
 ENSUREPIP=      no
@@ -1171,6 +1171,7 @@ PYTHON_HEADERS= \
 		$(srcdir)/Include/internal/pycore_import.h \
 		$(srcdir)/Include/internal/pycore_initconfig.h \
 		$(srcdir)/Include/internal/pycore_interp.h \
+		$(srcdir)/Include/internal/pycore_long.h \
 		$(srcdir)/Include/internal/pycore_object.h \
 		$(srcdir)/Include/internal/pycore_pathconfig.h \
 		$(srcdir)/Include/internal/pycore_pyerrors.h \

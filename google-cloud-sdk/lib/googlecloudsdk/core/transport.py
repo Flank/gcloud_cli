@@ -38,6 +38,7 @@ from six.moves import urllib
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 ENCODING = None if six.PY2 else 'utf-8'
+INVOCATION_ID = uuid.uuid4().hex
 
 TOKEN_URIS = [
     'https://accounts.google.com/o/oauth2/token',
@@ -194,6 +195,14 @@ class RequestWrapper(six.with_metaclass(abc.ABCMeta, object)):
     if request_reason:
       handlers.append(
           Handler(SetHeader('X-Goog-Request-Reason', request_reason)))
+
+    request_org_restriction_headers = properties.VALUES.resource_policy.org_restriction_header.Get(
+    )
+    if request_org_restriction_headers:
+      handlers.append(
+          Handler(
+              SetHeader('X-Goog-Allowed-Resources',
+                        request_org_restriction_headers)))
 
     # Do this one last so that it sees the effects of the other modifiers.
     if properties.VALUES.core.log_http.GetBool():
@@ -567,7 +576,7 @@ def MakeUserAgentString(cmd_path=None):
           ' {ua_fragment}').format(
               version=config.CLOUD_SDK_VERSION.replace(' ', '_'),
               cmd=(cmd_path or properties.VALUES.metrics.command_name.Get()),
-              inv_id=uuid.uuid4().hex,
+              inv_id=INVOCATION_ID,
               environment=properties.GetMetricsEnvironment(),
               env_version=properties.VALUES.metrics.environment_version.Get(),
               is_interactive=console_io.IsInteractive(

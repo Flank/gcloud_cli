@@ -78,6 +78,10 @@ class ConnectionProfilesClient(object):
       # clause catching and skipping relevant cases for older/alpha versions
       if profile.postgresql:
         return 'POSTGRES'
+      if profile.alloydb:
+        return ''
+      if profile.oracle:
+        return 'ORACLE'
       # TODO(b/178304949): Add SQL Server case once supported.
       return ''
     except AttributeError as _:
@@ -195,14 +199,40 @@ class ConnectionProfilesClient(object):
       update_fields.append('postgresql.ssl.clientCertificate')
 
   def _GetPostgreSqlConnectionProfile(self, args):
+    """Creates a Postgresql connection profile according to the given args.
+
+    Args:
+      args: argparse.Namespace, The arguments that this command was invoked
+        with.
+
+    Returns:
+      PostgreSqlConnectionProfile, to use when creating the connection profile.
+    """
+
     ssl_config = self._GetSslConfig(args)
-    return self.messages.PostgreSqlConnectionProfile(
+    connection_profile_obj = self.messages.PostgreSqlConnectionProfile(
         host=args.host,
         port=args.port,
         username=args.username,
         password=args.password,
         ssl=ssl_config,
         cloudSqlId=args.GetValue(self._InstanceArgName()))
+
+    private_service_connect_connectivity_ref = (
+        args.CONCEPTS.psc_service_attachment.Parse()
+    )
+    if private_service_connect_connectivity_ref:
+      psc_relative_name = (
+          private_service_connect_connectivity_ref.RelativeName()
+      )
+      connection_profile_obj.privateServiceConnectConnectivity = (
+          self.messages.PrivateServiceConnectConnectivity(
+              serviceAttachment=psc_relative_name
+          )
+      )
+    elif args.static_ip_connectivity:
+      connection_profile_obj.staticIpConnectivity = {}
+    return connection_profile_obj
 
   def _UpdatePostgreSqlConnectionProfile(self, connection_profile, args,
                                          update_fields):
@@ -286,7 +316,85 @@ class ConnectionProfilesClient(object):
     settings = self._GetCloudSqlSettings(args)
     return self.messages.CloudSqlConnectionProfile(settings=settings)
 
-  def _GetConnectionProfile(self, cp_type, args):
+  def _GetAlloyDBConnectionProfile(self, args, connection_profile_id):
+    """Creates an AlloyDB connection profile according to the given args.
+
+    Uses the connection profile ID as the cluster ID, and also sets "postgres"
+    as the initial user of the cluster.
+
+    Args:
+      args: argparse.Namespace, The arguments that this command was invoked
+        with.
+      connection_profile_id: str, the ID of the connection profile.
+
+    Returns:
+      AlloyDBConnectionProfile, to use when creating the connection profile.
+    """
+    cluster_settings = self.messages.AlloyDbSettings
+    primary_settings = self.messages.PrimaryInstanceSettings
+
+    cluster_labels = labels_util.ParseCreateArgs(args,
+                                                 cluster_settings.LabelsValue,
+                                                 'cluster_labels')
+    primary_labels = labels_util.ParseCreateArgs(args,
+                                                 primary_settings.LabelsValue,
+                                                 'primary_labels')
+    database_flags = labels_util.ParseCreateArgs(
+        args, primary_settings.DatabaseFlagsValue, 'database_flags')
+
+    primary_settings = primary_settings(
+        id=args.primary_id,
+        machineConfig=self.messages.MachineConfig(
+            cpuCount=args.cpu_count),
+        databaseFlags=database_flags,
+        labels=primary_labels)
+    cluster_settings = cluster_settings(
+        initialUser=self.messages.UserPassword(
+            user='postgres', password=args.password),
+        vpcNetwork=args.network,
+        labels=cluster_labels,
+        primaryInstanceSettings=primary_settings)
+    return self.messages.AlloyDbConnectionProfile(
+        clusterId=connection_profile_id, settings=cluster_settings)
+
+  def _GetForwardSshTunnelConnectivity(self, args):
+    return self.messages.ForwardSshTunnelConnectivity(
+        hostname=args.forward_ssh_hostname,
+        port=args.forward_ssh_port,
+        username=args.forward_ssh_username,
+        privateKey=args.forward_ssh_private_key,
+        password=args.forward_ssh_password)
+
+  def _GetOracleConnectionProfile(self, args):
+    """Creates an Oracle connection profile according to the given args.
+
+    Args:
+      args: argparse.Namespace, The arguments that this command was invoked
+        with.
+
+    Returns:
+      OracleConnectionProfile, to use when creating the connection profile.
+    """
+    connection_profile_obj = self.messages.OracleConnectionProfile(
+        host=args.host,
+        port=args.port,
+        username=args.username,
+        password=args.password,
+        databaseService=args.database_service)
+
+    private_connectivity_ref = args.CONCEPTS.private_connection.Parse()
+    if private_connectivity_ref:
+      connection_profile_obj.privateConnectivity = self.messages.PrivateConnectivity(
+          privateConnection=private_connectivity_ref.RelativeName())
+    elif args.forward_ssh_hostname:
+      connection_profile_obj.forwardSshConnectivity = (
+          self._GetForwardSshTunnelConnectivity(args)
+      )
+    elif args.static_ip_connectivity:
+      connection_profile_obj.staticServiceIpConnectivity = {}
+    return connection_profile_obj
+
+  def _GetConnectionProfile(self, cp_type, args, connection_profile_id):
     """Returns a connection profile according to type."""
     connection_profile_type = self.messages.ConnectionProfile
     labels = labels_util.ParseCreateArgs(
@@ -305,6 +413,13 @@ class ConnectionProfilesClient(object):
     elif cp_type == 'POSTGRESQL':
       postgresql_connection_profile = self._GetPostgreSqlConnectionProfile(args)
       params['postgresql'] = postgresql_connection_profile
+    elif cp_type == 'ALLOYDB':
+      alloydb_connection_profile = self._GetAlloyDBConnectionProfile(
+          args, connection_profile_id)
+      params['alloydb'] = alloydb_connection_profile
+    elif cp_type == 'ORACLE':
+      oracle_connection_profile = self._GetOracleConnectionProfile(args)
+      params['oracle'] = oracle_connection_profile
     return connection_profile_type(
         labels=labels,
         state=connection_profile_type.StateValueValuesEnum.CREATING,
@@ -370,7 +485,8 @@ class ConnectionProfilesClient(object):
     """
     self._ValidateArgs(args)
 
-    connection_profile = self._GetConnectionProfile(cp_type, args)
+    connection_profile = self._GetConnectionProfile(cp_type, args,
+                                                    connection_profile_id)
 
     request_id = api_util.GenerateRequestId()
     create_req_type = self.messages.DatamigrationProjectsLocationsConnectionProfilesCreateRequest

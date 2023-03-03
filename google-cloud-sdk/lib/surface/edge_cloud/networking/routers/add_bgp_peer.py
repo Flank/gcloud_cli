@@ -34,6 +34,7 @@ EXAMPLES = """\
    """
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 class AddBgpPeer(base.UpdateCommand):
   """Add a BGP peer to a Distributed Cloud Edge Network router.
 
@@ -51,15 +52,16 @@ class AddBgpPeer(base.UpdateCommand):
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
-    routers_client = routers.RoutersClient()
+    routers_client = routers.RoutersClient(self.ReleaseTrack())
     router_ref = args.CONCEPTS.router.Parse()
     update_req_op = routers_client.AddBgpPeer(router_ref, args)
 
     async_ = args.async_
     if not async_:
       response = routers_client.WaitForOperation(update_req_op)
-      log.UpdatedResource(router_ref, details='Operation was successful.')
+      log.UpdatedResource(
+          router_ref.RelativeName(), details='Operation was successful.')
       return response
 
     log.status.Print('Updating [{0}] with operation [{1}].'.format(
-        router_ref, update_req_op.name))
+        router_ref.RelativeName(), update_req_op.name))

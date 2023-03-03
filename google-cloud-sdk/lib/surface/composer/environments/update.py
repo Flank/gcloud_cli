@@ -25,15 +25,16 @@ from googlecloudsdk.command_lib.composer import flags
 from googlecloudsdk.command_lib.composer import image_versions_util as image_versions_command_util
 from googlecloudsdk.command_lib.composer import resource_args
 from googlecloudsdk.command_lib.composer import util as command_util
+from googlecloudsdk.core import log
 
 DETAILED_HELP = {
     'EXAMPLES':
         """\
-          To update the Cloud Composer environment named ``env-1'' to have 8
-          Airflow workers, and not have the ``production'' label, run:
+        To update the Cloud Composer environment named ``env-1'' to have 8
+        Airflow workers, and not have the ``production'' label, run:
 
-            $ {command} env-1 --node-count=8 --remove-labels=production
-        """
+          $ {command} env-1 --node-count=8 --remove-labels=production
+      """
 }
 
 _INVALID_OPTION_FOR_V2_ERROR_MSG = """\
@@ -55,6 +56,7 @@ class Update(base.Command):
   _support_maintenance_window = False
   _support_environment_size = True
   _support_airflow_database_retention = False
+  _support_cloud_data_lineage_integration = False
 
   @staticmethod
   def Args(parser, release_track=base.ReleaseTrack.GA):
@@ -157,7 +159,7 @@ class Update(base.Command):
             args.triggerer_cpu or args.triggerer_memory))):
         raise command_util.InvalidUserInputError(
             'Workloads Config flags introduced in Composer 2.X'
-            ' cannot be used when creating Composer 1.X environments.')
+            ' cannot be used when updating Composer 1.X environments.')
       params['scheduler_cpu'] = args.scheduler_cpu
       params['worker_cpu'] = args.worker_cpu
       params['web_server_cpu'] = args.web_server_cpu
@@ -182,6 +184,7 @@ class Update(base.Command):
     self._addScheduledSnapshotFields(params, args, is_composer_v1)
 
     if self._support_triggerer and (args.triggerer_cpu or args.triggerer_memory
+                                    or args.triggerer_count is not None
                                     or args.enable_triggerer or
                                     args.disable_triggerer):
       self._addTriggererFields(params, args, env_obj)
@@ -211,6 +214,10 @@ class Update(base.Command):
     command_util.ValidateMasterAuthorizedNetworks(
         args.master_authorized_networks)
     params['master_authorized_networks'] = args.master_authorized_networks
+    if self._support_cloud_data_lineage_integration:
+      if args.enable_cloud_data_lineage_integration or args.disable_cloud_data_lineage_integration:
+        params[
+            'cloud_data_lineage_integration_enabled'] = True if args.enable_cloud_data_lineage_integration else False
     return patch_util.ConstructPatch(**params)
 
   # TODO(b/245909413): Update Composer version
@@ -235,12 +242,16 @@ class Update(base.Command):
     triggerer_count = None
     triggerer_cpu = None
     triggerer_memory_gb = None
-    if env_obj.config.workloadsConfig and env_obj.config.workloadsConfig.triggerer:
+    if (env_obj.config.workloadsConfig and
+        env_obj.config.workloadsConfig.triggerer and
+        env_obj.config.workloadsConfig.triggerer.count != 0):
       triggerer_count = env_obj.config.workloadsConfig.triggerer.count
       triggerer_memory_gb = env_obj.config.workloadsConfig.triggerer.memoryGb
       triggerer_cpu = env_obj.config.workloadsConfig.triggerer.cpu
     if args.disable_triggerer or args.enable_triggerer:
       triggerer_count = 1 if args.enable_triggerer else 0
+    if args.triggerer_count is not None:
+      triggerer_count = args.triggerer_count
     if args.triggerer_cpu:
       triggerer_cpu = args.triggerer_cpu
     if args.triggerer_memory:
@@ -254,10 +265,10 @@ class Update(base.Command):
     for k, v in possible_args.items():
       if v and not triggerer_supported:
         raise command_util.InvalidUserInputError(
-            flags.INVALID_OPTION_FOR_MIN_AIRFLOW_VERSION_ERROR_MSG.format(
+            flags.INVALID_OPTION_FOR_MIN_IMAGE_VERSION_ERROR_MSG.format(
                 opt=k,
-                airflow_version=image_versions_command_util
-                .MIN_TRIGGERER_AIRFLOW_VERSION))
+                composer_version=flags.MIN_TRIGGERER_COMPOSER_VERSION,
+                airflow_version=flags.MIN_TRIGGERER_AIRFLOW_VERSION))
     if not triggerer_count:
       if args.triggerer_cpu:
         raise command_util.InvalidUserInputError(
@@ -265,9 +276,13 @@ class Update(base.Command):
       if args.triggerer_memory:
         raise command_util.InvalidUserInputError(
             'Cannot specify --triggerer-memory without enabled triggerer')
-    params['triggerer_cpu'] = triggerer_cpu
+    if triggerer_count == 1 and not (triggerer_memory_gb and triggerer_cpu):
+      raise command_util.InvalidUserInputError(
+          'Cannot enable triggerer without providing triggerer memory and cpu.')
     params['triggerer_count'] = triggerer_count
-    params['triggerer_memory_gb'] = triggerer_memory_gb
+    if triggerer_count:
+      params['triggerer_cpu'] = triggerer_cpu
+      params['triggerer_memory_gb'] = triggerer_memory_gb
 
   def Run(self, args):
     env_ref = args.CONCEPTS.environment.Parse()
@@ -288,6 +303,7 @@ class UpdateBeta(Update):
   _support_triggerer = True
   _support_maintenance_window = True
   _support_environment_size = True
+  _support_cloud_data_lineage_integration = True
 
   @staticmethod
   def AlphaAndBetaArgs(parser, release_track=base.ReleaseTrack.BETA):
@@ -299,6 +315,9 @@ class UpdateBeta(Update):
     flags.AddEnvUpgradeFlagsToGroup(Update.update_type_group)
     flags.AddMaintenanceWindowFlagsGroup(Update.update_type_group)
 
+    flags.AddCloudDataLineageIntegrationUpdateFlagsToGroup(
+        Update.update_type_group)
+
   @staticmethod
   def Args(parser):
     """Arguments available only in beta, not in alpha."""
@@ -306,7 +325,13 @@ class UpdateBeta(Update):
 
   def Run(self, args):
     env_ref = args.CONCEPTS.environment.Parse()
-
+    if (
+        args.airflow_version or args.image_version
+    ) and image_versions_command_util.IsDefaultImageVersion(args.image_version):
+      message = image_versions_command_util.BuildDefaultComposerVersionWarning(
+          args.image_version, args.airflow_version
+      )
+      log.warning(message)
     if args.airflow_version:
       # Converts airflow_version arg to image_version arg
       args.image_version = (

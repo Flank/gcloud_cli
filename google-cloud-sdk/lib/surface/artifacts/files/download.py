@@ -18,10 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from apitools.base.py import transfer
+import os
+import tempfile
+
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.artifacts import download_util
+from googlecloudsdk.command_lib.artifacts import file_util
 from googlecloudsdk.command_lib.artifacts import flags
-from googlecloudsdk.command_lib.artifacts import requests
 from googlecloudsdk.core import log
 
 
@@ -58,18 +61,43 @@ class Download(base.Command):
         metavar='DESTINATION',
         required=True,
         help="""\
-            The path where you want to download the file.""")
+            The path where you want to download the file.""",
+    )
+    parser.add_argument(
+        '--local-filename',
+        metavar='LOCAL_FILENAME',
+        help=(
+            'If specified, the name of the downloaded file on the local system'
+            ' is set to the value you use for LOCAL_FILENAME. Otherwise the'
+            ' name of the downloaded file is based on the file name in the'
+            ' registry.'
+        ),
+    )
 
   def Run(self, args):
     """Run the file download command."""
     log.status.Print('Downloading the file.')
-    client = requests.GetClientV1beta2()
-    file = args.CONCEPTS.file.Parse()
-    download_path = args.destination
-    request = requests.GetMessagesV1beta2(
-    ).ArtifactregistryMediaDownloadRequest(name=file.RelativeName())
-    download_object = transfer.Download.FromFile(
-        download_path + '/' + file.filesId, args.allow_overwrite)
-    client.media.Download(request, download=download_object)
-    log.status.Print(
-        'Successfully downloaded the file to ' + download_path)
+
+    # Escape slashes in the filesId.
+    file_escaped = file_util.EscapeFileName(args.CONCEPTS.file.Parse())
+    filename = (
+        args.local_filename
+        if args.local_filename
+        else self.os_friendly_filename(file_escaped.filesId)
+    )
+    tmp_path = os.path.join(tempfile.gettempdir(), filename)
+    final_path = os.path.join(args.destination, filename)
+    download_util.Download(
+        tmp_path, final_path, file_escaped.RelativeName(), args.allow_overwrite
+    )
+    log.status.Print('Successfully downloaded the file to ' + args.destination)
+
+  def os_friendly_filename(self, file_id):
+    filename = file_id.replace(':', '%3A')
+    filename = filename.replace('\\', '%5C')
+    filename = filename.replace('*', '%3F')
+    filename = filename.replace('?', '%22')
+    filename = filename.replace('<', '%3C')
+    filename = filename.replace('>', '%2E')
+    filename = filename.replace('|', '%7C')
+    return filename

@@ -37,7 +37,7 @@ def GetFleetTemplate(client, messages, project_id, template_name):
         fleet_template_request)
   except apitools_exceptions.HttpNotFoundError:
     raise exceptions.Error(
-        'Constraint template [{}] was not found in the Fleet.'
+        'Constraint template [{}] was not found in the fleet.'
         .format(template_name))
   formatted_template = {
       'name': fleet_template_response.ref.name,
@@ -76,7 +76,7 @@ def GetMembershipTemplate(client, messages, project_id, membership,
                                                   release_track)
   except apitools_exceptions.HttpNotFoundError:
     raise exceptions.Error(
-        'Membership [{}] was not found in the Fleet.'
+        'Membership [{}] was not found in the fleet.'
         .format(membership))
 
   try:
@@ -143,20 +143,12 @@ class Describe(calliope_base.DescribeCommand):
         type=str,
         help='The constraint template name.'
     )
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(
-          parser,
-          plural=True,
-          membership_help=(
-              'A single membership name for which to describe a membership '
-              'constraint template.'))
-    else:
-      parser.add_argument(
-          '--memberships',
-          type=str,
-          help=(
-              'A single membership name for which to describe a membership '
-              'constraint template.'))
+    resources.AddMembershipResourceArg(
+        parser,
+        plural=True,
+        membership_help=(
+            'A single membership name for which to describe a membership '
+            'constraint template.'))
 
   def Run(self, args):
     calliope_base.EnableUserProjectQuota()
@@ -169,15 +161,13 @@ class Describe(calliope_base.DescribeCommand):
     template_name = args.TEMPLATE_NAME.lower()
 
     if args.memberships is not None:
-      if resources.UseRegionalMemberships(self.ReleaseTrack()):
-        memberships = args.memberships
-      else:
-        memberships = args.memberships.split(',')
+      memberships = args.memberships
       if len(memberships) != 1:
         raise exceptions.Error('Please specify a single membership name.')
+      membership_name = memberships[0]
 
       return GetMembershipTemplate(client, messages, project_id,
-                                   args.memberships, template_name,
+                                   membership_name, template_name,
                                    self.ReleaseTrack())
     else:
       return GetFleetTemplate(client, messages, project_id,

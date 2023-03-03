@@ -717,6 +717,16 @@ class AppengineAppsServicesVersionsPatchRequest(_messages.Message):
   version = _messages.MessageField('Version', 3)
 
 
+class AppengineProjectsLocationsApplicationsGetRequest(_messages.Message):
+  r"""A AppengineProjectsLocationsApplicationsGetRequest object.
+
+  Fields:
+    name: Name of the Application resource to get. Example: apps/myapp.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class Application(_messages.Message):
   r"""An Application resource contains the top-level configuration of an App
   Engine application.
@@ -1357,6 +1367,18 @@ class FirewallRule(_messages.Message):
   description = _messages.StringField(2)
   priority = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   sourceRange = _messages.StringField(4)
+
+
+class FlexibleRuntimeSettings(_messages.Message):
+  r"""Runtime settings for the App Engine flexible environment.
+
+  Fields:
+    operatingSystem: The operating system of the application runtime.
+    runtimeVersion: The runtime version of an App Engine flexible application.
+  """
+
+  operatingSystem = _messages.StringField(1)
+  runtimeVersion = _messages.StringField(2)
 
 
 class GoogleAppengineV1betaLocationMetadata(_messages.Message):
@@ -2141,6 +2163,176 @@ class OperationMetadataV1Beta(_messages.Message):
   warning = _messages.StringField(8, repeated=True)
 
 
+class ProjectEvent(_messages.Message):
+  r"""The request sent to CLHs during project events.
+
+  Enums:
+    PhaseValueValuesEnum:
+
+  Fields:
+    eventId: The unique ID for this project event. CLHs can use this value to
+      dedup repeated calls. required
+    phase: A PhaseValueValuesEnum attribute.
+    projectMetadata: The projects metadata for this project. required
+    state: The state of the project that led to this event.
+  """
+
+  class PhaseValueValuesEnum(_messages.Enum):
+    r"""PhaseValueValuesEnum enum type.
+
+    Values:
+      UNKNOWN: <no description>
+      BEFORE_RESOURCE_HANDLING: <no description>
+      AFTER_RESOURCE_HANDLING: <no description>
+    """
+    UNKNOWN = 0
+    BEFORE_RESOURCE_HANDLING = 1
+    AFTER_RESOURCE_HANDLING = 2
+
+  eventId = _messages.StringField(1)
+  phase = _messages.EnumField('PhaseValueValuesEnum', 2)
+  projectMetadata = _messages.MessageField('ProjectsMetadata', 3)
+  state = _messages.MessageField('ProjectState', 4)
+
+
+class ProjectState(_messages.Message):
+  r"""ProjectState contains the externally-visible project state that is used
+  to communicate the state and reasoning for that state to the CLH. This data
+  is not persisted by CCFE, but is instead derived from CCFE's internal
+  representation of the project state.
+
+  Enums:
+    StateValueValuesEnum: The current state of the project. This state is the
+      culmination of all of the opinions from external systems that CCFE knows
+      about of the project.
+
+  Fields:
+    currentReasons: A Reasons attribute.
+    previousReasons: The previous and current reasons for a project state will
+      be sent for a project event. CLHs that need to know the signal that
+      caused the project event to trigger (edges) as opposed to just knowing
+      the state can act upon differences in the previous and current
+      reasons.Reasons will be provided for every system: service management,
+      data governance, abuse, and billing.If this is a CCFE-triggered event
+      used for reconciliation then the current reasons will be set to their
+      *_CONTROL_PLANE_SYNC state. The previous reasons will contain the last
+      known set of non-unknown non-control_plane_sync reasons for the
+      state.Reasons fields are deprecated. New tenants should only use the
+      state field. If you must know the reason(s) behind a specific state,
+      please consult with CCFE team first (cloud-ccfe-discuss@google.com).
+    state: The current state of the project. This state is the culmination of
+      all of the opinions from external systems that CCFE knows about of the
+      project.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The current state of the project. This state is the culmination of all
+    of the opinions from external systems that CCFE knows about of the
+    project.
+
+    Values:
+      UNKNOWN_STATE: A project should never be in an unknown state. Receipt of
+        a project with this state is an error.
+      ON: CCFE considers the project to be serving or transitioning into
+        serving.
+      OFF: CCFE considers the project to be in an OFF state. This could occur
+        due to various factors. The state could be triggered by Google-
+        internal audits (ex. abuse suspension, billing closed) or cleanups
+        trigged by compliance systems (ex. data governance hide). User-
+        initiated events such as service management deactivation trigger a
+        project to an OFF state.CLHs might choose to do nothing in this case
+        or to turn off costly resources. CLHs need to consider the customer
+        experience if an ON/OFF/ON sequence of state transitions occurs vs.
+        the cost of deleting resources, keeping metadata about resources, or
+        even keeping resources live for a period of time.CCFE will not send
+        any new customer requests to the CLH when the project is in an OFF
+        state. However, CCFE will allow all previous customer requests relayed
+        to CLH to complete.
+      DELETED: This state indicates that the project has been (or is being)
+        completely removed. This is often due to a data governance purge
+        request and therefore resources should be deleted when this state is
+        reached.
+    """
+    UNKNOWN_STATE = 0
+    ON = 1
+    OFF = 2
+    DELETED = 3
+
+  currentReasons = _messages.MessageField('Reasons', 1)
+  previousReasons = _messages.MessageField('Reasons', 2)
+  state = _messages.EnumField('StateValueValuesEnum', 3)
+
+
+class ProjectsMetadata(_messages.Message):
+  r"""ProjectsMetadata is the metadata CCFE stores about the all the relevant
+  projects (tenant, consumer, producer).
+
+  Enums:
+    ConsumerProjectStateValueValuesEnum: The CCFE state of the consumer
+      project. It is the same state that is communicated to the CLH during
+      project events. Notice that this field is not set in the DB, it is only
+      set in this proto when communicated to CLH in the side channel.
+
+  Fields:
+    consumerProjectId: The consumer project id.
+    consumerProjectNumber: The consumer project number.
+    consumerProjectState: The CCFE state of the consumer project. It is the
+      same state that is communicated to the CLH during project events. Notice
+      that this field is not set in the DB, it is only set in this proto when
+      communicated to CLH in the side channel.
+    p4ServiceAccount: The service account authorized to operate on the
+      consumer project. Note: CCFE only propagates P4SA with default tag to
+      CLH.
+    producerProjectId: The producer project id.
+    producerProjectNumber: The producer project number.
+    tenantProjectId: The tenant project id.
+    tenantProjectNumber: The tenant project number.
+  """
+
+  class ConsumerProjectStateValueValuesEnum(_messages.Enum):
+    r"""The CCFE state of the consumer project. It is the same state that is
+    communicated to the CLH during project events. Notice that this field is
+    not set in the DB, it is only set in this proto when communicated to CLH
+    in the side channel.
+
+    Values:
+      UNKNOWN_STATE: A project should never be in an unknown state. Receipt of
+        a project with this state is an error.
+      ON: CCFE considers the project to be serving or transitioning into
+        serving.
+      OFF: CCFE considers the project to be in an OFF state. This could occur
+        due to various factors. The state could be triggered by Google-
+        internal audits (ex. abuse suspension, billing closed) or cleanups
+        trigged by compliance systems (ex. data governance hide). User-
+        initiated events such as service management deactivation trigger a
+        project to an OFF state.CLHs might choose to do nothing in this case
+        or to turn off costly resources. CLHs need to consider the customer
+        experience if an ON/OFF/ON sequence of state transitions occurs vs.
+        the cost of deleting resources, keeping metadata about resources, or
+        even keeping resources live for a period of time.CCFE will not send
+        any new customer requests to the CLH when the project is in an OFF
+        state. However, CCFE will allow all previous customer requests relayed
+        to CLH to complete.
+      DELETED: This state indicates that the project has been (or is being)
+        completely removed. This is often due to a data governance purge
+        request and therefore resources should be deleted when this state is
+        reached.
+    """
+    UNKNOWN_STATE = 0
+    ON = 1
+    OFF = 2
+    DELETED = 3
+
+  consumerProjectId = _messages.StringField(1)
+  consumerProjectNumber = _messages.IntegerField(2)
+  consumerProjectState = _messages.EnumField('ConsumerProjectStateValueValuesEnum', 3)
+  p4ServiceAccount = _messages.StringField(4)
+  producerProjectId = _messages.StringField(5)
+  producerProjectNumber = _messages.IntegerField(6)
+  tenantProjectId = _messages.StringField(7)
+  tenantProjectNumber = _messages.IntegerField(8)
+
+
 class ReadinessCheck(_messages.Message):
   r"""Readiness checking configuration for VM instances. Unhealthy instances
   are removed from traffic rotation.
@@ -2167,6 +2359,142 @@ class ReadinessCheck(_messages.Message):
   path = _messages.StringField(5)
   successThreshold = _messages.IntegerField(6, variant=_messages.Variant.UINT32)
   timeout = _messages.StringField(7)
+
+
+class Reasons(_messages.Message):
+  r"""Projects transition between and within states based on reasons sent from
+  various systems. CCFE will provide the CLH with reasons for the current
+  state per system.The current systems that CCFE supports are: Service
+  Management (Inception) Data Governance (Wipeout) Abuse (Ares) Billing
+  (Internal Cloud Billing API)
+
+  Enums:
+    AbuseValueValuesEnum:
+    BillingValueValuesEnum:
+    DataGovernanceValueValuesEnum:
+    ServiceManagementValueValuesEnum:
+
+  Fields:
+    abuse: A AbuseValueValuesEnum attribute.
+    billing: A BillingValueValuesEnum attribute.
+    dataGovernance: A DataGovernanceValueValuesEnum attribute.
+    serviceManagement: A ServiceManagementValueValuesEnum attribute.
+  """
+
+  class AbuseValueValuesEnum(_messages.Enum):
+    r"""AbuseValueValuesEnum enum type.
+
+    Values:
+      ABUSE_UNKNOWN_REASON: An unknown reason indicates that the abuse system
+        has not sent a signal for this project.
+      ABUSE_CONTROL_PLANE_SYNC: Due to various reasons CCFE might proactively
+        restate a project state to a CLH to ensure that the CLH and CCFE are
+        both aware of the project state. This reason can be tied to any of the
+        states.
+      SUSPEND: If a project is deemed abusive we receive a suspend signal.
+        Suspend is a reason to put the project into an INTERNAL_OFF state.
+      REINSTATE: Projects that were once considered abusive can later be
+        deemed non-abusive. When this happens we must reinstate the project.
+        Reinstate is a reason to put the project into an ON state.
+    """
+    ABUSE_UNKNOWN_REASON = 0
+    ABUSE_CONTROL_PLANE_SYNC = 1
+    SUSPEND = 2
+    REINSTATE = 3
+
+  class BillingValueValuesEnum(_messages.Enum):
+    r"""BillingValueValuesEnum enum type.
+
+    Values:
+      BILLING_UNKNOWN_REASON: An unknown reason indicates that the billing
+        system has not sent a signal for this project.
+      BILLING_CONTROL_PLANE_SYNC: Due to various reasons CCFE might
+        proactively restate a project state to a CLH to ensure that the CLH
+        and CCFE are both aware of the project state. This reason can be tied
+        to any of the states.
+      PROBATION: Minor infractions cause a probation signal to be sent.
+        Probation is a reason to put the project into a ON state even though
+        it is a negative signal. CCFE will block mutations for this project
+        while it is on billing probation, but the CLH is expected to serve
+        non-mutation requests.
+      CLOSE: When a billing account is closed, it is a stronger signal about
+        non-payment. Close is a reason to put the project into an INTERNAL_OFF
+        state.
+      OPEN: Consumers can re-open billing accounts and update accounts to pull
+        them out of probation. When this happens, we get a signal that the
+        account is open. Open is a reason to put the project into an ON state.
+    """
+    BILLING_UNKNOWN_REASON = 0
+    BILLING_CONTROL_PLANE_SYNC = 1
+    PROBATION = 2
+    CLOSE = 3
+    OPEN = 4
+
+  class DataGovernanceValueValuesEnum(_messages.Enum):
+    r"""DataGovernanceValueValuesEnum enum type.
+
+    Values:
+      DATA_GOVERNANCE_UNKNOWN_REASON: An unknown reason indicates that data
+        governance has not sent a signal for this project.
+      DATA_GOVERNANCE_CONTROL_PLANE_SYNC: Due to various reasons CCFE might
+        proactively restate a project state to a CLH to ensure that the CLH
+        and CCFE are both aware of the project state. This reason can be tied
+        to any of the states.
+      HIDE: When a project is deleted we retain some data for a period of time
+        to allow the consumer to change their mind. Data governance sends a
+        signal to hide the data when this occurs. Hide is a reason to put the
+        project in an INTERNAL_OFF state.
+      UNHIDE: The decision to un-delete a project can be made. When this
+        happens data governance tells us to unhide any hidden data. Unhide is
+        a reason to put the project in an ON state.
+      PURGE: After a period of time data must be completely removed from our
+        systems. When data governance sends a purge signal we need to remove
+        data. Purge is a reason to put the project in a DELETED state. Purge
+        is the only event that triggers a delete mutation. All other events
+        have update semantics.
+    """
+    DATA_GOVERNANCE_UNKNOWN_REASON = 0
+    DATA_GOVERNANCE_CONTROL_PLANE_SYNC = 1
+    HIDE = 2
+    UNHIDE = 3
+    PURGE = 4
+
+  class ServiceManagementValueValuesEnum(_messages.Enum):
+    r"""ServiceManagementValueValuesEnum enum type.
+
+    Values:
+      SERVICE_MANAGEMENT_UNKNOWN_REASON: An unknown reason indicates that we
+        have not received a signal from service management about this project.
+        Since projects are created by request of service management, this
+        reason should never be set.
+      SERVICE_MANAGEMENT_CONTROL_PLANE_SYNC: Due to various reasons CCFE might
+        proactively restate a project state to a CLH to ensure that the CLH
+        and CCFE are both aware of the project state. This reason can be tied
+        to any of the states.
+      ACTIVATION: When a customer activates an API CCFE notifies the CLH and
+        sets the project to the ON state.
+      PREPARE_DEACTIVATION: When a customer deactivates and API service
+        management starts a two-step process to perform the deactivation. The
+        first step is to prepare. Prepare is a reason to put the project in a
+        EXTERNAL_OFF state.
+      ABORT_DEACTIVATION: If the deactivation is cancelled, service managed
+        needs to abort the deactivation. Abort is a reason to put the project
+        in an ON state.
+      COMMIT_DEACTIVATION: If the deactivation is followed through with,
+        service management needs to finish deactivation. Commit is a reason to
+        put the project in a DELETED state.
+    """
+    SERVICE_MANAGEMENT_UNKNOWN_REASON = 0
+    SERVICE_MANAGEMENT_CONTROL_PLANE_SYNC = 1
+    ACTIVATION = 2
+    PREPARE_DEACTIVATION = 3
+    ABORT_DEACTIVATION = 4
+    COMMIT_DEACTIVATION = 5
+
+  abuse = _messages.EnumField('AbuseValueValuesEnum', 1)
+  billing = _messages.EnumField('BillingValueValuesEnum', 2)
+  dataGovernance = _messages.EnumField('DataGovernanceValueValuesEnum', 3)
+  serviceManagement = _messages.EnumField('ServiceManagementValueValuesEnum', 4)
 
 
 class RepairApplicationRequest(_messages.Message):
@@ -2870,6 +3198,7 @@ class Version(_messages.Message):
       returned in GET requests if view=FULL is set.
     errorHandlers: Custom static error pages. Limited to 10KB per page.Only
       returned in GET requests if view=FULL is set.
+    flexibleRuntimeSettings: Settings for App Engine flexible runtimes.
     handlers: An ordered list of URL-matching patterns that should be applied
       to incoming requests. The first matching URL handles the request and
       other request handlers are not attempted.Only returned in GET requests
@@ -3075,30 +3404,31 @@ class Version(_messages.Message):
   env = _messages.StringField(14)
   envVariables = _messages.MessageField('EnvVariablesValue', 15)
   errorHandlers = _messages.MessageField('ErrorHandler', 16, repeated=True)
-  handlers = _messages.MessageField('UrlMap', 17, repeated=True)
-  healthCheck = _messages.MessageField('HealthCheck', 18)
-  id = _messages.StringField(19)
-  inboundServices = _messages.EnumField('InboundServicesValueListEntryValuesEnum', 20, repeated=True)
-  instanceClass = _messages.StringField(21)
-  libraries = _messages.MessageField('Library', 22, repeated=True)
-  livenessCheck = _messages.MessageField('LivenessCheck', 23)
-  manualScaling = _messages.MessageField('ManualScaling', 24)
-  name = _messages.StringField(25)
-  network = _messages.MessageField('Network', 26)
-  nobuildFilesRegex = _messages.StringField(27)
-  readinessCheck = _messages.MessageField('ReadinessCheck', 28)
-  resources = _messages.MessageField('Resources', 29)
-  runtime = _messages.StringField(30)
-  runtimeApiVersion = _messages.StringField(31)
-  runtimeChannel = _messages.StringField(32)
-  runtimeMainExecutablePath = _messages.StringField(33)
-  serviceAccount = _messages.StringField(34)
-  servingStatus = _messages.EnumField('ServingStatusValueValuesEnum', 35)
-  threadsafe = _messages.BooleanField(36)
-  versionUrl = _messages.StringField(37)
-  vm = _messages.BooleanField(38)
-  vpcAccessConnector = _messages.MessageField('VpcAccessConnector', 39)
-  zones = _messages.StringField(40, repeated=True)
+  flexibleRuntimeSettings = _messages.MessageField('FlexibleRuntimeSettings', 17)
+  handlers = _messages.MessageField('UrlMap', 18, repeated=True)
+  healthCheck = _messages.MessageField('HealthCheck', 19)
+  id = _messages.StringField(20)
+  inboundServices = _messages.EnumField('InboundServicesValueListEntryValuesEnum', 21, repeated=True)
+  instanceClass = _messages.StringField(22)
+  libraries = _messages.MessageField('Library', 23, repeated=True)
+  livenessCheck = _messages.MessageField('LivenessCheck', 24)
+  manualScaling = _messages.MessageField('ManualScaling', 25)
+  name = _messages.StringField(26)
+  network = _messages.MessageField('Network', 27)
+  nobuildFilesRegex = _messages.StringField(28)
+  readinessCheck = _messages.MessageField('ReadinessCheck', 29)
+  resources = _messages.MessageField('Resources', 30)
+  runtime = _messages.StringField(31)
+  runtimeApiVersion = _messages.StringField(32)
+  runtimeChannel = _messages.StringField(33)
+  runtimeMainExecutablePath = _messages.StringField(34)
+  serviceAccount = _messages.StringField(35)
+  servingStatus = _messages.EnumField('ServingStatusValueValuesEnum', 36)
+  threadsafe = _messages.BooleanField(37)
+  versionUrl = _messages.StringField(38)
+  vm = _messages.BooleanField(39)
+  vpcAccessConnector = _messages.MessageField('VpcAccessConnector', 40)
+  zones = _messages.StringField(41, repeated=True)
 
 
 class Volume(_messages.Message):

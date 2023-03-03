@@ -29,9 +29,25 @@ def AddFieldToUpdateMask(field, patch_request):
   return patch_request
 
 
-def UpdateTotalMemorySizeGb(unused_instance_ref, args, patch_request):
+def UpdateDisplayName(unused_instance_ref, args, patch_request):
+  """Python hook to add display name to the redis cluster update request."""
+  if args.IsSpecified('display_name'):
+    patch_request.cluster.displayName = args.display_name
+    patch_request = AddFieldToUpdateMask('display_name', patch_request)
+  return patch_request
+
+
+def UpdateSizeGb(unused_instance_ref, args, patch_request):
   """Python hook to add size to the redis cluster update request."""
-  if args.IsSpecified('total_memory_size_gb'):
-    patch_request.cluster.totalMemorySizeGb = args.total_memory_size_gb
-    patch_request = AddFieldToUpdateMask('total_memory_size_gb', patch_request)
+  if args.IsSpecified('size_gb'):
+    patch_request.cluster.sizeGb = args.size_gb
+    patch_request = AddFieldToUpdateMask('size_gb', patch_request)
+  return patch_request
+
+
+def UpdateReplicaCount(unused_instance_ref, args, patch_request):
+  """Hook to add replica count to the redis cluster update request."""
+  if args.IsSpecified('replica_count'):
+    patch_request.cluster.replicaCount = args.replica_count
+    patch_request = AddFieldToUpdateMask('replica_count', patch_request)
   return patch_request

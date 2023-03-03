@@ -27,7 +27,7 @@ from google.auth import credentials as ga_credentials  # type: ignore
 from google.oauth2 import service_account # type: ignore
 
 from google.longrunning import operations_pb2  # type: ignore
-from google.protobuf import empty_pb2  # type: ignore
+from cloudsdk.google.protobuf import empty_pb2  # type: ignore
 from googlecloudsdk.generated_clients.gapic_clients.logging_v2.types import logging_config
 
 try:
@@ -135,6 +135,16 @@ class ConfigServiceV2Transport(abc.ABC):
                 default_timeout=None,
                 client_info=client_info,
             ),
+            self.create_bucket_async: gapic_v1.method.wrap_method(
+                self.create_bucket_async,
+                default_timeout=None,
+                client_info=client_info,
+            ),
+            self.update_bucket_async: gapic_v1.method.wrap_method(
+                self.update_bucket_async,
+                default_timeout=None,
+                client_info=client_info,
+            ),
             self.create_bucket: gapic_v1.method.wrap_method(
                 self.create_bucket,
                 default_timeout=None,
@@ -235,6 +245,26 @@ initial=0.1,maximum=60.0,multiplier=1.3,                    predicate=retries.if
                     deadline=60.0,
                 ),
                 default_timeout=60.0,
+                client_info=client_info,
+            ),
+            self.create_link: gapic_v1.method.wrap_method(
+                self.create_link,
+                default_timeout=None,
+                client_info=client_info,
+            ),
+            self.delete_link: gapic_v1.method.wrap_method(
+                self.delete_link,
+                default_timeout=None,
+                client_info=client_info,
+            ),
+            self.list_links: gapic_v1.method.wrap_method(
+                self.list_links,
+                default_timeout=None,
+                client_info=client_info,
+            ),
+            self.get_link: gapic_v1.method.wrap_method(
+                self.get_link,
+                default_timeout=None,
                 client_info=client_info,
             ),
             self.list_exclusions: gapic_v1.method.wrap_method(
@@ -342,6 +372,24 @@ initial=0.1,maximum=60.0,multiplier=1.3,                    predicate=retries.if
             Union[
                 logging_config.LogBucket,
                 Awaitable[logging_config.LogBucket]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def create_bucket_async(self) -> Callable[
+            [logging_config.CreateBucketRequest],
+            Union[
+                operations_pb2.Operation,
+                Awaitable[operations_pb2.Operation]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def update_bucket_async(self) -> Callable[
+            [logging_config.UpdateBucketRequest],
+            Union[
+                operations_pb2.Operation,
+                Awaitable[operations_pb2.Operation]
             ]]:
         raise NotImplementedError()
 
@@ -468,6 +516,42 @@ initial=0.1,maximum=60.0,multiplier=1.3,                    predicate=retries.if
             Union[
                 empty_pb2.Empty,
                 Awaitable[empty_pb2.Empty]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def create_link(self) -> Callable[
+            [logging_config.CreateLinkRequest],
+            Union[
+                operations_pb2.Operation,
+                Awaitable[operations_pb2.Operation]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def delete_link(self) -> Callable[
+            [logging_config.DeleteLinkRequest],
+            Union[
+                operations_pb2.Operation,
+                Awaitable[operations_pb2.Operation]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def list_links(self) -> Callable[
+            [logging_config.ListLinksRequest],
+            Union[
+                logging_config.ListLinksResponse,
+                Awaitable[logging_config.ListLinksResponse]
+            ]]:
+        raise NotImplementedError()
+
+    @property
+    def get_link(self) -> Callable[
+            [logging_config.GetLinkRequest],
+            Union[
+                logging_config.Link,
+                Awaitable[logging_config.Link]
             ]]:
         raise NotImplementedError()
 

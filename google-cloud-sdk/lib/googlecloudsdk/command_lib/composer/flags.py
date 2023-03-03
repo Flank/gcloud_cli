@@ -35,12 +35,20 @@ from googlecloudsdk.core import properties
 
 import six
 
+MIN_TRIGGERER_AIRFLOW_VERSION = '2.2.5'
+MIN_TRIGGERER_COMPOSER_VERSION = '2.0.31'
+MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION = '2.0.32'
+
 PREREQUISITE_OPTION_ERROR_MSG = """\
 Cannot specify --{opt} without --{prerequisite}.
 """
 
-INVALID_OPTION_FOR_MIN_AIRFLOW_VERSION_ERROR_MSG = """\
-Cannot specify {opt}. Airflow version {airflow_version} is required.
+ENABLED_TRIGGERER_IS_REQUIRED_MSG = """\
+Cannot specify --{opt} without enabling a triggerer.
+"""
+
+INVALID_OPTION_FOR_MIN_IMAGE_VERSION_ERROR_MSG = """\
+Cannot specify {opt}. Composer version {composer_version} and Airflow version {airflow_version} are required.
 """
 
 _INVALID_OPTION_FOR_V2_ERROR_MSG = """\
@@ -64,8 +72,7 @@ def ValidateComposerVersionExclusiveOptionFactory(composer_v1_option,
 
       def IsImageVersionStringComposerV1(image_version):
         return (image_version.startswith('composer-1.') or
-                image_version.startswith('composer-1-') or
-                image_version.startswith('composer-latest'))
+                image_version.startswith('composer-1-'))
 
       try:
         if namespace.image_version and IsImageVersionStringComposerV1(
@@ -238,6 +245,7 @@ UPDATE_AIRFLOW_VERSION_FLAG = base.Argument(
     Upgrade the environment to a later Apache Airflow version in-place.
 
     Must be of the form `X[.Y[.Z]]`, where `[]` denotes optional fragments.
+    Examples: `2`, `2.3`, `2.3.4`.
 
     The Apache Airflow version is a semantic version or an alias in the form of
     major or major.minor version numbers, resolved to the latest matching Apache
@@ -256,6 +264,9 @@ UPDATE_IMAGE_VERSION_FLAG = base.Argument(
     Apache Airflow. Must be of the form
     `composer-A[.B.C[-D.E]]-airflow-X[.Y[.Z]]`, where `[]` denotes optional
     fragments.
+
+    Examples: `composer-2-airflow-2`, `composer-2-airflow-2.2`,
+    `composer-2.1.2-airflow-2.3.4`.
 
     The Cloud Composer portion of the image version is a semantic version or
     an alias in the form of major version number or `latest`, resolved to the
@@ -290,22 +301,27 @@ AUTOSCALING_FLAG_GROUP_DESCRIPTION = (
     'Composer 1.X as well).')
 
 SCHEDULED_SNAPSHOTS_GROUP_DESCRIPTION = (
-    'Group of arguments for setting scheduled snapshots settings in Composer 2')
+    'Group of arguments for setting scheduled snapshots settings in Composer '
+    '{} or greater.').format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION)
 
 SCHEDULED_SNAPSHOTS_UPDATE_GROUP_DESCRIPTION = (
     'Group of arguments used during update of scheduled snapshots settings in '
-    'Composer 2')
+    'Composer {} or greater.').format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION)
 
 TRIGGERER_PARAMETERS_FLAG_GROUP_DESCRIPTION = (
-    'Group of arguments for setting triggerer settings in Composer 2.2.X '
-    'or greater')
+    'Group of arguments for setting triggerer settings in Composer {} '
+    'or greater.'.format(MIN_TRIGGERER_COMPOSER_VERSION))
 
 TRIGGERER_ENABLED_GROUP_DESCRIPTION = (
     'Group of arguments for setting triggerer settings during update '
-    'in Composer 2.2.X or greater')
+    'in Composer {} or greater.'.format(MIN_TRIGGERER_COMPOSER_VERSION))
 
 MASTER_AUTHORIZED_NETWORKS_GROUP_DESCRIPTION = (
     'Group of arguments for setting master authorized networks configuration.')
+
+CLOUD_DATA_LINEAGE_INTEGRATION_GROUP_DESCRIPTION = (
+    'Group of arguments for setting Cloud Data Lineage integration '
+    'configuration in Composer 2.')
 
 CLEAR_PYPI_PACKAGES_FLAG = base.Argument(
     '--clear-pypi-packages',
@@ -405,7 +421,8 @@ CLUSTER_SECONDARY_RANGE_NAME_FLAG = base.Argument(
     allocated from this secondary range. NAME must be the name of an existing
     secondary range in the cluster subnetwork.
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 SERVICES_SECONDARY_RANGE_NAME_FLAG = base.Argument(
@@ -415,7 +432,8 @@ SERVICES_SECONDARY_RANGE_NAME_FLAG = base.Argument(
     Secondary range to be used for services (e.g. ClusterIPs). NAME must be the
     name of an existing secondary range in the cluster subnetwork.
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 MAX_PODS_PER_NODE = base.Argument(
@@ -488,7 +506,8 @@ CLOUD_SQL_MACHINE_TYPE = base.Argument(
     type=str,
     action=V1ExclusiveStoreAction,
     help="""\
-    Cloud SQL machine type used by the Airflow database.
+    Cloud SQL machine type used by the Airflow database. The list of available
+    machine types is available here: https://cloud.google.com/composer/pricing#db-machine-types.
     """)
 
 WEB_SERVER_MACHINE_TYPE = base.Argument(
@@ -515,8 +534,8 @@ TRIGGERER_CPU = base.Argument(
     default=None,
     action=V2ExclusiveStoreAction,
     help="""\
-    CPU allocated to Airflow triggerer. Supported in the Environments with Airflow 2.2.x and greater.
-    """)
+    CPU allocated to Airflow triggerer. Supported in the Environments with Composer {} and Airflow {} and greater.
+    """.format(MIN_TRIGGERER_COMPOSER_VERSION, MIN_TRIGGERER_AIRFLOW_VERSION))
 
 WORKER_CPU = base.Argument(
     '--worker-cpu',
@@ -560,9 +579,9 @@ TRIGGERER_MEMORY = base.Argument(
     default=None,
     action=V2ExclusiveStoreAction,
     help="""\
-    Memory allocated to Airflow triggerer, ex. 600MB, 3GB, 2. If units are not provided,
-    defaults to GB. Supported in the Environments with Airflow 2.2.x and greater.
-    """)
+    Memory allocated to Airflow triggerer, ex. 512MB, 3GB, 2. If units are not provided,
+    defaults to GB. Supported in the Environments with Composer {} and Airflow {} and greater.
+    """.format(MIN_TRIGGERER_COMPOSER_VERSION, MIN_TRIGGERER_AIRFLOW_VERSION))
 
 WORKER_MEMORY = base.Argument(
     '--worker-memory',
@@ -660,23 +679,52 @@ NUM_SCHEDULERS = base.Argument(
     Number of schedulers, supported in the Environments with Airflow 2.0.1 and later.
     """)
 
+TRIGGERER_COUNT = base.Argument(
+    '--triggerer-count',
+    default=None,
+    type=int,
+    action=V2ExclusiveStoreAction,
+    help="""\
+    Number of triggerers, supported in the Environments with Composer {} and Airflow {} and greater.
+    """.format(MIN_TRIGGERER_COMPOSER_VERSION, MIN_TRIGGERER_AIRFLOW_VERSION),
+)
+
+ENABLE_HIGH_RESILIENCE = base.Argument(
+    '--enable-high-resilience',
+    default=None,
+    hidden=True,
+    const=True,
+    action='store_const',
+    help="""\
+    Enable use of a high resilience, supported in the Environments with Composer 2.X or greater.
+    """
+)
+
 ENABLE_TRIGGERER = base.Argument(
     '--enable-triggerer',
     default=None,
     const=True,
-    action='store_const',
+    action=actions.DeprecationAction(
+        '--enable-triggerer',
+        action='store_const',
+        warn='This flag is deprecated. '
+             'Use --triggerer-count instead.'),
     help="""\
-    Enable use of a triggerer, supported in the Environments with Airflow 2.2.x and greater.
-    """)
+    Enable use of a triggerer, supported in the Environments with Composer {} and Airflow {} and greater.
+    """.format(MIN_TRIGGERER_COMPOSER_VERSION, MIN_TRIGGERER_AIRFLOW_VERSION))
 
 DISABLE_TRIGGERER = base.Argument(
     '--disable-triggerer',
     default=None,
     const=True,
-    action='store_const',
+    action=actions.DeprecationAction(
+        '--disable-triggerer',
+        action='store_const',
+        warn='This flag is deprecated. '
+             'Use --triggerer-count 0 instead.'),
     help="""\
-    Disable a triggerer, supported in the Environments with Airflow 2.2.x and greater.
-    """)
+    Disable a triggerer, supported in the Environments with Composer {} and Airflow {} and greater.
+    """.format(MIN_TRIGGERER_COMPOSER_VERSION, MIN_TRIGGERER_AIRFLOW_VERSION))
 
 ENVIRONMENT_SIZE_GA = arg_utils.ChoiceEnumMapper(
     arg_name='--environment-size',
@@ -710,6 +758,22 @@ AIRFLOW_DATABASE_RETENTION_DAYS = base.Argument(
       days for airflow database retention mechanism.
     """)
 
+ENABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
+    '--enable-cloud-data-lineage-integration',
+    default=None,
+    action='store_true',
+    help="""\
+    Enable Cloud Data Lineage integration.
+    """)
+
+DISABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
+    '--disable-cloud-data-lineage-integration',
+    default=None,
+    action='store_true',
+    help="""\
+    Disable Cloud Data Lineage integration.
+    """)
+
 
 def _IsValidIpv4CidrBlock(ipv4_cidr_block):
   """Validates that IPV4 CIDR block arg has valid format.
@@ -736,7 +800,8 @@ CLUSTER_IPV4_CIDR_FLAG = base.Argument(
     IP address range for the pods in this cluster in CIDR notation
     (e.g. 10.0.0.0/14).
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 SERVICES_IPV4_CIDR_FLAG = base.Argument(
@@ -753,7 +818,8 @@ SERVICES_IPV4_CIDR_FLAG = base.Argument(
     If unspecified, the services CIDR range will be chosen with a default
     mask size.
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 ENABLE_IP_MASQ_AGENT_FLAG = base.Argument(
@@ -768,7 +834,8 @@ ENABLE_IP_MASQ_AGENT_FLAG = base.Argument(
     behind the cluster node's IP address. This is done when sending traffic to
     destinations outside the cluster's pod CIDR range.
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 ENABLE_PRIVATE_ENVIRONMENT_FLAG = base.Argument(
@@ -781,7 +848,8 @@ ENABLE_PRIVATE_ENVIRONMENT_FLAG = base.Argument(
 
     If not specified, cluster nodes will be assigned public IP addresses.
 
-    Cannot be specified unless `--enable-ip-alias` is also specified.
+    When used with Composer 1.x, cannot be specified unless `--enable-ip-alias`
+    is also specified.
     """)
 
 ENABLE_PRIVATE_ENDPOINT_FLAG = base.Argument(
@@ -826,6 +894,37 @@ CONNECTION_SUBNETWORK_FLAG = base.Argument(
     Can be specified for Composer 2.X or greater. Cannot be specified
     unless `--enable-private-environment` is also specified.
     """)
+CONNECTION_TYPE_FLAG_HELP = """\
+    Mode of internal communication within the Composer environment. Must be one
+    of `VPC_PEERING` or `PRIVATE_SERVICE_CONNECT`.
+
+    Can be specified for Composer 2.X or greater. Cannot be specified
+    unless `--enable-private-environment` is also specified. Cannot be set to
+    `VPC_PEERING` if `--connection-subnetwork` is also specified.
+    """
+
+CONNECTION_TYPE_FLAG_ALPHA = arg_utils.ChoiceEnumMapper(
+    '--connection-type',
+    help_str=CONNECTION_TYPE_FLAG_HELP,
+    required=False,
+    message_enum=api_util.GetMessagesModule(
+        release_track=base.ReleaseTrack.ALPHA).NetworkingConfig
+    .ConnectionTypeValueValuesEnum)
+
+CONNECTION_TYPE_FLAG_BETA = arg_utils.ChoiceEnumMapper(
+    '--connection-type',
+    help_str=CONNECTION_TYPE_FLAG_HELP,
+    required=False,
+    message_enum=api_util.GetMessagesModule(
+        release_track=base.ReleaseTrack.BETA).NetworkingConfig
+    .ConnectionTypeValueValuesEnum)
+
+CONNECTION_TYPE_FLAG_GA = arg_utils.ChoiceEnumMapper(
+    '--connection-type',
+    help_str=CONNECTION_TYPE_FLAG_HELP,
+    required=False,
+    message_enum=api_util.GetMessagesModule(release_track=base.ReleaseTrack.GA)
+    .NetworkingConfig.ConnectionTypeValueValuesEnum)
 
 
 def _GetIpv4CidrMaskSize(ipv4_cidr_block):
@@ -950,8 +1049,8 @@ ENABLE_SCHEDULED_SNAPSHOT_CREATION = base.Argument(
     required=True,
     help="""\
       When specified, snapshots of the environment will be created according to a schedule.
-      Can be specified for Composer 2.X or greater.
-    """)
+      Can be specified for Composer {} or greater.
+    """.format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION))
 
 # TODO(b/245909413): Specify the minor Composer version here:
 DISABLE_SCHEDULED_SNAPSHOT_CREATION = base.Argument(
@@ -961,8 +1060,8 @@ DISABLE_SCHEDULED_SNAPSHOT_CREATION = base.Argument(
     action='store_const',
     help="""\
       Disables automated snapshots creation.
-      Can be specified for Composer 2.X or greater.
-    """)
+      Can be specified for Composer {} or greater.
+    """.format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION))
 
 SNAPSHOT_CREATION_SCHEDULE = base.Argument(
     '--snapshot-creation-schedule',
@@ -971,8 +1070,8 @@ SNAPSHOT_CREATION_SCHEDULE = base.Argument(
     action=V2ExclusiveStoreAction,
     help="""\
       Cron expression specifying when snapshots of the environment should be created.
-      Can be specified for Composer 2.X or greater.
-    """)
+      Can be specified for Composer {} or greater.
+    """.format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION))
 
 SNAPSHOT_LOCATION = base.Argument(
     '--snapshot-location',
@@ -981,8 +1080,8 @@ SNAPSHOT_LOCATION = base.Argument(
     required=True,
     help="""\
       The Cloud Storage location for storing automatically created snapshots.
-      Can be specified for Composer 2.X or greater.
-    """)
+      Can be specified for Composer {} or greater.
+    """.format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION))
 
 SNAPSHOT_SCHEDULE_TIMEZONE = base.Argument(
     '--snapshot-schedule-timezone',
@@ -990,9 +1089,9 @@ SNAPSHOT_SCHEDULE_TIMEZONE = base.Argument(
     action=V2ExclusiveStoreAction,
     required=True,
     help="""\
-      Timezone that sets the context to interpret snapshot_creation_schedule
-      Can be specified for Composer 2.X or greater.
-    """)
+      Timezone that sets the context to interpret snapshot_creation_schedule.
+      Can be specified for Composer {} or greater.
+    """.format(MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION))
 
 MAINTENANCE_WINDOW_START_FLAG = base.Argument(
     '--maintenance-window-start',
@@ -1043,7 +1142,6 @@ SKIP_PYPI_PACKAGES_INSTALLATION = base.Argument(
 SKIP_ENVIRONMENT_VARIABLES_SETTING = base.Argument(
     '--skip-environment-variables-setting',
     default=None,
-    hidden=True,
     action='store_true',
     help="""\
     When specified, skips setting environment variables from the snapshot.
@@ -1052,7 +1150,6 @@ SKIP_ENVIRONMENT_VARIABLES_SETTING = base.Argument(
 SKIP_AIRFLOW_OVERRIDES_SETTING = base.Argument(
     '--skip-airflow-overrides-setting',
     default=None,
-    hidden=True,
     action='store_true',
     help="""\
     When specified, skips setting Airflow overrides from the snapshot.
@@ -1061,7 +1158,6 @@ SKIP_AIRFLOW_OVERRIDES_SETTING = base.Argument(
 SKIP_COPYING_GCS_DATA = base.Argument(
     '--skip-gcs-data-copying',
     default=None,
-    hidden=True,
     action='store_true',
     help="""\
     When specified, skips copying dags, plugins and data folders from
@@ -1300,7 +1396,7 @@ def AddIpAliasEnvironmentFlags(update_type_group, support_max_pods_per_node):
     MAX_PODS_PER_NODE.AddToParser(group)
 
 
-def AddPrivateIpEnvironmentFlags(update_type_group):
+def AddPrivateIpEnvironmentFlags(update_type_group, release_track):
   """Adds flags related to private clusters to parser.
 
   Private cluster flags are related to similar flags found within GKE SDK:
@@ -1308,6 +1404,7 @@ def AddPrivateIpEnvironmentFlags(update_type_group):
 
   Args:
     update_type_group: argument group, the group to which flag should be added.
+    release_track: which release track messages should we use.
   """
   group = update_type_group.add_group(help='Private Clusters')
   ENABLE_PRIVATE_ENVIRONMENT_FLAG.AddToParser(group)
@@ -1317,6 +1414,12 @@ def AddPrivateIpEnvironmentFlags(update_type_group):
   CLOUD_SQL_IPV4_CIDR_FLAG.AddToParser(group)
   COMPOSER_NETWORK_IPV4_CIDR_FLAG.AddToParser(group)
   CONNECTION_SUBNETWORK_FLAG.AddToParser(group)
+  if release_track == base.ReleaseTrack.GA:
+    CONNECTION_TYPE_FLAG_GA.choice_arg.AddToParser(group)
+  elif release_track == base.ReleaseTrack.BETA:
+    CONNECTION_TYPE_FLAG_BETA.choice_arg.AddToParser(group)
+  elif release_track == base.ReleaseTrack.ALPHA:
+    CONNECTION_TYPE_FLAG_ALPHA.choice_arg.AddToParser(group)
   ENABLE_PRIVATELY_USED_PUBLIC_IPS_FLAG.AddToParser(group)
 
 
@@ -1390,7 +1493,7 @@ def AddScheduledSnapshotFlagsToGroup(update_type_group):
   """
 
   update_group = update_type_group.add_argument_group(
-      SCHEDULED_SNAPSHOTS_UPDATE_GROUP_DESCRIPTION, hidden=True, mutex=True)
+      SCHEDULED_SNAPSHOTS_UPDATE_GROUP_DESCRIPTION, mutex=True)
   DISABLE_SCHEDULED_SNAPSHOT_CREATION.AddToParser(update_group)
 
   scheduled_snapshots_params_group = update_group.add_argument_group(
@@ -1430,10 +1533,11 @@ def AddAutoscalingUpdateFlagsToGroup(update_type_group, release_track):
   MAX_WORKERS.AddToParser(update_group)
   if release_track != base.ReleaseTrack.GA:
     triggerer_params_group = update_group.add_argument_group(
-        TRIGGERER_PARAMETERS_FLAG_GROUP_DESCRIPTION, hidden=True, mutex=True)
+        TRIGGERER_PARAMETERS_FLAG_GROUP_DESCRIPTION, mutex=True)
     triggerer_enabled_group = triggerer_params_group.add_argument_group(
         TRIGGERER_ENABLED_GROUP_DESCRIPTION)
     TRIGGERER_CPU.AddToParser(triggerer_enabled_group)
+    TRIGGERER_COUNT.AddToParser(triggerer_enabled_group)
     TRIGGERER_MEMORY.AddToParser(triggerer_enabled_group)
     ENABLE_TRIGGERER.AddToParser(triggerer_enabled_group)
     DISABLE_TRIGGERER.AddToParser(triggerer_params_group)
@@ -1466,6 +1570,22 @@ def AddMaintenanceWindowFlagsGroup(update_type_group):
   MAINTENANCE_WINDOW_START_FLAG.AddToParser(group)
   MAINTENANCE_WINDOW_END_FLAG.AddToParser(group)
   MAINTENANCE_WINDOW_RECURRENCE_FLAG.AddToParser(group)
+
+
+def AddCloudDataLineageIntegrationUpdateFlagsToGroup(update_type_group):
+  """Adds flag group for Cloud Data Lineage integration.
+
+  Args:
+    update_type_group: argument group, the group to which flags should be added.
+  """
+  update_group = update_type_group.add_argument_group(
+      CLOUD_DATA_LINEAGE_INTEGRATION_GROUP_DESCRIPTION)
+
+  update_enable_disable_group = update_group.add_argument_group(mutex=True)
+  ENABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG.AddToParser(
+      update_enable_disable_group)
+  DISABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG.AddToParser(
+      update_enable_disable_group)
 
 
 def FallthroughToLocationProperty(location_refs, flag_name, failure_msg):

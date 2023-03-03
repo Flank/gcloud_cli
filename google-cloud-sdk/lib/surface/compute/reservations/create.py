@@ -56,8 +56,7 @@ def _RunCreate(compute_api, args):
 class Create(base.CreateCommand):
   """Create a Compute Engine reservation."""
   _support_share_setting = True
-  _support_resource_policies = False
-  _support_instance_template = False
+  _support_instance_template = True
 
   @classmethod
   def Args(cls, parser):
@@ -65,7 +64,7 @@ class Create(base.CreateCommand):
         parser, operation_type='create')
     flags.AddCreateFlags(
         parser, support_share_setting=cls._support_share_setting,
-        support_resource_policies=cls._support_resource_policies)
+        support_instance_template=cls._support_instance_template)
 
   def Run(self, args):
     return _RunCreate(base_classes.ComputeApiHolder(base.ReleaseTrack.GA), args)
@@ -75,8 +74,8 @@ class Create(base.CreateCommand):
 class CreateBeta(Create):
   """Create a Compute Engine reservation."""
   _support_share_setting = True
-  _support_resource_policies = True
-  _support_instance_template = False
+  _support_instance_template = True
+  _support_ssd_count = False
 
   @classmethod
   def Args(cls, parser):
@@ -84,7 +83,7 @@ class CreateBeta(Create):
         parser, operation_type='create')
     flags.AddCreateFlags(
         parser, support_share_setting=cls._support_share_setting,
-        support_resource_policies=cls._support_resource_policies)
+        support_instance_template=cls._support_instance_template)
 
   def Run(self, args):
     return _RunCreate(
@@ -95,8 +94,8 @@ class CreateBeta(Create):
 class CreateAlpha(CreateBeta):
   """Create a Compute Engine reservation."""
   _support_share_setting = True
-  _support_resource_policies = True
   _support_instance_template = True
+  _support_ssd_count = True
 
   @classmethod
   def Args(cls, parser):
@@ -106,8 +105,8 @@ class CreateAlpha(CreateBeta):
         parser,
         support_share_setting=cls._support_share_setting,
         support_fleet=True,
-        support_resource_policies=cls._support_resource_policies,
-        support_instance_template=cls._support_instance_template)
+        support_instance_template=cls._support_instance_template,
+        support_ssd_count=cls._support_ssd_count)
 
   def Run(self, args):
     return _RunCreate(
@@ -115,12 +114,16 @@ class CreateAlpha(CreateBeta):
 
 
 Create.detailed_help = {
-    'brief':
-        'Create a Compute Engine reservation.',
-    'EXAMPLES':
-        """
-        To create a Compute Engine reservation, run:
+    'brief': (
+        'Create a Compute Engine reservation.'
+    ),
+    'EXAMPLES': """
+        To create a Compute Engine reservation by specifying VM properties using an instance template, run:
 
-            $ {command} my-reservation --zone=fake-zone --vm-count=1 --machine-type=n1-standard-1 --min-cpu-platform="Intel Haswell"
+            $ {command} my-reservation --vm-count=1 --source-instance-template=example-instance-template --zone=fake-zone
+
+        To create a Compute Engine reservation by directly specifying VM properties, run:
+
+            $ {command} my-reservation --vm-count=1 --machine-type=custom-8-10240 --min-cpu-platform="Intel Haswell" --accelerator=count=2,type=nvidia-tesla-v100 --local-ssd=size=375,interface=scsi --zone=fake-zone
         """
 }

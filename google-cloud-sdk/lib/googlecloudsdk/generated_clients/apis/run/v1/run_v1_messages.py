@@ -137,7 +137,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -154,9 +156,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -319,10 +319,15 @@ class Container(_messages.Message):
     command: Entrypoint array. Not executed within a shell. The docker image's
       ENTRYPOINT is used if this is not provided. Variable references are not
       supported in Cloud Run.
-    env: List of environment variables to set in the container.
+    dependsOn: Container names which must start before this container.
+    env: List of environment variables to set in the container. EnvVar with
+      duplicate names are generally allowed; if referencing a secret, the name
+      must be unique for the container. For non-secret EnvVar names, the
+      Container will only get the last-declared one.
     envFrom: Not supported by Cloud Run.
-    image: Required. URL of the Container image in Google Container Registry
-      or Google Artifact Registry. More info:
+    image: Required. Name of the container image in Dockerhub, Google Artifact
+      Registry, or Google Container Registry. If the host is not provided,
+      Dockerhub is assumed. More info:
       https://kubernetes.io/docs/concepts/containers/images
     imagePullPolicy: Image pull policy. One of Always, Never, IfNotPresent.
       Defaults to Always if :latest tag is specified, or IfNotPresent
@@ -332,9 +337,8 @@ class Container(_messages.Message):
       restarted if the probe fails. More info:
       https://kubernetes.io/docs/concepts/workloads/pods/pod-
       lifecycle#container-probes
-    name: Name of the container specified as a DNS_LABEL. Currently unused in
-      Cloud Run. More info:
-      https://kubernetes.io/docs/concepts/overview/working-with-
+    name: Name of the container specified as a DNS_LABEL (RFC 1123). More
+      info: https://kubernetes.io/docs/concepts/overview/working-with-
       objects/names/#dns-label-names
     ports: List of ports to expose from the container. Only a single port can
       be specified. The specified ports must be listening on all interfaces
@@ -374,21 +378,38 @@ class Container(_messages.Message):
 
   args = _messages.StringField(1, repeated=True)
   command = _messages.StringField(2, repeated=True)
-  env = _messages.MessageField('EnvVar', 3, repeated=True)
-  envFrom = _messages.MessageField('EnvFromSource', 4, repeated=True)
-  image = _messages.StringField(5)
-  imagePullPolicy = _messages.StringField(6)
-  livenessProbe = _messages.MessageField('Probe', 7)
-  name = _messages.StringField(8)
-  ports = _messages.MessageField('ContainerPort', 9, repeated=True)
-  readinessProbe = _messages.MessageField('Probe', 10)
-  resources = _messages.MessageField('ResourceRequirements', 11)
-  securityContext = _messages.MessageField('SecurityContext', 12)
-  startupProbe = _messages.MessageField('Probe', 13)
-  terminationMessagePath = _messages.StringField(14)
-  terminationMessagePolicy = _messages.StringField(15)
-  volumeMounts = _messages.MessageField('VolumeMount', 16, repeated=True)
-  workingDir = _messages.StringField(17)
+  dependsOn = _messages.StringField(3, repeated=True)
+  env = _messages.MessageField('EnvVar', 4, repeated=True)
+  envFrom = _messages.MessageField('EnvFromSource', 5, repeated=True)
+  image = _messages.StringField(6)
+  imagePullPolicy = _messages.StringField(7)
+  livenessProbe = _messages.MessageField('Probe', 8)
+  name = _messages.StringField(9)
+  ports = _messages.MessageField('ContainerPort', 10, repeated=True)
+  readinessProbe = _messages.MessageField('Probe', 11)
+  resources = _messages.MessageField('ResourceRequirements', 12)
+  securityContext = _messages.MessageField('SecurityContext', 13)
+  startupProbe = _messages.MessageField('Probe', 14)
+  terminationMessagePath = _messages.StringField(15)
+  terminationMessagePolicy = _messages.StringField(16)
+  volumeMounts = _messages.MessageField('VolumeMount', 17, repeated=True)
+  workingDir = _messages.StringField(18)
+
+
+class ContainerOverride(_messages.Message):
+  r"""Per container override specification.
+
+  Fields:
+    args: Arguments to the entrypoint. Will replace existing args for
+      override.
+    env: List of environment variables to set in the container. Will be merged
+      with existing env for override.
+    name: The name of the container specified as a DNS_LABEL.
+  """
+
+  args = _messages.StringField(1, repeated=True)
+  env = _messages.MessageField('EnvVar', 2, repeated=True)
+  name = _messages.StringField(3)
 
 
 class ContainerPort(_messages.Message):
@@ -483,6 +504,32 @@ class DomainMappingStatus(_messages.Message):
   observedGeneration = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   resourceRecords = _messages.MessageField('ResourceRecord', 4, repeated=True)
   url = _messages.StringField(5)
+
+
+class EmptyDirVolumeSource(_messages.Message):
+  r"""Ephemeral storage which can be backed by real disks (HD, SSD), network
+  storage or memory (i.e. tmpfs). For now only in memory (tmpfs) is supported.
+  It is ephemeral in the sense that when the sandbox is taken down, the data
+  is destroyed with it (it does not persist across sandbox runs).
+
+  Fields:
+    medium: The medium on which the data is stored. The default is "" which
+      means to use the node's default medium. Must be an empty string
+      (default) or Memory. More info:
+      https://kubernetes.io/docs/concepts/storage/volumes#emptydir +optional
+    sizeLimit: Limit on the storage usable by this EmptyDir volume. The size
+      limit is also applicable for memory medium. The maximum usage on memory
+      medium EmptyDir would be the minimum value between the SizeLimit
+      specified here and the sum of memory limits of all containers in a pod.
+      This field's values are of the 'Quantity' k8s type:
+      https://kubernetes.io/docs/reference/kubernetes-api/common-
+      definitions/quantity/. The default is nil which means that the limit is
+      undefined. More info: http://kubernetes.io/docs/user-
+      guide/volumes#emptydir +optional
+  """
+
+  medium = _messages.StringField(1)
+  sizeLimit = _messages.StringField(2)
 
 
 class EnvFromSource(_messages.Message):
@@ -607,9 +654,9 @@ class ExecutionSpec(_messages.Message):
       parallelism.
     taskCount: Optional. Specifies the desired number of tasks the execution
       should run. Setting to 1 means that parallelism is limited to 1 and the
-      success of that task signals the success of the execution.
-    template: Optional. Describes the task(s) that will be created when
-      executing an execution.
+      success of that task signals the success of the execution. Defaults to
+      1.
+    template: Optional. The template used to create tasks for this execution.
   """
 
   parallelism = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -832,20 +879,23 @@ class HTTPGetAction(_messages.Message):
     httpHeaders: Custom headers to set in the request. HTTP allows repeated
       headers.
     path: Path to access on the HTTP server.
+    port: Port number to access on the container. Number must be in the range
+      1 to 65535.
     scheme: Not supported by Cloud Run.
   """
 
   host = _messages.StringField(1)
   httpHeaders = _messages.MessageField('HTTPHeader', 2, repeated=True)
   path = _messages.StringField(3)
-  scheme = _messages.StringField(4)
+  port = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  scheme = _messages.StringField(5)
 
 
 class HTTPHeader(_messages.Message):
   r"""HTTPHeader describes a custom header to be used in HTTP probes
 
   Fields:
-    name: The header field name
+    name: Required. The header field name
     value: The header field value
   """
 
@@ -924,7 +974,8 @@ class KeyToPath(_messages.Message):
 
   Fields:
     key: The Cloud Secret Manager secret version. Can be 'latest' for the
-      latest value or an integer for a specific version. The key to project.
+      latest value, or an integer or a secret alias for a specific version.
+      The key to project.
     mode: (Optional) Mode bits to use on this file, must be a value between 01
       and 0777 (octal). If 0 or not set, the Volume's default mode will be
       used. Notes * Internally, a umask of 0222 will be applied to any non-
@@ -1371,9 +1422,7 @@ class ObjectMeta(_messages.Message):
     name: Required. The name of the resource. In Cloud Run, name is required
       when creating top-level resources (Service, Job), must be unique within
       a Cloud Run project/region, and cannot be changed once created. More
-      info: https://kubernetes.io/docs/user-guide/identifiers#names If
-      ObjectMeta is part of a CreateServiceRequest, name must contain fewer
-      than 50 characters.
+      info: https://kubernetes.io/docs/user-guide/identifiers#names
     namespace: Required. Defines the space within each name must be unique
       within a Cloud Run region. In Cloud Run, it must be project ID or
       number.
@@ -1485,6 +1534,24 @@ class ObjectMeta(_messages.Message):
   resourceVersion = _messages.StringField(13)
   selfLink = _messages.StringField(14)
   uid = _messages.StringField(15)
+
+
+class Overrides(_messages.Message):
+  r"""RunJob Overrides that contains Execution fields to be overridden on the
+  go.
+
+  Fields:
+    containerOverrides: Per container override specification.
+    taskCount: The desired number of tasks the execution should run. Will
+      replace existing task_count value.
+    timeoutSeconds: Duration in seconds the task may be active before the
+      system will actively try to mark it failed and kill associated
+      containers. Will replace existing timeout_seconds value.
+  """
+
+  containerOverrides = _messages.MessageField('ContainerOverride', 1, repeated=True)
+  taskCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  timeoutSeconds = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class OwnerReference(_messages.Message):
@@ -1929,11 +1996,10 @@ class RouteStatus(_messages.Message):
       that was last processed by the controller. Clients polling for completed
       reconciliation should poll until observedGeneration =
       metadata.generation and the Ready condition's status is True or False.
-      Note that providing a trafficTarget that only has a configurationName
-      will result in a Route that does not increment either its
-      metadata.generation or its observedGeneration, as new "latest ready"
-      revisions from the Configuration are processed without an update to the
-      Route's spec.
+      Note that providing a TrafficTarget that has latest_revision=True will
+      result in a Route that does not increment either its metadata.generation
+      or its observedGeneration, as new "latest ready" revisions from the
+      Configuration are processed without an update to the Route's spec.
     traffic: Traffic holds the configured traffic distribution. These entries
       will always contain RevisionName references. When ConfigurationName
       appears in the spec, this will hold the LatestReadyRevisionName that was
@@ -2017,7 +2083,15 @@ class RunApiV1NamespacesSecretsReplaceSecretRequest(_messages.Message):
 
 
 class RunJobRequest(_messages.Message):
-  r"""Request message for creating a new execution of a job."""
+  r"""Request message for creating a new execution of a job.
+
+  Fields:
+    overrides: Optional. Overrides specification for a given execution of a
+      job. If provided, overrides will be applied to update the execution or
+      task spec.
+  """
+
+  overrides = _messages.MessageField('Overrides', 1)
 
 
 class RunNamespacesAuthorizeddomainsListRequest(_messages.Message):
@@ -2480,9 +2554,10 @@ class RunNamespacesServicesDeleteRequest(_messages.Message):
     kind: Not supported, and ignored by Cloud Run.
     name: Required. The fully qualified name of the service to delete. It can
       be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
     propagationPolicy: Not supported, and ignored by Cloud Run.
   """
 
@@ -2499,9 +2574,10 @@ class RunNamespacesServicesGetRequest(_messages.Message):
   Fields:
     name: Required. The fully qualified name of the service to retrieve. It
       can be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
   """
 
   name = _messages.StringField(1, required=True)
@@ -2545,9 +2621,10 @@ class RunNamespacesServicesReplaceServiceRequest(_messages.Message):
       default values without persisting the request. Supported values: `all`
     name: Required. The fully qualified name of the service to replace. It can
       be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
     service: A Service resource to be passed as the request body.
   """
 
@@ -3046,9 +3123,10 @@ class RunProjectsLocationsServicesDeleteRequest(_messages.Message):
     kind: Not supported, and ignored by Cloud Run.
     name: Required. The fully qualified name of the service to delete. It can
       be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
     propagationPolicy: Not supported, and ignored by Cloud Run.
   """
 
@@ -3091,9 +3169,10 @@ class RunProjectsLocationsServicesGetRequest(_messages.Message):
   Fields:
     name: Required. The fully qualified name of the service to retrieve. It
       can be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
   """
 
   name = _messages.StringField(1, required=True)
@@ -3137,9 +3216,10 @@ class RunProjectsLocationsServicesReplaceServiceRequest(_messages.Message):
       default values without persisting the request. Supported values: `all`
     name: Required. The fully qualified name of the service to replace. It can
       be any of the following forms: *
-      `namespaces/{project_id_or_number}/services/{service_name}` * `projects/
-      {project_id_or_number}/locations/{region}/services/{service_name}` * `pr
-      ojects/{project_id_or_number}/regions/{region}/services/{service_name}`
+      `namespaces/{project_id_or_number}/services/{service_name}` (only when
+      the `endpoint` is regional) * `projects/{project_id_or_number}/locations
+      /{region}/services/{service_name}` * `projects/{project_id_or_number}/re
+      gions/{region}/services/{service_name}`
     service: A Service resource to be passed as the request body.
   """
 
@@ -3298,8 +3378,8 @@ class SecretKeySelector(_messages.Message):
 
   Fields:
     key: Required. A Cloud Secret Manager secret version. Must be 'latest' for
-      the latest version or an integer for a specific version. The key of the
-      secret to select from. Must be a valid secret key.
+      the latest version, an integer for a specific version, or a version
+      alias. The key of the secret to select from. Must be a valid secret key.
     localObjectReference: This field should not be used directly as it is
       meant to be inlined directly into the message. Use the "name" field
       instead.
@@ -3717,7 +3797,7 @@ class TaskSpec(_messages.Message):
       disallow a number of fields on this Container. Only a single container
       may be provided.
     maxRetries: Optional. Number of retries allowed per task, before marking
-      this job failed.
+      this job failed. Defaults to 3.
     serviceAccountName: Optional. Email address of the IAM service account
       associated with the task of a job execution. The service account
       represents the identity of the running task, and determines what
@@ -3726,7 +3806,7 @@ class TaskSpec(_messages.Message):
     timeoutSeconds: Optional. Duration in seconds the task may be active
       before the system will actively try to mark it failed and kill
       associated containers. This applies per attempt of a task, meaning each
-      retry can run for the full timeout.
+      retry can run for the full timeout. Defaults to 600 seconds.
     volumes: Optional. List of volumes that can be mounted by containers
       belonging to the task. More info:
       https://kubernetes.io/docs/concepts/storage/volumes
@@ -3816,23 +3896,21 @@ class TrafficTarget(_messages.Message):
   r"""TrafficTarget holds a single entry of the routing table for a Route.
 
   Fields:
-    configurationName: ConfigurationName of a configuration to whose latest
-      revision which will be sent this portion of traffic. When the
-      "status.latestReadyRevisionName" of the referenced configuration
-      changes, traffic will automatically migrate from the prior "latest
-      ready" revision to the new one. This field is never set in Route's
-      status, only its spec. This is mutually exclusive with RevisionName.
-      Cloud Run currently supports a single ConfigurationName.
-    latestRevision: Optional. LatestRevision may be provided to indicate that
-      the latest ready Revision of the Configuration should be used for this
-      traffic target. When provided LatestRevision must be true if
-      RevisionName is empty; it must be false when RevisionName is non-empty.
+    configurationName: [Deprecated] Not supported in Cloud Run. It must be
+      empty.
+    latestRevision: Uses the "status.latestReadyRevisionName" of the Service
+      to determine the traffic target. When it changes, traffic will
+      automatically migrate from the prior "latest ready" revision to the new
+      one. This field must be false if RevisionName is set. This field
+      defaults to true otherwise. If the field is set to true on Status, this
+      means that the Revision was resolved from the Service's latest ready
+      revision.
     percent: Percent specifies percent of the traffic to this Revision or
       Configuration. This defaults to zero if unspecified.
-    revisionName: RevisionName of a specific revision to which to send this
-      portion of traffic. This is mutually exclusive with ConfigurationName.
-    tag: Optional. Tag is used to expose a dedicated url for referencing this
-      target exclusively.
+    revisionName: Points this traffic target to a specific Revision. This
+      field is mutually exclusive with latest_revision.
+    tag: Tag is used to expose a dedicated url for referencing this target
+      exclusively.
     url: Output only. URL displays the URL for accessing tagged traffic
       targets. URL is displayed in status, and is disallowed on spec. URL must
       contain a scheme (e.g. https://) and a hostname, but may not contain
@@ -3852,6 +3930,7 @@ class Volume(_messages.Message):
 
   Fields:
     configMap: Not supported in Cloud Run.
+    emptyDir: Ephemeral storage used as a shared volume.
     name: Volume's name. In Cloud Run Fully Managed, the name 'cloudsql' is
       reserved.
     secret: The secret's value will be presented as the content of a file
@@ -3860,8 +3939,9 @@ class Volume(_messages.Message):
   """
 
   configMap = _messages.MessageField('ConfigMapVolumeSource', 1)
-  name = _messages.StringField(2)
-  secret = _messages.MessageField('SecretVolumeSource', 3)
+  emptyDir = _messages.MessageField('EmptyDirVolumeSource', 2)
+  name = _messages.StringField(3)
+  secret = _messages.MessageField('SecretVolumeSource', 4)
 
 
 class VolumeMount(_messages.Message):

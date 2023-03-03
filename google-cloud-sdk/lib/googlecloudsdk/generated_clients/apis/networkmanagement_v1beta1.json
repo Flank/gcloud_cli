@@ -379,6 +379,10 @@
           "description": "A [Cloud Function](https:\/\/cloud.google.com\/functions).",
           "$ref": "CloudFunctionEndpoint"
         },
+        "appEngineVersion": {
+          "description": "An [App Engine](https:\/\/cloud.google.com\/appengine) [service version](https:\/\/cloud.google.com\/appengine\/docs\/admin-api\/reference\/rest\/v1\/apps.services.versions).",
+          "$ref": "AppEngineVersionEndpoint"
+        },
         "cloudRunRevision": {
           "description": "A [Cloud Run](https:\/\/cloud.google.com\/run) [revision](https:\/\/cloud.google.com\/run\/docs\/reference\/rest\/v1\/namespaces.revisions\/get)",
           "$ref": "CloudRunRevisionEndpoint"
@@ -414,6 +418,17 @@
       "properties": {
         "uri": {
           "description": "A [Cloud Function](https:\/\/cloud.google.com\/functions) name.",
+          "type": "string"
+        }
+      }
+    },
+    "AppEngineVersionEndpoint": {
+      "id": "AppEngineVersionEndpoint",
+      "description": "Wrapper for app engine service version attributes.",
+      "type": "object",
+      "properties": {
+        "uri": {
+          "description": "An [App Engine](https:\/\/cloud.google.com\/appengine) [service version](https:\/\/cloud.google.com\/appengine\/docs\/admin-api\/reference\/rest\/v1\/apps.services.versions) name.",
           "type": "string"
         }
       }
@@ -549,6 +564,7 @@
             "Initial state: packet originating from a Google Kubernetes Engine cluster master. A GKEMasterInfo is populated with starting instance information.",
             "Initial state: packet originating from a Cloud SQL instance. A CloudSQLInstanceInfo is populated with starting instance information.",
             "Initial state: packet originating from a Cloud Function. A CloudFunctionInfo is populated with starting function information.",
+            "Initial state: packet originating from an App Engine service version. An AppEngineVersionInfo is populated with starting version information.",
             "Initial state: packet originating from a Cloud Run revision. A CloudRunRevisionInfo is populated with starting revision information.",
             "Config checking state: verify ingress firewall rule.",
             "Config checking state: verify egress firewall rule.",
@@ -577,6 +593,7 @@
             "START_FROM_GKE_MASTER",
             "START_FROM_CLOUD_SQL_INSTANCE",
             "START_FROM_CLOUD_FUNCTION",
+            "START_FROM_APP_ENGINE_VERSION",
             "START_FROM_CLOUD_RUN_REVISION",
             "APPLY_INGRESS_FIREWALL_RULE",
             "APPLY_EGRESS_FIREWALL_RULE",
@@ -673,6 +690,10 @@
         "cloudFunction": {
           "description": "Display information of a Cloud Function.",
           "$ref": "CloudFunctionInfo"
+        },
+        "appEngineVersion": {
+          "description": "Display information of an App Engine service version.",
+          "$ref": "AppEngineVersionInfo"
         },
         "cloudRunRevision": {
           "description": "Display information of a Cloud Run revision.",
@@ -1067,9 +1088,10 @@
             "Target is a Google API.",
             "Target is a Google Kubernetes Engine cluster master.",
             "Target is a Cloud SQL instance.",
-            "Target is a published service using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-services).",
-            "Target is all Google APIs using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis).",
-            "Target is VPC-SC using [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis)."
+            "Target is a published service that uses [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-services).",
+            "Target is all Google APIs that use [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis).",
+            "Target is a VPC-SC that uses [Private Service Connect](https:\/\/cloud.google.com\/vpc\/docs\/configure-private-service-connect-apis).",
+            "Target is a serverless network endpoint group."
           ],
           "enum": [
             "TARGET_UNSPECIFIED",
@@ -1080,7 +1102,8 @@
             "CLOUD_SQL_INSTANCE",
             "PSC_PUBLISHED_SERVICE",
             "PSC_GOOGLE_API",
-            "PSC_VPC_SC"
+            "PSC_VPC_SC",
+            "SERVERLESS_NEG"
           ]
         },
         "resourceUri": {
@@ -1207,6 +1230,7 @@
             "Instance with only an internal IP address tries to access external hosts, but Cloud NAT is not enabled in the subnet, unless special configurations on a VM allow this connection.",
             "Destination internal address cannot be resolved to a known target. If this is a shared VPC scenario, verify if the service project ID is provided as test input. Otherwise, verify if the IP address is being used in the project.",
             "Forwarding rule's protocol and ports do not match the packet header.",
+            "Packet could be dropped because it was sent from a different region to a regional forwarding without global access.",
             "Forwarding rule does not have backends configured.",
             "Firewalls block the health check probes to the backends and cause the backends to be unavailable for traffic from the load balancer. For more details, see [Health check firewall rules](https:\/\/cloud.google.com\/load-balancing\/docs\/health-checks#firewall_rules).",
             "Packet is sent from or to a Compute Engine instance that is not in a running state.",
@@ -1218,6 +1242,7 @@
             "Packet was dropped inside Google Kubernetes Engine Service.",
             "Packet was dropped inside Cloud SQL Service.",
             "Packet was dropped because there is no peering between the originating network and the Google Managed Services Network.",
+            "Packet was dropped because the GKE cluster uses Private Service Connect (PSC), but the PSC endpoint is not found in the project.",
             "Packet was dropped because the Cloud SQL instance has neither a private nor a public IP address.",
             "Packet was dropped because a GKE cluster private endpoint is unreachable from a region different from the cluster's region.",
             "Packet sent from a public GKE cluster control plane to a private IP address.",
@@ -1228,9 +1253,9 @@
             "Packet could be dropped because the Cloud Function is not in an active status.",
             "Packet could be dropped because no VPC connector is set.",
             "Packet could be dropped because the VPC connector is not in a running state.",
-            "Packet could be dropped because it was sent from a different region to a regional forwarding without global access.",
-            "Privte Service Connect (PSC) connection is not in accepted state.",
-            "Packet sent from a Cloud Run revision that is not ready."
+            "The Private Service Connect endpoint is in a project that is not approved to connect to the service.",
+            "Packet sent from a Cloud Run revision that is not ready.",
+            "Packet was dropped inside Private Service Connect service producer."
           ],
           "enum": [
             "CAUSE_UNSPECIFIED",
@@ -1245,6 +1270,7 @@
             "NO_EXTERNAL_ADDRESS",
             "UNKNOWN_INTERNAL_ADDRESS",
             "FORWARDING_RULE_MISMATCH",
+            "FORWARDING_RULE_REGION_MISMATCH",
             "FORWARDING_RULE_NO_INSTANCES",
             "FIREWALL_BLOCKING_LOAD_BALANCER_BACKEND_HEALTH_CHECK",
             "INSTANCE_NOT_RUNNING",
@@ -1256,6 +1282,7 @@
             "DROPPED_INSIDE_GKE_SERVICE",
             "DROPPED_INSIDE_CLOUD_SQL_SERVICE",
             "GOOGLE_MANAGED_SERVICE_NO_PEERING",
+            "GKE_PSC_ENDPOINT_MISSING",
             "CLOUD_SQL_INSTANCE_NO_IP_ADDRESS",
             "GKE_CONTROL_PLANE_REGION_MISMATCH",
             "PUBLIC_GKE_CONTROL_PLANE_TO_PRIVATE_DESTINATION",
@@ -1266,9 +1293,9 @@
             "CLOUD_FUNCTION_NOT_ACTIVE",
             "VPC_CONNECTOR_NOT_SET",
             "VPC_CONNECTOR_NOT_RUNNING",
-            "FORWARDING_RULE_REGION_MISMATCH",
             "PSC_CONNECTION_NOT_ACCEPTED",
-            "CLOUD_RUN_REVISION_NOT_READY"
+            "CLOUD_RUN_REVISION_NOT_READY",
+            "DROPPED_INSIDE_PSC_SERVICE_PRODUCER"
           ]
         },
         "resourceUri": {
@@ -1475,6 +1502,29 @@
         }
       }
     },
+    "AppEngineVersionInfo": {
+      "id": "AppEngineVersionInfo",
+      "description": "For display only. Metadata associated with an App Engine version.",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "Name of an App Engine version.",
+          "type": "string"
+        },
+        "uri": {
+          "description": "URI of an App Engine version.",
+          "type": "string"
+        },
+        "runtime": {
+          "description": "Runtime of the App Engine version.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "App Engine execution environment for a version.",
+          "type": "string"
+        }
+      }
+    },
     "CloudRunRevisionInfo": {
       "id": "CloudRunRevisionInfo",
       "description": "For display only. Metadata associated with a Cloud Run revision.",
@@ -1678,7 +1728,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"

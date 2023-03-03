@@ -21,6 +21,43 @@ class AbandonReleaseResponse(_messages.Message):
   r"""The response object for `AbandonRelease`."""
 
 
+class AdvanceChildRolloutJob(_messages.Message):
+  r"""An advanceChildRollout Job."""
+
+
+class AdvanceChildRolloutJobRun(_messages.Message):
+  r"""AdvanceChildRolloutJobRun contains information specific to a
+  advanceChildRollout `JobRun`.
+
+  Fields:
+    rollout: Output only. Name of the `ChildRollout`. Format is
+      projects/{project}/
+      locations/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/a-z{0,62}.
+    rolloutPhaseId: Output only. the ID of the ChildRollout's Phase.
+  """
+
+  rollout = _messages.StringField(1)
+  rolloutPhaseId = _messages.StringField(2)
+
+
+class AdvanceRolloutRequest(_messages.Message):
+  r"""The request object used by `AdvanceRollout`.
+
+  Fields:
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+    phaseId: Required. The phase ID to advance the `Rollout` to.
+  """
+
+  overrideDeployPolicy = _messages.StringField(1, repeated=True)
+  phaseId = _messages.StringField(2)
+
+
+class AdvanceRolloutResponse(_messages.Message):
+  r"""The response object from `AdvanceRollout`."""
+
+
 class AnthosCluster(_messages.Message):
   r"""Information specifying an Anthos Cluster.
 
@@ -38,9 +75,12 @@ class ApproveRolloutRequest(_messages.Message):
 
   Fields:
     approved: Required. True = approve; false = reject
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
   """
 
   approved = _messages.BooleanField(1)
+  overrideDeployPolicy = _messages.StringField(2, repeated=True)
 
 
 class ApproveRolloutResponse(_messages.Message):
@@ -141,7 +181,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -158,9 +200,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -184,8 +224,81 @@ class BuildArtifact(_messages.Message):
   tag = _messages.StringField(2)
 
 
+class Canary(_messages.Message):
+  r"""Canary represents the canary deployment strategy.
+
+  Fields:
+    canaryDeployment: Configures the progressive based deployment for a
+      Target.
+    customCanaryDeployment: Configures the progressive based deployment for a
+      Target, but allows customizing at the phase level where a phase
+      represents each of the percentage deployments.
+    runtimeConfig: Optional. Runtime specific configurations for the
+      deployment strategy. The runtime configuration is used to determine how
+      Cloud Deploy will split traffic to enable a progressive deployment.
+  """
+
+  canaryDeployment = _messages.MessageField('CanaryDeployment', 1)
+  customCanaryDeployment = _messages.MessageField('CustomCanaryDeployment', 2)
+  runtimeConfig = _messages.MessageField('RuntimeConfig', 3)
+
+
+class CanaryDeployment(_messages.Message):
+  r"""CanaryDeployment represents the canary deployment configuration
+
+  Fields:
+    percentages: Required. The percentage based deployments that will occur as
+      a part of a `Rollout`. List is expected in ascending order and each
+      integer n is 0 <= n < 100.
+    verify: Whether to run verify tests after each percentage deployment.
+  """
+
+  percentages = _messages.IntegerField(1, repeated=True, variant=_messages.Variant.INT32)
+  verify = _messages.BooleanField(2)
+
+
 class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
+
+
+class CancelRolloutRequest(_messages.Message):
+  r"""The request object used by `CancelRollout`.
+
+  Fields:
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+  """
+
+  overrideDeployPolicy = _messages.StringField(1, repeated=True)
+
+
+class CancelRolloutResponse(_messages.Message):
+  r"""The response object from `CancelRollout`."""
+
+
+class ChildRolloutJobs(_messages.Message):
+  r"""ChildRollouts job composition
+
+  Fields:
+    advanceRolloutJobs: Output only. List of AdvanceChildRolloutJobs
+    createRolloutJobs: Output only. List of CreateChildRolloutJobs
+  """
+
+  advanceRolloutJobs = _messages.MessageField('Job', 1, repeated=True)
+  createRolloutJobs = _messages.MessageField('Job', 2, repeated=True)
+
+
+class CloudRunConfig(_messages.Message):
+  r"""CloudRunConfig contains the Cloud Run runtime configuration.
+
+  Fields:
+    automaticTrafficControl: Whether Cloud Deploy should update the traffic
+      stanza in a Cloud Run Service on the user's behalf to facilitate traffic
+      splitting. This is required to be true for CanaryDeployments, but
+      optional for CustomCanaryDeployments.
+  """
+
+  automaticTrafficControl = _messages.BooleanField(1)
 
 
 class CloudRunLocation(_messages.Message):
@@ -215,6 +328,19 @@ class CloudRunMetadata(_messages.Message):
   revision = _messages.StringField(1)
   service = _messages.StringField(2)
   serviceUrls = _messages.StringField(3, repeated=True)
+
+
+class CloudRunRenderMetadata(_messages.Message):
+  r"""CloudRunRenderMetadata contains Cloud Run information associated with a
+  `Release` render.
+
+  Fields:
+    service: Output only. The name of the Cloud Run Service in the rendered
+      manifest. Format is
+      projects/{project}/locations/{location}/services/{service}.
+  """
+
+  service = _messages.StringField(1)
 
 
 class ClouddeployProjectsLocationsDeliveryPipelinesCreateRequest(_messages.Message):
@@ -409,6 +535,8 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesCreateRequest(_messag
   object.
 
   Fields:
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
     parent: Required. The parent collection in which the `Release` should be
       created. Format should be projects/{project_id}/locations/{location_name
       }/deliveryPipelines/{pipeline_name}.
@@ -429,11 +557,12 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesCreateRequest(_messag
       user is provided with an expected result, but no actual change is made.
   """
 
-  parent = _messages.StringField(1, required=True)
-  release = _messages.MessageField('Release', 2)
-  releaseId = _messages.StringField(3)
-  requestId = _messages.StringField(4)
-  validateOnly = _messages.BooleanField(5)
+  overrideDeployPolicy = _messages.StringField(1, repeated=True)
+  parent = _messages.StringField(2, required=True)
+  release = _messages.MessageField('Release', 3)
+  releaseId = _messages.StringField(4)
+  requestId = _messages.StringField(5)
+  validateOnly = _messages.BooleanField(6)
 
 
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesGetRequest(_messages.Message):
@@ -476,6 +605,23 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesListRequest(_messages
   parent = _messages.StringField(5, required=True)
 
 
+class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsAdvanceRequest(_messages.Message):
+  r"""A
+  ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsAdvanceRequest
+  object.
+
+  Fields:
+    advanceRolloutRequest: A AdvanceRolloutRequest resource to be passed as
+      the request body.
+    name: Required. Name of the Rollout. Format is projects/{project}/location
+      s/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/{rollout}.
+  """
+
+  advanceRolloutRequest = _messages.MessageField('AdvanceRolloutRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsApproveRequest(_messages.Message):
   r"""A
   ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsApproveRequest
@@ -493,12 +639,31 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsApproveReques
   name = _messages.StringField(2, required=True)
 
 
+class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsCancelRequest(_messages.Message):
+  r"""A
+  ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsCancelRequest
+  object.
+
+  Fields:
+    cancelRolloutRequest: A CancelRolloutRequest resource to be passed as the
+      request body.
+    name: Required. Name of the Rollout. Format is projects/{project}/location
+      s/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/{rollout}.
+  """
+
+  cancelRolloutRequest = _messages.MessageField('CancelRolloutRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsCreateRequest(_messages.Message):
   r"""A
   ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsCreateRequest
   object.
 
   Fields:
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
     parent: Required. The parent collection in which the `Rollout` should be
       created. Format should be projects/{project_id}/locations/{location_name
       }/deliveryPipelines/{pipeline_name}/releases/{release_name}.
@@ -515,15 +680,19 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsCreateRequest
       (00000000-0000-0000-0000-000000000000).
     rollout: A Rollout resource to be passed as the request body.
     rolloutId: Required. ID of the `Rollout`.
+    startingPhaseId: Optional. The starting phase ID for the `Rollout`. If
+      empty the `Rollout` will start at the first phase.
     validateOnly: Optional. If set to true, the request is validated and the
       user is provided with an expected result, but no actual change is made.
   """
 
-  parent = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-  rollout = _messages.MessageField('Rollout', 3)
-  rolloutId = _messages.StringField(4)
-  validateOnly = _messages.BooleanField(5)
+  overrideDeployPolicy = _messages.StringField(1, repeated=True)
+  parent = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  rollout = _messages.MessageField('Rollout', 4)
+  rolloutId = _messages.StringField(5)
+  startingPhaseId = _messages.StringField(6)
+  validateOnly = _messages.BooleanField(7)
 
 
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsGetRequest(_messages.Message):
@@ -538,6 +707,22 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsGetRequest(_m
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsIgnoreJobRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsIgnoreJob
+  Request object.
+
+  Fields:
+    ignoreJobRequest: A IgnoreJobRequest resource to be passed as the request
+      body.
+    rollout: Required. Name of the Rollout. Format is projects/{project}/locat
+      ions/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/{rollout}.
+  """
+
+  ignoreJobRequest = _messages.MessageField('IgnoreJobRequest', 1)
+  rollout = _messages.StringField(2, required=True)
 
 
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsJobRunsGetRequest(_messages.Message):
@@ -578,6 +763,22 @@ class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsJobRunsListRe
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
   parent = _messages.StringField(5, required=True)
+
+
+class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsJobRunsTerminateRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsJobRunsTe
+  rminateRequest object.
+
+  Fields:
+    name: Required. Name of the `JobRun`. Format must be projects/{project}/lo
+      cations/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/{rollout}/jobRuns/{jobRun}.
+    terminateJobRunRequest: A TerminateJobRunRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  terminateJobRunRequest = _messages.MessageField('TerminateJobRunRequest', 2)
 
 
 class ClouddeployProjectsLocationsDeliveryPipelinesReleasesRolloutsListRequest(_messages.Message):
@@ -657,6 +858,147 @@ class ClouddeployProjectsLocationsDeliveryPipelinesTestIamPermissionsRequest(_me
 
   resource = _messages.StringField(1, required=True)
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class ClouddeployProjectsLocationsDeployPoliciesCreateRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeployPoliciesCreateRequest object.
+
+  Fields:
+    deployPolicy: A DeployPolicy resource to be passed as the request body.
+    deployPolicyId: Required. ID of the `DeployPolicy`.
+    parent: Required. The parent collection in which the `DeployPolicy` should
+      be created. Format should be
+      projects/{project_id}/locations/{location_name}.
+    requestId: Optional. A request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. The server will
+      guarantee that for at least 60 minutes since the first request. For
+      example, consider a situation where you make an initial request and the
+      request times out. If you make the request again with the same request
+      ID, the server can check if original operation with the same request ID
+      was received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      (00000000-0000-0000-0000-000000000000).
+    validateOnly: Optional. If set to true, the request is validated and the
+      user is provided with an expected result, but no actual change is made.
+  """
+
+  deployPolicy = _messages.MessageField('DeployPolicy', 1)
+  deployPolicyId = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  validateOnly = _messages.BooleanField(5)
+
+
+class ClouddeployProjectsLocationsDeployPoliciesDeleteRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeployPoliciesDeleteRequest object.
+
+  Fields:
+    allowMissing: Optional. If set to true, then deleting an already deleted
+      or non-existing `DeployPolicy` will succeed.
+    etag: Optional. This checksum is computed by the server based on the value
+      of other fields, and may be sent on update and delete requests to ensure
+      the client has an up-to-date value before proceeding.
+    name: Required. The name of the `DeployPolicy` to delete. Format should be
+      projects/{project_id}/locations/{location_name}/deployPolicies/{deploy_p
+      olicy_name}.
+    requestId: Optional. A request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. The server will
+      guarantee that for at least 60 minutes after the first request. For
+      example, consider a situation where you make an initial request and the
+      request times out. If you make the request again with the same request
+      ID, the server can check if original operation with the same request ID
+      was received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      (00000000-0000-0000-0000-000000000000).
+    validateOnly: Optional. If set, validate the request and preview the
+      review, but do not actually post it.
+  """
+
+  allowMissing = _messages.BooleanField(1)
+  etag = _messages.StringField(2)
+  name = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  validateOnly = _messages.BooleanField(5)
+
+
+class ClouddeployProjectsLocationsDeployPoliciesGetRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeployPoliciesGetRequest object.
+
+  Fields:
+    name: Required. Name of the `DeployPolicy`. Format must be projects/{proje
+      ct_id}/locations/{location_name}/deployPolicies/{deploy_policy_name}.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class ClouddeployProjectsLocationsDeployPoliciesListRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeployPoliciesListRequest object.
+
+  Fields:
+    filter: Filter deploy policies to be returned. See
+      https://google.aip.dev/160 for more details. All fields can be used in
+      the filter.
+    orderBy: Field to sort by. See https://google.aip.dev/132#ordering for
+      more details.
+    pageSize: The maximum number of deploy policies to return. The service may
+      return fewer than this value. If unspecified, at most 50 deploy policies
+      will be returned. The maximum value is 1000; values above 1000 will be
+      set to 1000.
+    pageToken: A page token, received from a previous `ListDeployPolicies`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other provided parameters match the call that provided the page token.
+    parent: Required. The parent, which owns this collection of deploy
+      policies. Format must be
+      projects/{project_id}/locations/{location_name}.
+  """
+
+  filter = _messages.StringField(1)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
+
+
+class ClouddeployProjectsLocationsDeployPoliciesPatchRequest(_messages.Message):
+  r"""A ClouddeployProjectsLocationsDeployPoliciesPatchRequest object.
+
+  Fields:
+    allowMissing: Optional. If set to true, updating a `DeployPolicy` that
+      does not exist will result in the creation of a new `DeployPolicy`.
+    deployPolicy: A DeployPolicy resource to be passed as the request body.
+    name: Output only. Name of the `DeployPolicy`. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+    requestId: Optional. A request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. The server will
+      guarantee that for at least 60 minutes since the first request. For
+      example, consider a situation where you make an initial request and the
+      request times out. If you make the request again with the same request
+      ID, the server can check if original operation with the same request ID
+      was received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      (00000000-0000-0000-0000-000000000000).
+    updateMask: Required. Field mask is used to specify the fields to be
+      overwritten in the `DeployPolicy` resource by the update. The fields
+      specified in the update_mask are relative to the resource, not the full
+      request. A field will be overwritten if it is in the mask. If the user
+      does not provide a mask then all fields will be overwritten.
+    validateOnly: Optional. If set to true, the request is validated and the
+      user is provided with an expected result, but no actual change is made.
+  """
+
+  allowMissing = _messages.BooleanField(1)
+  deployPolicy = _messages.MessageField('DeployPolicy', 2)
+  name = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  updateMask = _messages.StringField(5)
+  validateOnly = _messages.BooleanField(6)
 
 
 class ClouddeployProjectsLocationsGetConfigRequest(_messages.Message):
@@ -948,16 +1290,48 @@ class Config(_messages.Message):
   r"""Service-wide configuration.
 
   Fields:
-    defaultSkaffoldVersion: Output only. Default Skaffold version that is
-      assigned when a Release is created without specifying a Skaffold
-      version.
+    defaultSkaffoldVersion: Default Skaffold version that is assigned when a
+      Release is created without specifying a Skaffold version.
     name: Name of the configuration.
-    supportedVersions: Output only. All supported versions of Skaffold.
+    supportedVersions: All supported versions of Skaffold.
   """
 
   defaultSkaffoldVersion = _messages.StringField(1)
   name = _messages.StringField(2)
   supportedVersions = _messages.MessageField('SkaffoldVersion', 3, repeated=True)
+
+
+class CreateChildRolloutJob(_messages.Message):
+  r"""A createChildRollout Job."""
+
+
+class CreateChildRolloutJobRun(_messages.Message):
+  r"""CreateChildRolloutJobRun contains information specific to a
+  createChildRollout `JobRun`.
+
+  Fields:
+    rollout: Output only. Name of the `ChildRollout`. Format is
+      projects/{project}/
+      locations/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/a-z{0,62}.
+    rolloutPhaseId: Output only. The ID of the childRollout Phase initiated by
+      this JobRun.
+  """
+
+  rollout = _messages.StringField(1)
+  rolloutPhaseId = _messages.StringField(2)
+
+
+class CustomCanaryDeployment(_messages.Message):
+  r"""CustomCanaryDeployment represents the custom canary deployment
+  configuration.
+
+  Fields:
+    phaseConfigs: Required. Configuration for each phase in the canary
+      deployment in the order executed.
+  """
+
+  phaseConfigs = _messages.MessageField('PhaseConfig', 1, repeated=True)
 
 
 class Date(_messages.Message):
@@ -1120,6 +1494,52 @@ class DeliveryPipeline(_messages.Message):
   updateTime = _messages.StringField(11)
 
 
+class DeliveryPipelineAttribute(_messages.Message):
+  r"""Contains criteria for selecting DeliveryPipelines. Attributes provided
+  must match the delivery pipeline resource in order for policy restrictions
+  to apply. E.g. if id "prod" and labels "foo: bar" are given the delivery
+  pipeline resource must match both that id and have that label in order to be
+  selected.
+
+  Messages:
+    LabelsValue: DeliveryPipeline labels.
+
+  Fields:
+    id: ID of the `DeliveryPipeline`. The value of this field could be one of
+      the following: * The last segment of a pipeline name. It only needs the
+      ID to determine which pipeline is being referred to * "*", all delivery
+      pipelines in a location.
+    labels: DeliveryPipeline labels.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""DeliveryPipeline labels.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  id = _messages.StringField(1)
+  labels = _messages.MessageField('LabelsValue', 2)
+
+
 class DeliveryPipelineNotificationEvent(_messages.Message):
   r"""Payload proto for
   "clouddeploy.googleapis.com/deliverypipeline_notification" Platform Log
@@ -1143,7 +1563,8 @@ class DeliveryPipelineNotificationEvent(_messages.Message):
       TYPE_UNSPECIFIED: Type is unspecified.
       TYPE_PUBSUB_NOTIFICATION_FAILURE: A Pub/Sub notification failed to be
         sent.
-      TYPE_RENDER_STATUES_CHANGE: Release render status changed notification.
+      TYPE_RENDER_STATUES_CHANGE: Deprecated: This field is never used. Use
+        release_render log type instead.
     """
     TYPE_UNSPECIFIED = 0
     TYPE_PUBSUB_NOTIFICATION_FAILURE = 1
@@ -1192,11 +1613,18 @@ class DeployJobRun(_messages.Message):
         check Cloud Build logs.
       DEADLINE_EXCEEDED: The deploy build did not complete within the alloted
         time.
+      MISSING_RESOURCES_FOR_CANARY: There were missing resources in the
+        runtime environment required for a canary deployment. Check the Cloud
+        Build logs for more information.
+      CLOUD_BUILD_REQUEST_FAILED: Cloud Build failed to fulfill Google Cloud
+        Deploy's request. See failure_message for additional details.
     """
     FAILURE_CAUSE_UNSPECIFIED = 0
     CLOUD_BUILD_UNAVAILABLE = 1
     EXECUTION_FAILED = 2
     DEADLINE_EXCEEDED = 3
+    MISSING_RESOURCES_FOR_CANARY = 4
+    CLOUD_BUILD_REQUEST_FAILED = 5
 
   build = _messages.StringField(1)
   failureCause = _messages.EnumField('FailureCauseValueValuesEnum', 2)
@@ -1214,6 +1642,166 @@ class DeployJobRunMetadata(_messages.Message):
   """
 
   cloudRun = _messages.MessageField('CloudRunMetadata', 1)
+
+
+class DeployPolicy(_messages.Message):
+  r"""A `DeployPolicy` resource in the Google Cloud Deploy API. A
+  `DeployPolicy` inhibits manual or automation driven actions within a
+  Delivery Pipeline or Target.
+
+  Messages:
+    AnnotationsValue: User annotations. These attributes can only be set and
+      used by the user, and not by Google Cloud Deploy. Annotations must meet
+      the following constraints: * Annotations are key/value pairs. * Valid
+      annotation keys have two segments: an optional prefix and name,
+      separated by a slash (/). * The name segment is required and must be 63
+      characters or less, beginning and ending with an alphanumeric character
+      ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and
+      alphanumerics between. * The prefix is optional. If specified, the
+      prefix must be a DNS subdomain: a series of DNS labels separated by
+      dots(.), not longer than 253 characters in total, followed by a slash
+      (/). See https://kubernetes.io/docs/concepts/overview/working-with-
+      objects/annotations/#syntax-and-character-set for more details.
+    LabelsValue: Labels are attributes that can be set and used by both the
+      user and by Google Cloud Deploy. Labels must meet the following
+      constraints: * Keys and values can contain only lowercase letters,
+      numeric characters, underscores, and dashes. * All characters must use
+      UTF-8 encoding, and international characters are allowed. * Keys must
+      start with a lowercase letter or international character. * Each
+      resource is limited to a maximum of 64 labels. Both keys and values are
+      additionally constrained to be <= 128 bytes.
+
+  Fields:
+    annotations: User annotations. These attributes can only be set and used
+      by the user, and not by Google Cloud Deploy. Annotations must meet the
+      following constraints: * Annotations are key/value pairs. * Valid
+      annotation keys have two segments: an optional prefix and name,
+      separated by a slash (/). * The name segment is required and must be 63
+      characters or less, beginning and ending with an alphanumeric character
+      ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and
+      alphanumerics between. * The prefix is optional. If specified, the
+      prefix must be a DNS subdomain: a series of DNS labels separated by
+      dots(.), not longer than 253 characters in total, followed by a slash
+      (/). See https://kubernetes.io/docs/concepts/overview/working-with-
+      objects/annotations/#syntax-and-character-set for more details.
+    createTime: Output only. Time at which the deploy policy was created.
+    description: Description of the `DeployPolicy`. Max length is 255
+      characters.
+    etag: The weak etag of the `Automation` resource. This checksum is
+      computed by the server based on the value of other fields, and may be
+      sent on update and delete requests to ensure the client has an up-to-
+      date value before proceeding.
+    labels: Labels are attributes that can be set and used by both the user
+      and by Google Cloud Deploy. Labels must meet the following constraints:
+      * Keys and values can contain only lowercase letters, numeric
+      characters, underscores, and dashes. * All characters must use UTF-8
+      encoding, and international characters are allowed. * Keys must start
+      with a lowercase letter or international character. * Each resource is
+      limited to a maximum of 64 labels. Both keys and values are additionally
+      constrained to be <= 128 bytes.
+    name: Output only. Name of the `DeployPolicy`. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+    rules: Rules to apply.
+    selector: Selected resources to which the policy will be applied.
+    selects: Resources to apply the policy to.
+    suspended: When suspended, the policy will not prevent actions from
+      occurring, even if the action violates the policy.
+    uid: Output only. Unique identifier of the `DeployPolicy`.
+    updateTime: Output only. Most recent time at which the deploy policy was
+      updated.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class AnnotationsValue(_messages.Message):
+    r"""User annotations. These attributes can only be set and used by the
+    user, and not by Google Cloud Deploy. Annotations must meet the following
+    constraints: * Annotations are key/value pairs. * Valid annotation keys
+    have two segments: an optional prefix and name, separated by a slash (/).
+    * The name segment is required and must be 63 characters or less,
+    beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with
+    dashes (-), underscores (_), dots (.), and alphanumerics between. * The
+    prefix is optional. If specified, the prefix must be a DNS subdomain: a
+    series of DNS labels separated by dots(.), not longer than 253 characters
+    in total, followed by a slash (/). See
+    https://kubernetes.io/docs/concepts/overview/working-with-
+    objects/annotations/#syntax-and-character-set for more details.
+
+    Messages:
+      AdditionalProperty: An additional property for a AnnotationsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type AnnotationsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a AnnotationsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Labels are attributes that can be set and used by both the user and by
+    Google Cloud Deploy. Labels must meet the following constraints: * Keys
+    and values can contain only lowercase letters, numeric characters,
+    underscores, and dashes. * All characters must use UTF-8 encoding, and
+    international characters are allowed. * Keys must start with a lowercase
+    letter or international character. * Each resource is limited to a maximum
+    of 64 labels. Both keys and values are additionally constrained to be <=
+    128 bytes.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  annotations = _messages.MessageField('AnnotationsValue', 1)
+  createTime = _messages.StringField(2)
+  description = _messages.StringField(3)
+  etag = _messages.StringField(4)
+  labels = _messages.MessageField('LabelsValue', 5)
+  name = _messages.StringField(6)
+  rules = _messages.MessageField('PolicyRule', 7, repeated=True)
+  selector = _messages.MessageField('DeployPolicyResourceSelector', 8)
+  selects = _messages.MessageField('Resource', 9)
+  suspended = _messages.BooleanField(10)
+  uid = _messages.StringField(11)
+  updateTime = _messages.StringField(12)
+
+
+class DeployPolicyResourceSelector(_messages.Message):
+  r"""Contains information on the resources to select for a deploy policy.
+
+  Fields:
+    deliveryPipelines: Contains attributes about a delivery pipeline.
+    targets: Contains attributes about a target.
+  """
+
+  deliveryPipelines = _messages.MessageField('DeliveryPipelineAttribute', 1, repeated=True)
+  targets = _messages.MessageField('TargetAttribute', 2, repeated=True)
 
 
 class DeploymentJobs(_messages.Message):
@@ -1326,6 +1914,21 @@ class Expr(_messages.Message):
   title = _messages.StringField(4)
 
 
+class GatewayServiceMesh(_messages.Message):
+  r"""Information about the Kubernetes Gateway API service mesh configuration.
+
+  Fields:
+    deployment: Required. Name of the Kubernetes Deployment whose traffic is
+      managed by the specified HTTPRoute and Service.
+    httpRoute: Required. Name of the Gateway API HTTPRoute.
+    service: Required. Name of the Kubernetes Service.
+  """
+
+  deployment = _messages.StringField(1)
+  httpRoute = _messages.StringField(2)
+  service = _messages.StringField(3)
+
+
 class GkeCluster(_messages.Message):
   r"""Information specifying a GKE Cluster.
 
@@ -1345,6 +1948,25 @@ class GkeCluster(_messages.Message):
   internalIp = _messages.BooleanField(2)
 
 
+class IgnoreJobRequest(_messages.Message):
+  r"""The request object used by `IgnoreJob`.
+
+  Fields:
+    jobId: Required. The job ID for the Job to ignore.
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+    phaseId: Required. The phase ID the Job to ignore belongs to.
+  """
+
+  jobId = _messages.StringField(1)
+  overrideDeployPolicy = _messages.StringField(2, repeated=True)
+  phaseId = _messages.StringField(3)
+
+
+class IgnoreJobResponse(_messages.Message):
+  r"""The response object from `IgnoreJob`."""
+
+
 class Job(_messages.Message):
   r"""Job represents an operation for a `Rollout`.
 
@@ -1352,10 +1974,14 @@ class Job(_messages.Message):
     StateValueValuesEnum: Output only. The current state of the Job.
 
   Fields:
+    advanceChildRolloutJob: Output only. An advanceChildRollout Job.
+    createChildRolloutJob: Output only. A createChildRollout Job.
     deployJob: Output only. A deploy Job.
     id: Output only. The ID of the Job.
     jobRun: Output only. The name of the `JobRun` responsible for the most
       recent invocation of this Job.
+    skipMessage: Output only. Additional information on why the Job was
+      skipped, if available.
     state: Output only. The current state of the Job.
     verifyJob: Output only. A verify Job.
   """
@@ -1372,6 +1998,8 @@ class Job(_messages.Message):
       SUCCEEDED: The Job succeeded.
       FAILED: The Job failed.
       ABORTED: The Job was aborted.
+      SKIPPED: The Job was skipped.
+      IGNORED: The Job was ignored.
     """
     STATE_UNSPECIFIED = 0
     PENDING = 1
@@ -1380,12 +2008,17 @@ class Job(_messages.Message):
     SUCCEEDED = 4
     FAILED = 5
     ABORTED = 6
+    SKIPPED = 7
+    IGNORED = 8
 
-  deployJob = _messages.MessageField('DeployJob', 1)
-  id = _messages.StringField(2)
-  jobRun = _messages.StringField(3)
-  state = _messages.EnumField('StateValueValuesEnum', 4)
-  verifyJob = _messages.MessageField('VerifyJob', 5)
+  advanceChildRolloutJob = _messages.MessageField('AdvanceChildRolloutJob', 1)
+  createChildRolloutJob = _messages.MessageField('CreateChildRolloutJob', 2)
+  deployJob = _messages.MessageField('DeployJob', 3)
+  id = _messages.StringField(4)
+  jobRun = _messages.StringField(5)
+  skipMessage = _messages.StringField(6)
+  state = _messages.EnumField('StateValueValuesEnum', 7)
+  verifyJob = _messages.MessageField('VerifyJob', 8)
 
 
 class JobRun(_messages.Message):
@@ -1396,6 +2029,10 @@ class JobRun(_messages.Message):
     StateValueValuesEnum: Output only. The current state of the `JobRun`.
 
   Fields:
+    advanceChildRolloutJobRun: Output only. Information specific to an
+      advanceChildRollout `JobRun`
+    createChildRolloutJobRun: Output only. Information specific to a
+      createChildRollout `JobRun`.
     createTime: Output only. Time at which the `JobRun` was created.
     deployJobRun: Output only. Information specific to a deploy `JobRun`.
     endTime: Output only. Time at which the `JobRun` ended.
@@ -1422,23 +2059,29 @@ class JobRun(_messages.Message):
       IN_PROGRESS: The `JobRun` is in progress.
       SUCCEEDED: The `JobRun` has succeeded.
       FAILED: The `JobRun` has failed.
+      TERMINATING: The `JobRun` is terminating.
+      TERMINATED: The `JobRun` was terminated.
     """
     STATE_UNSPECIFIED = 0
     IN_PROGRESS = 1
     SUCCEEDED = 2
     FAILED = 3
+    TERMINATING = 4
+    TERMINATED = 5
 
-  createTime = _messages.StringField(1)
-  deployJobRun = _messages.MessageField('DeployJobRun', 2)
-  endTime = _messages.StringField(3)
-  etag = _messages.StringField(4)
-  jobId = _messages.StringField(5)
-  name = _messages.StringField(6)
-  phaseId = _messages.StringField(7)
-  startTime = _messages.StringField(8)
-  state = _messages.EnumField('StateValueValuesEnum', 9)
-  uid = _messages.StringField(10)
-  verifyJobRun = _messages.MessageField('VerifyJobRun', 11)
+  advanceChildRolloutJobRun = _messages.MessageField('AdvanceChildRolloutJobRun', 1)
+  createChildRolloutJobRun = _messages.MessageField('CreateChildRolloutJobRun', 2)
+  createTime = _messages.StringField(3)
+  deployJobRun = _messages.MessageField('DeployJobRun', 4)
+  endTime = _messages.StringField(5)
+  etag = _messages.StringField(6)
+  jobId = _messages.StringField(7)
+  name = _messages.StringField(8)
+  phaseId = _messages.StringField(9)
+  startTime = _messages.StringField(10)
+  state = _messages.EnumField('StateValueValuesEnum', 11)
+  uid = _messages.StringField(12)
+  verifyJobRun = _messages.MessageField('VerifyJobRun', 13)
 
 
 class JobRunNotificationEvent(_messages.Message):
@@ -1467,7 +2110,8 @@ class JobRunNotificationEvent(_messages.Message):
       TYPE_UNSPECIFIED: Type is unspecified.
       TYPE_PUBSUB_NOTIFICATION_FAILURE: A Pub/Sub notification failed to be
         sent.
-      TYPE_RENDER_STATUES_CHANGE: Release render status changed notification.
+      TYPE_RENDER_STATUES_CHANGE: Deprecated: This field is never used. Use
+        release_render log type instead.
     """
     TYPE_UNSPECIFIED = 0
     TYPE_PUBSUB_NOTIFICATION_FAILURE = 1
@@ -1482,6 +2126,18 @@ class JobRunNotificationEvent(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 7)
 
 
+class KubernetesConfig(_messages.Message):
+  r"""KubernetesConfig contains the Kubernetes runtime configuration.
+
+  Fields:
+    gatewayServiceMesh: Kubernetes Gateway API service mesh configuration.
+    serviceNetworking: Kubernetes Service networking configuration.
+  """
+
+  gatewayServiceMesh = _messages.MessageField('GatewayServiceMesh', 1)
+  serviceNetworking = _messages.MessageField('ServiceNetworking', 2)
+
+
 class ListDeliveryPipelinesResponse(_messages.Message):
   r"""The response object from `ListDeliveryPipelines`.
 
@@ -1493,6 +2149,21 @@ class ListDeliveryPipelinesResponse(_messages.Message):
   """
 
   deliveryPipelines = _messages.MessageField('DeliveryPipeline', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+  unreachable = _messages.StringField(3, repeated=True)
+
+
+class ListDeployPoliciesResponse(_messages.Message):
+  r"""The response object from `ListDeployPolicies`.
+
+  Fields:
+    deployPolicies: The `DeployPolicy` objects.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+    unreachable: Locations that could not be reached.
+  """
+
+  deployPolicies = _messages.MessageField('DeployPolicy', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
   unreachable = _messages.StringField(3, repeated=True)
 
@@ -1674,6 +2345,16 @@ class Metadata(_messages.Message):
   cloudRun = _messages.MessageField('CloudRunMetadata', 1)
 
 
+class MultiTarget(_messages.Message):
+  r"""Information specifying a multiTarget.
+
+  Fields:
+    targetIds: Required. The target_ids of this multiTarget.
+  """
+
+  targetIds = _messages.StringField(1, repeated=True)
+
+
 class Operation(_messages.Message):
   r"""This resource represents a long-running operation that is the result of
   a network API call.
@@ -1817,8 +2498,11 @@ class Phase(_messages.Message):
     StateValueValuesEnum: Output only. Current state of the Phase.
 
   Fields:
+    childRolloutJobs: Output only. ChildRollout job composition.
     deploymentJobs: Output only. Deployment job composition.
     id: Output only. The ID of the Phase.
+    skipMessage: Output only. Additional information on why the Phase was
+      skipped, if available.
     state: Output only. Current state of the Phase.
   """
 
@@ -1832,6 +2516,7 @@ class Phase(_messages.Message):
       SUCCEEDED: The Phase has succeeded.
       FAILED: The Phase has failed.
       ABORTED: The Phase was aborted.
+      SKIPPED: The Phase was skipped.
     """
     STATE_UNSPECIFIED = 0
     PENDING = 1
@@ -1839,10 +2524,50 @@ class Phase(_messages.Message):
     SUCCEEDED = 3
     FAILED = 4
     ABORTED = 5
+    SKIPPED = 6
 
-  deploymentJobs = _messages.MessageField('DeploymentJobs', 1)
-  id = _messages.StringField(2)
-  state = _messages.EnumField('StateValueValuesEnum', 3)
+  childRolloutJobs = _messages.MessageField('ChildRolloutJobs', 1)
+  deploymentJobs = _messages.MessageField('DeploymentJobs', 2)
+  id = _messages.StringField(3)
+  skipMessage = _messages.StringField(4)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
+
+
+class PhaseArtifact(_messages.Message):
+  r"""Contains the paths to the artifacts, relative to the URI, for a phase.
+
+  Fields:
+    manifestPath: Output only. File path of the rendered manifest relative to
+      the URI.
+    skaffoldConfigPath: Output only. File path of the resolved Skaffold
+      configuration relative to the URI.
+  """
+
+  manifestPath = _messages.StringField(1)
+  skaffoldConfigPath = _messages.StringField(2)
+
+
+class PhaseConfig(_messages.Message):
+  r"""PhaseConfig represents the configuration for a phase in the custom
+  canary deployment.
+
+  Fields:
+    percentage: Required. Percentage deployment for the phase.
+    phaseId: Required. The ID to assign to the `Rollout` phase. This value
+      must consist of lower-case letters, numbers, and hyphens, start with a
+      letter and end with a letter or a number, and have a max length of 63
+      characters. In other words, it must match the following regex:
+      `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.
+    profiles: Skaffold profiles to use when rendering the manifest for this
+      phase. These are in addition to the profiles list specified in the
+      `DeliveryPipeline` stage.
+    verify: Whether to run verify tests after the deployment.
+  """
+
+  percentage = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  phaseId = _messages.StringField(2)
+  profiles = _messages.StringField(3, repeated=True)
+  verify = _messages.BooleanField(4)
 
 
 class PipelineCondition(_messages.Message):
@@ -1851,12 +2576,15 @@ class PipelineCondition(_messages.Message):
 
   Fields:
     pipelineReadyCondition: Details around the Pipeline's overall status.
-    targetsPresentCondition: Detalis around targets enumerated in the
+    targetsPresentCondition: Details around targets enumerated in the
       pipeline.
+    targetsTypeCondition: Details on the whether the targets enumerated in the
+      pipeline are of the same type.
   """
 
   pipelineReadyCondition = _messages.MessageField('PipelineReadyCondition', 1)
   targetsPresentCondition = _messages.MessageField('TargetsPresentCondition', 2)
+  targetsTypeCondition = _messages.MessageField('TargetsTypeCondition', 3)
 
 
 class PipelineReadyCondition(_messages.Message):
@@ -1953,6 +2681,16 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
+class PolicyRule(_messages.Message):
+  r"""Rule to apply.
+
+  Fields:
+    restrictRollouts: Rollout restrictions.
+  """
+
+  restrictRollouts = _messages.MessageField('RestrictRollout', 1)
+
+
 class PrivatePool(_messages.Message):
   r"""Execution using a private Cloud Build pool.
 
@@ -1972,6 +2710,49 @@ class PrivatePool(_messages.Message):
   artifactStorage = _messages.StringField(1)
   serviceAccount = _messages.StringField(2)
   workerPool = _messages.StringField(3)
+
+
+class Range(_messages.Message):
+  r"""Range within which actions are restricted.
+
+  Enums:
+    DayOfWeekValueListEntryValuesEnum:
+
+  Fields:
+    dayOfWeek: Days of week.
+    endDate: End date.
+    endTimeOfDay: End time of day.
+    startDate: Start date.
+    startTimeOfDay: Start time of day.
+  """
+
+  class DayOfWeekValueListEntryValuesEnum(_messages.Enum):
+    r"""DayOfWeekValueListEntryValuesEnum enum type.
+
+    Values:
+      DAY_OF_WEEK_UNSPECIFIED: The day of the week is unspecified.
+      MONDAY: Monday
+      TUESDAY: Tuesday
+      WEDNESDAY: Wednesday
+      THURSDAY: Thursday
+      FRIDAY: Friday
+      SATURDAY: Saturday
+      SUNDAY: Sunday
+    """
+    DAY_OF_WEEK_UNSPECIFIED = 0
+    MONDAY = 1
+    TUESDAY = 2
+    WEDNESDAY = 3
+    THURSDAY = 4
+    FRIDAY = 5
+    SATURDAY = 6
+    SUNDAY = 7
+
+  dayOfWeek = _messages.EnumField('DayOfWeekValueListEntryValuesEnum', 1, repeated=True)
+  endDate = _messages.MessageField('Date', 2)
+  endTimeOfDay = _messages.MessageField('TimeOfDay', 3)
+  startDate = _messages.MessageField('Date', 4)
+  startTimeOfDay = _messages.MessageField('TimeOfDay', 5)
 
 
 class Release(_messages.Message):
@@ -2007,6 +2788,7 @@ class Release(_messages.Message):
       https://google.aip.dev/128#annotations for more details such as format
       and size limitations.
     buildArtifacts: List of artifacts to pass through to Skaffold command.
+    condition: Output only. Information around the state of the Release.
     createTime: Output only. Time at which the `Release` was created.
     deliveryPipelineSnapshot: Output only. Snapshot of the parent pipeline
       taken at release creation time.
@@ -2174,22 +2956,36 @@ class Release(_messages.Message):
   abandoned = _messages.BooleanField(1)
   annotations = _messages.MessageField('AnnotationsValue', 2)
   buildArtifacts = _messages.MessageField('BuildArtifact', 3, repeated=True)
-  createTime = _messages.StringField(4)
-  deliveryPipelineSnapshot = _messages.MessageField('DeliveryPipeline', 5)
-  description = _messages.StringField(6)
-  etag = _messages.StringField(7)
-  labels = _messages.MessageField('LabelsValue', 8)
-  name = _messages.StringField(9)
-  renderEndTime = _messages.StringField(10)
-  renderStartTime = _messages.StringField(11)
-  renderState = _messages.EnumField('RenderStateValueValuesEnum', 12)
-  skaffoldConfigPath = _messages.StringField(13)
-  skaffoldConfigUri = _messages.StringField(14)
-  skaffoldVersion = _messages.StringField(15)
-  targetArtifacts = _messages.MessageField('TargetArtifactsValue', 16)
-  targetRenders = _messages.MessageField('TargetRendersValue', 17)
-  targetSnapshots = _messages.MessageField('Target', 18, repeated=True)
-  uid = _messages.StringField(19)
+  condition = _messages.MessageField('ReleaseCondition', 4)
+  createTime = _messages.StringField(5)
+  deliveryPipelineSnapshot = _messages.MessageField('DeliveryPipeline', 6)
+  description = _messages.StringField(7)
+  etag = _messages.StringField(8)
+  labels = _messages.MessageField('LabelsValue', 9)
+  name = _messages.StringField(10)
+  renderEndTime = _messages.StringField(11)
+  renderStartTime = _messages.StringField(12)
+  renderState = _messages.EnumField('RenderStateValueValuesEnum', 13)
+  skaffoldConfigPath = _messages.StringField(14)
+  skaffoldConfigUri = _messages.StringField(15)
+  skaffoldVersion = _messages.StringField(16)
+  targetArtifacts = _messages.MessageField('TargetArtifactsValue', 17)
+  targetRenders = _messages.MessageField('TargetRendersValue', 18)
+  targetSnapshots = _messages.MessageField('Target', 19, repeated=True)
+  uid = _messages.StringField(20)
+
+
+class ReleaseCondition(_messages.Message):
+  r"""ReleaseCondition contains all conditions relevant to a Release.
+
+  Fields:
+    releaseReadyCondition: Details around the Releases's overall status.
+    skaffoldSupportedCondition: Details around the support state of the
+      release's skaffold version.
+  """
+
+  releaseReadyCondition = _messages.MessageField('ReleaseReadyCondition', 1)
+  skaffoldSupportedCondition = _messages.MessageField('SkaffoldSupportedCondition', 2)
 
 
 class ReleaseNotificationEvent(_messages.Message):
@@ -2214,7 +3010,8 @@ class ReleaseNotificationEvent(_messages.Message):
       TYPE_UNSPECIFIED: Type is unspecified.
       TYPE_PUBSUB_NOTIFICATION_FAILURE: A Pub/Sub notification failed to be
         sent.
-      TYPE_RENDER_STATUES_CHANGE: Release render status changed notification.
+      TYPE_RENDER_STATUES_CHANGE: Deprecated: This field is never used. Use
+        release_render log type instead.
     """
     TYPE_UNSPECIFIED = 0
     TYPE_PUBSUB_NOTIFICATION_FAILURE = 1
@@ -2223,6 +3020,21 @@ class ReleaseNotificationEvent(_messages.Message):
   message = _messages.StringField(1)
   release = _messages.StringField(2)
   type = _messages.EnumField('TypeValueValuesEnum', 3)
+
+
+class ReleaseReadyCondition(_messages.Message):
+  r"""ReleaseReadyCondition contains information around the status of the
+  Release. If a release is not ready, you cannot create a rollout with the
+  release.
+
+  Fields:
+    status: True if the Release is in a valid state. Otherwise at least one
+      condition in `ReleaseCondition` is in an invalid state. Iterate over
+      those conditions and see which condition(s) has status = false to find
+      out what is wrong with the Release.
+  """
+
+  status = _messages.BooleanField(1)
 
 
 class ReleaseRenderEvent(_messages.Message):
@@ -2239,16 +3051,104 @@ class ReleaseRenderEvent(_messages.Message):
   release = _messages.StringField(2)
 
 
+class RenderMetadata(_messages.Message):
+  r"""RenderMetadata includes information associated with a `Release` render.
+
+  Fields:
+    cloudRun: Output only. Metadata associated with rendering for Cloud Run.
+  """
+
+  cloudRun = _messages.MessageField('CloudRunRenderMetadata', 1)
+
+
+class Resource(_messages.Message):
+  r"""Contains information on the resources to select for a deploy policy.
+
+  Fields:
+    deliveryPipelines: Contains attributes about a delivery pipeline.
+    targets: Contains attributes about a target.
+  """
+
+  deliveryPipelines = _messages.MessageField('DeliveryPipelineAttribute', 1, repeated=True)
+  targets = _messages.MessageField('TargetAttribute', 2, repeated=True)
+
+
+class RestrictRollout(_messages.Message):
+  r"""Rollout restrictions.
+
+  Enums:
+    ActionsValueListEntryValuesEnum:
+    InvokerValueListEntryValuesEnum:
+
+  Fields:
+    actions: Rollout actions to be restricted as part of the policy. If left
+      empty, all actions will be restricted.
+    invoker: What invoked the action. If left empty, all invoker types will be
+      restricted.
+    name: Restriction name.
+    timeWindows: Time Windows within which actions are restricted.
+  """
+
+  class ActionsValueListEntryValuesEnum(_messages.Enum):
+    r"""ActionsValueListEntryValuesEnum enum type.
+
+    Values:
+      ACTIONS_UNSPECIFIED: Unspecified.
+      ADVANCE: Advance the rollout to the next phase.
+      APPROVE: Approve the rollout.
+      CANCEL: Cancel the rollout.
+      CREATE: Create a rollout.
+      DELETE: Delete a rollout.
+      IGNORE_JOB: Ignore a job result on the rollout.
+      REJECT: Reject a rollout.
+      RETRY_JOB: Retry a job for a rollout.
+      ROLLBACK: Rollback a rollout.
+      TERMINATE_JOBRUN: Terminate a jobrun.
+    """
+    ACTIONS_UNSPECIFIED = 0
+    ADVANCE = 1
+    APPROVE = 2
+    CANCEL = 3
+    CREATE = 4
+    DELETE = 5
+    IGNORE_JOB = 6
+    REJECT = 7
+    RETRY_JOB = 8
+    ROLLBACK = 9
+    TERMINATE_JOBRUN = 10
+
+  class InvokerValueListEntryValuesEnum(_messages.Enum):
+    r"""InvokerValueListEntryValuesEnum enum type.
+
+    Values:
+      INVOKER_UNSPECIFIED: Unspecified.
+      USER: The action is user-driven (e.g. creating a rollout manually via a
+        gcloud create command).
+      DEPLOY_AUTOMATION: Automated action by Cloud Deploy.
+    """
+    INVOKER_UNSPECIFIED = 0
+    USER = 1
+    DEPLOY_AUTOMATION = 2
+
+  actions = _messages.EnumField('ActionsValueListEntryValuesEnum', 1, repeated=True)
+  invoker = _messages.EnumField('InvokerValueListEntryValuesEnum', 2, repeated=True)
+  name = _messages.StringField(3)
+  timeWindows = _messages.MessageField('TimeWindow', 4)
+
+
 class RetryJobRequest(_messages.Message):
   r"""RetryJobRequest is the request object used by `RetryJob`.
 
   Fields:
     jobId: Required. The job ID for the Job to retry.
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
     phaseId: Required. The phase ID the Job to retry belongs to.
   """
 
   jobId = _messages.StringField(1)
-  phaseId = _messages.StringField(2)
+  overrideDeployPolicy = _messages.StringField(2, repeated=True)
+  phaseId = _messages.StringField(3)
 
 
 class RetryJobResponse(_messages.Message):
@@ -2288,6 +3188,10 @@ class Rollout(_messages.Message):
       and size limitations.
     approvalState: Output only. Approval state of the `Rollout`.
     approveTime: Output only. Time at which the `Rollout` was approved.
+    controllerRollout: Output only. Name of the `ControllerRollout`. Format is
+      projects/{project}/
+      locations/{location}/deliveryPipelines/{deliveryPipeline}/
+      releases/{release}/rollouts/a-z{0,62}.
     createTime: Output only. Time at which the `Rollout` was created.
     deployEndTime: Output only. Time at which the `Rollout` finished
       deploying.
@@ -2359,6 +3263,8 @@ class Rollout(_messages.Message):
       RELEASE_ABANDONED: Release is abandoned.
       VERIFICATION_CONFIG_NOT_FOUND: No skaffold verify configuration was
         found.
+      CLOUD_BUILD_REQUEST_FAILED: Cloud Build failed to fulfill Google Cloud
+        Deploy's request. See failure_message for additional details.
     """
     FAILURE_CAUSE_UNSPECIFIED = 0
     CLOUD_BUILD_UNAVAILABLE = 1
@@ -2367,6 +3273,7 @@ class Rollout(_messages.Message):
     RELEASE_FAILED = 4
     RELEASE_ABANDONED = 5
     VERIFICATION_CONFIG_NOT_FOUND = 6
+    CLOUD_BUILD_REQUEST_FAILED = 7
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. Current state of the `Rollout`.
@@ -2382,6 +3289,9 @@ class Rollout(_messages.Message):
         on this `Target`.
       PENDING_RELEASE: The `Rollout` is waiting for the `Release` to be fully
         rendered.
+      CANCELLING: The `Rollout` is in the process of being cancelled.
+      CANCELLED: The `Rollout` has been cancelled.
+      HALTED: The `Rollout` is halted.
     """
     STATE_UNSPECIFIED = 0
     SUCCEEDED = 1
@@ -2391,6 +3301,9 @@ class Rollout(_messages.Message):
     APPROVAL_REJECTED = 5
     PENDING = 6
     PENDING_RELEASE = 7
+    CANCELLING = 8
+    CANCELLED = 9
+    HALTED = 10
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class AnnotationsValue(_messages.Message):
@@ -2454,22 +3367,23 @@ class Rollout(_messages.Message):
   annotations = _messages.MessageField('AnnotationsValue', 1)
   approvalState = _messages.EnumField('ApprovalStateValueValuesEnum', 2)
   approveTime = _messages.StringField(3)
-  createTime = _messages.StringField(4)
-  deployEndTime = _messages.StringField(5)
-  deployFailureCause = _messages.EnumField('DeployFailureCauseValueValuesEnum', 6)
-  deployStartTime = _messages.StringField(7)
-  deployingBuild = _messages.StringField(8)
-  description = _messages.StringField(9)
-  enqueueTime = _messages.StringField(10)
-  etag = _messages.StringField(11)
-  failureReason = _messages.StringField(12)
-  labels = _messages.MessageField('LabelsValue', 13)
-  metadata = _messages.MessageField('Metadata', 14)
-  name = _messages.StringField(15)
-  phases = _messages.MessageField('Phase', 16, repeated=True)
-  state = _messages.EnumField('StateValueValuesEnum', 17)
-  targetId = _messages.StringField(18)
-  uid = _messages.StringField(19)
+  controllerRollout = _messages.StringField(4)
+  createTime = _messages.StringField(5)
+  deployEndTime = _messages.StringField(6)
+  deployFailureCause = _messages.EnumField('DeployFailureCauseValueValuesEnum', 7)
+  deployStartTime = _messages.StringField(8)
+  deployingBuild = _messages.StringField(9)
+  description = _messages.StringField(10)
+  enqueueTime = _messages.StringField(11)
+  etag = _messages.StringField(12)
+  failureReason = _messages.StringField(13)
+  labels = _messages.MessageField('LabelsValue', 14)
+  metadata = _messages.MessageField('Metadata', 15)
+  name = _messages.StringField(16)
+  phases = _messages.MessageField('Phase', 17, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 18)
+  targetId = _messages.StringField(19)
+  uid = _messages.StringField(20)
 
 
 class RolloutNotificationEvent(_messages.Message):
@@ -2497,7 +3411,8 @@ class RolloutNotificationEvent(_messages.Message):
       TYPE_UNSPECIFIED: Type is unspecified.
       TYPE_PUBSUB_NOTIFICATION_FAILURE: A Pub/Sub notification failed to be
         sent.
-      TYPE_RENDER_STATUES_CHANGE: Release render status changed notification.
+      TYPE_RENDER_STATUES_CHANGE: Deprecated: This field is never used. Use
+        release_render log type instead.
     """
     TYPE_UNSPECIFIED = 0
     TYPE_PUBSUB_NOTIFICATION_FAILURE = 1
@@ -2511,6 +3426,19 @@ class RolloutNotificationEvent(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 6)
 
 
+class RuntimeConfig(_messages.Message):
+  r"""RuntimeConfig contains the runtime specific configurations for a
+  deployment strategy.
+
+  Fields:
+    cloudRun: Cloud Run runtime configuration.
+    kubernetes: Kubernetes runtime configuration.
+  """
+
+  cloudRun = _messages.MessageField('CloudRunConfig', 1)
+  kubernetes = _messages.MessageField('KubernetesConfig', 2)
+
+
 class SerialPipeline(_messages.Message):
   r"""SerialPipeline defines a sequential set of stages for a
   `DeliveryPipeline`.
@@ -2521,6 +3449,19 @@ class SerialPipeline(_messages.Message):
   """
 
   stages = _messages.MessageField('Stage', 1, repeated=True)
+
+
+class ServiceNetworking(_messages.Message):
+  r"""Information about the Kubernetes Service networking configuration.
+
+  Fields:
+    deployment: Required. Name of the Kubernetes Deployment whose traffic is
+      managed by the specified Service.
+    service: Required. Name of the Kubernetes Service.
+  """
+
+  deployment = _messages.StringField(1)
+  service = _messages.StringField(2)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -2540,17 +3481,64 @@ class SetIamPolicyRequest(_messages.Message):
   updateMask = _messages.StringField(2)
 
 
+class SkaffoldSupportedCondition(_messages.Message):
+  r"""SkaffoldSupportedCondition contains information about when support for
+  the release's version of skaffold ends.
+
+  Enums:
+    SkaffoldSupportStateValueValuesEnum: The skaffold support state for this
+      release's version of skaffold.
+
+  Fields:
+    maintenanceModeTime: The time at which this release's version of skaffold
+      will enter maintenance mode.
+    skaffoldSupportState: The skaffold support state for this release's
+      version of skaffold.
+    status: True if the version of skaffold used by this release is supported.
+    supportExpirationTime: The time at which this release's version of
+      skaffold will no longer be supported.
+  """
+
+  class SkaffoldSupportStateValueValuesEnum(_messages.Enum):
+    r"""The skaffold support state for this release's version of skaffold.
+
+    Values:
+      SKAFFOLD_SUPPORT_STATE_UNSPECIFIED: Default value. This value is unused.
+      SKAFFOLD_SUPPORT_STATE_SUPPORTED: This skaffold version is currently
+        supported.
+      SKAFFOLD_SUPPORT_STATE_MAINTENANCE_MODE: This skaffold version is in
+        maintenance mode.
+      SKAFFOLD_SUPPORT_STATE_UNSUPPORTED: This skaffold version is no longer
+        supported.
+    """
+    SKAFFOLD_SUPPORT_STATE_UNSPECIFIED = 0
+    SKAFFOLD_SUPPORT_STATE_SUPPORTED = 1
+    SKAFFOLD_SUPPORT_STATE_MAINTENANCE_MODE = 2
+    SKAFFOLD_SUPPORT_STATE_UNSUPPORTED = 3
+
+  maintenanceModeTime = _messages.StringField(1)
+  skaffoldSupportState = _messages.EnumField('SkaffoldSupportStateValueValuesEnum', 2)
+  status = _messages.BooleanField(3)
+  supportExpirationTime = _messages.StringField(4)
+
+
 class SkaffoldVersion(_messages.Message):
   r"""Details of a supported Skaffold version.
 
   Fields:
+    maintenanceModeTime: The time at which this version of skaffold will enter
+      maintenance mode.
     supportEndDate: Date when this version is expected to no longer be
       supported.
+    supportExpirationTime: The time at which this version of skaffold will no
+      longer be supported.
     version: Release version number. For example, "1.20.3".
   """
 
-  supportEndDate = _messages.MessageField('Date', 1)
-  version = _messages.StringField(2)
+  maintenanceModeTime = _messages.StringField(1)
+  supportEndDate = _messages.MessageField('Date', 2)
+  supportExpirationTime = _messages.StringField(3)
+  version = _messages.StringField(4)
 
 
 class Stage(_messages.Message):
@@ -2701,11 +3689,14 @@ class Strategy(_messages.Message):
   r"""Strategy contains deployment strategy information.
 
   Fields:
+    canary: Canary deployment strategy provides progressive percentage based
+      deployments to a Target.
     standard: Standard deployment strategy executes a single deploy and allows
       verifying the deployment.
   """
 
-  standard = _messages.MessageField('Standard', 1)
+  canary = _messages.MessageField('Canary', 1)
+  standard = _messages.MessageField('Standard', 2)
 
 
 class Target(_messages.Message):
@@ -2754,6 +3745,7 @@ class Target(_messages.Message):
       start with a lowercase letter or international character. * Each
       resource is limited to a maximum of 64 labels. Both keys and values are
       additionally constrained to be <= 128 bytes.
+    multiTarget: Information specifying a multiTarget.
     name: Optional. Name of the `Target`. Format is
       projects/{project}/locations/{location}/targets/a-z{0,62}.
     requireApproval: Optional. Whether or not the `Target` requires approval.
@@ -2831,16 +3823,21 @@ class Target(_messages.Message):
   executionConfigs = _messages.MessageField('ExecutionConfig', 6, repeated=True)
   gke = _messages.MessageField('GkeCluster', 7)
   labels = _messages.MessageField('LabelsValue', 8)
-  name = _messages.StringField(9)
-  requireApproval = _messages.BooleanField(10)
-  run = _messages.MessageField('CloudRunLocation', 11)
-  targetId = _messages.StringField(12)
-  uid = _messages.StringField(13)
-  updateTime = _messages.StringField(14)
+  multiTarget = _messages.MessageField('MultiTarget', 9)
+  name = _messages.StringField(10)
+  requireApproval = _messages.BooleanField(11)
+  run = _messages.MessageField('CloudRunLocation', 12)
+  targetId = _messages.StringField(13)
+  uid = _messages.StringField(14)
+  updateTime = _messages.StringField(15)
 
 
 class TargetArtifact(_messages.Message):
   r"""The artifacts produced by a target render operation.
+
+  Messages:
+    PhaseArtifactsValue: Output only. Map from the phase ID to the phase
+      artifacts for the `Target`.
 
   Fields:
     artifactUri: Output only. URI of a directory containing the artifacts.
@@ -2848,13 +3845,87 @@ class TargetArtifact(_messages.Message):
       rollout, and all paths are relative to this location.
     manifestPath: Output only. File path of the rendered manifest relative to
       the URI.
+    phaseArtifacts: Output only. Map from the phase ID to the phase artifacts
+      for the `Target`.
     skaffoldConfigPath: Output only. File path of the resolved Skaffold
       configuration relative to the URI.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class PhaseArtifactsValue(_messages.Message):
+    r"""Output only. Map from the phase ID to the phase artifacts for the
+    `Target`.
+
+    Messages:
+      AdditionalProperty: An additional property for a PhaseArtifactsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type PhaseArtifactsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a PhaseArtifactsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A PhaseArtifact attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('PhaseArtifact', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   artifactUri = _messages.StringField(1)
   manifestPath = _messages.StringField(2)
-  skaffoldConfigPath = _messages.StringField(3)
+  phaseArtifacts = _messages.MessageField('PhaseArtifactsValue', 3)
+  skaffoldConfigPath = _messages.StringField(4)
+
+
+class TargetAttribute(_messages.Message):
+  r"""Contains criteria for selecting Targets. Attributes provided must match
+  the target resource in order for policy restrictions to apply. E.g. if id
+  "prod" and labels "foo: bar" are given the target resource must match both
+  that id and have that label in order to be selected.
+
+  Messages:
+    LabelsValue: Target labels.
+
+  Fields:
+    id: ID of the `Target`. The value of this field could be one of the
+      following: * The last segment of a target name. It only needs the ID to
+      determine which target is being referred to * "*", all targets in a
+      location.
+    labels: Target labels.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Target labels.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  id = _messages.StringField(1)
+  labels = _messages.MessageField('LabelsValue', 2)
 
 
 class TargetNotificationEvent(_messages.Message):
@@ -2879,7 +3950,8 @@ class TargetNotificationEvent(_messages.Message):
       TYPE_UNSPECIFIED: Type is unspecified.
       TYPE_PUBSUB_NOTIFICATION_FAILURE: A Pub/Sub notification failed to be
         sent.
-      TYPE_RENDER_STATUES_CHANGE: Release render status changed notification.
+      TYPE_RENDER_STATUES_CHANGE: Deprecated: This field is never used. Use
+        release_render log type instead.
     """
     TYPE_UNSPECIFIED = 0
     TYPE_PUBSUB_NOTIFICATION_FAILURE = 1
@@ -2904,6 +3976,8 @@ class TargetRender(_messages.Message):
       unspecified while the render in progress.
     failureMessage: Output only. Additional information about the render
       failure, if available.
+    metadata: Output only. Metadata related to the `Release` render for this
+      Target.
     renderingBuild: Output only. The resource name of the Cloud Build `Build`
       object that is used to render the manifest for this target. Format is
       `projects/{project}/locations/{location}/builds/{build}`.
@@ -2923,10 +3997,13 @@ class TargetRender(_messages.Message):
         service-account#required_permissions).
       EXECUTION_FAILED: The render operation did not complete successfully;
         check Cloud Build logs.
+      CLOUD_BUILD_REQUEST_FAILED: Cloud Build failed to fulfill Google Cloud
+        Deploy's request. See failure_message for additional details.
     """
     FAILURE_CAUSE_UNSPECIFIED = 0
     CLOUD_BUILD_UNAVAILABLE = 1
     EXECUTION_FAILED = 2
+    CLOUD_BUILD_REQUEST_FAILED = 3
 
   class RenderingStateValueValuesEnum(_messages.Enum):
     r"""Output only. Current state of the render operation for this Target.
@@ -2945,8 +4022,9 @@ class TargetRender(_messages.Message):
 
   failureCause = _messages.EnumField('FailureCauseValueValuesEnum', 1)
   failureMessage = _messages.StringField(2)
-  renderingBuild = _messages.StringField(3)
-  renderingState = _messages.EnumField('RenderingStateValueValuesEnum', 4)
+  metadata = _messages.MessageField('RenderMetadata', 3)
+  renderingBuild = _messages.StringField(4)
+  renderingState = _messages.EnumField('RenderingStateValueValuesEnum', 5)
 
 
 class TargetsPresentCondition(_messages.Message):
@@ -2954,7 +4032,7 @@ class TargetsPresentCondition(_messages.Message):
   the Delivery Pipeline that do not actually exist.
 
   Fields:
-    missingTargets: The list of Target names that are missing. For example,
+    missingTargets: The list of Target names that do not exist. For example,
       projects/{project_id}/locations/{location_name}/targets/{target_name}.
     status: True if there aren't any missing Targets.
     updateTime: Last time the condition was updated.
@@ -2963,6 +4041,36 @@ class TargetsPresentCondition(_messages.Message):
   missingTargets = _messages.StringField(1, repeated=True)
   status = _messages.BooleanField(2)
   updateTime = _messages.StringField(3)
+
+
+class TargetsTypeCondition(_messages.Message):
+  r"""TargetsTypeCondition contains information on whether the Targets defined
+  in the Delivery Pipeline are of the same type.
+
+  Fields:
+    errorDetails: Human readable error message.
+    status: True if the targets are all a comparable type. For example this is
+      true if all targets are GKE clusters. This is false if some targets are
+      Cloud Run targets and others are GKE clusters.
+  """
+
+  errorDetails = _messages.StringField(1)
+  status = _messages.BooleanField(2)
+
+
+class TerminateJobRunRequest(_messages.Message):
+  r"""The request object used by `TerminateJobRun`.
+
+  Fields:
+    overrideDeployPolicy: Optional. Deploy policies to override. Format is
+      projects/{project}/ locations/{location}/deployPolicies/a-z{0,62}.
+  """
+
+  overrideDeployPolicy = _messages.StringField(1, repeated=True)
+
+
+class TerminateJobRunResponse(_messages.Message):
+  r"""The response object from `TerminateJobRun`."""
 
 
 class TestIamPermissionsRequest(_messages.Message):
@@ -2987,6 +4095,40 @@ class TestIamPermissionsResponse(_messages.Message):
   """
 
   permissions = _messages.StringField(1, repeated=True)
+
+
+class TimeOfDay(_messages.Message):
+  r"""Represents a time of day. The date and time zone are either not
+  significant or are specified elsewhere. An API may choose to allow leap
+  seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.
+
+  Fields:
+    hours: Hours of day in 24 hour format. Should be from 0 to 23. An API may
+      choose to allow the value "24:00:00" for scenarios like business closing
+      time.
+    minutes: Minutes of hour of day. Must be from 0 to 59.
+    nanos: Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    seconds: Seconds of minutes of the time. Must normally be from 0 to 59. An
+      API may allow the value 60 if it allows leap-seconds.
+  """
+
+  hours = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  minutes = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  nanos = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  seconds = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
+class TimeWindow(_messages.Message):
+  r"""Time Window within which actions are restricted.
+
+  Fields:
+    ranges: Range within which actions are restricted.
+    timeZone: The time zone in IANA format [IANA Time Zone
+      Database](https://www.iana.org/time-zones) (e.g. America/New_York).
+  """
+
+  ranges = _messages.MessageField('Range', 1, repeated=True)
+  timeZone = _messages.StringField(2)
 
 
 class VerifyJob(_messages.Message):
@@ -3031,12 +4173,15 @@ class VerifyJobRun(_messages.Message):
         time.
       VERIFICATION_CONFIG_NOT_FOUND: No Skaffold verify configuration was
         found.
+      CLOUD_BUILD_REQUEST_FAILED: Cloud Build failed to fulfill Google Cloud
+        Deploy's request. See failure_message for additional details.
     """
     FAILURE_CAUSE_UNSPECIFIED = 0
     CLOUD_BUILD_UNAVAILABLE = 1
     EXECUTION_FAILED = 2
     DEADLINE_EXCEEDED = 3
     VERIFICATION_CONFIG_NOT_FOUND = 4
+    CLOUD_BUILD_REQUEST_FAILED = 5
 
   artifactUri = _messages.StringField(1)
   build = _messages.StringField(2)

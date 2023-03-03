@@ -13,7 +13,7 @@
       To create a cluster with name `my-redis-cluster` in region `us-central1`
       with memory size of 24 GiB, run:
 
-        $ {command} my-redis-cluster --region=us-central1 --total-memory-size-gb=24
+        $ {command} my-redis-cluster --region=us-central1 --size-gb=24
 
   arguments:
     resource:
@@ -23,14 +23,46 @@
         Your cluster ID must be 1 to 63 characters and use only lowercase letters, numbers, or
         hyphens. It must start with a lowercase letter and end with a lowercase letter or number.
     params:
+    - arg_name: auth-mode
+      api_field: cluster.authorizationMode
+      help_text: |
+        Available authorization mode of a Redis cluster.
+      choices:
+      - enum_value: AUTH_MODE_DISABLED
+        arg_value: disabled
+        help_text: |
+            Authorization is disabled for the cluster.
+      - enum_value: AUTH_MODE_IAM_AUTH
+        arg_value: iam-auth
+        help_text: |
+            IAM basic authorization is enabled for the cluster.
     - arg_name: display-name
       api_field: cluster.displayName
       help_text: |
         A human-readable name for the cluster.
-    - arg_name: total-memory-size-gb
-      api_field: cluster.totalMemorySizeGb
+    - arg_name: replica-count
+      api_field: cluster.replicaCount
+      type: int
+      help_text: |
+        The replica count of each shard.
+    - arg_name: size-gb
+      api_field: cluster.sizeGb
       help_text: |
         The memory size of the cluster in GiB.
+    - arg_name: transit-encryption-mode
+      api_field: cluster.transitEncryptionMode
+      help_text: |
+        Transit encryption mode used for the Redis cluster.
+        If not provided, encryption is disabled for the cluster.
+      choices:
+      - enum_value: TRANSIT_ENCRYPTION_MODE_DISABLED
+        arg_value: disabled
+        help_text: |
+          In-transit encryption is disabled for the cluster.
+      - enum_value: TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION
+        arg_value: server-authentication
+        help_text: |
+          The cluster uses server managed encryption for in-transit encryption.
 
   async:
     collection: redis.projects.locations.operations

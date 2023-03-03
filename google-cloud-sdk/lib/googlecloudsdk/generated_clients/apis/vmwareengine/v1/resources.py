@@ -119,6 +119,17 @@ class Collections(enum.Enum):
       ['name'],
       True
   )
+  PROJECTS_LOCATIONS_PRIVATECLOUDS_CLUSTERS_NODES = (
+      'projects.locations.privateClouds.clusters.nodes',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/privateClouds/'
+              '{privateCloudsId}/clusters/{clustersId}/nodes/{nodesId}',
+      },
+      ['name'],
+      True
+  )
   PROJECTS_LOCATIONS_PRIVATECLOUDS_EXTERNALADDRESSES = (
       'projects.locations.privateClouds.externalAddresses',
       '{+name}',
@@ -137,6 +148,40 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/privateClouds/'
               '{privateCloudsId}/hcxActivationKeys/{hcxActivationKeysId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_PRIVATECLOUDS_MANAGEMENTDNSZONEBINDINGS = (
+      'projects.locations.privateClouds.managementDnsZoneBindings',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/privateClouds/'
+              '{privateCloudsId}/managementDnsZoneBindings/'
+              '{managementDnsZoneBindingsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_PRIVATECLOUDS_SUBNETS = (
+      'projects.locations.privateClouds.subnets',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/privateClouds/'
+              '{privateCloudsId}/subnets/{subnetsId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_PRIVATECONNECTIONS = (
+      'projects.locations.privateConnections',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'privateConnections/{privateConnectionsId}',
       },
       ['name'],
       True

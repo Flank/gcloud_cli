@@ -93,7 +93,17 @@
           help_text: |
             Clear existing source Cloud function.
     - group:
-        release_tracks: [BETA]
+        mutex: true
+        params:
+        - arg_name: source-app-engine-version
+          api_field: connectivityTest.source.appEngineVersion.uri
+          help_text: |
+            App Engine version URI as the source endpoint.
+        - arg_name: clear-source-app-engine-version
+          type: bool
+          help_text: |
+            Clear existing source App Engine version.
+    - group:
         mutex: true
         params:
         - arg_name: source-cloud-run-revision
@@ -200,6 +210,7 @@
       - googlecloudsdk.command_lib.network_management.util:ValidateGKEMasterClustersURIs
       - googlecloudsdk.command_lib.network_management.util:ValidateCloudSQLInstancesURIs
       - googlecloudsdk.command_lib.network_management.util:ValidateCloudFunctionsURIs
+      - googlecloudsdk.command_lib.network_management.util:ValidateAppEngineVersionsURIs
       - googlecloudsdk.command_lib.network_management.util:ValidateCloudRunRevisionsURIs
     GA:
       api_version: v1
@@ -209,6 +220,9 @@
       - googlecloudsdk.command_lib.network_management.util:ClearEndpointAttrs
       - googlecloudsdk.command_lib.network_management.util:ValidateGKEMasterClustersURIs
       - googlecloudsdk.command_lib.network_management.util:ValidateCloudSQLInstancesURIs
+      - googlecloudsdk.command_lib.network_management.util:ValidateCloudFunctionsURIs
+      - googlecloudsdk.command_lib.network_management.util:ValidateAppEngineVersionsURIs
+      - googlecloudsdk.command_lib.network_management.util:ValidateCloudRunRevisionsURIs
     method: patch
     collection: networkmanagement.projects.locations.global.connectivityTests
 

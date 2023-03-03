@@ -116,6 +116,9 @@ def _GetConfirmedClearedFields(args, patch_instance, original_instance):
     cleared_fields.append('settings.denyMaintenancePeriods')
   if args.clear_password_policy:
     cleared_fields.append('settings.passwordValidationPolicy')
+  if args.IsKnownAndSpecified('clear_allowed_psc_projects'):
+    cleared_fields.append(
+        'settings.ipConfiguration.pscConfig.allowedConsumerProjects')
 
   log.status.write(
       'The following message will be used for the patch API method.\n')
@@ -245,6 +248,8 @@ def AddBaseArgs(parser, is_alpha=False):
   flags.AddMaintenanceVersion(parser)
   flags.AddSqlServerAudit(parser)
   flags.AddDeletionProtection(parser)
+  flags.AddConnectorEnforcement(parser)
+  flags.AddEnableGooglePrivatePath(parser)
 
 
 def AddBetaArgs(parser):
@@ -252,8 +257,9 @@ def AddBetaArgs(parser):
   flags.AddInstanceResizeLimit(parser)
   flags.AddAllocatedIpRangeName(parser)
   labels_util.AddUpdateLabelsFlags(parser, enable_clear=True)
-  flags.AddEnableGooglePrivatePath(parser)
-  flags.AddConnectorEnforcement(parser)
+  psc_update_group = parser.add_mutually_exclusive_group(hidden=True)
+  flags.AddAllowedPscProjects(psc_update_group)
+  flags.AddClearAllowedPscProjects(psc_update_group)
 
 
 def AddAlphaArgs(unused_parser):
@@ -314,11 +320,6 @@ def RunBasePatchCommand(args, release_track):
       release_track=release_track)
   patch_instance.project = instance_ref.project
   patch_instance.name = instance_ref.instance
-
-  # TODO(b/122660263): Remove when V1 instances are no longer supported.
-  # V1 deprecation notice.
-  if api_util.IsInstanceV1(sql_messages, original_instance_resource):
-    command_util.ShowV1DeprecationWarning()
 
   cleared_fields = _GetConfirmedClearedFields(args, patch_instance,
                                               original_instance_resource)

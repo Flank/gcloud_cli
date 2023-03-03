@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.util import apis
 
 DEFAULT_DATABASE = '(default)'
@@ -38,6 +39,11 @@ def GetClient():
 def GetService():
   """Returns the service for interacting with the Datastore Admin service."""
   return GetClient().projects_databases
+
+
+def GetLocationService():
+  """Returns the Firestore Location service for interacting with the Firestore Admin service."""
+  return GetClient().projects_locations
 
 
 def CreateDatabase(project, location, database, database_type):
@@ -62,12 +68,31 @@ def CreateDatabase(project, location, database, database_type):
               type=database_type, locationId=location)))
 
 
-def GetExportDocumentsRequest(database, output_uri_prefix, collection_ids=None):
+def ListDatabases(project):
+  """Lists all Firestore databases under the project.
+
+  Args:
+    project: the project ID to list databases, a string.
+
+  Returns:
+    a List of Databases.
+  """
+  messages = GetMessages()
+  return GetService().List(
+      messages.FirestoreProjectsDatabasesListRequest(
+          parent='projects/{}'.format(project)))
+
+
+def GetExportDocumentsRequest(database,
+                              output_uri_prefix,
+                              namespace_ids=None,
+                              collection_ids=None):
   """Returns a request for a Firestore Admin Export.
 
   Args:
     database: the database id to export, a string.
     output_uri_prefix: the output GCS path prefix, a string.
+    namespace_ids: a string list of namespace ids to export.
     collection_ids: a string list of collection ids to export.
 
   Returns:
@@ -79,6 +104,9 @@ def GetExportDocumentsRequest(database, output_uri_prefix, collection_ids=None):
   if collection_ids:
     kwargs['collectionIds'] = collection_ids
 
+  if namespace_ids is not None:
+    kwargs['namespaceIds'] = namespace_ids
+
   export_request = request_class(**kwargs)
 
   request = messages.FirestoreProjectsDatabasesExportDocumentsRequest(
@@ -87,12 +115,16 @@ def GetExportDocumentsRequest(database, output_uri_prefix, collection_ids=None):
   return request
 
 
-def GetImportDocumentsRequest(database, input_uri_prefix, collection_ids=None):
+def GetImportDocumentsRequest(database,
+                              input_uri_prefix,
+                              namespace_ids=None,
+                              collection_ids=None):
   """Returns a request for a Firestore Admin Import.
 
   Args:
     database: the database id to import, a string.
     input_uri_prefix: the location of the GCS export files, a string.
+    namespace_ids: a string list of namespace ids to import.
     collection_ids: a string list of collection ids to import.
 
   Returns:
@@ -105,6 +137,9 @@ def GetImportDocumentsRequest(database, input_uri_prefix, collection_ids=None):
   if collection_ids:
     kwargs['collectionIds'] = collection_ids
 
+  if namespace_ids:
+    kwargs['namespaceIds'] = namespace_ids
+
   import_request = request_class(**kwargs)
 
   return messages.FirestoreProjectsDatabasesImportDocumentsRequest(
@@ -112,33 +147,56 @@ def GetImportDocumentsRequest(database, input_uri_prefix, collection_ids=None):
       googleFirestoreAdminV1ImportDocumentsRequest=import_request)
 
 
-def Export(project, output_uri_prefix, collection_ids=None):
+def Export(project, database, output_uri_prefix, namespace_ids, collection_ids):
   """Performs a Firestore Admin Export.
 
   Args:
     project: the project id to export, a string.
+    database: the databae id to import, a string.
     output_uri_prefix: the output GCS path prefix, a string.
+    namespace_ids: a string list of namespace ids to import.
     collection_ids: a string list of collections to export.
 
   Returns:
     an Operation.
   """
-  dbname = 'projects/{}/databases/{}'.format(project, DEFAULT_DATABASE)
+  dbname = 'projects/{}/databases/{}'.format(project, database)
   return GetService().ExportDocuments(
-      GetExportDocumentsRequest(dbname, output_uri_prefix, collection_ids))
+      GetExportDocumentsRequest(dbname, output_uri_prefix, namespace_ids,
+                                collection_ids))
 
 
-def Import(project, input_uri_prefix, collection_ids=None):
+def Import(project, database, input_uri_prefix, namespace_ids, collection_ids):
   """Performs a Firestore Admin v1 Import.
 
   Args:
     project: the project id to import, a string.
+    database: the databae id to import, a string.
     input_uri_prefix: the input uri prefix of the exported files, a string.
+    namespace_ids: a string list of namespace ids to import.
     collection_ids: a string list of collections to import.
 
   Returns:
     an Operation.
   """
-  dbname = 'projects/{}/databases/{}'.format(project, DEFAULT_DATABASE)
+  dbname = 'projects/{}/databases/{}'.format(project, database)
   return GetService().ImportDocuments(
-      GetImportDocumentsRequest(dbname, input_uri_prefix, collection_ids))
+      GetImportDocumentsRequest(dbname, input_uri_prefix, namespace_ids,
+                                collection_ids))
+
+
+def ListLocations(project):
+  """Lists locations available to Google Cloud Firestore.
+
+  Args:
+    project: the project id to list locations, a string.
+
+  Returns:
+    a List of Locations.
+  """
+  return list_pager.YieldFromList(
+      GetLocationService(),
+      GetMessages().FirestoreProjectsLocationsListRequest(
+          name='projects/{}'.format(project)),
+      field='locations',
+      batch_size_attribute='pageSize')

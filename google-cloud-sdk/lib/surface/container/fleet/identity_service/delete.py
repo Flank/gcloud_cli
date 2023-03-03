@@ -18,12 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import sys
-
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.fleet import resources
 from googlecloudsdk.command_lib.container.fleet.features import base
-from googlecloudsdk.core import exceptions
-from googlecloudsdk.core.console import console_io
 
 
 class Delete(base.UpdateCommand):
@@ -41,52 +38,62 @@ class Delete(base.UpdateCommand):
 
   feature_name = 'identityservice'
 
+  _fleet_default_member_config_supported_tracks = [
+      calliope_base.ReleaseTrack.ALPHA, calliope_base.ReleaseTrack.BETA
+  ]
+
   @classmethod
   def Args(cls, parser):
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(
-          parser,
-          membership_help='Membership name provided during registration.')
-    else:
-      parser.add_argument(
-          '--membership',
-          type=str,
-          help=('Membership name provided during registration.'),
-      )
+    resources.AddMembershipResourceArg(
+        parser, membership_help='Membership name provided during registration.')
+
+    if cls.ReleaseTrack(
+    ) not in cls._fleet_default_member_config_supported_tracks:
+      return
+
+    parser.add_argument(
+        '--fleet-default-member-config',
+        action='store_true',
+        help="""If specified, deletes the default membership
+        configuration present in your fleet.
+
+        To delete the default membership configuration present in your
+        fleet, run:
+
+          $ {command} --fleet-default-member-config""",
+    )
 
   def Run(self, args):
-    # Get fleet memberships (cluster registered with fleet) from GCP Project.
-    if resources.UseRegionalMemberships(self.ReleaseTrack()):
-      membership = base.ParseMembership(
-          args, prompt=True, autoselect=True, search=True)
-    else:
-      all_memberships = base.ListMemberships()
-      if not all_memberships:
-        raise exceptions.Error('No Memberships available in the fleet.')
+    update_mask = []
+    patch = self.messages.Feature()
 
-      # Acquire membership.
-      membership = None
-      # Prompt user for an existing fleet membership if none is provided.
-      if not args.membership:
-        index = 0
-        if len(all_memberships) > 1:
-          index = console_io.PromptChoice(
-              options=all_memberships,
-              message='Please specify a membership to delete Identity Service {}:\n'
-          )
-        membership = all_memberships[index]
-        sys.stderr.write('Selecting membership [{}].\n'.format(membership))
-      else:
-        membership = args.membership
-        if membership not in all_memberships:
-          raise exceptions.Error(
-              'Membership {} is not in the fleet.'.format(membership))
+    if self.ReleaseTrack(
+    ) in self._fleet_default_member_config_supported_tracks:
+      # Clear the fleet_default_member_config if the
+      # fleet_default_member_config flag is set to true.
+      if args.fleet_default_member_config:
+        self._UpdateFleetDefaultMemberConfigMaskAndPatch(update_mask, patch)
+        # If the user only specified fleet_default_member_config flag,
+        # stop further processing.
+        if not args.membership:
+          self.Update(update_mask, patch)
+          return
+
+    self._UpdateMembershipSpecsMaskAndPatch(args, update_mask, patch)
+    # Patch the feature based on the given masks.
+    self.Update(update_mask, patch)
+
+  def _UpdateFleetDefaultMemberConfigMaskAndPatch(self, mask, patch):
+    patch.fleetDefaultMemberConfig = self.messages.CommonFleetDefaultMemberConfigSpec(
+    )
+    mask.append('fleet_default_member_config')
+
+  def _UpdateMembershipSpecsMaskAndPatch(self, args, mask, patch):
+    # Get fleet memberships (cluster registered with fleet) from GCP Project.
+    membership = base.ParseMembership(
+        args, prompt=True, autoselect=True, search=True)
 
     # Setup a patch to set the MembershipSpec to the empty proto ("delete").
-    if not resources.UseRegionalMemberships(self.ReleaseTrack()):
-      membership = self.MembershipResourceName(membership)
     specs = {membership: self.messages.MembershipFeatureSpec()}
-    patch = self.messages.Feature(
-        membershipSpecs=self.hubclient.ToMembershipSpecs(specs))
-
-    self.Update(['membership_specs'], patch)
+    patch.membershipSpecs = self.hubclient.ToMembershipSpecs(specs)
+    mask.append('membership_specs')

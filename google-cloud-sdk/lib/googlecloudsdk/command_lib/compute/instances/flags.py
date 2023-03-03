@@ -343,16 +343,29 @@ def AddMaintenanceInterval():
       '--maintenance-interval',
       type=lambda x: x.upper(),
       choices={
-          'PERIODIC': 'VMs receive infrastructure and hypervisor updates '
-                      'on a periodic basis, minimizing the number of'
-                      ' maintenance operations (live migrations or '
-                      'terminations) on an individual VM. Security updates'
-                      ' will still be applied as soon as they are '
-                      'available.'
+          'PERIODIC': (
+              'VMs receive infrastructure and hypervisor updates '
+              'on a periodic basis, minimizing the number of'
+              ' maintenance operations (live migrations or '
+              'terminations) on an individual VM. Security updates'
+              ' will still be applied as soon as they are '
+              'available.'
+          ),
+          'RECURRENT': (
+              'VMs receive infrastructure and hypervisor updates on a periodic'
+              ' basis, minimizing the number of maintenance operations (live'
+              ' migrations or terminations) on an individual VM.  This may mean'
+              ' a VM will take longer to receive an update than if it was'
+              ' configured for AS_NEEDED.  Security updates will'
+              ' still be applied as soonas they are available.'
+              ' RECURRENT is used for GEN3 and Sliceof Hardware'
+              ' VMs.'
+          ),
       },
       help="""
       Specifies how infrastructure upgrades should be applied to the VM.
-      """)
+      """,
+  )
 
 
 def AddMaintenanceFreezeDuration():
@@ -861,13 +874,13 @@ def AddCreateDiskArgs(parser,
 
   if support_replica_zones:
     disk_help += """
-      *replica-zones*::: If specified, the created disk is regional.
-      Only one zone can be specified and it has to be different from
-      the zone of the instance, the other replica zone will be inferred from
-      the instance zone. The disk will be replicated to the specified replica zone
-      and the zone of the newly created instance.
-      """
-    spec['replica-zones'] = arg_parsers.ArgList(max_length=1)
+      *replica-zones*::: Required for each regional disk associated with the
+      instance. Specify the URLs of the zones where the disk should be
+      replicated to. You must provide exactly two replica zones, and one zone
+      must be the same as the instance zone. You can't use this option with boot
+      disks.
+    """
+    spec['replica-zones'] = arg_parsers.ArgList(max_length=2)
 
   if support_provisioned_throughput:
     spec['provisioned-throughput'] = int
@@ -1090,29 +1103,23 @@ def ValidateDiskBootFlags(args, enable_kms=False):
       raise exceptions.BadArgumentException(
           '--boot-disk-device-name',
           'Each instance can have exactly one boot disk. '
-          'One boot disk was specified through [--disk or --create-disk]'
-      )
+          'One boot disk was specified through [--disk or --create-disk]')
 
     if args.boot_disk_type:
       raise exceptions.BadArgumentException(
-          '--boot-disk-type',
-          'Each instance can have exactly one boot disk. '
-          'One boot disk was specified through [--disk or --create-disk]'
-      )
+          '--boot-disk-type', 'Each instance can have exactly one boot disk. '
+          'One boot disk was specified through [--disk or --create-disk]')
 
     if args.boot_disk_size:
       raise exceptions.BadArgumentException(
-          '--boot-disk-size',
-          'Each instance can have exactly one boot disk. '
-          'One boot disk was specified through [--disk or --create-disk]'
-      )
+          '--boot-disk-size', 'Each instance can have exactly one boot disk. '
+          'One boot disk was specified through [--disk or --create-disk]')
 
     if not args.boot_disk_auto_delete:
       raise exceptions.BadArgumentException(
           '--no-boot-disk-auto-delete',
           'Each instance can have exactly one boot disk. '
-          'One boot disk was specified through [--disk or --create-disk]'
-      )
+          'One boot disk was specified through [--disk or --create-disk]')
 
     if enable_kms:
       if args.boot_disk_kms_key:
@@ -1261,7 +1268,8 @@ def AddAddressArgs(parser,
                    support_subinterface=False,
                    instance_create=False,
                    containers=False,
-                   support_network_queue_count=False):
+                   support_network_queue_count=False,
+                   support_network_attachments=False):
   """Adds address arguments for instances and instance-templates.
 
   Args:
@@ -1275,6 +1283,8 @@ def AddAddressArgs(parser,
       to true, for create command otherwise.
     support_network_queue_count: indicates flexible networking queue count is
       supported or not.
+    support_network_attachments: indicates whether network attachments are
+      supported.
   """
   addresses = parser.add_mutually_exclusive_group()
   AddNoAddressArg(addresses)
@@ -1297,6 +1307,13 @@ def AddAddressArgs(parser,
       'subnet': str,
       'private-network-ip': str,
       'aliases': str,
+      'network-attachment': str,
+      'ipv6-address': str,
+      'ipv6-prefix-length': int,
+      'external-ipv6-address': str,
+      'external-ipv6-prefix-length': int,
+      'internal-ipv6-address': str,
+      'internal-ipv6-prefix-length': int,
   }
 
   multiple_network_interface_cards_spec['network-tier'] = _ValidateNetworkTier
@@ -1316,8 +1333,10 @@ def AddAddressArgs(parser,
       Adds a network interface to the instance. Mutually exclusive with any
       of these flags: *--address*, *--network*, *--network-tier*, *--subnet*,
       *--private-network-ip*, *--stack-type*, *--ipv6-network-tier*,
-      *--ipv6-public-ptr-domain*. This flag can be repeated to specify multiple
-      network interfaces.
+      *--ipv6-public-ptr-domain*, *--internal-ipv6-address*,
+      *--internal-ipv6-prefix-length*, *--ipv6-address*, *--ipv6-prefix-length*,
+      *--external-ipv6-address*, *--external-ipv6-prefix-length*.
+      This flag can be repeated to specify multiple network interfaces.
     """)
   else:
     network_interface_help_texts.append("""\
@@ -1406,16 +1425,26 @@ def AddAddressArgs(parser,
         address, it must belong to the CIDR range specified by the range
         name on the subnet. If the IP range is specified by netmask, the
         IP allocator will pick an available range with the specified netmask
-        and allocate it to this network interface.""")
+        and allocate it to this network interface.
+        """)
   else:
     network_interface_help_texts.append("""
-        Each IP alias range consists of a range name and an CIDR netmask
-        (e.g. `/24`) separated by a colon, or just the netmask.
+        Each IP alias range consists of a range name and a CIDR netmask
+        (e.g. `/24`) separated by a colon or just the netmask.
         The range name is the name of the range within the network
         interface's subnet from which to allocate an IP alias range. If
         unspecified, it defaults to the primary IP range of the subnet.
         The IP allocator will pick an available range with the specified
-        netmask and allocate it to this network interface.""")
+        netmask and allocate it to this network interface.
+        """)
+
+  if support_network_attachments:
+    # TODO(b/265153883): Add a link to the user guide.
+    network_interface_help_texts.append("""
+      *network-attachment*::: Specifies the network attachment that this
+      interface should connect to. Mutually exclusive with *--network* and
+      *--subnet* flags.
+      """)
 
   if instance_create:
     network_interfaces = parser.add_group(mutex=True)
@@ -1627,20 +1656,22 @@ def AddMaxRunDurationVmArgs(parser):
       help="""\
       Limits how long this VM instance can run, specified as a duration
       relative to the VM instance's most-recent start time. Format the duration,
-      ``MAX_RUN_DURATION'', similar to `T1h2m3s` where you can specify
-      the number of hours, minutes, and seconds
-      using `h`, `m`, and `s` respectively.
-      Alternatively, to specify a timestamp, use `--termination-time` instead.
+      ``MAX_RUN_DURATION'', as the number of days, hours, minutes, and seconds
+      followed by d, h, m, and s respectively. For example, specify 30m for a
+      duration of 30 minutes or specify 1d2h3m4s for a duration of 1 day,
+      2 hours, 3 minutes, and 4 seconds. Alternatively, to specify a timestamp,
+      use `--termination-time` instead.
 
       If neither `--max-run-duration` nor `--termination-time` is specified
       (default), the VM instance runs until prompted by a user action
       or system event.
-      If either is specified, the VM instance will be terminated
-      using the action specified by `--instance-termination-action`.
-      For `--max-run-duration`, the VM instance is terminated
-      whenever the VM's current runtime reaches ``MAX_RUN_DURATION'';
-      the current runtime is reset to zero
-      any time the VM instance is stopped and started again.
+      If either is specified, the VM instance is scheduled to be automatically
+      terminated using the action specified by `--instance-termination-action`.
+      For `--max-run-duration`, the VM instance is automatically terminated when the VM's
+      current runtime reaches ``MAX_RUN_DURATION''. Note: Anytime the VM instance
+      is stopped or suspended,  `--max-run-duration` and (unless the VM uses
+      `--provisioning-model=SPOT`) `--instance-termination-action` are
+      automatically removed from the VM.
       """)
 
   parser.add_argument(
@@ -1648,16 +1679,19 @@ def AddMaxRunDurationVmArgs(parser):
       type=arg_parsers.Datetime.Parse,
       help="""
       Limits how long this VM instance can run, specified as a time.
-      Format the time, ``TERMINATION_TIME'', as a RFC 3339 timestamp.
+      Format the time, ``TERMINATION_TIME'', as a RFC 3339 timestamp. For more
+      information, see https://tools.ietf.org/html/rfc3339.
       Alternatively, to specify a duration, use `--max-run-duration` instead.
 
      If neither `--termination-time` nor `--max-run-duration`
      is specified (default),
      the VM instance runs until prompted by a user action or system event.
-     If either is specified, the VM instance will be terminated using the action
-     specified by `--instance-termination-action`.
-     For `--termination-time`,
-     the VM instance is terminated only during the specified time.
+     If either is specified, the VM instance is scheduled to be automatically
+     terminated using the action specified by `--instance-termination-action`.
+     For `--termination-time`, the VM instance is automatically terminated at the
+     specified timestamp. Note: Anytime the VM instance is stopped or suspended,
+     `--termination-time` and (unless the VM uses `--provisioning-model=SPOT`)
+     `--instance-termination-action` are automatically removed from the VM.
      """)
 
 
@@ -1696,7 +1730,9 @@ def AddInstanceTerminationActionVmArgs(parser, is_update=False):
         },
         type=arg_utils.ChoiceToEnumName,
         help="""\
-      Specifies the termination action that will be taken upon VM preemption.
+      Specifies the termination action that will be taken upon VM preemption
+      (`--provisioning-model=SPOT` or `--preemptible`) or automatic instance
+      termination (`--max-run-duration` or `--termination-time`).
       """)
     termination_action_group.add_argument(
         '--clear-instance-termination-action',
@@ -1721,7 +1757,9 @@ def AddInstanceTerminationActionVmArgs(parser, is_update=False):
         },
         type=arg_utils.ChoiceToEnumName,
         help="""\
-      Specifies the termination action that will be taken upon VM preemption.
+      Specifies the termination action that will be taken upon VM preemption
+      (`--provisioning-model=SPOT` or `--preemptible`) or automatic instance
+      termination (`--max-run-duration` or `--termination-time`).
       """)
 
 
@@ -3238,34 +3276,57 @@ def AddIpv6NetworkTierArgs(parser):
 
 def AddIPv6AddressArgs(parser):
   parser.add_argument(
+      '--external-ipv6-address',
+      type=NonEmptyString('--external-ipv6-address'),
+      help="""
+      Assigns the given external IPv6 address to the instance that is created.
+      The address must be the first IP address in the range. This option can be
+      used only when creating a single instance.
+    """)
+
+
+def AddIPv6AddressAlphaArgs(parser):
+  parser.add_argument(
       '--ipv6-address',
       type=NonEmptyString('--ipv6-address'),
       help="""
       Assigns the given external IPv6 address to the instance that is created.
-      The address must be the first IP in the range. This option can only be
-      used when creating a single instance.
+      The address must be the first IP address in the range. This option can be
+      used only when creating a single instance.
     """)
 
 
 def AddIPv6PrefixLengthArgs(parser):
   parser.add_argument(
+      '--external-ipv6-prefix-length',
+      type=int,
+      help="""
+      The prefix length of the external IPv6 address range. This field should be
+      used together with `--external-ipv6-address`. Only the /96 IP address range
+      is supported, and the default value is 96.
+    """)
+
+
+def AddIPv6PrefixLengthAlphaArgs(parser):
+  parser.add_argument(
       '--ipv6-prefix-length',
       type=int,
       help="""
-      Prefix Length of the External IPv6 address range, should be used together
-      with --ipv6-address. Currently only /96 is supported and the default value
-      is 96.
+      The prefix length of the external IPv6 address range. This field should be
+      used together with `--ipv6-address`. Only the /96 IP address range is
+      supported, and the default value is 96.
     """)
 
 
 def AddInternalIPv6AddressArgs(parser):
   parser.add_argument(
       '--internal-ipv6-address',
-      type=NonEmptyString('--ipv6-address'),
+      type=NonEmptyString('--internal-ipv6-address'),
       help="""
-      Assigns the given internal IPv6 address or range to the instance that is
-      created. The address must be the first IP in the range or a IP range with
-      /96. This option can only be used when creating a single instance.
+      Assigns the given internal IPv6 address or range to the instance
+        that is created. The address must be the first IP address in the range
+        or a /96 IP address range. This option can be used only when creating a single
+        instance.
     """)
 
 
@@ -3275,10 +3336,9 @@ def AddInternalIPv6PrefixLengthArgs(parser):
       type=int,
       help="""
       Optional field that indicates the prefix length of the internal IPv6
-      address range, should be used together with
-      `--internal-ipv6-address=fd20::`. Currently only /96 is supported and the
-      default value is 96. If not set, the prefix length from
-      `--internal-ipv6-address=fd20::/96` will be used or assigned a default
+      address range, should be used together with --internal-ipv6-address. Only
+      /96 is supported and the default value is 96. If not set, the prefix
+      length from --internal-ipv6-address will be used or assigned a default
       value of 96.
     """)
 

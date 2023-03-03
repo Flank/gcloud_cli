@@ -33,6 +33,7 @@ EXAMPLES = """\
    """
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.GA)
 class GetStatus(base.Command):
   """Get the status of a specified Distributed Cloud Edge Network router.
 
@@ -56,6 +57,8 @@ class GetStatus(base.Command):
     return router_status
 
   def Run(self, args):
-    routers_client = routers.RoutersClient()
+    routers_client = routers.RoutersClient(self.ReleaseTrack())
     router_ref = args.CONCEPTS.router.Parse()
+    if self.ReleaseTrack() == base.ReleaseTrack.GA:
+      return routers_client.GetStatus(router_ref)
     return self._PreprocessResult(routers_client.GetStatus(router_ref))

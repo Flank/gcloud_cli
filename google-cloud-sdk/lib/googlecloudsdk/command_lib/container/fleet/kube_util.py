@@ -28,12 +28,10 @@ from googlecloudsdk.api_lib.container import api_adapter as gke_api_adapter
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.api_lib.util import waiter
-from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.container.fleet.memberships import gke_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import execution_utils
-from googlecloudsdk.core import http
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import requests
@@ -131,6 +129,7 @@ class MembershipCRDCreationOperation(object):
   """An operation that waits for a membership CRD to be created."""
 
   CREATED_KEYWORD = 'unchanged'
+  CONFIGURED_KEYWORD = 'configured'
 
   def __init__(self, kube_client, membership_crd_manifest):
     self.kube_client = kube_client
@@ -151,7 +150,8 @@ class MembershipCRDCreationOperation(object):
       self.error = err
 
     # If creation is successful, the create operation should show "unchanged"
-    elif self.CREATED_KEYWORD in out:
+    # or "configured"
+    elif self.CREATED_KEYWORD in out or self.CONFIGURED_KEYWORD in out:
       self.done = True
       self.succeeded = True
 
@@ -739,17 +739,11 @@ class KubernetesClient(object):
     Raises:
       Error: If the response has a status code >= 400.
     """
-    if base.UseRequests():
-      r = requests.GetSession().request(method, url, headers=headers)
-      content = r.content
-      status = r.status_code
-    else:
-      r, content = http.Http().request(url, method, headers=headers)
-      status = r.status
-
+    r = requests.GetSession().request(method, url, headers=headers)
+    status = r.status_code
     if status >= 400:
       raise exceptions.Error('status: {}, reason: {}'.format(status, r.reason))
-    return content
+    return r.content
 
   def _ClusterRequest(self, method, api_path, headers=None):
     """Internal method to make requests against the target cluster.

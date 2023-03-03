@@ -346,6 +346,10 @@
         "doXcomPush": {
           "description": "if true, an XCom is pushed containing the Operator\u2019s result.",
           "type": "boolean"
+        },
+        "isDynamicallyMapped": {
+          "description": "Whether this task will be mapped to multiple task instances during runtime.",
+          "type": "boolean"
         }
       }
     },
@@ -482,7 +486,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "Required. The resource name of the task instance, in the form: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\/dags\/{dagId}\/dagRuns\/{dagRunId}\/taskInstances\/{taskInstanceId}\".",
+          "description": "Required. The resource name of the task instance, in the form: \"projects\/{project_id}\/locations\/{location_id}\/environments\/{environment_id}\/dags\/{dag_id}\/dagRuns\/{dag_run_id}\/taskInstances\/{task_instance_id_with_optional_map_index}\".",
           "type": "string"
         },
         "id": {
@@ -589,6 +593,15 @@
           "description": "The number of tries that should be performed before failing the task.",
           "type": "integer",
           "format": "int32"
+        },
+        "isDynamicallyMapped": {
+          "description": "Whether this TaskInstance is dynamically mapped.",
+          "type": "boolean"
+        },
+        "mapIndex": {
+          "description": "If is_dynamically_mapped is set to true, this field contains index of the dynamically-mapped TaskInstance, If is_dynamically_mapped is set to false, this field has no meaning.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -651,6 +664,31 @@
           "description": "The execution date of the DAG run.",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "PauseDagRequest": {
+      "id": "PauseDagRequest",
+      "description": "Request to pause a DAG.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "ActivateDagRequest": {
+      "id": "ActivateDagRequest",
+      "description": "Request to unpause a DAG.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "SourceCode": {
+      "id": "SourceCode",
+      "description": "A source code of a DAG.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "The source code of the user-defined DAG.",
+          "type": "string"
         }
       }
     },
@@ -877,6 +915,11 @@
           "readOnly": true,
           "type": "string"
         },
+        "airflowByoidUri": {
+          "description": "Output only. The 'bring your own identity' variant of the URI of the Apache Airflow Web UI hosted within this environment, to be accessed with third-party identity credentials (see [Airflow web interface](\/composer\/docs\/how-to\/accessing\/airflow-web-interface)).",
+          "readOnly": true,
+          "type": "string"
+        },
         "environmentSize": {
           "description": "Optional. The size of the Cloud Composer environment. This field is supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer.",
           "type": "string",
@@ -900,6 +943,18 @@
         "masterAuthorizedNetworksConfig": {
           "description": "Optional. The configuration options for GKE cluster master authorized networks. By default master authorized networks feature is: - in case of private environment: enabled with no external networks allowlisted. - in case of public environment: disabled.",
           "$ref": "MasterAuthorizedNetworksConfig"
+        },
+        "resilienceMode": {
+          "description": "Optional. Resilience mode of the Cloud Composer Environment. This field is supported for Cloud Composer environments in versions composer-2.0.32-airflow-*.*.* and newer.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default mode doesn't change environment parameters.",
+            "Enabled High Resilience mode, including Cloud SQL HA."
+          ],
+          "enum": [
+            "RESILIENCE_MODE_UNSPECIFIED",
+            "HIGH_RESILIENCE"
+          ]
         }
       }
     },
@@ -1011,7 +1066,7 @@
           "type": "string"
         },
         "tags": {
-          "description": "Optional. The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with [RFC1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). Cannot be updated. This field is supported for Cloud Composer environments in versions composer-1.*.*-airflow-*.*.*.",
+          "description": "Optional. The list of instance tags applied to all node VMs. Tags are used to identify valid sources or targets for network firewalls. Each tag within the list must comply with [RFC1035](https:\/\/www.ietf.org\/rfc\/rfc1035.txt). Cannot be updated.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1190,10 +1245,6 @@
         "zone": {
           "description": "Optional. The Compute Engine zone where the Airflow database is created. If zone is provided, it must be in the region selected for the environment. If zone is not provided, a zone is automatically selected. The zone can only be set during environment creation. Supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.*.",
           "type": "string"
-        },
-        "highAvailability": {
-          "description": "Optional. Creates the Airflow Database in High Availability mode. This option can only be set during environment creation.",
-          "type": "boolean"
         }
       }
     },
@@ -1256,6 +1307,36 @@
           "format": "int32"
         },
         "taskLogsStorageMode": {
+          "description": "Optional. The mode of storage for Airflow workers task logs. For details, see go\/composer-store-task-logs-in-cloud-logging-only-design-doc",
+          "type": "string",
+          "enumDescriptions": [
+            "This configuration is not specified by the user.",
+            "Store task logs in Cloud Logging and in the environment's Cloud Storage bucket.",
+            "Store task logs in Cloud Logging only."
+          ],
+          "enum": [
+            "TASK_LOGS_STORAGE_MODE_UNSPECIFIED",
+            "CLOUD_LOGGING_AND_CLOUD_STORAGE",
+            "CLOUD_LOGGING_ONLY"
+          ]
+        },
+        "taskLogsRetentionConfig": {
+          "description": "Optional. The configuration settings for task logs retention",
+          "$ref": "TaskLogsRetentionConfig"
+        }
+      }
+    },
+    "TaskLogsRetentionConfig": {
+      "id": "TaskLogsRetentionConfig",
+      "description": "The configuration setting for Task Logs.",
+      "type": "object",
+      "properties": {
+        "retentionDays": {
+          "description": "Optional. The number of days to retain task logs in the Cloud Logging bucket",
+          "type": "integer",
+          "format": "int32"
+        },
+        "storageMode": {
           "description": "Optional. The mode of storage for Airflow workers task logs. For details, see go\/composer-store-task-logs-in-cloud-logging-only-design-doc",
           "type": "string",
           "enumDescriptions": [
@@ -1360,6 +1441,11 @@
           "description": "Optional. Storage (GB) request and limit for Airflow web server.",
           "type": "number",
           "format": "float"
+        },
+        "count": {
+          "description": "Optional. The number of web server instances. If not provided or set to 0, a single web server instance will be created.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -1681,6 +1767,13 @@
         }
       }
     },
+    "DatabaseFailoverRequest": {
+      "id": "DatabaseFailoverRequest",
+      "description": "Request to trigger database failover (only for highly resilient environments).",
+      "type": "object",
+      "properties": {
+      }
+    },
     "ListImageVersionsResponse": {
       "id": "ListImageVersionsResponse",
       "description": "The ImageVersions in a project and location.",
@@ -1790,7 +1883,8 @@
             "A resource update operation.",
             "A resource check operation.",
             "Saves snapshot of the resource operation.",
-            "Loads snapshot of the resource operation."
+            "Loads snapshot of the resource operation.",
+            "Triggers failover of environment's Cloud SQL instance (only for highly resilient environments)."
           ],
           "enum": [
             "TYPE_UNSPECIFIED",
@@ -1799,7 +1893,8 @@
             "UPDATE",
             "CHECK",
             "SAVE_SNAPSHOT",
-            "LOAD_SNAPSHOT"
+            "LOAD_SNAPSHOT",
+            "DATABASE_FAILOVER"
           ]
         },
         "resource": {
@@ -1879,6 +1974,13 @@
     "LoadSnapshotResponse": {
       "id": "LoadSnapshotResponse",
       "description": "Response to LoadSnapshotRequest.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "DatabaseFailoverResponse": {
+      "id": "DatabaseFailoverResponse",
+      "description": "Response for DatabaseFailoverRequest.",
       "type": "object",
       "properties": {
       }
@@ -2242,6 +2344,34 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Loads a snapshot of a Cloud Composer environment. As a result of this operation, a snapshot of environment's specified in LoadSnapshotRequest is loaded into the environment."
+                },
+                "databaseFailover": {
+                  "id": "composer.projects.locations.environments.databaseFailover",
+                  "path": "v1alpha2/{+environment}:databaseFailover",
+                  "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:databaseFailover",
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "environment": {
+                      "description": "Target environment: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\"",
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "environment"
+                  ],
+                  "request": {
+                    "$ref": "DatabaseFailoverRequest"
+                  },
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Triggers database failover (only for highly resilient environments)."
                 }
               }
               ,
@@ -2384,6 +2514,87 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
                       "description": "Trigger a DAG run."
+                    },
+                    "pause": {
+                      "id": "composer.projects.locations.environments.dags.pause",
+                      "path": "v1alpha2/{+name}:pause",
+                      "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:pause",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The name of dag to pause.",
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+\/dags\/[^\/]+$",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "PauseDagRequest"
+                      },
+                      "response": {
+                        "$ref": "Dag"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Pauses a dag."
+                    },
+                    "activate": {
+                      "id": "composer.projects.locations.environments.dags.activate",
+                      "path": "v1alpha2/{+name}:activate",
+                      "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:activate",
+                      "httpMethod": "POST",
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The name of dag to pause.",
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+\/dags\/[^\/]+$",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "ActivateDagRequest"
+                      },
+                      "response": {
+                        "$ref": "Dag"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Activates a dag."
+                    },
+                    "getSourceCode": {
+                      "id": "composer.projects.locations.environments.dags.getSourceCode",
+                      "path": "v1alpha2/{+dag}:getSourceCode",
+                      "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:getSourceCode",
+                      "httpMethod": "GET",
+                      "parameters": {
+                        "dag": {
+                          "description": "Required. The resource name of the DAG to fetch source code of. Must be in the form: \"projects\/{projectId}\/locations\/{locationId}\/environments\/{environmentId}\/dags\/{dagId}\".",
+                          "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/environments\/[^\/]+\/dags\/[^\/]+$",
+                          "location": "path",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "parameterOrder": [
+                        "dag"
+                      ],
+                      "response": {
+                        "$ref": "SourceCode"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "description": "Retrieves DAG source code."
                     }
                   }
                   ,

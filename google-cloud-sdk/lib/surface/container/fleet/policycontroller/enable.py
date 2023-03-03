@@ -18,12 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.fleet import resources
 from googlecloudsdk.command_lib.container.fleet.features import base
 from googlecloudsdk.command_lib.container.fleet.policycontroller import utils
 from googlecloudsdk.core import exceptions
 
 
+@calliope_base.Hidden
 class Enable(base.UpdateCommand, base.EnableCommand):
   """Enable Policy Controller Feature.
 
@@ -40,25 +42,14 @@ class Enable(base.UpdateCommand, base.EnableCommand):
 
   @classmethod
   def Args(cls, parser):
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(
-          parser,
-          plural=True,
-          membership_help=(
-              'The membership names to update, separated by commas if multiple '
-              'are supplied. Ignored if --all-memberships is supplied; if '
-              'neither is supplied, a prompt will appear with all available '
-              'memberships.'))
-    else:
-      parser.add_argument(
-          '--memberships',
-          type=str,
-          help=(
-              'The membership names to update, separated by commas if multiple '
-              'are supplied. Ignored if --all-memberships is supplied; if '
-              'neither is supplied, a prompt will appear with all available '
-              'memberships.'),
-      )
+    resources.AddMembershipResourceArg(
+        parser,
+        plural=True,
+        membership_help=(
+            'The membership names to update, separated by commas if multiple '
+            'are supplied. Ignored if --all-memberships is supplied; if '
+            'neither is supplied, a prompt will appear with all available '
+            'memberships.'))
     parser.add_argument(
         '--all-memberships',
         action='store_true',
@@ -123,11 +114,8 @@ class Enable(base.UpdateCommand, base.EnableCommand):
         self.messages.PolicyControllerHubConfig.InstallSpecValueValuesEnum
         .INSTALL_SPEC_ENABLED)
 
-    if resources.UseRegionalMemberships(self.ReleaseTrack()):
-      memberships = base.ParseMembershipsPlural(
-          args, prompt=True, prompt_cancel=False, search=True)
-    else:
-      memberships = utils.select_memberships(args)
+    memberships = base.ParseMembershipsPlural(
+        args, prompt=True, prompt_cancel=False, search=True)
     for membership in memberships:
       poco_membership_spec = self.messages.PolicyControllerMembershipSpec(
           policyControllerHubConfig=poco_hub_config)
@@ -135,8 +123,6 @@ class Enable(base.UpdateCommand, base.EnableCommand):
         poco_membership_spec.version = args.version
 
       membership_path = membership
-      if not resources.UseRegionalMemberships(self.ReleaseTrack()):
-        membership_path = self.MembershipResourceName(membership)
       membership_specs[membership_path] = self.messages.MembershipFeatureSpec(
           policycontroller=poco_membership_spec)
 

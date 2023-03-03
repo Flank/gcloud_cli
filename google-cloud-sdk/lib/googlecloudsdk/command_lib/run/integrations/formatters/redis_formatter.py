@@ -20,6 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.run.integrations.formatters import base_formatter
+from googlecloudsdk.command_lib.run.integrations.formatters import states
 from googlecloudsdk.core.resource import custom_printer_base as cp
 
 _REDIS_INSTANCE_TYPE = 'google_redis_instance'
@@ -33,12 +34,12 @@ class RedisFormatter(base_formatter.BaseFormatter):
     """Print the config of the integration.
 
     Args:
-      record: dict, the integration.
+      record: integration_printer.Record class that just holds data.
 
     Returns:
       The printed output.
     """
-    res_config = record.get('config', {}).get('redis', {}).get('instance', {})
+    res_config = record.config.get('redis', {}).get('instance', {})
 
     labeled = [('Memory Size GB', res_config.get('memory-size-gb'))]
     if 'tier' in res_config:
@@ -52,12 +53,12 @@ class RedisFormatter(base_formatter.BaseFormatter):
     """Print the component status of the integration.
 
     Args:
-      record: dict, the integration.
+      record: integration_printer.Record class that just holds data.
 
     Returns:
       The printed output.
     """
-    resource_status = record.get('status', {})
+    resource_status = record.status
     resources = resource_status.get('resourceComponentStatuses', {})
     redis = self._RedisFromResources(resources)
     vpc = self._VpcFromResources(resources)
@@ -81,8 +82,11 @@ class RedisFormatter(base_formatter.BaseFormatter):
   def CallToAction(self, record):
     """Call to action to use generated environment variables.
 
+    If the resource state is not ACTIVE then the resource is not ready for
+    use and the call to action will not be shown.
+
     Args:
-      record: dict, the integration.
+      record: integration_printer.Record class that just holds data.
 
     Returns:
       A formatted string of the call to action message,
@@ -91,6 +95,10 @@ class RedisFormatter(base_formatter.BaseFormatter):
     ## TODO(b/222759433):Once more than one redis instance is supported print
     ## correct variables. This will not be trivial since binding is not
     ## contained with redis resource.
+
+    state = record.status.get('state', '')
+    if state != states.ACTIVE:
+      return None
 
     return ('To connect to the Redis instance utilize the '
             'environment variables {} and {}. These have '

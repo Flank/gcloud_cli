@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.storage import flags
 
 
 DETAILED_HELP = {
@@ -45,4 +46,8 @@ class Storage(base.Group):
   def Filter(self, context, args):
     # TODO(b/190541521):  Determine if command group works with project number
     base.RequireProjectID(args)
+    # gsutil does not keep the user project quota enabled by default. Hence
+    # we will be keeping it disabled in gcloud storage as well to ensure parity.
+    # See b/258687686#comment5 for more information.
+    base.DisableUserProjectQuota()
     del context, args

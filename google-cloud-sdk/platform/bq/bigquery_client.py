@@ -10,16 +10,13 @@ from __future__ import print_function
 import abc
 import collections
 import datetime
-import errno
 import hashlib
 import itertools
 import json
 import logging
 import os
-import pkgutil
 import random
 import re
-import shutil
 import string
 import sys
 import tempfile
@@ -46,6 +43,8 @@ from six.moves.urllib.parse import urljoin
 
 # pylint: disable=unused-import
 import bq_flags
+from discovery_documents import discovery_document_cache
+from discovery_documents import discovery_document_loader
 
 
 # A unique non-None default, for use in kwargs that need to
@@ -54,7 +53,6 @@ _DEFAULT = object()
 
 # Maximum number of jobs that can be retrieved by ListJobs (sanity limit).
 _MAX_RESULTS = 100000
-
 
 
 _GCS_SCHEME_PREFIX = 'gs://'
@@ -440,6 +438,8 @@ def _ParseReservationPath(path):
   Args:
     path: String specifying the reservation path in the format
       projects/<project_id>/locations/<location>/reservations/<reservation_id>
+      or
+      projects/<project_id>/locations/<location>/biReservation
 
   Returns:
     A tuple of three elements: containing project_id, location and
@@ -450,19 +450,22 @@ def _ParseReservationPath(path):
   """
 
   pattern = re.compile(
-      r"""
-  ^projects\/(?P<project_id>[\w:\-.]*[\w:\-]+)?
-  \/locations\/(?P<location>[\w\-]+)?
-  \/reservations\/(?P<reservation_id>[\w\-\/]+)$
-  """, re.X)
+      r'^projects/(?P<project_id>[\w:\-.]*[\w:\-]+)?' +
+      r'/locations/(?P<location>[\w\-]+)?' +
+      # Accept a suffix of '/reservations/<reservation ID>' or
+      # one of '/biReservation'
+      r'/(reservations/(?P<reservation_id>[\w\-/]+)' +
+      r'|(?P<bi_id>biReservation)' + r')$',
+      re.X)
 
   match = re.search(pattern, path)
   if not match:
     raise BigqueryError('Could not parse reservation path: %s' % path)
 
-  project_id = match.groupdict().get('project_id', None)
-  location = match.groupdict().get('location', None)
-  reservation_id = match.groupdict().get('reservation_id', None)
+  group = lambda key: match.groupdict().get(key, None)
+  project_id = group('project_id')
+  location = group('location')
+  reservation_id = group('reservation_id') or group('bi_id')
   return (project_id, location, reservation_id)
 
 
@@ -912,47 +915,38 @@ class BigqueryServiceError(BigqueryError):
 
 class BigqueryNotFoundError(BigqueryServiceError):
   """The requested resource or identifier was not found."""
-  pass
 
 
 class BigqueryDuplicateError(BigqueryServiceError):
   """The requested resource or identifier already exists."""
-  pass
 
 
 class BigqueryAccessDeniedError(BigqueryServiceError):
   """The user does not have access to the requested resource."""
-  pass
 
 
 class BigqueryInvalidQueryError(BigqueryServiceError):
   """The SQL statement is invalid."""
-  pass
 
 
 class BigqueryTermsOfServiceError(BigqueryAccessDeniedError):
   """User has not ACK'd ToS."""
-  pass
 
 
 class BigqueryBackendError(BigqueryServiceError):
   """A backend error typically corresponding to retriable HTTP 5xx failures."""
-  pass
 
 
 class BigqueryClientError(BigqueryError):
   """Invalid use of BigqueryClient."""
-  pass
 
 
 class BigqueryClientConfigurationError(BigqueryClientError):
   """Invalid configuration of BigqueryClient."""
-  pass
 
 
 class BigquerySchemaError(BigqueryClientError):
   """Error in locating or parsing the schema."""
-  pass
 
 
 class BigqueryModel(model.JsonModel):
@@ -978,6 +972,7 @@ class BigqueryModel(model.JsonModel):
   # pylint: disable=g-bad-name
   def response(self, resp, content):
     """Convert the response wire format into a Python object."""
+    logging.info('Response from server with status code: %s', resp['status'])
     return super(BigqueryModel, self).response(resp, content)
 
   # pylint: enable=g-bad-name
@@ -988,6 +983,8 @@ class BigqueryHttp(http_request.HttpRequest):
 
   def __init__(self, bigquery_model, *args, **kwds):
     super(BigqueryHttp, self).__init__(*args, **kwds)
+    logging.info('URL being requested from BQ client: %s %s', kwds['method'],
+                 args[2])
     self._model = bigquery_model
 
   @staticmethod
@@ -1280,15 +1277,18 @@ class BigqueryClient(object):
         bigquery_model,
     )
     discovery_document = None
+    if self.discovery_document != _DEFAULT:
+      discovery_document = self.discovery_document
     if discovery_document == _DEFAULT:
       # Use the api description packed with this client, if one exists.
+      doc_filename = discovery_document_loader.get_discovery_bigquery_name(
+          self.api, self.api_version)
       try:
-        discovery_document = pkgutil.get_data(
-            'bigquery_client',
-            'discovery/%s.bigquery.%s.rest.json' %
-            (_ToFilename(self.api), self.api_version)).decode('utf-8')
-      except IOError:
-        discovery_document = None
+        discovery_document = discovery_document_loader.load_local_discovery_doc(
+            doc_filename)
+      except FileNotFoundError as e:
+        logging.warning('Failed to load discovery doc from local files: %s', e)
+
     if discovery_document is None:
       # Attempt to retrieve discovery doc with retry logic for transient,
       # retry-able errors.
@@ -1337,10 +1337,12 @@ class BigqueryClient(object):
 
     discovery_document_to_build_client = self.OverrideEndpoint(
         discovery_document)
+
+    built_client = None
     try:
       client_options = discovery.get_client_options()
       if (not flags.FLAGS['api'].using_default_value
-          ):
+         ):
         client_options.api_endpoint = _BuildApiEndpointFromApiFlag(
             flags.FLAGS.api,
             _ParseDiscoveryDoc(discovery_document_to_build_client))
@@ -1353,11 +1355,13 @@ class BigqueryClient(object):
           model=bigquery_model,
           client_options=client_options,
           requestBuilder=bigquery_http)
-      return built_client
     except Exception:
       logging.error('Error building from discovery document: %s',
                     discovery_document)
       raise
+
+
+    return built_client
 
   def BuildDiscoveryNextApiClient(self):
     """Builds and returns BigQuery API client from discovery_next document."""
@@ -1367,28 +1371,27 @@ class BigqueryClient(object):
     bigquery_http = BigqueryHttp.Factory(
         bigquery_model,
     )
-    models_discovery_document = None
+    models_doc = None
     try:
-      models_discovery_document = self.OverrideEndpoint(
-          pkgutil.get_data('bigquery_client',
-                           'discovery_next/bigquery.json'))
-    except IOError:
-      logging.error('Failed to build discovery_next document')
+      models_doc = discovery_document_loader.load_local_discovery_doc(
+          discovery_document_loader.DISCOVERY_NEXT_BIGQUERY)
+      models_doc = self.OverrideEndpoint(models_doc)
+    except (BigqueryClientError, FileNotFoundError) as e:
+      logging.warning('Failed to load discovery doc from local files: %s', e)
       raise
+
     try:
       client_options = discovery.get_client_options()
       if flags.FLAGS.mtls:
-        client_options.api_endpoint = discovery.get_mtls_endpoint(
-            models_discovery_document)
+        client_options.api_endpoint = discovery.get_mtls_endpoint(models_doc)
       return discovery.build_from_document(
-          models_discovery_document,
+          models_doc,
           http=http,
           model=bigquery_model,
           client_options=client_options,
           requestBuilder=bigquery_http)
     except Exception:
-      logging.error('Error building from models document: %s',
-                    models_discovery_document)
+      logging.error('Error building from models document: %s', models_doc)
       raise
 
   def BuildIAMPolicyApiClient(self):
@@ -1399,30 +1402,26 @@ class BigqueryClient(object):
     bigquery_http = BigqueryHttp.Factory(
         bigquery_model,
     )
-    iam_policy_discovery_document = None
     try:
-      iam_policy_discovery_document = self.OverrideEndpoint(
-          pkgutil.get_data('bigquery_client',
-                           'discovery_next/iam-policy.json'))
-    except IOError:
-      logging.error('Failed to build iam policy discovery document')
-      raise
+      iam_pol_doc = discovery_document_loader.load_local_discovery_doc(
+          discovery_document_loader.DISCOVERY_NEXT_IAM_POLICY)
+      iam_pol_doc = self.OverrideEndpoint(iam_pol_doc)
+    except (BigqueryClientError, FileNotFoundError) as e:
+      logging.warning('Failed to load discovery doc from local files: %s', e)
+
     try:
       client_options = discovery.get_client_options()
       if flags.FLAGS.mtls:
-        client_options.api_endpoint = discovery.get_mtls_endpoint(
-            iam_policy_discovery_document)
+        client_options.api_endpoint = discovery.get_mtls_endpoint(iam_pol_doc)
       return discovery.build_from_document(
-          iam_policy_discovery_document,
+          iam_pol_doc,
           http=http,
           model=bigquery_model,
           client_options=client_options,
           requestBuilder=bigquery_http)
     except Exception:
-      logging.error('Error building from iam policy document: %s',
-                    iam_policy_discovery_document)
+      logging.error('Error building from iam policy document: %s', iam_pol_doc)
       raise
-
 
   @property
   def apiclient(self):
@@ -1913,10 +1912,6 @@ class BigqueryClient(object):
          ):
       return ApiClientHelper.BetaReservationReference(
           projectId=project_id, location=location, reservationId=reservation_id)
-    elif (self.api_version == 'edition_preview'
-         ):
-      return ApiClientHelper.EditionPreviewReservationReference(
-          projectId=project_id, location=location, reservationId=reservation_id)
     else:
       return ApiClientHelper.ReservationReference(
           projectId=project_id, location=location, reservationId=reservation_id)
@@ -1957,12 +1952,6 @@ class BigqueryClient(object):
     if not capacity_commitment_id:
       raise BigqueryError('Capacity commitment id not specified.')
 
-    if (self.api_version == 'edition_preview'
-       ):
-      return ApiClientHelper.EditionPreviewCapacityCommitmentReference.Create(
-          projectId=project_id,
-          location=location,
-          capacityCommitmentId=capacity_commitment_id)
     return ApiClientHelper.CapacityCommitmentReference.Create(
         projectId=project_id,
         location=location,
@@ -2116,7 +2105,6 @@ class BigqueryClient(object):
       self,
       slots,
       ignore_idle_slots,
-    edition,
     target_job_concurrency,
     enable_queuing_and_priorities,
     multi_region_auxiliary,
@@ -2128,7 +2116,6 @@ class BigqueryClient(object):
       slots: Number of slots allocated to this reservation subtree.
       ignore_idle_slots: Specifies whether queries should ignore idle slots from
         other reservations.
-      edition: The edition for this reservation.
       target_job_concurrency: Job concurrency target.
       enable_queuing_and_priorities: Whether queuing and new prioritization
         behavior should be enabled for the reservation.
@@ -2176,9 +2163,6 @@ class BigqueryClient(object):
           'budget_slot_hours'] = autoscale_budget_slot_hours
 
 
-    if edition is not None:
-      reservation['edition'] = edition
-
     return reservation
 
   def CreateReservation(
@@ -2186,7 +2170,6 @@ class BigqueryClient(object):
       reference,
       slots,
       ignore_idle_slots,
-    edition,
     target_job_concurrency,
     enable_queuing_and_priorities,
     multi_region_auxiliary,
@@ -2199,7 +2182,6 @@ class BigqueryClient(object):
       slots: Number of slots allocated to this reservation subtree.
       ignore_idle_slots: Specifies whether queries should ignore idle slots from
         other reservations.
-      edition: The edition for this reservation.
       target_job_concurrency: Job concurrency target.
       enable_queuing_and_priorities: Whether queuing and new prioritization
         behavior should be enabled for the reservation.
@@ -2218,7 +2200,6 @@ class BigqueryClient(object):
     reservation = self.GetBodyForCreateReservation(
         slots,
         ignore_idle_slots,
-        edition,
         target_job_concurrency,
         enable_queuing_and_priorities,
         multi_region_auxiliary,
@@ -2328,6 +2309,7 @@ class BigqueryClient(object):
     return client.projects().locations().updateBiReservation(
         name=reference.path(), updateMask=update_mask,
         body=bi_reservation).execute()
+
 
   def GetParamsForUpdateReservation(
       self,
@@ -2451,7 +2433,6 @@ class BigqueryClient(object):
   def CreateCapacityCommitment(
       self,
       reference,
-    edition,
     slots,
     plan,
     renewal_plan,
@@ -2460,7 +2441,6 @@ class BigqueryClient(object):
 
     Arguments:
       reference: Project to create a capacity commitment within.
-      edition: The edition for this capacity commitment.
       slots: Number of slots in this commitment.
       plan: Commitment plan for this capacity commitment.
       renewal_plan: Renewal plan for this capacity commitment.
@@ -2476,8 +2456,6 @@ class BigqueryClient(object):
     capacity_commitment['renewal_plan'] = renewal_plan
     if multi_region_auxiliary is not None:
       capacity_commitment['multi_region_auxiliary'] = multi_region_auxiliary
-    if edition is not None:
-      capacity_commitment['edition'] = edition
     client = self.GetReservationApiClient()
     parent = 'projects/%s/locations/%s' % (reference.projectId,
                                            reference.location)
@@ -3157,8 +3135,8 @@ class BigqueryClient(object):
         if 'sparkOptions' in object_info:
           formatter.AddColumns(
               ('Connection', 'Runtime Version', 'Container Image', 'Properties',
-               'Main File URI', 'PyFile URIs', 'Jar URIs', 'File URIs',
-               'Archive URIs'))
+               'Main File URI', 'Main Class', 'PyFile URIs', 'Jar URIs',
+               'File URIs', 'Archive URIs'))
     elif reference_type == ApiClientHelper.RowAccessPolicyReference:
       if print_format == 'list':
         formatter.AddColumns(('Id', 'Filter Predicate', 'Grantees',
@@ -3216,8 +3194,9 @@ class BigqueryClient(object):
           'ignoreIdleSlots',
           'creationTime',
           'updateTime',
-          'multiRegionAuxiliary'
-      ))
+          'multiRegionAuxiliary',
+          'autoscaleMaxSlots',
+          'autoscaleCurrentSlots'))
     elif reference_type == ApiClientHelper.BetaReservationReference:
       formatter.AddColumns((
           'name',
@@ -3227,38 +3206,28 @@ class BigqueryClient(object):
           'enableQueuingAndPriorities',
           'creationTime',
           'updateTime',
-          'multiRegionAuxiliary'
-      ))
+          'multiRegionAuxiliary'))
     elif reference_type == ApiClientHelper.AutoscaleAlphaReservationReference:
-      formatter.AddColumns((
-          'name',
-          'slotCapacity',
-          'targetJobConcurrency',
-          'ignoreIdleSlots',
-          'autoscaleMaxSlots',
-          'autoscaleCurrentSlots',
-          'creationTime',
-          'updateTime',
-          'multiRegionAuxiliary'
-      ))
+      formatter.AddColumns(
+          ('name', 'slotCapacity', 'targetJobConcurrency', 'ignoreIdleSlots',
+           'autoscaleMaxSlots', 'autoscaleCurrentSlots', 'creationTime',
+           'updateTime', 'multiRegionAuxiliary'))
     elif reference_type == ApiClientHelper.AutoscalePreviewReservationReference:
       formatter.AddColumns(
           ('name', 'slotCapacity', 'targetJobConcurrency', 'ignoreIdleSlots',
            'autoscaleBudgetSlotHours', 'autoscaleUsedBudgetSlotHours',
            'creationTime', 'updateTime', 'multiRegionAuxiliary'))
-    elif reference_type == ApiClientHelper.EditionPreviewReservationReference:
-      formatter.AddColumns(
-          ('name', 'slotCapacity', 'targetJobConcurrency', 'ignoreIdleSlots',
-           'creationTime', 'updateTime', 'multiRegionAuxiliary', 'edition',
-           'autoscaleMaxSlots', 'autoscaleCurrentSlots'))
     elif reference_type == ApiClientHelper.CapacityCommitmentReference:
-      formatter.AddColumns(
-          ('name', 'slotCount', 'plan', 'renewalPlan', 'state',
-           'commitmentStartTime', 'commitmentEndTime', 'multiRegionAuxiliary'))
-    elif reference_type == ApiClientHelper.EditionPreviewCapacityCommitmentReference:
-      formatter.AddColumns(('name', 'slotCount', 'plan', 'renewalPlan', 'state',
-                            'commitmentStartTime', 'commitmentEndTime',
-                            'multiRegionAuxiliary', 'edition'))
+      formatter.AddColumns((
+          'name',
+          'slotCount',
+          'plan',
+          'renewalPlan',
+          'state',
+          'commitmentStartTime',
+          'commitmentEndTime',
+          'multiRegionAuxiliary'
+      ))
     elif reference_type == ApiClientHelper.BetaReservationAssignmentReference:
       formatter.AddColumns(('name', 'jobType', 'assignee', 'priority'))
     elif reference_type == ApiClientHelper.ReservationAssignmentReference:
@@ -3464,8 +3433,7 @@ class BigqueryClient(object):
       return BigqueryClient.FormatReservationInfo(
           reservation=object_info, reference_type=object_type)
     elif issubclass(object_type, ApiClientHelper.CapacityCommitmentReference):
-      return BigqueryClient.FormatCapacityCommitmentInfo(
-          object_info, reference_type=object_type)
+      return BigqueryClient.FormatCapacityCommitmentInfo(object_info)
     elif issubclass(object_type,
                     ApiClientHelper.ReservationAssignmentReference):
       return BigqueryClient.FormatReservationAssignmentInfo(object_info)
@@ -3707,8 +3675,9 @@ class BigqueryClient(object):
                  ('runtimeVersion', 'Runtime Version'),
                  ('containerImage', 'Container Image'),
                  ('properties', 'Properties'), ('mainFileUri', 'Main File URI'),
-                 ('pyFileUris', 'PyFile URIs'), ('jarUris', 'Jar URIs'),
-                 ('fileUris', 'File URIs'), ('archiveUris', 'Archive URIs')]
+                 ('mainClass', 'Main Class'), ('pyFileUris', 'PyFile URIs'),
+                 ('jarUris', 'Jar URIs'), ('fileUris', 'File URIs'),
+                 ('archiveUris', 'Archive URIs')]
       for spark_key, result_key in options:
         if spark_key in spark_options:
           result[result_key] = spark_options[spark_key]
@@ -3937,10 +3906,6 @@ class BigqueryClient(object):
             location=location,
             reservationId=reservation_id)
         result[key] = reference.__str__()
-      # Don't show edition unless the correct api_version is specified.
-      elif key == 'edition':
-        if reference_type == ApiClientHelper.EditionPreviewReservationReference:
-          result[key] = value
       else:
         result[key] = value
     # Default values not passed along in the response.
@@ -3960,10 +3925,8 @@ class BigqueryClient(object):
         'enableQueuingAndPriorities' not in list(result.keys())):
       result['enableQueuingAndPriorities'] = 'False'
     if 'autoscale' in list(result.keys()):
-      if ((reference_type == ApiClientHelper.AutoscaleAlphaReservationReference
-           or reference_type
-           == ApiClientHelper.EditionPreviewReservationReference) and
-          'maxSlots' in result['autoscale']):
+      if (reference_type != ApiClientHelper.AutoscalePreviewReservationReference
+          and 'maxSlots' in result['autoscale']):
         result['autoscaleMaxSlots'] = result['autoscale']['maxSlots']
         result['autoscaleCurrentSlots'] = '0'
         if 'currentSlots' in result['autoscale']:
@@ -3981,12 +3944,11 @@ class BigqueryClient(object):
     return result
 
   @classmethod
-  def FormatCapacityCommitmentInfo(cls, capacity_commitment, reference_type):
+  def FormatCapacityCommitmentInfo(cls, capacity_commitment):
     """Prepare a capacity commitment for printing.
 
     Arguments:
       capacity_commitment: capacity commitment to format.
-      reference_type: Type of capacity commitment.
 
     Returns:
       A dictionary of capacity commitment properties.
@@ -4001,10 +3963,6 @@ class BigqueryClient(object):
             location=location,
             capacityCommitmentId=capacity_commitment_id)
         result[key] = reference.__str__()
-      elif key == 'edition':
-        if (reference_type ==
-            ApiClientHelper.EditionPreviewCapacityCommitmentReference):
-          result[key] = value
       else:
         result[key] = value
     # Default values not passed along in the response.
@@ -4912,7 +4870,7 @@ class BigqueryClient(object):
         value can be from 48 to 168 hours (2 to 7 days). The default value is
         168 hours if this is not set.
       storage_billing_model: Optional. Sets the storage billing model for the
-      dataset.
+        dataset.
 
     Raises:
       TypeError: if reference is not an ApiClientHelper.DatasetReference
@@ -5014,8 +4972,10 @@ class BigqueryClient(object):
         an external table. For example, a BigQuery table backed by CSV files in
         GCS.
       view_udf_resources: optional UDF resources used in a view.
-      use_legacy_sql: Whether to use Legacy SQL. If not set, the default
-        behavior is true.
+      use_legacy_sql: The choice of using Legacy SQL for the query is optional.
+        If not specified, the server will automatically determine the dialect
+        based on query information, such as dialect prefixes. If no prefixes are
+        found, it will default to Legacy SQL.
       labels: an optional dict of labels to set on the table.
       time_partitioning: if set, enables time based partitioning on the table
         and configures the partitioning.
@@ -5082,6 +5042,20 @@ class BigqueryClient(object):
       if not ignore_existing:
         raise
 
+  def _FetchDataSource(self, project_reference, data_source_id):
+    transfer_client = self.GetTransferV1ApiClient()
+    data_source_retrieval = (
+        project_reference + '/locations/-/dataSources/' + data_source_id
+    )
+
+    return (
+        transfer_client.projects()
+        .locations()
+        .dataSources()
+        .get(name=data_source_retrieval)
+        .execute()
+    )
+
   def UpdateTransferConfig(self,
                            reference,
                            target_dataset=None,
@@ -5141,23 +5115,22 @@ class BigqueryClient(object):
       update_mask.append('transfer_config.display_name')
       update_items['displayName'] = display_name
 
-    data_source_retrieval = (
-        project_reference + '/locations/-/dataSources/' +
-        current_config['dataSourceId'])
-    data_source_info = transfer_client.projects().locations().dataSources().get(
-        name=data_source_retrieval).execute()
-
     if params:
       update_items = self.ProcessParamsFlag(params, update_items)
       update_mask.append('transfer_config.params')
 
     # if refresh window provided, check that data source supports it
     if refresh_window_days:
-      if refresh_window_days:
-        update_items = self.ProcessRefreshWindowDaysFlag(
-            refresh_window_days, data_source_info, update_items,
-            current_config['dataSourceId'])
-        update_mask.append('transfer_config.data_refresh_window_days')
+      data_source_info = self._FetchDataSource(
+          project_reference, current_config['dataSourceId']
+      )
+      update_items = self.ProcessRefreshWindowDaysFlag(
+          refresh_window_days,
+          data_source_info,
+          update_items,
+          current_config['dataSourceId'],
+      )
+      update_mask.append('transfer_config.data_refresh_window_days')
 
     if schedule_args:
       if schedule_args.schedule is not None:
@@ -5244,14 +5217,12 @@ class BigqueryClient(object):
       create_items['displayName'] = display_name
     else:
       raise BigqueryError('A display name must be provided.')
-    data_sources_reference = (
-        reference + '/locations/-/dataSources/' + data_source)
-    data_source_info = transfer_client.projects().locations().dataSources().get(
-        name=data_sources_reference).execute()
+
     create_items['dataSourceId'] = data_source
 
     # if refresh window provided, check that data source supports it
     if refresh_window_days:
+      data_source_info = self._FetchDataSource(reference, data_source)
       create_items = self.ProcessRefreshWindowDaysFlag(refresh_window_days,
                                                        data_source_info,
                                                        create_items,
@@ -5327,7 +5298,6 @@ class BigqueryClient(object):
       refresh window days flag.
     Raises:
       BigqueryError: If the data source does not support (custom) window days.
-
     """
     if 'dataRefreshType' in data_source_info:
       if data_source_info['dataRefreshType'] == 'CUSTOM_SLIDING_WINDOW':
@@ -5341,31 +5311,30 @@ class BigqueryClient(object):
       raise BigqueryError('Data source \'%s\' does not'
                           ' support refresh window days.' % data_source)
 
-  def UpdateTable(
-      self,
-      reference,
-      schema=None,
-      description=None,
-      display_name=None,
-      expiration=None,
-      view_query=None,
-      materialized_view_query=None,
-      enable_refresh=None,
-      refresh_interval_ms=None,
-      max_staleness=None,
-      external_data_config=None,
-      view_udf_resources=None,
-      use_legacy_sql=None,
-      labels_to_set=None,
-      label_keys_to_remove=None,
-      time_partitioning=None,
-      range_partitioning=None,
-      clustering=None,
-      require_partition_filter=None,
-      etag=None,
-      encryption_configuration=None,
-      location=None,
-      autodetect_schema=False):
+  def UpdateTable(self,
+                  reference,
+                  schema=None,
+                  description=None,
+                  display_name=None,
+                  expiration=None,
+                  view_query=None,
+                  materialized_view_query=None,
+                  enable_refresh=None,
+                  refresh_interval_ms=None,
+                  max_staleness=None,
+                  external_data_config=None,
+                  view_udf_resources=None,
+                  use_legacy_sql=None,
+                  labels_to_set=None,
+                  label_keys_to_remove=None,
+                  time_partitioning=None,
+                  range_partitioning=None,
+                  clustering=None,
+                  require_partition_filter=None,
+                  etag=None,
+                  encryption_configuration=None,
+                  location=None,
+                  autodetect_schema=False):
     """Updates a table.
 
     Args:
@@ -5389,8 +5358,10 @@ class BigqueryClient(object):
         an external table. For example, a BigQuery table backed by CSV files in
         GCS.
       view_udf_resources: optional UDF resources used in a view.
-      use_legacy_sql: Whether to use Legacy SQL. If not set, the default
-        behavior is true.
+      use_legacy_sql: The choice of using Legacy SQL for the query is optional.
+        If not specified, the server will automatically determine the dialect
+        based on query information, such as dialect prefixes. If no prefixes are
+        found, it will default to Legacy SQL.
       labels_to_set: an optional dict of labels to set on this table.
       label_keys_to_remove: an optional list of label keys to remove from this
         table.
@@ -5580,7 +5551,7 @@ class BigqueryClient(object):
         value can be from 48 to 168 hours (2 to 7 days). The default value is
         168 hours if this is not set.
       storage_billing_model: Optional. Sets the storage billing model for the
-      dataset.
+        dataset.
 
     Raises:
       TypeError: if reference is not a DatasetReference.
@@ -5875,7 +5846,7 @@ class BigqueryClient(object):
         job_reference['location'] = location
     media_upload = ''
     if upload_file:
-      resumable = True
+      resumable = self.enable_resumable_uploads
       # There is a bug in apiclient http lib that make uploading resumable files
       # with 0 length broken.
       if os.stat(upload_file).st_size == 0:
@@ -5931,8 +5902,10 @@ class BigqueryClient(object):
       external_table_definitions_json: Json representation of external table
         definitions.
       udf_resources: Array of inline and external UDF code resources.
-      use_legacy_sql: Whether to use Legacy SQL. If not set, the default value
-        is true.
+      use_legacy_sql: The choice of using Legacy SQL for the query is optional.
+        If not specified, the server will automatically determine the dialect
+        based on query information, such as dialect prefixes. If no prefixes are
+        found, it will default to Legacy SQL.
       location: Optional. The geographic location where the job should run.
       connection_properties: Optional. Connection properties to use when running
         the query, presented as a list of key/value pairs. A key of "time_zone"
@@ -6352,7 +6325,6 @@ class BigqueryClient(object):
         after FormatJobInfo().
         For dry run queries schema and rows are empty, the execution metadata
         dict contains statistics
-
     """
     if not self.sync:
       raise BigqueryClientError('Running RPC-style query asynchronously is '
@@ -6517,8 +6489,10 @@ class BigqueryClient(object):
       udf_resources: Array of inline and remote UDF resources.
       maximum_billing_tier: Upper limit for billing tier.
       maximum_bytes_billed: Upper limit for bytes billed.
-      use_legacy_sql: Whether to use Legacy SQL. If not set, the default value
-        is true.
+      use_legacy_sql: The choice of using Legacy SQL for the query is optional.
+        If not specified, the server will automatically determine the dialect
+        based on query information, such as dialect prefixes. If no prefixes are
+        found, it will default to Legacy SQL.
       schema_update_options: schema update options when appending to the
         destination table or truncating a table partition.
       labels: an optional dict of labels to set on the query job.
@@ -6676,12 +6650,12 @@ class BigqueryClient(object):
         file with the reader schema, enabled for the format: AVRO, PARQUET, ORC.
       range_partitioning: Optional. Provides range partitioning specification
         for the destination table.
-      hive_partitioning_options: (experimental) Options for configuring hive
-        is picked if it is in the specified list and if it supports the
-        precision and the scale. STRING supports all precision and scale values.
-        If none of the listed types supports the precision and the scale, the
-        type supporting the widest range in the specified list is picked, and if
-        a value exceeds the supported range when reading the data, an error will
+      hive_partitioning_options: (experimental) Options for configuring hive is
+        picked if it is in the specified list and if it supports the precision
+        and the scale. STRING supports all precision and scale values. If none
+        of the listed types supports the precision and the scale, the type
+        supporting the widest range in the specified list is picked, and if a
+        value exceeds the supported range when reading the data, an error will
         be returned. This field cannot contain duplicate types. The order of the
       decimal_target_types: (experimental) Defines the list of possible SQL data
         types to which the source decimal values are converted. This list and
@@ -7264,9 +7238,6 @@ class ApiClientHelper(object):
     """Reference for autoscale_preview, which has more features than stable versions."""
     pass
 
-  class EditionPreviewReservationReference(ReservationReference):
-    """Reference for edition_preview, which has more features than stable versions."""
-
   class CapacityCommitmentReference(Reference):
     """Helper class to provide a reference to capacity commitment."""
     _required_fields = frozenset(
@@ -7277,9 +7248,6 @@ class ApiClientHelper(object):
 
     def path(self):
       return self._path_str % dict(self)
-
-  class EditionPreviewCapacityCommitmentReference(CapacityCommitmentReference):
-    """Reference for edition_preview, which has more features than stable versions."""
 
   class ReservationAssignmentReference(Reference):
     """Helper class to provide a reference to reservation assignment."""

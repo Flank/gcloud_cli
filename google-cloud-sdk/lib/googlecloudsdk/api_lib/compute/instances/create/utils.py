@@ -652,12 +652,26 @@ def _CreateLocalSsdMessage(resources,
   return local_ssd
 
 
-def GetBulkNetworkInterfaces(args, resource_parser, compute_client, holder,
-                             project, location, scope, skip_defaults):
+def GetBulkNetworkInterfaces(
+    args,
+    resource_parser,
+    compute_client,
+    holder,
+    project,
+    location,
+    scope,
+    skip_defaults
+):
   """Gets network interfaces in bulk instance API."""
-  if (skip_defaults and not instance_utils.IsAnySpecified(
-      args, 'network_interface', 'network', 'network_tier', 'subnet',
-      'no_address')):
+  bulk_args = [
+      'network_interface',
+      'network',
+      'network_tier',
+      'subnet',
+      'no_address',
+      'stack_type',
+  ]
+  if skip_defaults and not instance_utils.IsAnySpecified(args, *bulk_args):
     return []
   elif args.network_interface:
     return CreateNetworkInterfaceMessages(
@@ -679,6 +693,7 @@ def GetBulkNetworkInterfaces(args, resource_parser, compute_client, holder,
             location=location,
             scope=scope,
             network_tier=getattr(args, 'network_tier', None),
+            stack_type=getattr(args, 'stack_type', None),
         )
     ]
 
@@ -700,6 +715,12 @@ def GetNetworkInterfaces(args, client, holder, project, location, scope,
       'public_ptr_domain',
       'stack_type',
       'subnet',
+      'ipv6_address',
+      'ipv6_prefix_length',
+      'internal_ipv6_address',
+      'internal_ipv6_prefix_length',
+      'external_ipv6_address',
+      'external_ipv6_prefix_length',
   ])
   if (skip_defaults and
       not instance_utils.IsAnySpecified(args, *network_interface_args)):
@@ -724,20 +745,24 @@ def GetNetworkInterfaces(args, client, holder, project, location, scope,
           ipv6_public_ptr_domain=getattr(args, 'ipv6_public_ptr_domain', None),
           stack_type=getattr(args, 'stack_type', None),
           ipv6_network_tier=getattr(args, 'ipv6_network_tier', None),
-      )
+          external_ipv6_address=getattr(args, 'external_ipv6_address', None),
+          external_ipv6_prefix_length=getattr(args,
+                                              'external_ipv6_prefix_length',
+                                              None))
   ]
 
 
 def GetNetworkInterfacesAlpha(args, client, holder, project, location, scope,
                               skip_defaults):
-  """"Get network interfaces in compute Alpha API."""
+  """Get network interfaces in compute Alpha API."""
   network_interface_args = filter(lambda flag: hasattr(args, flag), [
       'address', 'ipv6_network_tier', 'ipv6_public_ptr_domain', 'network',
       'network_tier', 'no_address', 'no_public_dns', 'no_public_ptr',
       'no_public_ptr_domain', 'private_network_ip', 'public_dns', 'public_ptr',
       'public_ptr_domain', 'stack_type', 'subnet', 'ipv6_address',
       'ipv6_prefix_length', 'internal_ipv6_address',
-      'internal_ipv6_prefix_length'
+      'internal_ipv6_prefix_length', 'external_ipv6_address',
+      'external_ipv6_prefix_length'
   ])
   if (skip_defaults and
       not instance_utils.IsAnySpecified(args, *network_interface_args)):
@@ -769,6 +794,10 @@ def GetNetworkInterfacesAlpha(args, client, holder, project, location, scope,
           internal_ipv6_address=getattr(args, 'internal_ipv6_address', None),
           internal_ipv6_prefix_length=getattr(args,
                                               'internal_ipv6_prefix_length',
+                                              None),
+          external_ipv6_address=getattr(args, 'external_ipv6_address', None),
+          external_ipv6_prefix_length=getattr(args,
+                                              'external_ipv6_prefix_length',
                                               None))
   ]
 
@@ -799,7 +828,10 @@ def CreateNetworkInterfaceMessage(resources,
                                   ipv6_address=None,
                                   ipv6_prefix_length=None,
                                   internal_ipv6_address=None,
-                                  internal_ipv6_prefix_length=None):
+                                  internal_ipv6_prefix_length=None,
+                                  network_attachment=None,
+                                  external_ipv6_address=None,
+                                  external_ipv6_prefix_length=None):
   """Returns a new NetworkInterface message."""
   # TODO(b/30460572): instance reference should have zone name, not zone URI.
   if scope == compute_scopes.ScopeEnum.ZONE:
@@ -825,12 +857,18 @@ def CreateNetworkInterfaceMessage(resources,
             'project': project,
         }, collection='compute.networks')
     network_interface.network = network_ref.SelfLink()
-  elif subnet is None:
+  # We only populate the default network when network-attachment is not
+  # specified because for a network interface targeting a network attachment,
+  # both network and subnetwork should not be there.
+  elif subnet is None and network_attachment is None:
     network_ref = resources.Parse(
         constants.DEFAULT_NETWORK,
         params={'project': project},
         collection='compute.networks')
     network_interface.network = network_ref.SelfLink()
+
+  if network_attachment is not None:
+    network_interface.networkAttachment = network_attachment
 
   if private_network_ip is not None:
     # Try interpreting the address as IP address.
@@ -859,7 +897,9 @@ def CreateNetworkInterfaceMessage(resources,
     network_interface.stackType = messages.NetworkInterface.StackTypeValueValuesEnum(
         stack_type)
 
-  if not no_address:
+  # Again, for a network interface targeting a network attachment, access
+  # config is not needed/wanted.
+  if not no_address and network_attachment is None:
     access_config = messages.AccessConfig(
         name=constants.DEFAULT_ACCESS_CONFIG_NAME,
         type=messages.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT)
@@ -889,7 +929,18 @@ def CreateNetworkInterfaceMessage(resources,
 
     network_interface.accessConfigs = [access_config]
 
-  if ipv6_network_tier is not None or ipv6_public_ptr_domain is not None or ipv6_address:
+  # New flag has higher priority than the old one.
+  if external_ipv6_address is None:
+    external_ipv6_address = ipv6_address
+
+  if external_ipv6_prefix_length is None:
+    external_ipv6_prefix_length = ipv6_prefix_length
+
+  if (
+      ipv6_network_tier is not None
+      or ipv6_public_ptr_domain is not None
+      or external_ipv6_address
+  ):
     ipv6_access_config = messages.AccessConfig(
         name=constants.DEFAULT_IPV6_ACCESS_CONFIG_NAME,
         type=messages.AccessConfig.TypeValueValuesEnum.DIRECT_IPV6)
@@ -902,18 +953,18 @@ def CreateNetworkInterfaceMessage(resources,
   if ipv6_public_ptr_domain is not None:
     ipv6_access_config.publicPtrDomainName = ipv6_public_ptr_domain
 
-  if ipv6_address:
+  if external_ipv6_address:
     # Try interpreting the address as IPv6.
     try:
       # ipaddress only allows unicode input
-      ipaddress.ip_address(six.text_type(ipv6_address))
-      ipv6_access_config.externalIpv6 = ipv6_address
+      ipaddress.ip_address(six.text_type(external_ipv6_address))
+      ipv6_access_config.externalIpv6 = external_ipv6_address
     except ValueError:
       # ipaddress could not resolve as an IPv6 address.
       ipv6_access_config.externalIpv6 = instances_flags.GetAddressRef(
-          resources, ipv6_address, region).SelfLink()
-    if ipv6_prefix_length:
-      ipv6_access_config.externalIpv6PrefixLength = ipv6_prefix_length
+          resources, external_ipv6_address, region).SelfLink()
+    if external_ipv6_prefix_length:
+      ipv6_access_config.externalIpv6PrefixLength = external_ipv6_prefix_length
     else:
       ipv6_access_config.externalIpv6PrefixLength = 96
 
@@ -987,7 +1038,12 @@ def CreateNetworkInterfaceMessages(resources,
               ipv6_network_tier=interface.get('ipv6-network-tier', None),
               ipv6_public_ptr_domain=interface.get('ipv6-public-ptr-domain',
                                                    None),
-              queue_count=interface.get('queue-count', None)))
+              queue_count=interface.get('queue-count', None),
+              network_attachment=interface.get('network-attachment', None),
+              external_ipv6_address=interface.get('external-ipv6-address',
+                                                  None),
+              external_ipv6_prefix_length=interface.get(
+                  'external-ipv6-prefix-length', None)))
   elif network_interface_json is not None:
     network_interfaces = yaml.load(network_interface_json)
     if not network_interfaces:  # Empty json.

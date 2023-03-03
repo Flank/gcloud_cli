@@ -96,6 +96,28 @@ def GetLocalSsdFlag(custom_name=None):
       help=help_text)
 
 
+def GetLocalSsdFlagWithCount(custom_name=None):
+  """Gets the --local-ssd flag."""
+  help_text = """\
+  Manage the size and the interface of local SSD to use. See
+  https://cloud.google.com/compute/docs/disks/local-ssd for more information.
+  *interface*::: The kind of disk interface exposed to the VM for this SSD. Valid
+  values are `scsi` and `nvme`. SCSI is the default and is supported by more
+  guest operating systems. NVME may provide higher performance.
+  *size*::: The size of the local SSD in base-2 GB.
+  *count*::: The number of local SSD to use per VM. Default value is 1.
+  """
+  return base.Argument(
+      custom_name if custom_name else '--local-ssd',
+      type=arg_parsers.ArgDict(spec={
+          'interface': (lambda x: x.upper()),
+          'size': int,
+          'count': int
+      }),
+      action='append',
+      help=help_text)
+
+
 def GetAcceleratorFlag(custom_name=None):
   """Gets the --accelerator flag."""
   help_text = """\
@@ -171,8 +193,9 @@ def GetRemoveShareWithFlag(custom_name=None):
 def GetResourcePolicyFlag(custom_name=None):
   """Gets the --resource-policies flag."""
   help_text = """\
-  Specify if this is reservation with resource policy. If you omit this flag,
-  no resource policy will be added to this reservation.
+  The resource policies to include in this reservation. If you omit this flag,
+  no resource policies are added. You can specify any string as the key, and
+  specify the name of a resource policy as the value.
   """
   return base.Argument(
       custom_name or '--resource-policies',
@@ -196,8 +219,8 @@ def GetSourceInstanceTemplateFlag(custom_name=None):
 def AddCreateFlags(parser,
                    support_fleet=False,
                    support_share_setting=False,
-                   support_resource_policies=False,
-                   support_instance_template=False):
+                   support_instance_template=False,
+                   support_ssd_count=False):
   """Adds all flags needed for the create command."""
   GetDescriptionFlag().AddToParser(parser)
 
@@ -207,8 +230,7 @@ def AddCreateFlags(parser,
 
   specific_sku_group.AddArgument(GetRequireSpecificAllocation())
   specific_sku_group.AddArgument(GetVmCountFlag())
-  if support_resource_policies:
-    specific_sku_group.AddArgument(GetResourcePolicyFlag())
+  specific_sku_group.AddArgument(GetResourcePolicyFlag())
 
   # create the sku properties group for the SpecificSkuReservation
   # this group allows instance properties XOR source instance template
@@ -226,7 +248,10 @@ def AddCreateFlags(parser,
       required=False)
   instance_properties_group.AddArgument(GetMinCpuPlatform())
   instance_properties_group.AddArgument(GetMachineType())
-  instance_properties_group.AddArgument(GetLocalSsdFlag())
+  if support_ssd_count:
+    instance_properties_group.AddArgument(GetLocalSsdFlagWithCount())
+  else:
+    instance_properties_group.AddArgument(GetLocalSsdFlag())
   instance_properties_group.AddArgument(GetAcceleratorFlag())
   instance_properties_group.AddArgument(GetLocationHint())
   if support_fleet:

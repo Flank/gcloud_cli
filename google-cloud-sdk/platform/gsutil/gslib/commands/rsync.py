@@ -513,7 +513,7 @@ _DETAILED_HELP_TEXT = ("""
                  path is always relative (similar to Unix rsync or tar exclude
                  options). For example, if you run the command:
 
-                   gsutil rsync -x "data./.*\\.txt$" dir gs://my-bucket
+                   gsutil rsync -x "data.[/\\\\].*\\.txt$" dir gs://my-bucket
 
                  it skips the file dir/data1/a.txt.
 
@@ -528,6 +528,21 @@ _DETAILED_HELP_TEXT = ("""
                  use ^ as an escape character instead of \\ and escape the |
                  character. When using Windows PowerShell, use ' instead of "
                  and surround the | character with ".
+
+  -y pattern     Similar to the -x option, but the command will first skip
+                 directories/prefixes using the provided pattern and then
+                 exclude files/objects using the same pattern. This is usually
+                 much faster, but won't work as intended with negative
+                 lookahead patterns. For example, if you run the command:
+
+                   gsutil rsync -y "^(?!.*\.txt$).*" dir gs://my-bucket
+
+                 This would first exclude all subdirectories unless they end in
+                 .txt before excluding all files except those ending in .txt.
+                 Running the same command with the -x option would result in all
+                 .txt files being included, regardless of whether they appear in
+                 subdirectories that end in .txt.
+
 """)
 # pylint: enable=anomalous-backslash-in-string
 
@@ -731,14 +746,15 @@ def _FieldedListingIterator(cls, gsutil_api, base_url_str, desc):
           'metadata/%s' % GID_ATTR,
           'metadata/%s' % UID_ATTR,
       ])
-    expanded_exclude_pattern = re.compile('{}/{}'.format(
-        base_url_str.rstrip('/\\'), cls.exclude_pattern.pattern
-    )) if cls.exclude_pattern is not None else None
+    exclude_tuple = (
+        base_url, cls.exclude_dirs,
+        cls.exclude_pattern) if cls.exclude_pattern is not None else None
+
     iterator = CreateWildcardIterator(
         wildcard,
         gsutil_api,
         project_id=cls.project_id,
-        exclude_pattern=expanded_exclude_pattern,
+        exclude_tuple=exclude_tuple,
         ignore_symlinks=cls.exclude_symlinks,
         logger=cls.logger).IterObjects(
             # Request just the needed fields, to reduce bandwidth usage.
@@ -762,7 +778,9 @@ def _FieldedListingIterator(cls, gsutil_api, base_url_str, desc):
         os.path.islink(url.object_name)):
       continue
     if cls.exclude_pattern:
-      str_to_check = url.url_string[len(base_url_str):]
+      # The wildcard_iterator may optionally use the exclude pattern to exclude
+      # directories while this section excludes individual files.
+      str_to_check = url.url_string[len(base_url.url_string):]
       if str_to_check.startswith(url.delim):
         str_to_check = str_to_check[1:]
       if cls.exclude_pattern.match(str_to_check):
@@ -1591,7 +1609,7 @@ class RsyncCommand(Command):
       usage_synopsis=_SYNOPSIS,
       min_args=2,
       max_args=2,
-      supported_sub_args='a:cCdenpPriRuUx:j:J',
+      supported_sub_args='a:cCdenpPriRuUx:y:j:J',
       file_url_ok=True,
       provider_url_ok=False,
       urls_start_arg=0,
@@ -1678,6 +1696,17 @@ class RsyncCommand(Command):
     for signal_num in GetCaughtSignals():
       RegisterSignalHandler(signal_num, _HandleSignals)
 
+    process_count, thread_count = self._GetProcessAndThreadCount(
+        process_count=None,
+        thread_count=None,
+        parallel_operations_override=self.ParallelOverrideReason.SPEED,
+        print_macos_warning=False)
+    copy_helper.TriggerReauthForDestinationProviderIfNecessary(
+        dst_url,
+        self.gsutil_api,
+        worker_count=process_count * thread_count,
+    )
+
     # Perform sync requests in parallel (-m) mode, if requested, using
     # configured number of parallel processes and threads. Otherwise,
     # perform requests with sequential function calls in current process.
@@ -1728,6 +1757,7 @@ class RsyncCommand(Command):
     self.preserve_posix_attrs = False
     self.compute_file_checksums = False
     self.dryrun = False
+    self.exclude_dirs = False
     self.exclude_pattern = None
     self.skip_old_files = False
     self.ignore_existing = False
@@ -1783,7 +1813,9 @@ class RsyncCommand(Command):
           self.ignore_existing = True
         elif o == '-U':
           self.skip_unsupported_objects = True
-        elif o == '-x':
+        elif o == '-x' or o == '-y':
+          if o == '-y':
+            self.exclude_dirs = True
           if not a:
             raise CommandException('Invalid blank exclude filter')
           try:

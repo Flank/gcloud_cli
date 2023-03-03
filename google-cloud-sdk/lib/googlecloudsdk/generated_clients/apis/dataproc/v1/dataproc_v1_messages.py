@@ -24,11 +24,10 @@ class AcceleratorConfig(_messages.Message):
       to this instance.
     acceleratorTypeUri: Full URL, partial URI, or short name of the
       accelerator type resource to expose to this instance. See Compute Engine
-      AcceleratorTypes (https://cloud.google.com/compute/docs/reference/beta/a
-      cceleratorTypes).Examples:
-      https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-
-      east1-a/acceleratorTypes/nvidia-tesla-k80
-      projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
+      AcceleratorTypes (https://cloud.google.com/compute/docs/reference/v1/acc
+      eleratorTypes).Examples: https://www.googleapis.com/compute/v1/projects/
+      [project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-k80
+      projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-k80
       nvidia-tesla-k80Auto Zone Exception: If you are using the Dataproc Auto
       Zone Placement
       (https://cloud.google.com/dataproc/docs/concepts/configuring-
@@ -156,24 +155,8 @@ class AutoscalingPolicy(_messages.Message):
   workerConfig = _messages.MessageField('InstanceGroupAutoscalingPolicyConfig', 6)
 
 
-class AuxiliaryGceNodePool(_messages.Message):
-  r"""Deprecated: Dataproc Compute Engine node pool identification and
-  configuration information.
-
-  Fields:
-    gceNodePool: Required. Dataproc Compute Engine node pool configuration.
-    gceNodePoolId: Optional. An optional Compute Engine node pool id.
-      Generated if not specified.The id must contain only letters (a-z, A-Z),
-      numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end
-      with underscore or hyphen. Must consist of between 3 and 33 characters.
-  """
-
-  gceNodePool = _messages.MessageField('GceNodePool', 1)
-  gceNodePoolId = _messages.StringField(2)
-
-
 class AuxiliaryNodeGroup(_messages.Message):
-  r"""Node group identification and configuration. information.
+  r"""Node group identification and configuration information.
 
   Fields:
     nodeGroup: Required. Node group configuration.
@@ -469,7 +452,9 @@ class Binding(_messages.Message):
       (https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-
       service-accounts). For example, my-project.svc.id.goog[my-namespace/my-
       kubernetes-sa]. group:{emailid}: An email address that represents a
-      Google group. For example, admins@example.com.
+      Google group. For example, admins@example.com. domain:{domain}: The G
+      Suite domain (primary) that represents all the users of that domain. For
+      example, google.com or example.com.
       deleted:user:{emailid}?uid={uniqueid}: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, alice@example.com?uid=123456789012345678901. If the user is
@@ -486,9 +471,7 @@ class Binding(_messages.Message):
       been recently deleted. For example,
       admins@example.com?uid=123456789012345678901. If the group is recovered,
       this value reverts to group:{emailid} and the recovered group retains
-      the role in the binding. domain:{domain}: The G Suite domain (primary)
-      that represents all the users of that domain. For example, google.com or
-      example.com.
+      the role in the binding.
     role: Role that is assigned to the list of members, or principals. For
       example, roles/viewer, roles/editor, or roles/owner.
   """
@@ -542,10 +525,10 @@ class Cluster(_messages.Message):
       creating a Dataproc cluster that does not directly control the
       underlying compute resources, for example, when creating a Dataproc-on-
       GKE cluster
-      (https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke).
-      Dataproc may set default values, and values may change when clusters are
-      updated. Exactly one of config or virtual_cluster_config must be
-      specified.
+      (https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke-
+      overview). Dataproc may set default values, and values may change when
+      clusters are updated. Exactly one of config or virtual_cluster_config
+      must be specified.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -594,8 +577,6 @@ class ClusterConfig(_messages.Message):
   Fields:
     autoscalingConfig: Optional. Autoscaling config for the policy associated
       with the cluster. Cluster does not autoscale if this field is unset.
-    auxiliaryGceNodePools: Optional. Deprecated: The Compute Engine
-      configuration settings for cluster node pools.
     auxiliaryNodeGroups: Optional. The node group settings.
     configBucket: Optional. A Cloud Storage bucket used to stage job
       dependencies, config files, and job driver console output. If you do not
@@ -650,23 +631,22 @@ class ClusterConfig(_messages.Message):
   """
 
   autoscalingConfig = _messages.MessageField('AutoscalingConfig', 1)
-  auxiliaryGceNodePools = _messages.MessageField('AuxiliaryGceNodePool', 2, repeated=True)
-  auxiliaryNodeGroups = _messages.MessageField('AuxiliaryNodeGroup', 3, repeated=True)
-  configBucket = _messages.StringField(4)
-  dataprocMetricConfig = _messages.MessageField('DataprocMetricConfig', 5)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 6)
-  endpointConfig = _messages.MessageField('EndpointConfig', 7)
-  gceClusterConfig = _messages.MessageField('GceClusterConfig', 8)
-  gkeClusterConfig = _messages.MessageField('GkeClusterConfig', 9)
-  initializationActions = _messages.MessageField('NodeInitializationAction', 10, repeated=True)
-  lifecycleConfig = _messages.MessageField('LifecycleConfig', 11)
-  masterConfig = _messages.MessageField('InstanceGroupConfig', 12)
-  metastoreConfig = _messages.MessageField('MetastoreConfig', 13)
-  secondaryWorkerConfig = _messages.MessageField('InstanceGroupConfig', 14)
-  securityConfig = _messages.MessageField('SecurityConfig', 15)
-  softwareConfig = _messages.MessageField('SoftwareConfig', 16)
-  tempBucket = _messages.StringField(17)
-  workerConfig = _messages.MessageField('InstanceGroupConfig', 18)
+  auxiliaryNodeGroups = _messages.MessageField('AuxiliaryNodeGroup', 2, repeated=True)
+  configBucket = _messages.StringField(3)
+  dataprocMetricConfig = _messages.MessageField('DataprocMetricConfig', 4)
+  encryptionConfig = _messages.MessageField('EncryptionConfig', 5)
+  endpointConfig = _messages.MessageField('EndpointConfig', 6)
+  gceClusterConfig = _messages.MessageField('GceClusterConfig', 7)
+  gkeClusterConfig = _messages.MessageField('GkeClusterConfig', 8)
+  initializationActions = _messages.MessageField('NodeInitializationAction', 9, repeated=True)
+  lifecycleConfig = _messages.MessageField('LifecycleConfig', 10)
+  masterConfig = _messages.MessageField('InstanceGroupConfig', 11)
+  metastoreConfig = _messages.MessageField('MetastoreConfig', 12)
+  secondaryWorkerConfig = _messages.MessageField('InstanceGroupConfig', 13)
+  securityConfig = _messages.MessageField('SecurityConfig', 14)
+  softwareConfig = _messages.MessageField('SoftwareConfig', 15)
+  tempBucket = _messages.StringField(16)
+  workerConfig = _messages.MessageField('InstanceGroupConfig', 17)
 
 
 class ClusterMetrics(_messages.Message):
@@ -1184,9 +1164,19 @@ class DataprocProjectsLocationsBatchesListRequest(_messages.Message):
   r"""A DataprocProjectsLocationsBatchesListRequest object.
 
   Fields:
-    filter: Optional. A filter constraining the batches to list. Filters are
-      case sensitive and have the following syntax:field = value AND field =
-      value ...
+    filter: Optional. A filter for the batches to return in the response.A
+      filter is a logical expression constraining the values of various fields
+      in each batch resource. Filters are case sensitive, and may contain
+      multiple clauses combined with logical operators (AND/OR). Supported
+      fields are batch_id, batch_uuid, state, and create_time.e.g. state =
+      RUNNING and create_time < "2023-01-01T00:00:00Z" filters for batches in
+      state RUNNING that were created before 2023-01-01See
+      https://google.aip.dev/assets/misc/ebnf-filtering.txt for a detailed
+      description of the filter syntax and a list of supported comparisons.
+    orderBy: Optional. Field(s) on which to sort the list of batches.Currently
+      the only supported sort orders are unspecified (empty) and create_time
+      desc to sort by most recently created batches first.See
+      https://google.aip.dev/132#ordering for more details.
     pageSize: Optional. The maximum number of batches to return in each
       response. The service may return fewer than this value. The default page
       size is 20; the maximum page size is 1000.
@@ -1196,9 +1186,10 @@ class DataprocProjectsLocationsBatchesListRequest(_messages.Message):
   """
 
   filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
 
 
 class DataprocProjectsLocationsOperationsCancelRequest(_messages.Message):
@@ -1320,9 +1311,17 @@ class DataprocProjectsLocationsSessionsListRequest(_messages.Message):
   r"""A DataprocProjectsLocationsSessionsListRequest object.
 
   Fields:
-    filter: Optional. A filter constraining the sessions to list. Filters are
-      case-sensitive and have the following syntax:[field = value] AND [field
-      [= value]] ...
+    filter: Optional. A filter for the sessions to return in the response.A
+      filter is a logical expression constraining the values of various fields
+      in each session resource. Filters are case sensitive, and may contain
+      multiple clauses combined with logical operators (AND/OR). Supported
+      fields are session_id, session_uuid, state, and create_time.e.g. state =
+      ACTIVE and create_time < "2023-01-01T00:00:00Z" filters for sessions in
+      state ACTIVE that were created before 2023-01-01See
+      https://google.aip.dev/assets/misc/ebnf-filtering.txt for a detailed
+      description of the filter syntax and a list of supported comparisons.
+    orderBy: Optional. Field(s) on which to sort the list of sessions. See
+      https://google.aip.dev/132#ordering for more details.
     pageSize: Optional. The maximum number of sessions to return in each
       response. The service may return fewer than this value.
     pageToken: Optional. A page token received from a previous ListSessions
@@ -1331,9 +1330,10 @@ class DataprocProjectsLocationsSessionsListRequest(_messages.Message):
   """
 
   filter = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
 
 
 class DataprocProjectsLocationsSessionsTerminateRequest(_messages.Message):
@@ -1743,108 +1743,6 @@ class DataprocProjectsRegionsClustersDiagnoseRequest(_messages.Message):
   region = _messages.StringField(4, required=True)
 
 
-class DataprocProjectsRegionsClustersGceNodePoolsCreateRequest(_messages.Message):
-  r"""A DataprocProjectsRegionsClustersGceNodePoolsCreateRequest object.
-
-  Fields:
-    gceNodePool: A GceNodePool resource to be passed as the request body.
-    gceNodePoolId: Optional. An optional Compute Engine node pool id.
-      Generated if not specified.The id must contain only letters (a-z, A-Z),
-      numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end
-      with underscore or hyphen. Must consist of between 3 and 33 characters.
-    parent: Required. The parent resource where this Compute Engine node pool
-      will be created. Format:
-      projects/{project}/regions/{region}/clusters/{cluster}
-    requestId: Optional. A unique ID used to identify the request. If the
-      server receives two CreateGceNodePoolRequest (https://cloud.google.com/d
-      ataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.datapro
-      c.v1.CreateGceNodePoolRequest)s with the same id, then the second
-      request will be ignored and the first google.longrunning.Operation
-      created and stored in the backend is returned.It is recommended to
-      always set this value to a UUID
-      (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
-      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
-      and hyphens (-). The maximum length is 40 characters.
-  """
-
-  gceNodePool = _messages.MessageField('GceNodePool', 1)
-  gceNodePoolId = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
-  requestId = _messages.StringField(4)
-
-
-class DataprocProjectsRegionsClustersGceNodePoolsDeleteRequest(_messages.Message):
-  r"""A DataprocProjectsRegionsClustersGceNodePoolsDeleteRequest object.
-
-  Fields:
-    name: Required. The name of the Compute Engine node pool to delete.
-      Format: projects/{project}/regions/{region}/clusters/{cluster}/gceNodePo
-      ols/{gceNodePool}
-    requestId: Optional. A unique ID used to identify the request. If the
-      server receives two DeleteGceNodePoolRequest (https://cloud.google.com/d
-      ataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.datapro
-      c.v1.DeleteGceNodePoolRequest)s with the same id, then the second
-      request will be ignored and the first google.longrunning.Operation
-      created and stored in the backend is returned.It is recommended to
-      always set this value to a UUID
-      (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
-      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
-      and hyphens (-). The maximum length is 40 characters.
-  """
-
-  name = _messages.StringField(1, required=True)
-  requestId = _messages.StringField(2)
-
-
-class DataprocProjectsRegionsClustersGceNodePoolsGetRequest(_messages.Message):
-  r"""A DataprocProjectsRegionsClustersGceNodePoolsGetRequest object.
-
-  Fields:
-    name: Required. The name of the Compute Engine node pool to retrieve.
-      Format: projects/{project}/regions/{region}/clusters/{cluster}/gceNodePo
-      ols/{gceNodePool}
-  """
-
-  name = _messages.StringField(1, required=True)
-
-
-class DataprocProjectsRegionsClustersGceNodePoolsListRequest(_messages.Message):
-  r"""A DataprocProjectsRegionsClustersGceNodePoolsListRequest object.
-
-  Fields:
-    pageSize: The maximum number of node pools to return. The service may
-      return fewer than this value. If unspecified, at most 50 node pools will
-      be returned. The maximum value is 1000; values above 1000 will be
-      coerced to 1000.
-    pageToken: A page token, received from a previous ListGceNodePools call.
-      Provide this to retrieve the subsequent page.When paginating, all other
-      parameters provided to ListGceNodePools must match the call that
-      provided the page token.
-    parent: Required. The parent, which owns this collection of Compute Engine
-      node pools. Format:
-      projects/{project}/regions/{region}/clusters/{cluster}
-  """
-
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
-
-
-class DataprocProjectsRegionsClustersGceNodePoolsResizeRequest(_messages.Message):
-  r"""A DataprocProjectsRegionsClustersGceNodePoolsResizeRequest object.
-
-  Fields:
-    name: Required. The name of the Compute Engine node pool to resize.
-      Format: projects/{project}/regions/{region}/clusters/{cluster}/gceNodePo
-      ols/{gceNodePool}
-    resizeGceNodePoolRequest: A ResizeGceNodePoolRequest resource to be passed
-      as the request body.
-  """
-
-  name = _messages.StringField(1, required=True)
-  resizeGceNodePoolRequest = _messages.MessageField('ResizeGceNodePoolRequest', 2)
-
-
 class DataprocProjectsRegionsClustersGetClusterAsTemplateRequest(_messages.Message):
   r"""A DataprocProjectsRegionsClustersGetClusterAsTemplateRequest object.
 
@@ -1952,10 +1850,9 @@ class DataprocProjectsRegionsClustersNodeGroupsCreateRequest(_messages.Message):
     requestId: Optional. A unique ID used to identify the request. If the
       server receives two CreateNodeGroupRequest (https://cloud.google.com/dat
       aproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.
-      v1.CreateNodeGroupRequest)s with the same id, then the second request
-      will be ignored and the first google.longrunning.Operation created and
-      stored in the backend is returned.It is recommended to always set this
-      value to a UUID
+      v1.CreateNodeGroupRequests) with the same ID, the second request is
+      ignored and the first google.longrunning.Operation created and stored in
+      the backend is returned.Recommendation: Set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
@@ -1976,10 +1873,9 @@ class DataprocProjectsRegionsClustersNodeGroupsDeleteRequest(_messages.Message):
     requestId: Optional. A unique ID used to identify the request. If the
       server receives two DeleteNodeGroupRequest (https://cloud.google.com/dat
       aproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.
-      v1.DeleteNodeGroupRequest)s with the same id, then the second request
-      will be ignored and the first google.longrunning.Operation created and
-      stored in the backend is returned.It is recommended to always set this
-      value to a UUID
+      v1.DeleteNodeGroupRequests) with the same ID, the second request is
+      ignored and the first google.longrunning.Operation created and stored in
+      the backend is returned.Recommendation: Set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
@@ -2006,12 +1902,12 @@ class DataprocProjectsRegionsClustersNodeGroupsListRequest(_messages.Message):
   Fields:
     pageSize: The maximum number of node groups to return. The service may
       return fewer than this value. If unspecified, at most 50 node groups are
-      returned. The maximum value is 1000; values above 1000 will be coerced
+      returned. The maximum value is 1000. Values greater than 1000 are forced
       to 1000.
     pageToken: A page token, received from a previous ListNodeGroups call.
-      Provide this to retrieve the subsequent page.When paginating, all other
-      parameters provided to ListNodeGroups must match the call that provided
-      the page token.
+      Provide this token to retrieve the subsequent page.When paginating, the
+      other parameters provided to ListNodeGroups must match the call that
+      provided the page token.
     parent: Required. The parent, which owns the collection of node groups.
       Format: projects/{project}/regions/{region}/clusters/{cluster}
   """
@@ -2042,7 +1938,7 @@ class DataprocProjectsRegionsClustersPatchRequest(_messages.Message):
     cluster: A Cluster resource to be passed as the request body.
     clusterName: Required. The cluster name.
     gracefulDecommissionTimeout: Optional. Timeout for graceful YARN
-      decomissioning. Graceful decommissioning allows removing nodes from the
+      decommissioning. Graceful decommissioning allows removing nodes from the
       cluster without interrupting jobs in progress. Timeout specifies how
       long to wait for jobs in progress to finish before forcefully removing
       nodes (and potentially interrupting jobs). Default timeout is 0 (for
@@ -2673,8 +2569,10 @@ class DiagnoseClusterRequest(_messages.Message):
   Fields:
     diagnosisInterval: Optional. Time interval in which diagnosis should be
       carried out on the cluster.
-    job: Optional. Specifies the job on which diagnosis is to be performed.
-      Format: projects/{project}/regions/{region}/jobs/{job}
+    job: Optional. DEPRECATED Specifies the job on which diagnosis is to be
+      performed. Format: projects/{project}/regions/{region}/jobs/{job}
+    jobs: Optional. Specifies a list of jobs on which diagnosis is to be
+      performed. Format: projects/{project}/regions/{region}/jobs/{job}
     tarballAccess: Optional. (Optional) The access type to the diagnostic
       tarball. If not specified, falls back to default access of the bucket
     tarballGcsDir: Optional. (Optional) The output Cloud Storage directory for
@@ -2682,8 +2580,10 @@ class DiagnoseClusterRequest(_messages.Message):
       the cluster's staging bucket will be used.
     workers: Optional. A list of workers in the cluster to run the diagnostic
       script on.
-    yarnApplicationId: Optional. Specifies the yarn application on which
-      diagnosis is to be performed.
+    yarnApplicationId: Optional. DEPRECATED Specifies the yarn application on
+      which diagnosis is to be performed.
+    yarnApplicationIds: Optional. Specifies a list of yarn applications on
+      which diagnosis is to be performed.
   """
 
   class TarballAccessValueValuesEnum(_messages.Enum):
@@ -2701,10 +2601,12 @@ class DiagnoseClusterRequest(_messages.Message):
 
   diagnosisInterval = _messages.MessageField('Interval', 1)
   job = _messages.StringField(2)
-  tarballAccess = _messages.EnumField('TarballAccessValueValuesEnum', 3)
-  tarballGcsDir = _messages.StringField(4)
-  workers = _messages.StringField(5, repeated=True)
-  yarnApplicationId = _messages.StringField(6)
+  jobs = _messages.StringField(3, repeated=True)
+  tarballAccess = _messages.EnumField('TarballAccessValueValuesEnum', 4)
+  tarballGcsDir = _messages.StringField(5)
+  workers = _messages.StringField(6, repeated=True)
+  yarnApplicationId = _messages.StringField(7)
+  yarnApplicationIds = _messages.StringField(8, repeated=True)
 
 
 class DiagnoseClusterResults(_messages.Message):
@@ -2750,12 +2652,11 @@ class DiskConfig(_messages.Message):
 
 
 class DriverRunner(_messages.Message):
-  r"""Configurations for the driver runner
+  r"""Driver runner configuration.
 
   Fields:
-    masterDriverRunner: Optional. (default) Run driver on master node
-    yarnDriverRunner: Optional. Configuration for running the driver on
-      workers using YARN
+    masterDriverRunner: Optional. (default) Run the driver on the master node.
+    yarnDriverRunner: Optional. Run the driver on worker nodes using YARN.
   """
 
   masterDriverRunner = _messages.MessageField('MasterDriverRunner', 1)
@@ -2763,11 +2664,11 @@ class DriverRunner(_messages.Message):
 
 
 class DriverSchedulingConfig(_messages.Message):
-  r"""Configurations for the driver scheduling
+  r"""Driver scheduling configuration.
 
   Fields:
-    memoryMb: Required. The amount of memory in MB this driver is requesting
-    vcores: Required. The number of vCPUs this driver is requesting
+    memoryMb: Required. The amount of memory in MB the driver is requesting.
+    vcores: Required. The number of vCPUs the driver is requesting.
   """
 
   memoryMb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -2789,9 +2690,12 @@ class EncryptionConfig(_messages.Message):
   Fields:
     gcePdKmsKeyName: Optional. The Cloud KMS key name to use for PD disk
       encryption for all instances in the cluster.
+    kmsKey: Optional. The Cloud KMS key name to use for encrypting customer
+      core content and cluster PD disk for all instances in the cluster.
   """
 
   gcePdKmsKeyName = _messages.StringField(1)
+  kmsKey = _messages.StringField(2)
 
 
 class EndpointConfig(_messages.Message):
@@ -2860,15 +2764,35 @@ class ExecutionConfig(_messages.Message):
   Fields:
     idleTtl: Optional. The duration to keep the session alive while it's
       idling. Passing this threshold will cause the session to be terminated.
-      Minimum value is 30 minutes; maximum value is 14 days (see JSON
+      Minimum value is 10 minutes; maximum value is 14 days (see JSON
       representation of Duration (https://developers.google.com/protocol-
-      buffers/docs/proto3#json)).
+      buffers/docs/proto3#json)). Defaults to 4 hours if not set. If both ttl
+      and idle_ttl are specified, the conditions are treated as and OR: the
+      workload will be terminated when it has been idle for idle_ttl or when
+      the ttl has passed, whichever comes first.
     kmsKey: Optional. The Cloud KMS key to use for encryption.
     networkTags: Optional. Tags used for network traffic control.
     networkUri: Optional. Network URI to connect workload to.
     performanceTier: Optional. Performance tier for workload execution.
     serviceAccount: Optional. Service account that used to execute workload.
+    stagingBucket: Optional. A Cloud Storage bucket used to stage workload
+      dependencies, config files, and store workload output and other
+      ephemeral data, such as Spark history files. If you do not specify a
+      staging bucket, Cloud Dataproc will determine a Cloud Storage location
+      according to the region where your workload is running, and then create
+      and manage project-level, per-location staging and temporary buckets.
+      This field requires a Cloud Storage bucket name, not a gs://... URI to a
+      Cloud Storage bucket.
     subnetworkUri: Optional. Subnetwork URI to connect workload to.
+    ttl: Optional. The duration after which the workload will be terminated.
+      When the workload passes this ttl, it will be unconditionally killed
+      without waiting for ongoing work to finish. Minimum value is 10 minutes;
+      maximum value is 14 days (see JSON representation of Duration
+      (https://developers.google.com/protocol-buffers/docs/proto3#json)). If
+      both ttl and idle_ttl are specified, the conditions are treated as and
+      OR: the workload will be terminated when it has been idle for idle_ttl
+      or when the ttl has passed, whichever comes first. If ttl is not
+      specified for a session, it defaults to 24h.
   """
 
   class PerformanceTierValueValuesEnum(_messages.Enum):
@@ -2891,7 +2815,9 @@ class ExecutionConfig(_messages.Message):
   networkUri = _messages.StringField(4)
   performanceTier = _messages.EnumField('PerformanceTierValueValuesEnum', 5)
   serviceAccount = _messages.StringField(6)
-  subnetworkUri = _messages.StringField(7)
+  stagingBucket = _messages.StringField(7)
+  subnetworkUri = _messages.StringField(8)
+  ttl = _messages.StringField(9)
 
 
 class Expr(_messages.Message):
@@ -2966,8 +2892,8 @@ class GceClusterConfig(_messages.Message):
       (see Using Subnetworks
       (https://cloud.google.com/compute/docs/subnetworks) for more
       information).A full URL, partial URI, or short name are valid. Examples:
-      https://www.googleapis.com/compute/v1/projects/[project_id]/regions/glob
-      al/default projects/[project_id]/regions/global/default default
+      https://www.googleapis.com/compute/v1/projects/[project_id]/global/netwo
+      rks/default projects/[project_id]/global/networks/default default
     nodeGroupAffinity: Optional. Node Group Affinity for sole-tenant clusters.
     privateIpv6GoogleAccess: Optional. The type of IPv6 access for a cluster.
     reservationAffinity: Optional. Reservation Affinity for consuming Zonal
@@ -2998,21 +2924,18 @@ class GceClusterConfig(_messages.Message):
       (https://cloud.google.com/security/shielded-cloud/shielded-vm).
     subnetworkUri: Optional. The Compute Engine subnetwork to be used for
       machine communications. Cannot be specified with network_uri.A full URL,
-      partial URI, or short name are valid. Examples:
-      https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-
-      east1/subnetworks/sub0 projects/[project_id]/regions/us-
-      east1/subnetworks/sub0 sub0
+      partial URI, or short name are valid. Examples: https://www.googleapis.c
+      om/compute/v1/projects/[project_id]/regions/[region]/subnetworks/sub0
+      projects/[project_id]/regions/[region]/subnetworks/sub0 sub0
     tags: The Compute Engine tags to add to all instances (see Tagging
       instances (https://cloud.google.com/compute/docs/label-or-tag-
       resources#tags)).
-    zoneUri: Optional. The zone where the Compute Engine cluster will be
-      located. On a create request, it is required in the "global" region. If
-      omitted in a non-global Dataproc region, the service will pick a zone in
-      the corresponding Compute Engine region. On a get request, zone will
-      always be present.A full URL, partial URI, or short name are valid.
-      Examples:
+    zoneUri: Optional. The Compute Engine zone where the Dataproc cluster will
+      be located. If omitted, the service will pick a zone in the cluster's
+      Compute Engine region. On a get request, zone will always be present.A
+      full URL, partial URI, or short name are valid. Examples:
       https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]
-      projects/[project_id]/zones/[zone] us-central1-f
+      projects/[project_id]/zones/[zone] [zone]
   """
 
   class PrivateIpv6GoogleAccessValueValuesEnum(_messages.Enum):
@@ -3075,84 +2998,6 @@ class GceClusterConfig(_messages.Message):
   subnetworkUri = _messages.StringField(11)
   tags = _messages.StringField(12, repeated=True)
   zoneUri = _messages.StringField(13)
-
-
-class GceNodePool(_messages.Message):
-  r"""Deprecated: Dataproc Compute Engine node pool.
-
-  Enums:
-    RolesValueListEntryValuesEnum:
-
-  Messages:
-    LabelsValue: Optional. Compute Engine node pool labels. Label keys must
-      consist of 1 to 63 characters and conform to RFC 1035
-      (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty. If
-      specified, they must consist of 1 to 63 characters and conform to RFC
-      1035 (https://www.ietf.org/rfc/rfc1035.txt). The Compute Engine node
-      pool can have no more than 32 labels.
-
-  Fields:
-    labels: Optional. Compute Engine node pool labels. Label keys must consist
-      of 1 to 63 characters and conform to RFC 1035
-      (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty. If
-      specified, they must consist of 1 to 63 characters and conform to RFC
-      1035 (https://www.ietf.org/rfc/rfc1035.txt). The Compute Engine node
-      pool can have no more than 32 labels.
-    name: The Compute Engine node pool resource name (https://aip.dev/122).
-    nodePoolConfig: Optional. The Compute Engine node pool instance group
-      configuration.
-    roles: Required. Compute Engine node pool roles.
-  """
-
-  class RolesValueListEntryValuesEnum(_messages.Enum):
-    r"""RolesValueListEntryValuesEnum enum type.
-
-    Values:
-      ROLE_UNSPECIFIED: Required unspecified role.
-      DRIVER: Job drivers will run on the node pool.
-      MASTER: Master nodes
-      PRIMARY_WORKER: Primary workers
-      SECONDARY_WORKER: Secondary workers
-    """
-    ROLE_UNSPECIFIED = 0
-    DRIVER = 1
-    MASTER = 2
-    PRIMARY_WORKER = 3
-    SECONDARY_WORKER = 4
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class LabelsValue(_messages.Message):
-    r"""Optional. Compute Engine node pool labels. Label keys must consist of
-    1 to 63 characters and conform to RFC 1035
-    (https://www.ietf.org/rfc/rfc1035.txt). Label values can be empty. If
-    specified, they must consist of 1 to 63 characters and conform to RFC 1035
-    (https://www.ietf.org/rfc/rfc1035.txt). The Compute Engine node pool can
-    have no more than 32 labels.
-
-    Messages:
-      AdditionalProperty: An additional property for a LabelsValue object.
-
-    Fields:
-      additionalProperties: Additional properties of type LabelsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a LabelsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A string attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.StringField(2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  labels = _messages.MessageField('LabelsValue', 1)
-  name = _messages.StringField(2)
-  nodePoolConfig = _messages.MessageField('InstanceGroupConfig', 3)
-  roles = _messages.EnumField('RolesValueListEntryValuesEnum', 4, repeated=True)
 
 
 class GetIamPolicyRequest(_messages.Message):
@@ -3381,6 +3226,17 @@ class GkeNodePoolTarget(_messages.Message):
   nodePool = _messages.StringField(1)
   nodePoolConfig = _messages.MessageField('GkeNodePoolConfig', 2)
   roles = _messages.EnumField('RolesValueListEntryValuesEnum', 3, repeated=True)
+
+
+class GoogleCloudDataprocV1WorkflowTemplateEncryptionConfig(_messages.Message):
+  r"""Encryption settings for the encrypting customer core content. NEXT ID: 2
+
+  Fields:
+    kmsKey: Optional. The Cloud KMS key name to use for encrypting customer
+      core content.
+  """
+
+  kmsKey = _messages.StringField(1)
 
 
 class HadoopJob(_messages.Message):
@@ -3683,11 +3539,11 @@ class InstanceGroupConfig(_messages.Message):
     diskConfig: Optional. Disk option config settings.
     imageUri: Optional. The Compute Engine image resource used for cluster
       instances.The URI can represent an image or image family.Image examples:
-      https://www.googleapis.com/compute/beta/projects/[project_id]/global/ima
-      ges/[image-id] projects/[project_id]/global/images/[image-id] image-
+      https://www.googleapis.com/compute/v1/projects/[project_id]/global/image
+      s/[image-id] projects/[project_id]/global/images/[image-id] image-
       idImage family examples. Dataproc will use the most recent image from
-      the family: https://www.googleapis.com/compute/beta/projects/[project_id
-      ]/global/images/family/[custom-image-family-name]
+      the family: https://www.googleapis.com/compute/v1/projects/[project_id]/
+      global/images/family/[custom-image-family-name]
       projects/[project_id]/global/images/family/[custom-image-family-name]If
       the URI is unspecified, it will be inferred from
       SoftwareConfig.image_version or the system default.
@@ -3698,11 +3554,12 @@ class InstanceGroupConfig(_messages.Message):
     isPreemptible: Output only. Specifies that this instance group contains
       preemptible instances.
     machineTypeUri: Optional. The Compute Engine machine type used for cluster
-      instances.A full URL, partial URI, or short name are valid. Examples:
-      https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-
-      east1-a/machineTypes/n1-standard-2 projects/[project_id]/zones/us-
-      east1-a/machineTypes/n1-standard-2 n1-standard-2Auto Zone Exception: If
-      you are using the Dataproc Auto Zone Placement
+      instances.A full URL, partial URI, or short name are valid. Examples: ht
+      tps://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/m
+      achineTypes/n1-standard-2
+      projects/[project_id]/zones/[zone]/machineTypes/n1-standard-2
+      n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto
+      Zone Placement
       (https://cloud.google.com/dataproc/docs/concepts/configuring-
       clusters/auto-zone#using_auto_zone_placement) feature, you must use the
       short name of the machine type resource, for example, n1-standard-2.
@@ -3891,7 +3748,7 @@ class Job(_messages.Message):
     driverOutputResourceUri: Output only. A URI pointing to the location of
       the stdout of the job's driver program.
     driverRunner: Optional. Configurations for the driver runner
-    driverSchedulingConfig: Optional. Configurations for the driver scheduling
+    driverSchedulingConfig: Optional. Driver scheduling configuration.
     hadoopJob: Optional. Job is a Hadoop job.
     hiveJob: Optional. Job is a Hive job.
     jobUuid: Output only. A UUID that uniquely identifies a job within the
@@ -4064,18 +3921,19 @@ class JobScheduling(_messages.Message):
   Fields:
     maxFailuresPerHour: Optional. Maximum number of times per hour a driver
       may be restarted as a result of driver exiting with non-zero code before
-      job is reported failed.A job may be reported as thrashing if driver
-      exits with non-zero code 4 times within 10 minute window.Maximum value
-      is 10.Note: Currently, this restartable job option is not supported in
-      Dataproc workflow template
+      job is reported failed.A job may be reported as thrashing if the driver
+      exits with a non-zero code four times within a 10-minute window.Maximum
+      value is 10.Note: This restartable job option is not supported in
+      Dataproc workflow templates
       (https://cloud.google.com/dataproc/docs/concepts/workflows/using-
-      workflows#adding_jobs_to_a_template) jobs.
-    maxFailuresTotal: Optional. Maximum number of times in total a driver may
-      be restarted as a result of driver exiting with non-zero code before job
-      is reported failed. Maximum value is 240.Note: Currently, this
-      restartable job option is not supported in Dataproc workflow template
+      workflows#adding_jobs_to_a_template).
+    maxFailuresTotal: Optional. Maximum total number of times a driver may be
+      restarted as a result of the driver exiting with a non-zero code. After
+      the maximum number is reached, the job will be reported as
+      failed.Maximum value is 240.Note: Currently, this restartable job option
+      is not supported in Dataproc workflow templates
       (https://cloud.google.com/dataproc/docs/concepts/workflows/using-
-      workflows#adding_jobs_to_a_template) jobs.
+      workflows#adding_jobs_to_a_template).
   """
 
   maxFailuresPerHour = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -4157,7 +4015,28 @@ class JobStatus(_messages.Message):
 
 
 class JupyterConfig(_messages.Message):
-  r"""Jupyter configuration for an interactive session."""
+  r"""Jupyter configuration for an interactive session.
+
+  Enums:
+    KernelValueValuesEnum: Optional. Kernel
+
+  Fields:
+    kernel: Optional. Kernel
+  """
+
+  class KernelValueValuesEnum(_messages.Enum):
+    r"""Optional. Kernel
+
+    Values:
+      KERNEL_UNSPECIFIED: The kernel is unknown.
+      PYTHON: Python kernel.
+      SCALA: Scala kernel.
+    """
+    KERNEL_UNSPECIFIED = 0
+    PYTHON = 1
+    SCALA = 2
+
+  kernel = _messages.EnumField('KernelValueValuesEnum', 1)
 
 
 class KerberosConfig(_messages.Message):
@@ -4428,20 +4307,6 @@ class ListClustersResponse(_messages.Message):
   nextPageToken = _messages.StringField(2)
 
 
-class ListGceNodePoolsResponse(_messages.Message):
-  r"""Deprecated: a response to list the Compute Engine node pools in a given
-  cluster.
-
-  Fields:
-    gceNodePools: The node pools from the specified cluster.
-    nextPageToken: A token, which can be sent as page_token to retrieve the
-      next page. If this field is omitted, there are no subsequent pages.
-  """
-
-  gceNodePools = _messages.MessageField('GceNodePool', 1, repeated=True)
-  nextPageToken = _messages.StringField(2)
-
-
 class ListJobsResponse(_messages.Message):
   r"""A list of jobs in a project.
 
@@ -4657,10 +4522,7 @@ class ManagedGroupConfig(_messages.Message):
 
 
 class MasterDriverRunner(_messages.Message):
-  r"""The default mode of executing drivers: on master nodes Currently no
-  internal fields.
-  """
-
+  r"""The default mode of executing drivers: on master nodes"""
 
 
 class MetastoreConfig(_messages.Message):
@@ -4726,6 +4588,7 @@ class Metric(_messages.Message):
       YARN: YARN metric source.
       SPARK_HISTORY_SERVER: Spark History Server metric source.
       HIVESERVER2: Hiveserver2 metric source.
+      HIVEMETASTORE: hivemetastore metric source
     """
     METRIC_SOURCE_UNSPECIFIED = 0
     MONITORING_AGENT_DEFAULTS = 1
@@ -4734,6 +4597,7 @@ class Metric(_messages.Message):
     YARN = 4
     SPARK_HISTORY_SERVER = 5
     HIVESERVER2 = 6
+    HIVEMETASTORE = 7
 
   metricOverrides = _messages.StringField(1, repeated=True)
   metricSource = _messages.EnumField('MetricSourceValueValuesEnum', 2)
@@ -4755,7 +4619,8 @@ class NamespacedGkeDeploymentTarget(_messages.Message):
 
 
 class NodeGroup(_messages.Message):
-  r"""Dataproc Node Group.
+  r"""Dataproc Node Group. The Dataproc NodeGroup resource is not related to
+  the Dataproc NodeGroupAffinity resource.
 
   Enums:
     RolesValueListEntryValuesEnum:
@@ -4776,7 +4641,7 @@ class NodeGroup(_messages.Message):
       RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). The node group must
       have no more than 32 labelsn.
     name: The Node group resource name (https://aip.dev/122).
-    nodePoolConfig: Optional. The node group instance group configuration.
+    nodeGroupConfig: Optional. The node group instance group configuration.
     roles: Required. Node group roles.
   """
 
@@ -4826,21 +4691,22 @@ class NodeGroup(_messages.Message):
 
   labels = _messages.MessageField('LabelsValue', 1)
   name = _messages.StringField(2)
-  nodePoolConfig = _messages.MessageField('InstanceGroupConfig', 3)
+  nodeGroupConfig = _messages.MessageField('InstanceGroupConfig', 3)
   roles = _messages.EnumField('RolesValueListEntryValuesEnum', 4, repeated=True)
 
 
 class NodeGroupAffinity(_messages.Message):
-  r"""Node Group Affinity for clusters using sole-tenant node groups.
+  r"""Node Group Affinity for clusters using sole-tenant node groups. The
+  Dataproc NodeGroupAffinity resource is not related to the Dataproc NodeGroup
+  resource.
 
   Fields:
     nodeGroupUri: Required. The URI of a sole-tenant node group resource
       (https://cloud.google.com/compute/docs/reference/rest/v1/nodeGroups)
       that the cluster will be created on.A full URL, partial URI, or node
-      group name are valid. Examples:
-      https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-
-      central1-a/nodeGroups/node-group-1 projects/[project_id]/zones/us-
-      central1-a/nodeGroups/node-group-1 node-group-1
+      group name are valid. Examples: https://www.googleapis.com/compute/v1/pr
+      ojects/[project_id]/zones/[zone]/nodeGroups/node-group-1
+      projects/[project_id]/zones/[zone]/nodeGroups/node-group-1 node-group-1
   """
 
   nodeGroupUri = _messages.StringField(1)
@@ -5560,7 +5426,7 @@ class RepairClusterRequest(_messages.Message):
       (with error NOT_FOUND) if a cluster with the specified UUID does not
       exist.
     gracefulDecommissionTimeout: Optional. Timeout for graceful YARN
-      decomissioning. Graceful decommissioning facilitates the removal of
+      decommissioning. Graceful decommissioning facilitates the removal of
       cluster nodes without interrupting jobs in progress. The timeout
       specifies the amount of time to wait for jobs finish before forcefully
       removing nodes. The default timeout is 0 for forceful decommissioning,
@@ -5622,60 +5488,27 @@ class ReservationAffinity(_messages.Message):
   values = _messages.StringField(3, repeated=True)
 
 
-class ResizeGceNodePoolRequest(_messages.Message):
-  r"""Deprecated: a request to resize a Compute Engine node pool.
-
-  Fields:
-    gracefulDecommissionTimeout: Optional. Timeout for graceful YARN
-      decomissioning. Graceful decommissioning allows removing nodes from the
-      Compute Engine timeout without interrupting jobs in progress. Timeout
-      specifies how long to wait for jobs in progress to finish before
-      forcefully removing nodes (and potentially interrupting jobs). Default
-      timeout is 0 (for forceful decommission), and the maximum allowed
-      timeout is 1 day. (see JSON representation of Duration
-      (https://developers.google.com/protocol-buffers/docs/proto3#json)).Only
-      supported on Dataproc image versions 1.2 and higher.
-    requestId: Optional. A unique ID used to identify the request. If the
-      server receives two ResizeGceNodePoolRequest (https://cloud.google.com/d
-      ataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.datapro
-      c.v1.ResizeGceNodePoolRequest)s with the same id, then the second
-      request will be ignored and the first google.longrunning.Operation
-      created and stored in the backend is returned.It is recommended to
-      always set this value to a UUID
-      (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
-      must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
-      and hyphens (-). The maximum length is 40 characters.
-    size: Required. The number of running instances that the node pool should
-      maintain at any given time. The group automatically adds or removes
-      instances to maintain the number of instances specified by this
-      parameter.
-  """
-
-  gracefulDecommissionTimeout = _messages.StringField(1)
-  requestId = _messages.StringField(2)
-  size = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-
-
 class ResizeNodeGroupRequest(_messages.Message):
   r"""A request to resize a node group.
 
   Fields:
     gracefulDecommissionTimeout: Optional. Timeout for graceful YARN
-      decomissioning. Graceful decommissioning allows removing nodes from the
-      Compute Engine timeout without interrupting jobs in progress. Timeout
-      specifies how long to wait for jobs in progress to finish before
-      forcefully removing nodes (and potentially interrupting jobs). Default
-      timeout is 0 (for forceful decommission), and the maximum allowed
-      timeout is 1 day. (see JSON representation of Duration
+      decomissioning. Graceful decommissioning
+      (https://cloud.google.com/dataproc/docs/concepts/configuring-
+      clusters/scaling-clusters#graceful_decommissioning) allows the removal
+      of nodes from the Compute Engine node group without interrupting jobs in
+      progress. This timeout specifies how long to wait for jobs in progress
+      to finish before forcefully removing nodes (and potentially interrupting
+      jobs). Default timeout is 0 (for forceful decommission), and the maximum
+      allowed timeout is 1 day. (see JSON representation of Duration
       (https://developers.google.com/protocol-buffers/docs/proto3#json)).Only
       supported on Dataproc image versions 1.2 and higher.
     requestId: Optional. A unique ID used to identify the request. If the
       server receives two ResizeNodeGroupRequest (https://cloud.google.com/dat
       aproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.
-      v1.ResizeNodeGroupRequest)s with the same id, then the second request
-      will be ignored and the first google.longrunning.Operation created and
-      stored in the backend is returned.It is recommended to always set this
-      value to a UUID
+      v1.ResizeNodeGroupRequests) with the same ID, the second request is
+      ignored and the first google.longrunning.Operation created and stored in
+      the backend is returned.Recommendation: Set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
@@ -5747,7 +5580,8 @@ class RuntimeInfo(_messages.Message):
 
   Fields:
     approximateUsage: Output only. Approximate workload resource usage
-      calculated after workload finishes.
+      calculated after workload finishes (see Dataproc Serverless pricing
+      (https://cloud.google.com/dataproc-serverless/pricing)).
     currentUsage: Output only. Snapshot of current workload resource usage.
     diagnosticOutputUri: Output only. A URI pointing to the location of the
       diagnostics tarball.
@@ -6098,6 +5932,7 @@ class SoftwareConfig(_messages.Message):
       HBASE: HBase. (beta)
       HIVE_WEBHCAT: The Hive Web HCatalog (the REST service for accessing
         HCatalog).
+      HUDI: Hudi.
       JUPYTER: The Jupyter Notebook.
       KERBEROS: The Kerberos security feature.
       PRESTO: The Presto query engine.
@@ -6116,16 +5951,17 @@ class SoftwareConfig(_messages.Message):
     FLINK = 4
     HBASE = 5
     HIVE_WEBHCAT = 6
-    JUPYTER = 7
-    KERBEROS = 8
-    PRESTO = 9
-    TRINO = 10
-    RANGER = 11
-    SOLR = 12
-    ZEPPELIN = 13
-    ZOOKEEPER = 14
-    DASK = 15
-    GPU_DRIVER = 16
+    HUDI = 7
+    JUPYTER = 8
+    KERBEROS = 9
+    PRESTO = 10
+    TRINO = 11
+    RANGER = 12
+    SOLR = 13
+    ZEPPELIN = 14
+    ZOOKEEPER = 15
+    DASK = 16
+    GPU_DRIVER = 17
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PropertiesValue(_messages.Message):
@@ -6923,11 +6759,16 @@ class TrinoJob(_messages.Message):
 
 
 class UsageMetrics(_messages.Message):
-  r"""Usage metrics represent total resources consumed by a workload.
+  r"""Usage metrics represent approximate total resources consumed by a
+  workload.
 
   Fields:
-    milliDcuSeconds: Optional. DCU usage in milliDCU*seconds.
-    shuffleStorageGbSeconds: Optional. Shuffle storage usage in GB*Seconds
+    milliDcuSeconds: Optional. DCU (Dataproc Compute Units) usage in (milliDCU
+      x seconds) (see Dataproc Serverless pricing
+      (https://cloud.google.com/dataproc-serverless/pricing)).
+    shuffleStorageGbSeconds: Optional. Shuffle storage usage in (GB x seconds)
+      (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-
+      serverless/pricing)).
   """
 
   milliDcuSeconds = _messages.IntegerField(1)
@@ -6935,12 +6776,16 @@ class UsageMetrics(_messages.Message):
 
 
 class UsageSnapshot(_messages.Message):
-  r"""Usage snaphot represents the resources consumed by a workload at a given
-  time.
+  r"""The usage snaphot represents the resources consumed by a workload at a
+  specified time.
 
   Fields:
-    milliDcu: Optional. Milli (one-thousandth) Dataproc Compute Units.
-    shuffleStorageGb: Optional. Shuffle Storage in gigabytes (GB).
+    milliDcu: Optional. Milli (one-thousandth) Dataproc Compute Units (DCUs)
+      (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-
+      serverless/pricing)).
+    shuffleStorageGb: Optional. Shuffle Storage in gigabytes (GB). (see
+      Dataproc Serverless pricing (https://cloud.google.com/dataproc-
+      serverless/pricing))
     snapshotTime: Optional. The timestamp of the usage snapshot.
   """
 
@@ -6962,7 +6807,7 @@ class ValueValidation(_messages.Message):
 class VirtualClusterConfig(_messages.Message):
   r"""The Dataproc cluster config for a cluster that does not directly control
   the underlying compute resources, such as a Dataproc-on-GKE cluster
-  (https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke).
+  (https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke-overview).
 
   Fields:
     auxiliaryServicesConfig: Optional. Configuration of auxiliary services
@@ -7154,6 +6999,8 @@ class WorkflowTemplate(_messages.Message):
       workflow is running at the end of the timeout period, any remaining jobs
       are cancelled, the workflow is ended, and if the workflow was running on
       a managed cluster, the cluster is deleted.
+    encryptionConfig: Optional. Encryption settings for the encrypting
+      customer core content.
     id: A string attribute.
     jobs: Required. The Directed Acyclic Graph of Jobs to submit.
     labels: Optional. The labels to associate with this template. These labels
@@ -7218,14 +7065,15 @@ class WorkflowTemplate(_messages.Message):
 
   createTime = _messages.StringField(1)
   dagTimeout = _messages.StringField(2)
-  id = _messages.StringField(3)
-  jobs = _messages.MessageField('OrderedJob', 4, repeated=True)
-  labels = _messages.MessageField('LabelsValue', 5)
-  name = _messages.StringField(6)
-  parameters = _messages.MessageField('TemplateParameter', 7, repeated=True)
-  placement = _messages.MessageField('WorkflowTemplatePlacement', 8)
-  updateTime = _messages.StringField(9)
-  version = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  encryptionConfig = _messages.MessageField('GoogleCloudDataprocV1WorkflowTemplateEncryptionConfig', 3)
+  id = _messages.StringField(4)
+  jobs = _messages.MessageField('OrderedJob', 5, repeated=True)
+  labels = _messages.MessageField('LabelsValue', 6)
+  name = _messages.StringField(7)
+  parameters = _messages.MessageField('TemplateParameter', 8, repeated=True)
+  placement = _messages.MessageField('WorkflowTemplatePlacement', 9)
+  updateTime = _messages.StringField(10)
+  version = _messages.IntegerField(11, variant=_messages.Variant.INT32)
 
 
 class WorkflowTemplatePlacement(_messages.Message):
@@ -7294,12 +7142,12 @@ class YarnApplication(_messages.Message):
 
 
 class YarnDriverRunner(_messages.Message):
-  r"""Schedule the driver on workers using YARN
+  r"""Schedule the driver on worker nodes using YARN.
 
   Fields:
-    memoryMb: Optional. The amount of memory in MB this driver is requesting
-      from YARN
-    vcores: Optional. The number of vCPUs this driver is requesting from YARN
+    memoryMb: Optional. The amount of memory in MB the driver is requesting
+      from YARN.
+    vcores: Optional. The number of vCPUs this driver is requesting from YARN.
   """
 
   memoryMb = _messages.IntegerField(1, variant=_messages.Variant.INT32)

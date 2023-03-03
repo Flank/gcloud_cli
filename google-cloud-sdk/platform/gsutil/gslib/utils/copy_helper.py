@@ -32,6 +32,7 @@ import mimetypes
 from operator import attrgetter
 import os
 import pickle
+import pyu2f
 import random
 import re
 import shutil
@@ -1484,6 +1485,65 @@ def ExpandUrlToSingleBlr(url_str,
   # Case 4: If no objects/prefixes matched, and nonexistent objects should be
   # treated as subdirectories.
   return (storage_url, treat_nonexistent_object_as_subdir)
+
+
+def TriggerReauthForDestinationProviderIfNecessary(destination_url, gsutil_api,
+                                                   worker_count):
+  """Makes a request to the destination API provider to trigger reauth.
+
+  Addresses https://github.com/GoogleCloudPlatform/gsutil/issues/1639.
+
+  If an API call occurs in a child process, the library that handles
+  reauth will fail. We need to make at least one API call in the main
+  process to allow a user to reauthorize.
+
+  For cloud source URLs this already happens because the plurality of 
+  the source name expansion iterator is checked in the main thread. For
+  cloud destination URLs, only some situations result in a similar API
+  call. In these situations, this function exits without performing an
+  API call. In others, this function performs an API call to trigger
+  reauth.
+
+  Args:
+    destination_url (StorageUrl): The destination of the transfer.
+    gsutil_api (CloudApiDelegator): API to use for the GetBucket call.
+    worker_count (int): If greater than 1, assume that parallel execution
+      is used. Technically, reauth challenges can be answered in the main
+      process, but they may be triggered multiple times if multithreading
+      is used.
+  
+  Returns:
+    None, but performs an API call if necessary.
+  """
+  # Only perform this check if the user has opted in.
+  if not config.getbool(
+      'GSUtil', 'trigger_reauth_challenge_for_parallel_operations', False):
+    return
+
+  # Reauth is not necessary for non-cloud destinations.
+  if not destination_url.IsCloudUrl():
+    return
+
+  # Destination wildcards are expanded by an API call in the main process.
+  if ContainsWildcard(destination_url.url_string):
+    return
+
+  # If gsutil executes sequentially, all calls will occur in the main process.
+  if worker_count == 1:
+    return
+
+  try:
+    # The specific API call is not important, but one must occur.
+    gsutil_api.GetBucket(
+        destination_url.bucket_name,
+        fields=['location'],  # Single field to limit XML API calls.
+        provider=destination_url.scheme)
+  except Exception as e:
+    if isinstance(e, pyu2f.errors.PluginError):
+      raise
+
+    # Other exceptions can be ignored. The purpose was just to trigger
+    # a reauth challenge.
 
 
 def FixWindowsNaming(src_url, dst_url):

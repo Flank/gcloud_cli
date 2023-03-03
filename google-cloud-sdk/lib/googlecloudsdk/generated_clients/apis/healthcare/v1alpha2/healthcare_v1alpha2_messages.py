@@ -18,13 +18,29 @@ class AnalyzeEntitiesRequest(_messages.Message):
   r"""The request to analyze healthcare entities in a document.
 
   Enums:
+    AlternativeOutputFormatValueValuesEnum: Alternative output format to be
+      generated based on the results of analysis.
     LicensedVocabulariesValueListEntryValuesEnum:
 
   Fields:
+    alternativeOutputFormat: Alternative output format to be generated based
+      on the results of analysis.
     documentContent: document_content is a document to be annotated.
     licensedVocabularies: A list of licensed vocabularies to use in the
       request, in addition to the default unlicensed vocabularies.
   """
+
+  class AlternativeOutputFormatValueValuesEnum(_messages.Enum):
+    r"""Alternative output format to be generated based on the results of
+    analysis.
+
+    Values:
+      ALTERNATIVE_OUTPUT_FORMAT_UNSPECIFIED: No alternative output format is
+        specified.
+      FHIR_BUNDLE: FHIR bundle output.
+    """
+    ALTERNATIVE_OUTPUT_FORMAT_UNSPECIFIED = 0
+    FHIR_BUNDLE = 1
 
   class LicensedVocabulariesValueListEntryValuesEnum(_messages.Enum):
     r"""LicensedVocabulariesValueListEntryValuesEnum enum type.
@@ -38,8 +54,9 @@ class AnalyzeEntitiesRequest(_messages.Message):
     ICD10CM = 1
     SNOMEDCT_US = 2
 
-  documentContent = _messages.StringField(1)
-  licensedVocabularies = _messages.EnumField('LicensedVocabulariesValueListEntryValuesEnum', 2, repeated=True)
+  alternativeOutputFormat = _messages.EnumField('AlternativeOutputFormatValueValuesEnum', 1)
+  documentContent = _messages.StringField(2)
+  licensedVocabularies = _messages.EnumField('LicensedVocabulariesValueListEntryValuesEnum', 3, repeated=True)
 
 
 class AnalyzeEntitiesResponse(_messages.Message):
@@ -51,13 +68,17 @@ class AnalyzeEntitiesResponse(_messages.Message):
       mention content.
     entityMentions: entity_mentions contains all the annotated medical
       entities that were mentioned in the provided document.
+    fhirBundle: The FHIR bundle ([`R4`](https://www.hl7.org/fhir/R4)) that
+      includes all the entities, the entity mentions, and the relationships in
+      JSON format.
     relationships: relationships contains all the binary relationships that
       were identified between entity mentions within the provided document.
   """
 
   entities = _messages.MessageField('Entity', 1, repeated=True)
   entityMentions = _messages.MessageField('EntityMention', 2, repeated=True)
-  relationships = _messages.MessageField('EntityMentionRelationship', 3, repeated=True)
+  fhirBundle = _messages.StringField(3)
+  relationships = _messages.MessageField('EntityMentionRelationship', 4, repeated=True)
 
 
 class AnnotationConfig(_messages.Message):
@@ -315,7 +336,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -332,9 +355,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -753,10 +774,12 @@ class DateShiftConfig(_messages.Message):
   consistent for a given patient and crypto key combination.
 
   Fields:
-    cryptoKey: An AES 128/192/256 bit key. Causes the shift to be computed
-      based on this key and the patient ID. A default key is generated for
-      each de-identification operation and is used when neither `crypto_key`
-      nor `kms_wrapped` is specified. Must not be set if `kms_wrapped` is set.
+    cryptoKey: An AES 128/192/256 bit key. The date shift is computed based on
+      this key and the patient ID. If the patient ID is empty for a DICOM
+      resource, the date shift is computed based on this key and the study
+      instance UID. If `crypto_key` is not set, then `kms_wrapped` is used to
+      calculate the date shift. If neither is set, a default key is generated
+      for each de-identify operation. Must not be set if `kms_wrapped` is set.
   """
 
   cryptoKey = _messages.BytesField(1)
@@ -1035,7 +1058,7 @@ class EntityMention(_messages.Message):
       number between 0 and 1.
     linkedEntities: linked_entities are candidate ontological concepts that
       this entity mention may refer to. They are sorted by decreasing
-      confidence.it
+      confidence.
     mentionId: mention_id uniquely identifies each entity mention in a single
       response.
     subject: The subject this entity mention relates to. Its value is one of:
@@ -1298,19 +1321,19 @@ class ExportMessagesRequest(_messages.Message):
 
   Fields:
     endTime: The end of the range in `send_time` (MSH.7, https://www.hl7.org/d
-      ocumentcenter/public_temp_2E58C1F9-1C23-BA17-0C6126475344DA9D/wg/conf/HL
-      7MSH.htm) to process. If not specified, the time when the export is
-      scheduled is used. This value has to be after the `start_time` defined
-      above. Only messages whose `send_times` lie in the range defined by this
-      value and the `start_time` above are exported.
+      ocumentcenter/public_temp_2E58C1F9-1C23-BA17-
+      0C6126475344DA9D/wg/conf/HL7MSH.htm) to process. If not specified, the
+      time when the export is scheduled is used. This value has to be after
+      the `start_time` defined above. Only messages whose `send_times` lie in
+      the range defined by this value and the `start_time` above are exported.
     gcsDestination: A GoogleCloudHealthcareV1alpha2Hl7v2GcsDestination
       attribute.
     startTime: The start of the range in `send_time` (MSH.7, https://www.hl7.o
-      rg/documentcenter/public_temp_2E58C1F9-1C23-BA17-0C6126475344DA9D/wg/con
-      f/HL7MSH.htm) to process. If not specified, the UNIX epoch
-      (1970-01-01T00:00:00Z) is used. This value has to come before the
-      `end_time` defined below. Only messages whose `send_times` lie in the
-      range defined by this value and `end_time` are exported.
+      rg/documentcenter/public_temp_2E58C1F9-1C23-BA17-
+      0C6126475344DA9D/wg/conf/HL7MSH.htm) to process. If not specified, the
+      UNIX epoch (1970-01-01T00:00:00Z) is used. This value has to come before
+      the `end_time` defined below. Only messages whose `send_times` lie in
+      the range defined by this value and `end_time` are exported.
   """
 
   endTime = _messages.StringField(1)
@@ -1484,7 +1507,8 @@ class FhirStore(_messages.Message):
     notificationConfig: If non-empty, publish all resource modifications of
       this FHIR store to this destination. The Pub/Sub message attributes
       contain a map with a string describing the action that has triggered the
-      notification. For example, "action":"CreateResource".
+      notification. For example, "action":"CreateResource". Deprecated. Use
+      `notification_configs` instead.
     streamConfigs: A list of streaming configs that configure the destinations
       of streaming export for every resource mutation in this FHIR store. Each
       store is allowed to have up to 10 streaming configs. After a new config
@@ -1557,6 +1581,37 @@ class FhirStore(_messages.Message):
   notificationConfig = _messages.MessageField('NotificationConfig', 6)
   streamConfigs = _messages.MessageField('StreamConfig', 7, repeated=True)
   version = _messages.EnumField('VersionValueValuesEnum', 8)
+
+
+class FhirStoreMetric(_messages.Message):
+  r"""Count of resources and total storage size by type for a given FHIR
+  store.
+
+  Fields:
+    count: The total count of FHIR resources in the store of this resource
+      type.
+    resourceType: The FHIR resource type this metric applies to.
+    structuredStorageSizeBytes: The total amount of structured storage used by
+      FHIR resources of this resource type in the store.
+  """
+
+  count = _messages.IntegerField(1)
+  resourceType = _messages.StringField(2)
+  structuredStorageSizeBytes = _messages.IntegerField(3)
+
+
+class FhirStoreMetrics(_messages.Message):
+  r"""List of metrics for a given FHIR store.
+
+  Fields:
+    metrics: List of FhirStoreMetric by resource type.
+    name: The resource name of the FHIR store to get metrics for, in the
+      format `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_sto
+      re_id}`.
+  """
+
+  metrics = _messages.MessageField('FhirStoreMetric', 1, repeated=True)
+  name = _messages.StringField(2)
 
 
 class FieldMetadata(_messages.Message):
@@ -3278,6 +3333,18 @@ class HealthcareProjectsLocationsDatasetsFhirStoresExportRequest(_messages.Messa
 
   exportResourcesRequest = _messages.MessageField('ExportResourcesRequest', 1)
   name = _messages.StringField(2, required=True)
+
+
+class HealthcareProjectsLocationsDatasetsFhirStoresGetFHIRStoreMetricsRequest(_messages.Message):
+  r"""A
+  HealthcareProjectsLocationsDatasetsFhirStoresGetFHIRStoreMetricsRequest
+  object.
+
+  Fields:
+    name: The resource name of the FHIR store to get metrics for.
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class HealthcareProjectsLocationsDatasetsFhirStoresGetIamPolicyRequest(_messages.Message):

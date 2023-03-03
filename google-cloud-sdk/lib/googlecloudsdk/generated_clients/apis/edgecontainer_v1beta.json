@@ -297,6 +297,21 @@
           "description": "Output only. The lowest release version among all worker nodes. This field can be empty if the cluster does not have any worker nodes.",
           "readOnly": true,
           "type": "string"
+        },
+        "controlPlane": {
+          "description": "Optional. The configuration of the cluster control plane.",
+          "$ref": "ControlPlane"
+        },
+        "systemAddonsConfig": {
+          "description": "Optional. The configuration of the system add-ons.",
+          "$ref": "SystemAddonsConfig"
+        },
+        "dataPlaneLoadBalancerIpv4AddressPools": {
+          "description": "Optional. Address pools for cluster data plane load balancing.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -424,6 +439,74 @@
           "description": "The time that the window ends. The end time must take place after the start time.",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "ControlPlane": {
+      "id": "ControlPlane",
+      "description": "Configuration of the cluster control plane.",
+      "type": "object",
+      "properties": {
+        "remote": {
+          "description": "Remote control plane configuration.",
+          "$ref": "Remote"
+        },
+        "local": {
+          "description": "Local control plane configuration.",
+          "$ref": "Local"
+        }
+      }
+    },
+    "Remote": {
+      "id": "Remote",
+      "description": "Configuration specific to clusters with a control plane hosted remotely.",
+      "type": "object",
+      "properties": {
+      }
+    },
+    "Local": {
+      "id": "Local",
+      "description": "Configuration specific to clusters with a control plane hosted locally.",
+      "type": "object",
+      "properties": {
+        "nodeLocation": {
+          "description": "Name of the Google Distributed Cloud Edge zones where this node pool will be created. For example: `us-central1-edge-customer-a`.",
+          "type": "string"
+        },
+        "nodeCount": {
+          "description": "The number of nodes to serve as replicas of the Control Plane.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "machineFilter": {
+          "description": "Only machines matching this filter will be allowed to host control plane nodes. The filtering language accepts strings like \"name=\", and is documented here: [AIP-160](https:\/\/google.aip.dev\/160).",
+          "type": "string"
+        }
+      }
+    },
+    "SystemAddonsConfig": {
+      "id": "SystemAddonsConfig",
+      "description": "Config that customers are allowed to define for GDCE system add-ons.",
+      "type": "object",
+      "properties": {
+        "ingress": {
+          "description": "Optional. Config for Ingress.",
+          "$ref": "Ingress"
+        }
+      }
+    },
+    "Ingress": {
+      "id": "Ingress",
+      "description": "Config for the Ingress add-on which allows customers to create an Ingress object to manage external access to the servers in a cluster. The add-on consists of istiod and istio-ingress.",
+      "type": "object",
+      "properties": {
+        "disabled": {
+          "description": "Optional. Whether Ingress is disabled.",
+          "type": "boolean"
+        },
+        "ipv4Vip": {
+          "description": "Optional. Ingress VIP.",
+          "type": "string"
         }
       }
     },
@@ -616,7 +699,7 @@
           }
         },
         "hostedNode": {
-          "description": "Canonical resource name of the node that this machine is responsible for hosting e.g. projects\/{project}\/locations\/{location}\/clusters\/{cluster_id}\/nodePools\/{pool_id}\/{node}, Or empty if the machine is not assigned to assume the role of a node.",
+          "description": "Canonical resource name of the node that this machine is responsible for hosting e.g. projects\/{project}\/locations\/{location}\/clusters\/{cluster_id}\/nodePools\/{pool_id}\/{node}, Or empty if the machine is not assigned to assume the role of a node. For control plane nodes hosted on edge machines, this will return the following format: \"projects\/{project}\/locations\/{location}\/clusters\/{cluster_id}\/controlPlaneNodes\/{node}\".",
           "type": "string"
         },
         "zone": {
@@ -722,6 +805,10 @@
           "description": "Whether this VPN connection has HA enabled on cluster side. If enabled, when creating VPN connection we will attempt to use 2 ANG floating IPs.",
           "type": "boolean"
         },
+        "router": {
+          "description": "Optional. The VPN connection Cloud Router name.",
+          "type": "string"
+        },
         "details": {
           "description": "Output only. The created connection details.",
           "readOnly": true,
@@ -739,7 +826,7 @@
           "type": "string"
         },
         "serviceAccount": {
-          "description": "Optional. The service account in the VPC project configured by user. It is used to create\/delete Cloud Router and Cloud HA VPNs for VPN connection. If this SA is changed during\/after a VPN connection is created, you need to remove the Cloud Router and Cloud VPN resources in |project_id|.",
+          "description": "Optional. The service account in the VPC project configured by user. It is used to create\/delete Cloud Router and Cloud HA VPNs for VPN connection. If this SA is changed during\/after a VPN connection is created, you need to remove the Cloud Router and Cloud VPN resources in |project_id|. It is in the form of service-{project_number}@gcp-sa-edgecontainer.iam.gserviceaccount.com.",
           "type": "string"
         }
       }
@@ -788,7 +875,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The created Cloud Router name.",
+          "description": "The associated Cloud Router name.",
           "type": "string"
         }
       }
@@ -890,6 +977,13 @@
         "apiVersion": {
           "description": "API version used to start the operation.",
           "type": "string"
+        },
+        "warnings": {
+          "description": "Warnings that do not block the operation, but still hold relevant information for the end user to receive.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

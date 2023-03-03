@@ -38,6 +38,26 @@ class Collections(enum.Enum):
       ['foldersId', 'locationsId'],
       True
   )
+  FOLDERS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS = (
+      'folders.locations.orgPolicyViolationsPreviews',
+      'folders/{foldersId}/locations/{locationsId}/'
+      'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}',
+      {},
+      ['foldersId', 'locationsId', 'orgPolicyViolationsPreviewsId'],
+      True
+  )
+  FOLDERS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS_OPERATIONS = (
+      'folders.locations.orgPolicyViolationsPreviews.operations',
+      '{+name}',
+      {
+          '':
+              'folders/{foldersId}/locations/{locationsId}/'
+              'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/'
+              'operations/{operationsId}',
+      },
+      ['name'],
+      True
+  )
   FOLDERS_LOCATIONS_REPLAYS = (
       'folders.locations.replays',
       '{+name}',
@@ -45,6 +65,17 @@ class Collections(enum.Enum):
           '':
               'folders/{foldersId}/locations/{locationsId}/replays/'
               '{replaysId}',
+      },
+      ['name'],
+      True
+  )
+  FOLDERS_LOCATIONS_REPLAYS_OPERATIONS = (
+      'folders.locations.replays.operations',
+      '{+name}',
+      {
+          '':
+              'folders/{foldersId}/locations/{locationsId}/replays/'
+              '{replaysId}/operations/{operationsId}',
       },
       ['name'],
       True
@@ -73,6 +104,26 @@ class Collections(enum.Enum):
       ['organizationsId', 'locationsId'],
       True
   )
+  ORGANIZATIONS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS = (
+      'organizations.locations.orgPolicyViolationsPreviews',
+      'organizations/{organizationsId}/locations/{locationsId}/'
+      'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}',
+      {},
+      ['organizationsId', 'locationsId', 'orgPolicyViolationsPreviewsId'],
+      True
+  )
+  ORGANIZATIONS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS_OPERATIONS = (
+      'organizations.locations.orgPolicyViolationsPreviews.operations',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/locations/{locationsId}/'
+              'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/'
+              'operations/{operationsId}',
+      },
+      ['name'],
+      True
+  )
   ORGANIZATIONS_LOCATIONS_REPLAYS = (
       'organizations.locations.replays',
       '{+name}',
@@ -80,6 +131,17 @@ class Collections(enum.Enum):
           '':
               'organizations/{organizationsId}/locations/{locationsId}/'
               'replays/{replaysId}',
+      },
+      ['name'],
+      True
+  )
+  ORGANIZATIONS_LOCATIONS_REPLAYS_OPERATIONS = (
+      'organizations.locations.replays.operations',
+      '{+name}',
+      {
+          '':
+              'organizations/{organizationsId}/locations/{locationsId}/'
+              'replays/{replaysId}/operations/{operationsId}',
       },
       ['name'],
       True
@@ -98,6 +160,26 @@ class Collections(enum.Enum):
       ['projectsId', 'locationsId'],
       True
   )
+  PROJECTS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS = (
+      'projects.locations.orgPolicyViolationsPreviews',
+      'projects/{projectsId}/locations/{locationsId}/'
+      'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}',
+      {},
+      ['projectsId', 'locationsId', 'orgPolicyViolationsPreviewsId'],
+      True
+  )
+  PROJECTS_LOCATIONS_ORGPOLICYVIOLATIONSPREVIEWS_OPERATIONS = (
+      'projects.locations.orgPolicyViolationsPreviews.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/'
+              'orgPolicyViolationsPreviews/{orgPolicyViolationsPreviewsId}/'
+              'operations/{operationsId}',
+      },
+      ['name'],
+      True
+  )
   PROJECTS_LOCATIONS_REPLAYS = (
       'projects.locations.replays',
       '{+name}',
@@ -105,6 +187,17 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/replays/'
               '{replaysId}',
+      },
+      ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_REPLAYS_OPERATIONS = (
+      'projects.locations.replays.operations',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/replays/'
+              '{replaysId}/operations/{operationsId}',
       },
       ['name'],
       True

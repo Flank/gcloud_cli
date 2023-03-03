@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 # modules in the presence of threads.
 import encodings.idna  # pylint: disable=unused-import
 import json
+import mimetypes
 import os
 import re
 
@@ -31,6 +32,7 @@ from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
 from googlecloudsdk.api_lib.util import common_args
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.artifacts import repository_util
 from googlecloudsdk.command_lib.artifacts import requests as ar_requests
 from googlecloudsdk.command_lib.projects import util as project_util
 from googlecloudsdk.core import log
@@ -201,7 +203,7 @@ def AppendRepoDataToRequest(repo_ref, repo_args, request):
   request.repository.name = repo_ref.RelativeName()
   request.repositoryId = repo_ref.repositoriesId
   request.repository.format = repo_format
-
+  repository_util.RetainFormatConfig(messages, request.repository)
   return request
 
 
@@ -212,9 +214,9 @@ def AppendUpstreamPoliciesToRequest(repo_ref, repo_args, request):
     if isinstance(
         request,
         messages.ArtifactregistryProjectsLocationsRepositoriesPatchRequest):
-      if request.updateMask:
-        request.updateMask += ","
-      request.updateMask += "virtual_repository_config"
+      # Clear the updateMask for update request, so AR will replace all old
+      # policies with policies from the file.
+      request.updateMask = None
     content = console_io.ReadFromFileOrStdin(
         repo_args.upstream_policy_file, binary=False)
     policies = json.loads(content)
@@ -247,7 +249,6 @@ def UpstreamsArgs():
   return [
       base.Argument(
           "--upstream-policy-file",
-          hidden=True,
           metavar="FILE",
           help=_REPO_CREATION_HELP_UPSTREAM_POLICIES)
   ]
@@ -396,7 +397,7 @@ def AppendSortingToRequest(unused_ref, ver_args, request):
 
   if (ver_args.limit is not None and ver_args.filter is None and set_limit):
     request.pageSize = ver_args.limit
-    # Otherwise request gets overriden somewhere down the line.
+    # Otherwise request gets overridden somewhere down the line.
     ver_args.page_size = ver_args.limit
 
   return request
@@ -513,7 +514,7 @@ def ListRepositories(args):
 
   repos = []
   for sublist in results:
-    repos.extend([repo for repo in sublist])
+    repos.extend(sublist)
   repos.sort(key=lambda x: x.name.split("/")[-1])
 
   return repos
@@ -655,19 +656,16 @@ def EscapeTagNameHook(ref, unused_args, req):
 
 def EscapeVersionNameHook(ref, unused_args, req):
   """Escapes slashes and pluses from request names."""
-  tag = resources.REGISTRY.Create(
+  version = resources.REGISTRY.Create(
       "artifactregistry.projects.locations.repositories.packages.versions",
       projectsId=ref.projectsId,
       locationsId=ref.locationsId,
       repositoriesId=ref.repositoriesId,
       packagesId=ref.packagesId.replace("/", "%2F").replace("+", "%2B"),
-      versionsId=ref.versionsId.replace("/", "%2F").replace("+", "%2B"))
-  req.name = tag.RelativeName()
+      versionsId=ref.versionsId.replace("/", "%2F").replace("+", "%2B"),
+  )
+  req.name = version.RelativeName()
   return req
-
-
-def IssueGetProjectSettingsRequest(unused_ref, args):
-  return ar_requests.GetProjectSettings(GetProject(args))
 
 
 def GetRedirectionEnablementReport(project):
@@ -735,6 +733,13 @@ def GetRedirectionEnablementReport(project):
   return missing_repos
 
 
+# TODO(b/261183749): Remove modify_request_hook when singleton resource args
+# are enabled in declarative.
+def UpdateSettingsResource(unused_ref, unused_args, req):
+  req.name = req.name + "/projectSettings"
+  return req
+
+
 def CheckRedirectionPermission(project):
   con = console_attr.GetConsoleAttr()
   authorized = ar_requests.TestRedirectionIAMPermission(project)
@@ -744,6 +749,24 @@ def CheckRedirectionPermission(project):
         "the {} permission(s) on project {}.".format(
             ",".join(ar_requests.REDIRECT_PERMISSIONS), project))
   return authorized
+
+
+def GetVPCSCConfig(unused_ref, args):
+  project = GetProject(args)
+  location = GetLocation(args)
+  return ar_requests.GetVPCSCConfig(project, location)
+
+
+def AllowVPCSCConfig(unused_ref, args):
+  project = GetProject(args)
+  location = GetLocation(args)
+  return ar_requests.AllowVPCSCConfig(project, location)
+
+
+def DenyVPCSCConfig(unused_ref, args):
+  project = GetProject(args)
+  location = GetLocation(args)
+  return ar_requests.DenyVPCSCConfig(project, location)
 
 
 def EnableUpgradeRedirection(unused_ref, args):
@@ -891,3 +914,8 @@ def SanitizeRemoteRepositoryConfig(unused_ref, args, request):
     request.repository.remoteRepositoryConfig.mavenRepository = None
 
   return request
+
+
+def GetMimetype(path):
+  mime_type, _ = mimetypes.guess_type(path)
+  return mime_type or "application/octet-stream"

@@ -32,12 +32,13 @@ from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.resource import resource_projector
 
 
-def _object_iterator(url, all_versions):
+def _object_iterator(url, all_versions, fetch_encrypted_object_hashes):
   """Iterates through resources matching URL and filter out non-objects."""
-  for resource in wildcard_iterator.get_wildcard_iterator(
-      url.url_string,
+  for resource in wildcard_iterator.CloudWildcardIterator(
+      url,
       all_versions=all_versions,
       error_on_missing_key=False,
+      fetch_encrypted_object_hashes=fetch_encrypted_object_hashes,
       fields_scope=cloud_api.FieldsScope.FULL):
     if isinstance(resource, resource_reference.ObjectResource):
       yield resource
@@ -81,7 +82,10 @@ class List(base.ListCommand):
         action='store_true',
         help='Emulates gsutil stat-style behavior. Does not show past object'
         ' versions and changes output format.')
+    flags.add_additional_headers_flag(parser)
     flags.add_encryption_flags(parser, command_only_reads_data=True)
+    flags.add_fetch_encrypted_object_hashes_flag(parser, is_list=True)
+    flags.add_raw_display_flag(parser)
 
   def Display(self, args, resources):
     if args.stat:
@@ -106,19 +110,31 @@ class List(base.ListCommand):
       else:
         urls.append(url)
 
+    stat_formatter = (
+        gsutil_full_resource_formatter.GsutilFullResourceFormatter()
+    )
     for url in urls:
       if args.stat:
         # Replicating gsutil "stat" command behavior.
         found_match = False
-        for resource in _object_iterator(url, all_versions=False):
+        for resource in _object_iterator(
+            url,
+            all_versions=False,
+            fetch_encrypted_object_hashes=args.fetch_encrypted_object_hashes):
           found_match = True
-          yield resource.get_full_metadata_string(
-              gsutil_full_resource_formatter.GsutilFullResourceFormatter(),
-              show_acl=False)
+          yield stat_formatter.format_object(resource, show_acl=False)
         if not found_match:
           log.error('No URLs matched: ' + url.url_string)
           self.exit_code = 1
       else:
-        for resource in _object_iterator(url, all_versions=True):
+        for resource in _object_iterator(
+            url,
+            all_versions=True,
+            fetch_encrypted_object_hashes=args.fetch_encrypted_object_hashes):
           # MakeSerializable will omit all the None values.
-          yield resource_projector.MakeSerializable(resource.metadata)
+          serialized_metadata = resource_projector.MakeSerializable(
+              resource.metadata
+          )
+          yield serialized_metadata
+
+          # TODO(b/249985723): Return standardized resource if not args.raw.

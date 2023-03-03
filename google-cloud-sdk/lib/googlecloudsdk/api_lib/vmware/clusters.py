@@ -34,18 +34,14 @@ class ClustersClient(util.VmwareClientBase):
         name=resource.RelativeName())
     return self.service.Get(request)
 
-  def Create(self,
-             resource,
-             node_type=None,
-             node_count=None,
-             node_custom_core_count=None):
+  def Create(self, resource, nodes_configs):
     parent = resource.Parent().RelativeName()
     cluster_id = resource.Name()
 
-    cluster = self.messages.Cluster(
-        nodeCount=node_count, nodeTypeId=node_type)
-    if node_custom_core_count is not None:
-      cluster.nodeCustomCoreCount = node_custom_core_count
+    node_type_configs = util.ConstructNodeParameterConfigMessage(
+        self.messages.Cluster.NodeTypeConfigsValue,
+        self.messages.NodeTypeConfig, nodes_configs)
+    cluster = self.messages.Cluster(nodeTypeConfigs=node_type_configs)
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsClustersCreateRequest(
         parent=parent,
         cluster=cluster,
@@ -58,31 +54,24 @@ class ClustersClient(util.VmwareClientBase):
         name=resource.RelativeName())
     return self.service.Delete(request)
 
-  def List(self,
-           private_cloud_resource,
-           filter_expression=None,
-           limit=None,
-           page_size=None,
-           sort_by=None):
+  def List(self, private_cloud_resource):
     private_cloud = private_cloud_resource.RelativeName()
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsClustersListRequest(
-        parent=private_cloud, filter=filter_expression)
-    if page_size:
-      request.page_size = page_size
+        parent=private_cloud
+    )
     return list_pager.YieldFromList(
         self.service,
         request,
-        limit=limit,
         batch_size_attribute='pageSize',
-        batch_size=page_size,
         field='clusters')
 
-  def Update(self,
-             resource,
-             node_count=None):
-    cluster = self.messages.Cluster(
-        nodeCount=node_count)
+  def Update(self, resource, nodes_configs):
+    node_type_configs = util.ConstructNodeParameterConfigMessage(
+        self.messages.Cluster.NodeTypeConfigsValue,
+        self.messages.NodeTypeConfig, nodes_configs)
+    cluster = self.messages.Cluster(nodeTypeConfigs=node_type_configs)
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsClustersPatchRequest(
         name=resource.RelativeName(),
-        cluster=cluster)
+        cluster=cluster,
+        updateMask='node_type_configs.*.node_count')
     return self.service.Patch(request)

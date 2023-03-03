@@ -108,7 +108,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -125,9 +127,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -150,9 +150,9 @@ class CloudRunService(_messages.Message):
       segment (section 3.3 of RFC2396). Examples: "/route", "route",
       "route/subroute".
     region: Required. The region the Cloud Run service is deployed in.
-    service: Required. The name of the Cloud run service being addressed (see
-      https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services)
-      . Only services located in the same project of the trigger object can be
+    service: Required. The name of the Cloud run service being addressed. See
+      https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services.
+      Only services located in the same project of the trigger object can be
       addressed.
   """
 
@@ -999,9 +999,9 @@ class Trigger(_messages.Message):
       the client has an up-to-date value before proceeding.
     labels: Optional. User labels attached to the triggers that can be used to
       group resources.
-    matchingCriteria: Required. null The criteria by which events are
-      filtered. Only events that match with this criteria will be sent to the
-      destination.
+    matchingCriteria: Required. Unordered list. The criteria by which events
+      are filtered. Only events that match with this criteria will be sent to
+      the destination.
     name: Required. The resource name of the trigger. Must be unique within
       the location on the project and must in
       `projects/{project}/locations/{location}/triggers/{trigger}` format.
@@ -1018,9 +1018,9 @@ class Trigger(_messages.Message):
       services. In order to create Audit Log triggers, the service account
       should also have 'eventarc.events.receiveAuditLogV1Written' permission.
     transport: Output only. In order to deliver messages, Eventarc may use
-      other GCP products as transport intermediary. This field contains a
-      reference to that transport intermediary. This information can be used
-      for debugging purposes.
+      other Google Cloud products as transport intermediary. This field
+      contains a reference to that transport intermediary. This information
+      can be used for debugging purposes.
     updateTime: Output only. The last-modified time.
   """
 

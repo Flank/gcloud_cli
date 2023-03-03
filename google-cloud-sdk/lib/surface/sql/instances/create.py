@@ -22,7 +22,6 @@ from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.sql import api_util as common_api_util
 from googlecloudsdk.api_lib.sql import exceptions as sql_exceptions
-from googlecloudsdk.api_lib.sql import instances as api_util
 from googlecloudsdk.api_lib.sql import operations
 from googlecloudsdk.api_lib.sql import validate
 from googlecloudsdk.calliope import base
@@ -37,6 +36,9 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.resource import resource_property
 import six
+
+# 1h, based off of the max time it usually takes to create a SQL instance.
+_INSTANCE_CREATION_TIMEOUT_SECONDS = 3600
 
 DETAILED_HELP = {
     'EXAMPLES':
@@ -158,6 +160,9 @@ def AddBaseArgs(parser, is_alpha=False):
   flags.AddSqlServerAudit(parser)
   flags.AddDeletionProtection(parser)
   flags.AddSqlServerTimeZone(parser)
+  flags.AddConnectorEnforcement(parser)
+  flags.AddTimeout(parser, _INSTANCE_CREATION_TIMEOUT_SECONDS)
+  flags.AddEnableGooglePrivatePath(parser)
 
 
 def AddBetaArgs(parser):
@@ -166,8 +171,9 @@ def AddBetaArgs(parser):
   flags.AddInstanceResizeLimit(parser)
   flags.AddAllocatedIpRangeName(parser)
   labels_util.AddCreateLabelsFlags(parser)
-  flags.AddEnableGooglePrivatePath(parser)
-  flags.AddConnectorEnforcement(parser)
+  psc_setup_group = parser.add_group(hidden=True)
+  flags.AddEnablePrivateServiceConnect(psc_setup_group)
+  flags.AddAllowedPscProjects(psc_setup_group)
 
 
 def AddAlphaArgs(unused_parser):
@@ -276,6 +282,13 @@ def RunBaseCreateCommand(args, release_track):
       raise sql_exceptions.ArgumentError(
           '`--enable-point-in-time-recovery` cannot be specified when '
           '--no-backup is specified')
+
+  if (args.IsKnownAndSpecified('allowed_psc_projects') and
+      not args.IsKnownAndSpecified('enable_private_service_connect')):
+    raise sql_exceptions.ArgumentError(
+        '`--allowed-psc-projects` requires '
+        '`--enable-private-service-connect`')
+
   if release_track == base.ReleaseTrack.ALPHA:
     if args.IsSpecified('workload_tier'):
       if not (args.IsSpecified('cpu') and args.IsSpecified('memory')):
@@ -288,15 +301,6 @@ def RunBaseCreateCommand(args, release_track):
           args,
           instance_ref=instance_ref,
           release_track=release_track))
-
-  # TODO(b/122660263): Remove when V1 instances are no longer supported.
-  # V1 instances are deprecated.
-  # Note that the exception type is intentionally vague because the user may not
-  # have directly supplied the offending argument.  For example, creating a read
-  # replica defaults its tier to that of its master.
-  if api_util.IsInstanceV1(sql_messages, instance_resource):
-    raise sql_exceptions.ArgumentError(
-        'First Generation instances can no longer be created.')
 
   operation_ref = None
   try:
@@ -321,8 +325,7 @@ def RunBaseCreateCommand(args, release_track):
         sql_client,
         operation_ref,
         'Creating Cloud SQL instance for ' + args.database_version,
-        # TODO(b/138403566): Remove the override once we improve creation times.
-        max_wait_seconds=680)
+        max_wait_seconds=args.timeout)
 
     log.CreatedResource(instance_ref)
 

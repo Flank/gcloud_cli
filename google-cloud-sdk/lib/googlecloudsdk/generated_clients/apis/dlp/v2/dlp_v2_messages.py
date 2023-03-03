@@ -2330,8 +2330,10 @@ class GooglePrivacyDlpV2Action(_messages.Message):
 
   Fields:
     deidentify: Create a de-identified copy of the input data.
-    jobNotificationEmails: Enable email notification for project owners and
-      editors on job's completion/failure.
+    jobNotificationEmails: Sends an email when the job completes. The email
+      goes to IAM project owners and technical [Essential
+      Contacts](https://cloud.google.com/resource-manager/docs/managing-
+      notification-contacts).
     pubSub: Publish a notification to a Pub/Sub topic.
     publishFindingsToCloudDataCatalog: Publish findings to Cloud Datahub.
     publishSummaryToCscc: Publish summary to Cloud Security Command Center
@@ -3013,7 +3015,7 @@ class GooglePrivacyDlpV2Container(_messages.Message):
 
 
 class GooglePrivacyDlpV2ContentItem(_messages.Message):
-  r"""Container structure for the content to inspect.
+  r"""A GooglePrivacyDlpV2ContentItem object.
 
   Fields:
     byteItem: Content data to inspect or redact. Replaces `type` and `data`.
@@ -3377,11 +3379,12 @@ class GooglePrivacyDlpV2CustomInfoType(_messages.Message):
 
     Values:
       LIKELIHOOD_UNSPECIFIED: Default value; same as POSSIBLE.
-      VERY_UNLIKELY: Few matching elements.
-      UNLIKELY: <no description>
-      POSSIBLE: Some matching elements.
-      LIKELY: <no description>
-      VERY_LIKELY: Many matching elements.
+      VERY_UNLIKELY: Highest chance of a false positive.
+      UNLIKELY: High chance of a false positive.
+      POSSIBLE: Some matching signals. The default value.
+      LIKELY: Low chance of a false positive.
+      VERY_LIKELY: Confidence level is high. Lowest chance of a false
+        positive.
     """
     LIKELIHOOD_UNSPECIFIED = 0
     VERY_UNLIKELY = 1
@@ -3776,7 +3779,9 @@ class GooglePrivacyDlpV2DeidentifyContentRequest(_messages.Message):
       fields that are set in this request will replace their corresponding
       fields in the template. Repeated fields are appended. Singular sub-
       messages and groups are recursively merged.
-    item: The item to de-identify. Will be treated as text.
+    item: The item to de-identify. Will be treated as text. This value must be
+      of type Table if your deidentify_config is a RecordTransformations
+      object.
     locationId: Deprecated. This field has no effect.
   """
 
@@ -4060,6 +4065,25 @@ class GooglePrivacyDlpV2Error(_messages.Message):
   timestamps = _messages.StringField(2, repeated=True)
 
 
+class GooglePrivacyDlpV2ExcludeByHotword(_messages.Message):
+  r"""The rule to exclude findings based on a hotword. For record inspection
+  of tables, column names are considered hotwords. An example of this is to
+  exclude a finding if it belongs to a BigQuery column that matches a specific
+  pattern.
+
+  Fields:
+    hotwordRegex: Regular expression pattern defining what qualifies as a
+      hotword.
+    proximity: Range of characters within which the entire hotword must
+      reside. The total length of the window cannot exceed 1000 characters.
+      The windowBefore property in proximity should be set to 1 if the hotword
+      needs to be included in a column header.
+  """
+
+  hotwordRegex = _messages.MessageField('GooglePrivacyDlpV2Regex', 1)
+  proximity = _messages.MessageField('GooglePrivacyDlpV2Proximity', 2)
+
+
 class GooglePrivacyDlpV2ExcludeInfoTypes(_messages.Message):
   r"""List of excluded infoTypes.
 
@@ -4087,6 +4111,8 @@ class GooglePrivacyDlpV2ExclusionRule(_messages.Message):
 
   Fields:
     dictionary: Dictionary which defines the rule.
+    excludeByHotword: Drop if the hotword rule is contained in the proximate
+      context. For tabular data, the context includes the column name.
     excludeInfoTypes: Set of infoTypes for which findings would affect this
       rule.
     matchingType: How the rule is applied, see MatchingType documentation for
@@ -4118,9 +4144,10 @@ class GooglePrivacyDlpV2ExclusionRule(_messages.Message):
     MATCHING_TYPE_INVERSE_MATCH = 3
 
   dictionary = _messages.MessageField('GooglePrivacyDlpV2Dictionary', 1)
-  excludeInfoTypes = _messages.MessageField('GooglePrivacyDlpV2ExcludeInfoTypes', 2)
-  matchingType = _messages.EnumField('MatchingTypeValueValuesEnum', 3)
-  regex = _messages.MessageField('GooglePrivacyDlpV2Regex', 4)
+  excludeByHotword = _messages.MessageField('GooglePrivacyDlpV2ExcludeByHotword', 2)
+  excludeInfoTypes = _messages.MessageField('GooglePrivacyDlpV2ExcludeInfoTypes', 3)
+  matchingType = _messages.EnumField('MatchingTypeValueValuesEnum', 4)
+  regex = _messages.MessageField('GooglePrivacyDlpV2Regex', 5)
 
 
 class GooglePrivacyDlpV2Export(_messages.Message):
@@ -4271,11 +4298,12 @@ class GooglePrivacyDlpV2Finding(_messages.Message):
 
     Values:
       LIKELIHOOD_UNSPECIFIED: Default value; same as POSSIBLE.
-      VERY_UNLIKELY: Few matching elements.
-      UNLIKELY: <no description>
-      POSSIBLE: Some matching elements.
-      LIKELY: <no description>
-      VERY_LIKELY: Many matching elements.
+      VERY_UNLIKELY: Highest chance of a false positive.
+      UNLIKELY: High chance of a false positive.
+      POSSIBLE: Some matching signals. The default value.
+      LIKELY: Low chance of a false positive.
+      VERY_LIKELY: Confidence level is high. Lowest chance of a false
+        positive.
     """
     LIKELIHOOD_UNSPECIFIED = 0
     VERY_UNLIKELY = 1
@@ -4696,7 +4724,7 @@ class GooglePrivacyDlpV2InfoType(_messages.Message):
       creating a CustomInfoType, or one of the names listed at
       https://cloud.google.com/dlp/docs/infotypes-reference when specifying a
       built-in type. When sending Cloud DLP results to Data Catalog, infoType
-      names should conform to the pattern `[A-Za-z0-9$-_]{1,64}`.
+      names should conform to the pattern `[A-Za-z0-9$_-]{1,64}`.
     version: Optional version name for this InfoType.
   """
 
@@ -4786,6 +4814,7 @@ class GooglePrivacyDlpV2InfoTypeCategory(_messages.Message):
       URUGUAY: The infoType is typically used in Uruguay.
       VENEZUELA: The infoType is typically used in Venezuela.
       INTERNAL: The infoType is typically used in Google internally.
+      NEW_ZEALAND: The infoType is typically used in New Zealand.
     """
     LOCATION_UNSPECIFIED = 0
     GLOBAL = 1
@@ -4828,6 +4857,7 @@ class GooglePrivacyDlpV2InfoTypeCategory(_messages.Message):
     URUGUAY = 38
     VENEZUELA = 39
     INTERNAL = 40
+    NEW_ZEALAND = 41
 
   class TypeCategoryValueValuesEnum(_messages.Enum):
     r"""The class of identifiers where this infoType belongs
@@ -4873,6 +4903,7 @@ class GooglePrivacyDlpV2InfoTypeDescription(_messages.Message):
       provided in the request.
     displayName: Human readable form of the infoType name.
     name: Internal name of the infoType.
+    sensitivityScore: The default sensitivity of the infoType.
     supportedBy: Which parts of the API supports this InfoType.
     versions: A list of available versions for the infotype.
   """
@@ -4893,8 +4924,9 @@ class GooglePrivacyDlpV2InfoTypeDescription(_messages.Message):
   description = _messages.StringField(2)
   displayName = _messages.StringField(3)
   name = _messages.StringField(4)
-  supportedBy = _messages.EnumField('SupportedByValueListEntryValuesEnum', 5, repeated=True)
-  versions = _messages.MessageField('GooglePrivacyDlpV2VersionDescription', 6, repeated=True)
+  sensitivityScore = _messages.MessageField('GooglePrivacyDlpV2SensitivityScore', 5)
+  supportedBy = _messages.EnumField('SupportedByValueListEntryValuesEnum', 6, repeated=True)
+  versions = _messages.MessageField('GooglePrivacyDlpV2VersionDescription', 7, repeated=True)
 
 
 class GooglePrivacyDlpV2InfoTypeLimit(_messages.Message):
@@ -4929,10 +4961,12 @@ class GooglePrivacyDlpV2InfoTypeSummary(_messages.Message):
   r"""The infoType details for this column.
 
   Fields:
+    estimatedPrevalence: Not populated for predicted infotypes.
     infoType: The infoType.
   """
 
-  infoType = _messages.MessageField('GooglePrivacyDlpV2InfoType', 1)
+  estimatedPrevalence = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  infoType = _messages.MessageField('GooglePrivacyDlpV2InfoType', 2)
 
 
 class GooglePrivacyDlpV2InfoTypeTransformation(_messages.Message):
@@ -4997,7 +5031,12 @@ class GooglePrivacyDlpV2InspectConfig(_messages.Message):
       not used for data profiling. When redacting sensitive data from images,
       finding limits don't apply. They can cause unexpected or inconsistent
       results, where only some data is redacted. Don't include finding limits
-      in RedactImage requests. Otherwise, Cloud DLP returns an error.
+      in RedactImage requests. Otherwise, Cloud DLP returns an error. When set
+      within `InspectJobConfig`, the specified maximum values aren't hard
+      limits. If an inspection job reaches these limits, the job ends
+      gradually, not abruptly. Therefore, the actual number of findings that
+      Cloud DLP returns can be multiple times higher than these maximum
+      values.
     minLikelihood: Only returns findings equal or above this threshold. The
       default is POSSIBLE. See https://cloud.google.com/dlp/docs/likelihood to
       learn more.
@@ -5024,11 +5063,12 @@ class GooglePrivacyDlpV2InspectConfig(_messages.Message):
 
     Values:
       LIKELIHOOD_UNSPECIFIED: Default value; same as POSSIBLE.
-      VERY_UNLIKELY: Few matching elements.
-      UNLIKELY: <no description>
-      POSSIBLE: Some matching elements.
-      LIKELY: <no description>
-      VERY_LIKELY: Many matching elements.
+      VERY_UNLIKELY: Highest chance of a false positive.
+      UNLIKELY: High chance of a false positive.
+      POSSIBLE: Some matching signals. The default value.
+      LIKELY: Low chance of a false positive.
+      VERY_LIKELY: Confidence level is high. Lowest chance of a false
+        positive.
     """
     LIKELIHOOD_UNSPECIFIED = 0
     VERY_UNLIKELY = 1
@@ -5579,11 +5619,12 @@ class GooglePrivacyDlpV2LikelihoodAdjustment(_messages.Message):
 
     Values:
       LIKELIHOOD_UNSPECIFIED: Default value; same as POSSIBLE.
-      VERY_UNLIKELY: Few matching elements.
-      UNLIKELY: <no description>
-      POSSIBLE: Some matching elements.
-      LIKELY: <no description>
-      VERY_LIKELY: Many matching elements.
+      VERY_UNLIKELY: Highest chance of a false positive.
+      UNLIKELY: High chance of a false positive.
+      POSSIBLE: Some matching signals. The default value.
+      LIKELY: Low chance of a false positive.
+      VERY_LIKELY: Confidence level is high. Lowest chance of a false
+        positive.
     """
     LIKELIHOOD_UNSPECIFIED = 0
     VERY_UNLIKELY = 1
@@ -6114,14 +6155,14 @@ class GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog(_messages.Message):
 
 
 class GooglePrivacyDlpV2PublishSummaryToCscc(_messages.Message):
-  r"""Publish the result summary of a DlpJob to the Cloud Security Command
-  Center (CSCC Alpha). This action is only available for projects which are
-  parts of an organization and whitelisted for the alpha Cloud Security
-  Command Center. The action will publish the count of finding instances and
-  their info types. The summary of findings will be persisted in CSCC and are
-  governed by CSCC service-specific policy, see
-  https://cloud.google.com/terms/service-terms Only a single instance of this
-  action can be specified. Compatible with: Inspect
+  r"""Publish the result summary of a DlpJob to [Security Command
+  Center](https://cloud.google.com/security-command-center). This action is
+  available for only projects that belong to an organization. This action
+  publishes the count of finding instances and their infoTypes. The summary of
+  findings are persisted in Security Command Center and are governed by
+  [service-specific policies for Security Command
+  Center](https://cloud.google.com/terms/service-terms). Only a single
+  instance of this action can be specified. Compatible with: Inspect
   """
 
 

@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container import flags
 from surface.container.clusters import create
@@ -42,6 +41,8 @@ auto_flags = [
     'privateEndpointSubnetwork',
     'managedConfig',
     'fleetProject',
+    'enableFleet',
+    'enableSecurityPosture',
 ]
 
 # Change default flag values in create-auto
@@ -64,7 +65,7 @@ def AddAutoFlags(parser, release_track):
   flags.AddMonitoringFlag(parser, autopilot=True)
   flags.AddBinauthzFlags(
       parser,
-      api_version=api_adapter.APIVersionFromReleaseTrack(release_track),
+      release_track=release_track,
       autopilot=True)
 
 

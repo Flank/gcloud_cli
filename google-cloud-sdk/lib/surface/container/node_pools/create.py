@@ -93,7 +93,7 @@ def _Args(parser):
   flags.AddImageFlag(parser, hidden=True)
   flags.AddImageProjectFlag(parser, hidden=True)
   flags.AddImageFamilyFlag(parser, hidden=True)
-  flags.AddLabelsFlag(parser, for_node_pool=True, hidden=True)
+  flags.AddLabelsFlag(parser, for_node_pool=True)
   flags.AddNodeLabelsFlag(parser, for_node_pool=True)
   flags.AddTagsFlag(
       parser, """\
@@ -116,6 +116,7 @@ for examples.
   flags.AddThreadsPerCore(parser)
   flags.AddAdditionalNodeNetworkFlag(parser, hidden=True)
   flags.AddAdditionalPodNetworkFlag(parser, hidden=True)
+  flags.AddAsyncFlag(parser)
 
 
 def ParseCreateNodePoolOptionsBase(args):
@@ -135,6 +136,8 @@ def ParseCreateNodePoolOptionsBase(args):
       node_version=args.node_version,
       num_nodes=args.num_nodes,
       local_ssd_count=args.local_ssd_count,
+      local_nvme_ssd_block=args.local_nvme_ssd_block,
+      ephemeral_storage_local_ssd=args.ephemeral_storage_local_ssd,
       tags=args.tags,
       threads_per_core=args.threads_per_core,
       labels=args.labels,
@@ -202,7 +205,7 @@ class Create(base.CreateCommand):
         enable_gpu_deprecated_fields=False)
     flags.AddBootDiskKmsKeyFlag(parser)
     flags.AddClusterAutoscalingFlags(parser)
-    flags.AddLocalSSDFlag(parser)
+    flags.AddLocalSSDsGAFlags(parser, for_node_pool=True)
     flags.AddPreemptibleFlag(parser, for_node_pool=True)
     flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
@@ -233,13 +236,15 @@ class Create(base.CreateCommand):
     flags.AddNodePoolEnablePrivateNodes(parser)
     flags.AddEnableFastSocketFlag(parser)
     flags.AddLoggingVariantFlag(parser, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(parser, hidden=True)
+    flags.AddWindowsOsVersionFlag(parser)
+    flags.AddPlacementTypeFlag(parser, for_node_pool=True, hidden=False)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
     ops.node_locations = args.node_locations
     ops.network_performance_config = args.network_performance_configs
     ops.disable_pod_cidr_overprovision = args.disable_pod_cidr_overprovision
+    ops.placement_type = args.placement_type
     return ops
 
   def Run(self, args):
@@ -278,7 +283,11 @@ class Create(base.CreateCommand):
             pool_ref.projectId)
 
       operation_ref = adapter.CreateNodePool(pool_ref, options)
-
+      if args.async_:
+        op = adapter.GetOperation(operation_ref)
+        if not args.IsSpecified('format'):
+          args.format = util.OPERATIONS_FORMAT
+        return op
       adapter.WaitForOperation(
           operation_ref,
           'Creating node pool {0}'.format(pool_ref.nodePoolId),
@@ -339,7 +348,9 @@ class CreateBeta(Create):
     flags.AddDisablePodCIDROverprovisionFlag(parser)
     flags.AddEnableFastSocketFlag(parser)
     flags.AddLoggingVariantFlag(parser, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(parser, hidden=True)
+    flags.AddWindowsOsVersionFlag(parser)
+    flags.AddQueuedProvisioningFlag(parser, hidden=True)
+    flags.AddTPUTopologyFlag(parser, hidden=True)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
@@ -364,6 +375,8 @@ class CreateBeta(Create):
     ops.enable_confidential_nodes = args.enable_confidential_nodes
     ops.disable_pod_cidr_overprovision = args.disable_pod_cidr_overprovision
     ops.enable_fast_socket = args.enable_fast_socket
+    ops.enable_queued_provisioning = args.enable_queued_provisioning
+    ops.tpu_topology = args.tpu_topology
     return ops
 
 
@@ -396,6 +409,8 @@ class CreateAlpha(Create):
     ops.enable_confidential_nodes = args.enable_confidential_nodes
     ops.disable_pod_cidr_overprovision = args.disable_pod_cidr_overprovision
     ops.enable_fast_socket = args.enable_fast_socket
+    ops.enable_queued_provisioning = args.enable_queued_provisioning
+    ops.tpu_topology = args.tpu_topology
     return ops
 
   @staticmethod
@@ -443,7 +458,8 @@ class CreateAlpha(Create):
     flags.AddDisablePodCIDROverprovisionFlag(parser)
     flags.AddEnableFastSocketFlag(parser)
     flags.AddLoggingVariantFlag(parser, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(parser, hidden=True)
-
+    flags.AddWindowsOsVersionFlag(parser)
+    flags.AddQueuedProvisioningFlag(parser, hidden=True)
+    flags.AddTPUTopologyFlag(parser, hidden=True)
 
 Create.detailed_help = DETAILED_HELP

@@ -39,6 +39,7 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
+    self.media = self.MediaService(self)
     self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
     self.projects_locations_repositories_aptArtifacts = self.ProjectsLocationsRepositoriesAptArtifactsService(self)
     self.projects_locations_repositories_dockerImages = self.ProjectsLocationsRepositoriesDockerImagesService(self)
@@ -46,6 +47,7 @@ class ArtifactregistryV1(base_api.BaseApiClient):
     self.projects_locations_repositories_genericArtifacts = self.ProjectsLocationsRepositoriesGenericArtifactsService(self)
     self.projects_locations_repositories_goModules = self.ProjectsLocationsRepositoriesGoModulesService(self)
     self.projects_locations_repositories_googetArtifacts = self.ProjectsLocationsRepositoriesGoogetArtifactsService(self)
+    self.projects_locations_repositories_kfpArtifacts = self.ProjectsLocationsRepositoriesKfpArtifactsService(self)
     self.projects_locations_repositories_mavenArtifacts = self.ProjectsLocationsRepositoriesMavenArtifactsService(self)
     self.projects_locations_repositories_npmPackages = self.ProjectsLocationsRepositoriesNpmPackagesService(self)
     self.projects_locations_repositories_packages_tags = self.ProjectsLocationsRepositoriesPackagesTagsService(self)
@@ -56,6 +58,46 @@ class ArtifactregistryV1(base_api.BaseApiClient):
     self.projects_locations_repositories = self.ProjectsLocationsRepositoriesService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
+
+  class MediaService(base_api.BaseApiService):
+    """Service class for the media resource."""
+
+    _NAME = 'media'
+
+    def __init__(self, client):
+      super(ArtifactregistryV1.MediaService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Download(self, request, global_params=None, download=None):
+      r"""Download a file.
+
+      Args:
+        request: (ArtifactregistryMediaDownloadRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+        download: (Download, default: None) If present, download
+            data from the request via this stream.
+      Returns:
+        (DownloadFileResponse) The response message.
+      """
+      config = self.GetMethodConfig('Download')
+      return self._RunMethod(
+          config, request, global_params=global_params,
+          download=download)
+
+    Download.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/repositories/{repositoriesId}/files/{filesId}:download',
+        http_method='GET',
+        method_id='artifactregistry.media.download',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}:download',
+        request_field='',
+        request_type_name='ArtifactregistryMediaDownloadRequest',
+        response_type_name='DownloadFileResponse',
+        supports_download=True,
+    )
 
   class ProjectsLocationsOperationsService(base_api.BaseApiService):
     """Service class for the projects_locations_operations resource."""
@@ -226,7 +268,7 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         method_id='artifactregistry.projects.locations.repositories.dockerImages.list',
         ordered_params=['parent'],
         path_params=['parent'],
-        query_params=['pageSize', 'pageToken'],
+        query_params=['orderBy', 'pageSize', 'pageToken'],
         relative_path='v1/{+parent}/dockerImages',
         request_field='',
         request_type_name='ArtifactregistryProjectsLocationsRepositoriesDockerImagesListRequest',
@@ -339,7 +381,7 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         method_id='artifactregistry.projects.locations.repositories.genericArtifacts.upload',
         ordered_params=['parent'],
         path_params=['parent'],
-        query_params=['name'],
+        query_params=[],
         relative_path='v1/{+parent}/genericArtifacts:create',
         request_field='uploadGenericArtifactRequest',
         request_type_name='ArtifactregistryProjectsLocationsRepositoriesGenericArtifactsUploadRequest',
@@ -469,6 +511,55 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         request_field='uploadGoogetArtifactRequest',
         request_type_name='ArtifactregistryProjectsLocationsRepositoriesGoogetArtifactsUploadRequest',
         response_type_name='UploadGoogetArtifactMediaResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsRepositoriesKfpArtifactsService(base_api.BaseApiService):
+    """Service class for the projects_locations_repositories_kfpArtifacts resource."""
+
+    _NAME = 'projects_locations_repositories_kfpArtifacts'
+
+    def __init__(self, client):
+      super(ArtifactregistryV1.ProjectsLocationsRepositoriesKfpArtifactsService, self).__init__(client)
+      self._upload_configs = {
+          'Upload': base_api.ApiUploadInfo(
+              accept=['*/*'],
+              max_size=None,
+              resumable_multipart=None,
+              resumable_path=None,
+              simple_multipart=True,
+              simple_path='/upload/v1/{+parent}/kfpArtifacts:create',
+          ),
+          }
+
+    def Upload(self, request, global_params=None, upload=None):
+      r"""Directly uploads a KFP artifact. The returned Operation will complete once the resource is uploaded. Package, Version, and File resources will be created based on the uploaded artifact. Uploaded artifacts that conflict with existing resources will be overwritten.
+
+      Args:
+        request: (ArtifactregistryProjectsLocationsRepositoriesKfpArtifactsUploadRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+        upload: (Upload, default: None) If present, upload
+            this stream with the request.
+      Returns:
+        (UploadKfpArtifactMediaResponse) The response message.
+      """
+      config = self.GetMethodConfig('Upload')
+      upload_config = self.GetUploadConfig('Upload')
+      return self._RunMethod(
+          config, request, global_params=global_params,
+          upload=upload, upload_config=upload_config)
+
+    Upload.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/repositories/{repositoriesId}/kfpArtifacts:create',
+        http_method='POST',
+        method_id='artifactregistry.projects.locations.repositories.kfpArtifacts.upload',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=[],
+        relative_path='v1/{+parent}/kfpArtifacts:create',
+        request_field='uploadKfpArtifactRequest',
+        request_type_name='ArtifactregistryProjectsLocationsRepositoriesKfpArtifactsUploadRequest',
+        response_type_name='UploadKfpArtifactMediaResponse',
         supports_download=False,
     )
 
@@ -1330,6 +1421,33 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def GetVpcscConfig(self, request, global_params=None):
+      r"""Retrieves the VPCSC Config for the Project.
+
+      Args:
+        request: (ArtifactregistryProjectsLocationsGetVpcscConfigRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (VPCSCConfig) The response message.
+      """
+      config = self.GetMethodConfig('GetVpcscConfig')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetVpcscConfig.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/vpcscConfig',
+        http_method='GET',
+        method_id='artifactregistry.projects.locations.getVpcscConfig',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='ArtifactregistryProjectsLocationsGetVpcscConfigRequest',
+        response_type_name='VPCSCConfig',
+        supports_download=False,
+    )
+
     def List(self, request, global_params=None):
       r"""Lists information about the supported locations for this service.
 
@@ -1354,6 +1472,33 @@ class ArtifactregistryV1(base_api.BaseApiClient):
         request_field='',
         request_type_name='ArtifactregistryProjectsLocationsListRequest',
         response_type_name='ListLocationsResponse',
+        supports_download=False,
+    )
+
+    def UpdateVpcscConfig(self, request, global_params=None):
+      r"""Updates the VPCSC Config for the Project.
+
+      Args:
+        request: (ArtifactregistryProjectsLocationsUpdateVpcscConfigRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (VPCSCConfig) The response message.
+      """
+      config = self.GetMethodConfig('UpdateVpcscConfig')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateVpcscConfig.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/vpcscConfig',
+        http_method='PATCH',
+        method_id='artifactregistry.projects.locations.updateVpcscConfig',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['updateMask'],
+        relative_path='v1/{+name}',
+        request_field='vPCSCConfig',
+        request_type_name='ArtifactregistryProjectsLocationsUpdateVpcscConfigRequest',
+        response_type_name='VPCSCConfig',
         supports_download=False,
     )
 

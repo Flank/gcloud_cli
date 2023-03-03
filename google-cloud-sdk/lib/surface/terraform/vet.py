@@ -26,6 +26,7 @@ from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.credentials.store import GetFreshAccessToken
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 
 MISSING_BINARY = ('Could not locate terraform-tools executable [{binary}]. '
@@ -52,8 +53,8 @@ class TerraformToolsTfplanToCaiOperation(
         structured_output=True,
         **kwargs)
 
-  def _ParseArgsForCommand(self, command, terraform_plan_json, project,
-                           verbosity, output_path, **kwargs):
+  def _ParseArgsForCommand(self, command, terraform_plan_json, project, region,
+                           zone, verbosity, output_path, **kwargs):
     args = [
         command,
         terraform_plan_json,
@@ -66,6 +67,10 @@ class TerraformToolsTfplanToCaiOperation(
     ]
     if project:
       args += ['--project', project]
+    if region:
+      args += ['--region', region]
+    if zone:
+      args += ['--zone', zone]
     return args
 
 
@@ -125,6 +130,16 @@ class Vet(base.Command):
         required=True,
         help='Directory which contains a policy library',
     )
+    parser.add_argument(
+        '--zone',
+        required=False,
+        help='Default zone to use for resources that do not have one set',
+    )
+    parser.add_argument(
+        '--region',
+        required=False,
+        help='Default region to use for resources that do not have one set',
+    )
 
   def Run(self, args):
     tfplan_to_cai_operation = TerraformToolsTfplanToCaiOperation()
@@ -142,6 +157,27 @@ class Vet(base.Command):
         'HTTP_PROXY', 'http_proxy', 'HTTPS_PROXY', 'https_proxy', 'NO_PROXY',
         'no_proxy'
     ]
+
+    # env names and orders are from
+    # https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#full-reference
+    project_env_names = [
+        'GOOGLE_PROJECT',
+        'GOOGLE_CLOUD_PROJECT',
+        'GCLOUD_PROJECT',
+    ]
+
+    zone_env_names = [
+        'GOOGLE_ZONE',
+        'GCLOUD_ZONE',
+        'CLOUDSDK_COMPUTE_ZONE',
+    ]
+
+    region_env_names = [
+        'GOOGLE_REGION',
+        'GCLOUD_REGION',
+        'CLOUDSDK_COMPUTE_REGION',
+    ]
+
     for env_key, env_val in os.environ.items():
       if env_key in proxy_env_names:
         env_vars[env_key] = env_val
@@ -149,9 +185,46 @@ class Vet(base.Command):
     with files.TemporaryDirectory() as tempdir:
       cai_assets = os.path.join(tempdir, 'cai_assets.json')
 
+      # project flag and CLOUDSDK_CORE_PROJECT env are linked with core property
+      project = properties.VALUES.core.project.Get()
+      if project:
+        log.debug('Setting project to {} from properties'.format(project))
+      else:
+        for env_key in project_env_names:
+          project = encoding.GetEncodedValue(os.environ, env_key)
+          if project:
+            log.debug('Setting project to {} from env {}'.format(
+                project, env_key))
+            break
+
+      region = ''
+      if args.region:
+        region = args.region
+        log.debug('Setting region to {} from args'.format(region))
+      else:
+        for env_key in region_env_names:
+          region = encoding.GetEncodedValue(os.environ, env_key)
+          if region:
+            log.debug('Setting region to {} from env {}'.format(
+                region, env_key))
+            break
+
+      zone = ''
+      if args.zone:
+        zone = args.zone
+        log.debug('Setting zone to {} from args'.format(zone))
+      else:
+        for env_key in zone_env_names:
+          zone = encoding.GetEncodedValue(os.environ, env_key)
+          if zone:
+            log.debug('Setting zone to {} from env {}'.format(zone, env_key))
+            break
+
       response = tfplan_to_cai_operation(
           command='tfplan-to-cai',
-          project=args.project or properties.VALUES.core.project.Get(),
+          project=project,
+          region=region,
+          zone=zone,
           terraform_plan_json=args.terraform_plan_json,
           verbosity=args.verbosity,
           output_path=cai_assets,

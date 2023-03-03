@@ -197,6 +197,33 @@ class ComposerV1alpha2(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def Activate(self, request, global_params=None):
+      r"""Activates a dag.
+
+      Args:
+        request: (ComposerProjectsLocationsEnvironmentsDagsActivateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Dag) The response message.
+      """
+      config = self.GetMethodConfig('Activate')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Activate.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:activate',
+        http_method='POST',
+        method_id='composer.projects.locations.environments.dags.activate',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1alpha2/{+name}:activate',
+        request_field='activateDagRequest',
+        request_type_name='ComposerProjectsLocationsEnvironmentsDagsActivateRequest',
+        response_type_name='Dag',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
       r"""Retrieves a DAG.
 
@@ -221,6 +248,33 @@ class ComposerV1alpha2(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComposerProjectsLocationsEnvironmentsDagsGetRequest',
         response_type_name='Dag',
+        supports_download=False,
+    )
+
+    def GetSourceCode(self, request, global_params=None):
+      r"""Retrieves DAG source code.
+
+      Args:
+        request: (ComposerProjectsLocationsEnvironmentsDagsGetSourceCodeRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SourceCode) The response message.
+      """
+      config = self.GetMethodConfig('GetSourceCode')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetSourceCode.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:getSourceCode',
+        http_method='GET',
+        method_id='composer.projects.locations.environments.dags.getSourceCode',
+        ordered_params=['dag'],
+        path_params=['dag'],
+        query_params=[],
+        relative_path='v1alpha2/{+dag}:getSourceCode',
+        request_field='',
+        request_type_name='ComposerProjectsLocationsEnvironmentsDagsGetSourceCodeRequest',
+        response_type_name='SourceCode',
         supports_download=False,
     )
 
@@ -275,6 +329,33 @@ class ComposerV1alpha2(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComposerProjectsLocationsEnvironmentsDagsListStatsRequest',
         response_type_name='ListDagStatsResponse',
+        supports_download=False,
+    )
+
+    def Pause(self, request, global_params=None):
+      r"""Pauses a dag.
+
+      Args:
+        request: (ComposerProjectsLocationsEnvironmentsDagsPauseRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Dag) The response message.
+      """
+      config = self.GetMethodConfig('Pause')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Pause.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}/dags/{dagsId}:pause',
+        http_method='POST',
+        method_id='composer.projects.locations.environments.dags.pause',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1alpha2/{+name}:pause',
+        request_field='pauseDagRequest',
+        request_type_name='ComposerProjectsLocationsEnvironmentsDagsPauseRequest',
+        response_type_name='Dag',
         supports_download=False,
     )
 
@@ -365,6 +446,33 @@ class ComposerV1alpha2(base_api.BaseApiClient):
         relative_path='v1alpha2/{+parent}/environments',
         request_field='environment',
         request_type_name='ComposerProjectsLocationsEnvironmentsCreateRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def DatabaseFailover(self, request, global_params=None):
+      r"""Triggers database failover (only for highly resilient environments).
+
+      Args:
+        request: (ComposerProjectsLocationsEnvironmentsDatabaseFailoverRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('DatabaseFailover')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DatabaseFailover.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1alpha2/projects/{projectsId}/locations/{locationsId}/environments/{environmentsId}:databaseFailover',
+        http_method='POST',
+        method_id='composer.projects.locations.environments.databaseFailover',
+        ordered_params=['environment'],
+        path_params=['environment'],
+        query_params=[],
+        relative_path='v1alpha2/{+environment}:databaseFailover',
+        request_field='databaseFailoverRequest',
+        request_type_name='ComposerProjectsLocationsEnvironmentsDatabaseFailoverRequest',
         response_type_name='Operation',
         supports_download=False,
     )

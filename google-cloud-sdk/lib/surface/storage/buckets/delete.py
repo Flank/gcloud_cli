@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 import multiprocessing
 
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.storage import errors
+from googlecloudsdk.command_lib.storage import errors_util
 from googlecloudsdk.command_lib.storage import flags
 from googlecloudsdk.command_lib.storage import name_expansion
 from googlecloudsdk.command_lib.storage import plurality_checkable_iterator
@@ -56,20 +56,22 @@ class Delete(base.Command):
   def Args(parser):
     parser.add_argument(
         'urls', nargs='+', help='Specifies the URLs of the buckets to delete.')
+    flags.add_additional_headers_flag(parser)
     flags.add_continue_on_error_flag(parser)
 
   def Run(self, args):
     for url_string in args.urls:
-      if not storage_url.storage_url_from_string(url_string).is_bucket():
-        raise errors.InvalidUrlError(
-            'buckets delete only accepts cloud bucket URLs. Example:'
-            ' "gs://bucket"')
+      url = storage_url.storage_url_from_string(url_string)
+      errors_util.raise_error_if_not_bucket(args.command_path, url)
 
     task_status_queue = multiprocessing.Queue()
 
     bucket_iterator = delete_task_iterator_factory.DeleteTaskIteratorFactory(
-        name_expansion.NameExpansionIterator(args.urls, include_buckets=True),
-        task_status_queue=task_status_queue).bucket_iterator()
+        name_expansion.NameExpansionIterator(
+            args.urls, include_buckets=name_expansion.BucketSetting.YES
+        ),
+        task_status_queue=task_status_queue,
+    ).bucket_iterator()
     plurality_checkable_bucket_iterator = (
         plurality_checkable_iterator.PluralityCheckableIterator(
             bucket_iterator))

@@ -38,42 +38,30 @@ class PrivateCloudsClient(util.VmwareClientBase):
     response = self.service.Get(request)
     return response
 
-  def Create(self,
-             resource,
-             description=None,
-             cluster_id=None,
-             node_type=None,
-             node_count=None,
-             network_cidr=None,
-             network=None,
-             vmware_engine_network_id=None,
-             network_project=None,
-             node_custom_core_count=None):
+  def Create(
+      self,
+      resource,
+      cluster_id,
+      nodes_configs,
+      network_cidr,
+      vmware_engine_network_id,
+      private_cloud_type,
+      description=None):
     parent = resource.Parent().RelativeName()
     project = resource.Parent().Parent().Name()
     private_cloud_id = resource.Name()
     private_cloud = self.messages.PrivateCloud(description=description)
-    network_config = self.messages.NetworkConfig(managementCidr=network_cidr)
+    private_cloud.type = self.messages.PrivateCloud.TypeValueValuesEnum(
+        private_cloud_type)
+    ven = self.networks_client.GetByID(project, vmware_engine_network_id)
+    network_config = self.messages.NetworkConfig(
+        managementCidr=network_cidr, vmwareEngineNetwork=ven.name)
 
-    # old networking model
-    if network_project is None:
-      network_project = project
+    management_cluster = self.messages.ManagementCluster(clusterId=cluster_id)
+    management_cluster.nodeTypeConfigs = util.ConstructNodeParameterConfigMessage(
+        self.messages.ManagementCluster.NodeTypeConfigsValue,
+        self.messages.NodeTypeConfig, nodes_configs)
 
-    if network is not None:
-      if not network.startswith('project'):
-        network = 'projects/{}/global/networks/{}'.format(
-            network_project, network)
-
-      network_config.network = network
-
-    # new networking model
-    if vmware_engine_network_id is not None:
-      ven = self.networks_client.GetByID(project, vmware_engine_network_id)
-      network_config.vmwareEngineNetwork = ven.name
-
-    management_cluster = self.messages.ManagementCluster(
-        clusterId=cluster_id, nodeCount=node_count,
-        nodeTypeId=node_type, nodeCustomCoreCount=node_custom_core_count)
     private_cloud.managementCluster = management_cluster
     private_cloud.networkConfig = network_config
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsCreateRequest(
@@ -82,14 +70,11 @@ class PrivateCloudsClient(util.VmwareClientBase):
         privateCloud=private_cloud)
     return self.service.Create(request)
 
-  def Update(self,
-             resource,
-             description=None):
+  def Update(self, resource, description):
     private_cloud = self.Get(resource)
     update_mask = []
-    if description is not None:
-      private_cloud.description = description
-      update_mask.append('description')
+    private_cloud.description = description
+    update_mask.append('description')
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsPatchRequest(
         privateCloud=private_cloud,
         name=resource.RelativeName(),
@@ -106,23 +91,17 @@ class PrivateCloudsClient(util.VmwareClientBase):
         self.messages.VmwareengineProjectsLocationsPrivateCloudsDeleteRequest(
             name=resource.RelativeName(), delayHours=delay_hours))
 
-  def List(self,
-           location_resource,
-           filter_expression=None,
-           limit=None,
-           page_size=None,
-           sort_by=None):
+  def List(self, location_resource):
     location = location_resource.RelativeName()
-    request = self.messages.VmwareengineProjectsLocationsPrivateCloudsListRequest(
-        parent=location, filter=filter_expression)
-    if page_size:
-      request.page_size = page_size
+    request = (
+        self.messages.VmwareengineProjectsLocationsPrivateCloudsListRequest(
+            parent=location
+        )
+    )
     return list_pager.YieldFromList(
         self.service,
         request,
-        limit=limit,
         batch_size_attribute='pageSize',
-        batch_size=page_size,
         field='privateClouds')
 
   def GetNsxCredentials(self, resource):

@@ -15,7 +15,8 @@ package = 'batch'
 
 
 class Accelerator(_messages.Message):
-  r"""Accelerator describes Compute Engine accelerators to be attached to VMs.
+  r"""Accelerator describes Compute Engine accelerators to be attached to the
+  VM.
 
   Fields:
     count: The number of accelerators of this type.
@@ -66,6 +67,7 @@ class AllocationPolicy(_messages.Message):
     location: Location where compute resources should be allocated for the
       Job.
     network: The network policy.
+    serviceAccount: Service account that VMs will run as.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -101,11 +103,12 @@ class AllocationPolicy(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 2)
   location = _messages.MessageField('LocationPolicy', 3)
   network = _messages.MessageField('NetworkPolicy', 4)
+  serviceAccount = _messages.MessageField('ServiceAccount', 5)
 
 
 class AttachedDisk(_messages.Message):
-  r"""A new or an existing persistent disk or a local ssd attached to a VM
-  instance.
+  r"""A new or an existing persistent disk (PD) or a local ssd attached to a
+  VM instance.
 
   Fields:
     deviceName: Device name that the guest operating system will see. It is
@@ -119,69 +122,6 @@ class AttachedDisk(_messages.Message):
   deviceName = _messages.StringField(1)
   existingDisk = _messages.StringField(2)
   newDisk = _messages.MessageField('Disk', 3)
-
-
-class AuditConfig(_messages.Message):
-  r"""Specifies the audit configuration for a service. The configuration
-  determines which permission types are logged, and what identities, if any,
-  are exempted from logging. An AuditConfig must have one or more
-  AuditLogConfigs. If there are AuditConfigs for both `allServices` and a
-  specific service, the union of the two AuditConfigs is used for that
-  service: the log_types specified in each AuditConfig are enabled, and the
-  exempted_members in each AuditLogConfig are exempted. Example Policy with
-  multiple AuditConfigs: { "audit_configs": [ { "service": "allServices",
-  "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [
-  "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type":
-  "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com",
-  "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type":
-  "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For
-  sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-  logging. It also exempts `jose@example.com` from DATA_READ logging, and
-  `aliya@example.com` from DATA_WRITE logging.
-
-  Fields:
-    auditLogConfigs: The configuration for logging of each type of permission.
-    service: Specifies a service that will be enabled for audit logging. For
-      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-      `allServices` is a special value that covers all services.
-  """
-
-  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
-  service = _messages.StringField(2)
-
-
-class AuditLogConfig(_messages.Message):
-  r"""Provides the configuration for logging a type of permissions. Example: {
-  "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [
-  "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" } ] } This enables
-  'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from
-  DATA_READ logging.
-
-  Enums:
-    LogTypeValueValuesEnum: The log type that this config enables.
-
-  Fields:
-    exemptedMembers: Specifies the identities that do not cause logging for
-      this type of permission. Follows the same format of Binding.members.
-    logType: The log type that this config enables.
-  """
-
-  class LogTypeValueValuesEnum(_messages.Enum):
-    r"""The log type that this config enables.
-
-    Values:
-      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
-      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
-      DATA_WRITE: Data writes. Example: CloudSQL Users create
-      DATA_READ: Data reads. Example: CloudSQL Users list
-    """
-    LOG_TYPE_UNSPECIFIED = 0
-    ADMIN_READ = 1
-    DATA_WRITE = 2
-    DATA_READ = 3
-
-  exemptedMembers = _messages.StringField(1, repeated=True)
-  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
 
 
 class Barrier(_messages.Message):
@@ -211,11 +151,12 @@ class BatchProjectsLocationsJobsCreateRequest(_messages.Message):
   Fields:
     job: A Job resource to be passed as the request body.
     jobId: ID used to uniquely identify the Job within its parent scope. This
-      field should contain at most 63 characters. Only alphanumeric characters
-      or '-' are accepted. The '-' character cannot be the first or the last
-      one. A system generated ID will be used if the field is not set. The
-      job.name field in the request will be ignored and the created resource
-      name of the Job will be "{parent}/jobs/{job_id}".
+      field should contain at most 63 characters and must start with lowercase
+      characters. Only lowercase characters, numbers and '-' are accepted. The
+      '-' character cannot be the first or the last one. A system generated ID
+      will be used if the field is not set. The job.name field in the request
+      will be ignored and the created resource name of the Job will be
+      "{parent}/jobs/{job_id}".
     parent: Required. The parent resource name where the Job will be created.
       Pattern: "projects/{project}/locations/{location}"
     requestId: Optional. An optional request ID to identify requests. Specify
@@ -223,7 +164,7 @@ class BatchProjectsLocationsJobsCreateRequest(_messages.Message):
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -248,7 +189,7 @@ class BatchProjectsLocationsJobsDeleteRequest(_messages.Message):
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes after the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -259,32 +200,6 @@ class BatchProjectsLocationsJobsDeleteRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
   reason = _messages.StringField(2)
   requestId = _messages.StringField(3)
-
-
-class BatchProjectsLocationsJobsGetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsJobsGetIamPolicyRequest object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
 
 
 class BatchProjectsLocationsJobsGetRequest(_messages.Message):
@@ -311,22 +226,6 @@ class BatchProjectsLocationsJobsListRequest(_messages.Message):
   pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(3)
   parent = _messages.StringField(4, required=True)
-
-
-class BatchProjectsLocationsJobsSetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsJobsSetIamPolicyRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
 
 
 class BatchProjectsLocationsJobsTaskGroupsTasksGetRequest(_messages.Message):
@@ -358,22 +257,6 @@ class BatchProjectsLocationsJobsTaskGroupsTasksListRequest(_messages.Message):
   parent = _messages.StringField(4, required=True)
 
 
-class BatchProjectsLocationsJobsTestIamPermissionsRequest(_messages.Message):
-  r"""A BatchProjectsLocationsJobsTestIamPermissionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
 class BatchProjectsLocationsListRequest(_messages.Message):
   r"""A BatchProjectsLocationsListRequest object.
 
@@ -392,64 +275,6 @@ class BatchProjectsLocationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
-
-
-class BatchProjectsLocationsNodesGetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsNodesGetIamPolicyRequest object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
-
-
-class BatchProjectsLocationsNodesSetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsNodesSetIamPolicyRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class BatchProjectsLocationsNodesTestIamPermissionsRequest(_messages.Message):
-  r"""A BatchProjectsLocationsNodesTestIamPermissionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
 class BatchProjectsLocationsOperationsCancelRequest(_messages.Message):
@@ -501,124 +326,6 @@ class BatchProjectsLocationsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
-class BatchProjectsLocationsTasksGetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsTasksGetIamPolicyRequest object.
-
-  Fields:
-    options_requestedPolicyVersion: Optional. The maximum policy version that
-      will be used to format the policy. Valid values are 0, 1, and 3.
-      Requests specifying an invalid value will be rejected. Requests for
-      policies with any conditional role bindings must specify version 3.
-      Policies with no conditional role bindings may specify any valid value
-      or leave the field unset. The policy in the response might use the
-      policy version that you specified, or it might use a lower policy
-      version. For example, if you specify version 3, but the policy has no
-      conditional role bindings, the response uses version 1. To learn which
-      resources support conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    resource: REQUIRED: The resource for which the policy is being requested.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-  """
-
-  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  resource = _messages.StringField(2, required=True)
-
-
-class BatchProjectsLocationsTasksSetIamPolicyRequest(_messages.Message):
-  r"""A BatchProjectsLocationsTasksSetIamPolicyRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy is being specified.
-      See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
-      request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
-
-
-class BatchProjectsLocationsTasksTestIamPermissionsRequest(_messages.Message):
-  r"""A BatchProjectsLocationsTasksTestIamPermissionsRequest object.
-
-  Fields:
-    resource: REQUIRED: The resource for which the policy detail is being
-      requested. See [Resource
-      names](https://cloud.google.com/apis/design/resource_names) for the
-      appropriate value for this field.
-    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
-      passed as the request body.
-  """
-
-  resource = _messages.StringField(1, required=True)
-  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
-
-
-class Binding(_messages.Message):
-  r"""Associates `members`, or principals, with a `role`.
-
-  Fields:
-    condition: The condition that is associated with this binding. If the
-      condition evaluates to `true`, then this binding applies to the current
-      request. If the condition evaluates to `false`, then this binding does
-      not apply to the current request. However, a different role binding
-      might grant the same role to one or more of the principals in this
-      binding. To learn which resources support conditions in their IAM
-      policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-    members: Specifies the principals requesting access for a Google Cloud
-      resource. `members` can have the following values: * `allUsers`: A
-      special identifier that represents anyone who is on the internet; with
-      or without a Google account. * `allAuthenticatedUsers`: A special
-      identifier that represents anyone who is authenticated with a Google
-      account or a service account. Does not include identities that come from
-      external identity providers (IdPs) through identity federation. *
-      `user:{emailid}`: An email address that represents a specific Google
-      account. For example, `alice@example.com` . *
-      `serviceAccount:{emailid}`: An email address that represents a Google
-      service account. For example, `my-other-
-      app@appspot.gserviceaccount.com`. *
-      `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`:
-      An identifier for a [Kubernetes service
-      account](https://cloud.google.com/kubernetes-engine/docs/how-
-      to/kubernetes-service-accounts). For example, `my-
-      project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
-      `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
-      `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
-      identifier) representing a user that has been recently deleted. For
-      example, `alice@example.com?uid=123456789012345678901`. If the user is
-      recovered, this value reverts to `user:{emailid}` and the recovered user
-      retains the role in the binding. *
-      `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address
-      (plus unique identifier) representing a service account that has been
-      recently deleted. For example, `my-other-
-      app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the
-      service account is undeleted, this value reverts to
-      `serviceAccount:{emailid}` and the undeleted service account retains the
-      role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An
-      email address (plus unique identifier) representing a Google group that
-      has been recently deleted. For example,
-      `admins@example.com?uid=123456789012345678901`. If the group is
-      recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
-    role: Role that is assigned to the list of `members`, or principals. For
-      example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-  """
-
-  condition = _messages.MessageField('Expr', 1)
-  members = _messages.StringField(2, repeated=True)
-  role = _messages.StringField(3)
-
-
 class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
@@ -642,8 +349,9 @@ class Container(_messages.Message):
 
   Fields:
     blockExternalNetwork: If set to true, external network access to and from
-      container will be blocked. The container will use the default internal
-      network 'goog-internal'.
+      container will be blocked, containers that are with
+      block_external_network as true can still communicate with each other,
+      network cannot be specified in the `container.options` field.
     commands: Overrides the `CMD` specified in the container. If there is an
       ENTRYPOINT (either in the container image or with the entrypoint field
       below) then commands are appended as arguments to the ENTRYPOINT.
@@ -652,10 +360,10 @@ class Container(_messages.Message):
     options: Arbitrary additional options to include in the "docker run"
       command when running this container, e.g. "--network host".
     password: Optional password for logging in to a docker registry. If
-      password matches "projects/*/secrets/*/versions/*" then Batch will read
+      password matches `projects/*/secrets/*/versions/*` then Batch will read
       the password from the Secret Manager;
     username: Optional username for logging in to a docker registry. If
-      username matches "projects/*/secrets/*/versions/*" then Batch will read
+      username matches `projects/*/secrets/*/versions/*` then Batch will read
       the username from the Secret Manager.
     volumes: Volumes to mount (bind mount) from the host machine files or
       directories into the container, formatted to match docker run's --volume
@@ -674,22 +382,34 @@ class Container(_messages.Message):
 
 class Disk(_messages.Message):
   r"""A new persistent disk or a local ssd. A VM can only have one local SSD
-  setting but multiple local SSD partitions.
-  https://cloud.google.com/compute/docs/disks#pdspecs.
+  setting but multiple local SSD partitions. See
+  https://cloud.google.com/compute/docs/disks#pdspecs and
   https://cloud.google.com/compute/docs/disks#localssds.
 
   Fields:
     diskInterface: Local SSDs are available through both "SCSI" and "NVMe"
       interfaces. If not indicated, "NVMe" will be the default one for local
       ssds. We only support "SCSI" for persistent disks now.
-    image: Name of a public or custom image used as the data source.
-    sizeGb: Disk size in GB. This field is ignored if `data_source` is `disk`
-      or `image`. If `type` is `local-ssd`, size_gb should be a multiple of
-      375GB, otherwise, the final size will be the next greater multiple of
-      375 GB.
+    image: Name of a public or custom image used as the data source. For
+      example, the following are all valid URLs: * Specify the image by its
+      family name: projects/{project}/global/images/family/{image_family} *
+      Specify the image version:
+      projects/{project}/global/images/{image_version} You can also use Batch
+      customized image in short names. The following image values are
+      supported for a boot disk: * "batch-debian": use Batch Debian images. *
+      "batch-centos": use Batch CentOS images. * "batch-cos": use Batch
+      Container-Optimized images.
+    sizeGb: Disk size in GB. For persistent disk, this field is ignored if
+      `data_source` is `image` or `snapshot`. For local SSD, size_gb should be
+      a multiple of 375GB, otherwise, the final size will be the next greater
+      multiple of 375 GB. For boot disk, Batch will calculate the boot disk
+      size based on source image and task requirements if you do not speicify
+      the size. If both this field and the boot_disk_mib field in task spec's
+      compute_resource are defined, Batch will only honor this field.
     snapshot: Name of a snapshot used as the data source.
-    type: Disk type as shown in `gcloud compute disk-types list` For example,
-      "pd-ssd", "pd-standard", "pd-balanced", "local-ssd".
+    type: Disk type as shown in `gcloud compute disk-types list`. For example,
+      local SSD uses type "local-ssd". Persistent disks and boot disks use
+      "pd-balanced", "pd-extreme", "pd-ssd" or "pd-standard".
   """
 
   diskInterface = _messages.StringField(1)
@@ -713,11 +433,46 @@ class Environment(_messages.Message):
   when executing Tasks.
 
   Messages:
+    SecretVariablesValue: A map of environment variable names to Secret
+      Manager secret names. The VM will access the named secrets to set the
+      value of each environment variable.
     VariablesValue: A map of environment variable names to values.
 
   Fields:
+    encryptedVariables: An encrypted JSON dictionary where the key/value pairs
+      correspond to environment variable names and their values.
+    secretVariables: A map of environment variable names to Secret Manager
+      secret names. The VM will access the named secrets to set the value of
+      each environment variable.
     variables: A map of environment variable names to values.
   """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class SecretVariablesValue(_messages.Message):
+    r"""A map of environment variable names to Secret Manager secret names.
+    The VM will access the named secrets to set the value of each environment
+    variable.
+
+    Messages:
+      AdditionalProperty: An additional property for a SecretVariablesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type SecretVariablesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a SecretVariablesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class VariablesValue(_messages.Message):
@@ -743,47 +498,13 @@ class Environment(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  variables = _messages.MessageField('VariablesValue', 1)
-
-
-class Expr(_messages.Message):
-  r"""Represents a textual expression in the Common Expression Language (CEL)
-  syntax. CEL is a C-like expression language. The syntax and semantics of CEL
-  are documented at https://github.com/google/cel-spec. Example (Comparison):
-  title: "Summary size limit" description: "Determines if a summary is less
-  than 100 chars" expression: "document.summary.size() < 100" Example
-  (Equality): title: "Requestor is owner" description: "Determines if
-  requestor is the document owner" expression: "document.owner ==
-  request.auth.claims.email" Example (Logic): title: "Public documents"
-  description: "Determine whether the document should be publicly visible"
-  expression: "document.type != 'private' && document.type != 'internal'"
-  Example (Data Manipulation): title: "Notification string" description:
-  "Create a notification string with a timestamp." expression: "'New message
-  received at ' + string(document.create_time)" The exact variables and
-  functions that may be referenced within an expression are determined by the
-  service that evaluates it. See the service documentation for additional
-  information.
-
-  Fields:
-    description: Optional. Description of the expression. This is a longer
-      text which describes the expression, e.g. when hovered over it in a UI.
-    expression: Textual representation of an expression in Common Expression
-      Language syntax.
-    location: Optional. String indicating the location of the expression for
-      error reporting, e.g. a file name and a position in the file.
-    title: Optional. Title for the expression, i.e. a short string describing
-      its purpose. This can be used e.g. in UIs which allow to enter the
-      expression.
-  """
-
-  description = _messages.StringField(1)
-  expression = _messages.StringField(2)
-  location = _messages.StringField(3)
-  title = _messages.StringField(4)
+  encryptedVariables = _messages.MessageField('KMSEnvMap', 1)
+  secretVariables = _messages.MessageField('SecretVariablesValue', 2)
+  variables = _messages.MessageField('VariablesValue', 3)
 
 
 class GCS(_messages.Message):
-  r"""Represents a Google Cloud Storage volume source config.
+  r"""Represents a Google Cloud Storage volume.
 
   Fields:
     remotePath: Remote path, either a bucket name or a subdirectory of a
@@ -801,15 +522,15 @@ class InstancePolicy(_messages.Message):
     ProvisioningModelValueValuesEnum: The provisioning model.
 
   Fields:
-    accelerators: The accelerators attached to each VM instance. Not yet
-      implemented.
+    accelerators: The accelerators attached to each VM instance.
+    bootDisk: Boot disk to be created and attached to each VM by this
+      InstancePolicy. Boot disk will be deleted when the VM is deleted.
     disks: Non-boot disks to be attached for each VM created by this
-      InstancePolicy. New disks will be deleted when the attached VM is
-      deleted.
+      InstancePolicy. New disks will be deleted when the VM is deleted.
     machineType: The Compute Engine machine type.
     minCpuPlatform: The minimum CPU platform. See
-      `https://cloud.google.com/compute/docs/instances/specify-min-cpu-
-      platform`. Not yet implemented.
+      https://cloud.google.com/compute/docs/instances/specify-min-cpu-
+      platform. Not yet implemented.
     provisioningModel: The provisioning model.
   """
 
@@ -832,10 +553,11 @@ class InstancePolicy(_messages.Message):
     PREEMPTIBLE = 3
 
   accelerators = _messages.MessageField('Accelerator', 1, repeated=True)
-  disks = _messages.MessageField('AttachedDisk', 2, repeated=True)
-  machineType = _messages.StringField(3)
-  minCpuPlatform = _messages.StringField(4)
-  provisioningModel = _messages.EnumField('ProvisioningModelValueValuesEnum', 5)
+  bootDisk = _messages.MessageField('Disk', 2)
+  disks = _messages.MessageField('AttachedDisk', 3, repeated=True)
+  machineType = _messages.StringField(4)
+  minCpuPlatform = _messages.StringField(5)
+  provisioningModel = _messages.EnumField('ProvisioningModelValueValuesEnum', 6)
 
 
 class InstancePolicyOrTemplate(_messages.Message):
@@ -864,6 +586,7 @@ class InstanceStatus(_messages.Message):
     ProvisioningModelValueValuesEnum: The VM instance provisioning model.
 
   Fields:
+    bootDisk: The VM boot disk.
     machineType: The Compute Engine machine type.
     provisioningModel: The VM instance provisioning model.
     taskPack: The max number of tasks can be assigned to this instance type.
@@ -887,9 +610,10 @@ class InstanceStatus(_messages.Message):
     SPOT = 2
     PREEMPTIBLE = 3
 
-  machineType = _messages.StringField(1)
-  provisioningModel = _messages.EnumField('ProvisioningModelValueValuesEnum', 2)
-  taskPack = _messages.IntegerField(3)
+  bootDisk = _messages.MessageField('Disk', 1)
+  machineType = _messages.StringField(2)
+  provisioningModel = _messages.EnumField('ProvisioningModelValueValuesEnum', 3)
+  taskPack = _messages.IntegerField(4)
 
 
 class Job(_messages.Message):
@@ -919,9 +643,10 @@ class Job(_messages.Message):
     name: Output only. Job name. For example: "projects/123456/locations/us-
       central1/jobs/job01".
     notifications: Notification configurations.
-    priority: Priority of the Job. The valid value range is [0, 100). A job
-      with higher priority value is more likely to run earlier if all other
-      requirements are satisfied.
+    priority: Priority of the Job. The valid value range is [0, 100). Default
+      value is 0. Higher value indicates higher priority. A job with higher
+      priority value is more likely to run earlier if all other requirements
+      are satisfied.
     status: Output only. Job status. It is read only for users.
     taskGroups: Required. TaskGroups in the Job. Only one TaskGroup is
       supported now.
@@ -1064,21 +789,47 @@ class JobStatus(_messages.Message):
   taskGroups = _messages.MessageField('TaskGroupsValue', 4)
 
 
+class KMSEnvMap(_messages.Message):
+  r"""A KMSEnvMap object.
+
+  Fields:
+    cipherText: The value of the cipherText response from the `encrypt`
+      method.
+    keyName: The name of the KMS key that will be used to decrypt the cipher
+      text.
+  """
+
+  cipherText = _messages.StringField(1)
+  keyName = _messages.StringField(2)
+
+
 class LifecyclePolicy(_messages.Message):
   r"""LifecyclePolicy describes how to deal with task failures based on
   different conditions.
 
   Enums:
     ActionValueValuesEnum: Action to execute when ActionCondition is true.
+      When RETRY_TASK is specified, we will retry failed tasks if we notice
+      any exit code match and fail tasks if no match is found. Likewise, when
+      FAIL_TASK is specified, we will fail tasks if we notice any exit code
+      match and retry tasks if no match is found.
 
   Fields:
-    action: Action to execute when ActionCondition is true.
+    action: Action to execute when ActionCondition is true. When RETRY_TASK is
+      specified, we will retry failed tasks if we notice any exit code match
+      and fail tasks if no match is found. Likewise, when FAIL_TASK is
+      specified, we will fail tasks if we notice any exit code match and retry
+      tasks if no match is found.
     actionCondition: Conditions that decide why a task failure is dealt with a
       specific action.
   """
 
   class ActionValueValuesEnum(_messages.Enum):
-    r"""Action to execute when ActionCondition is true.
+    r"""Action to execute when ActionCondition is true. When RETRY_TASK is
+    specified, we will retry failed tasks if we notice any exit code match and
+    fail tasks if no match is found. Likewise, when FAIL_TASK is specified, we
+    will fail tasks if we notice any exit code match and retry tasks if no
+    match is found.
 
     Values:
       ACTION_UNSPECIFIED: Action unspecified.
@@ -1354,11 +1105,11 @@ class Message(_messages.Message):
 
 
 class NFS(_messages.Message):
-  r"""Represents an NFS server and remote path: :
+  r"""Represents an NFS volume.
 
   Fields:
-    remotePath: Remote source path exported from NFS, e.g., "/share".
-    server: URI of the NFS server, e.g. an IP address.
+    remotePath: Remote source path exported from the NFS, e.g., "/share".
+    server: The IP address of the NFS.
   """
 
   remotePath = _messages.StringField(1)
@@ -1369,7 +1120,11 @@ class NetworkInterface(_messages.Message):
   r"""A network interface.
 
   Fields:
-    network: The URL of the network resource.
+    network: The URL of an existing network resource. You can specify the
+      network as a full or partial URL. For example, the following are all
+      valid URLs: * https://www.googleapis.com/compute/v1/projects/{project}/g
+      lobal/networks/{network} * projects/{project}/global/networks/{network}
+      * global/networks/{network}
     noExternalIpAddress: Default is false (with an external IP address).
       Required if no external public IP address is attached to the VM. If no
       external public IP address, additional configuration is required to
@@ -1377,7 +1132,12 @@ class NetworkInterface(_messages.Message):
       https://cloud.google.com/vpc/docs/configure-private-google-access and
       https://cloud.google.com/nat/docs/gce-example#create-nat for more
       information.
-    subnetwork: The URL of the Subnetwork resource.
+    subnetwork: The URL of an existing subnetwork resource in the network. You
+      can specify the subnetwork as a full or partial URL. For example, the
+      following are all valid URLs: * https://www.googleapis.com/compute/v1/pr
+      ojects/{project}/regions/{region}/subnetworks/{subnetwork} *
+      projects/{project}/regions/{region}/subnetworks/{subnetwork} *
+      regions/{region}/subnetworks/{subnetwork}
   """
 
   network = _messages.StringField(1)
@@ -1530,84 +1290,6 @@ class OperationMetadata(_messages.Message):
   verb = _messages.StringField(7)
 
 
-class Policy(_messages.Message):
-  r"""An Identity and Access Management (IAM) policy, which specifies access
-  controls for Google Cloud resources. A `Policy` is a collection of
-  `bindings`. A `binding` binds one or more `members`, or principals, to a
-  single `role`. Principals can be user accounts, service accounts, Google
-  groups, and domains (such as G Suite). A `role` is a named list of
-  permissions; each `role` can be an IAM predefined role or a user-created
-  custom role. For some types of Google Cloud resources, a `binding` can also
-  specify a `condition`, which is a logical expression that allows access to a
-  resource only if the expression evaluates to `true`. A condition can add
-  constraints based on attributes of the request, the resource, or both. To
-  learn which resources support conditions in their IAM policies, see the [IAM
-  documentation](https://cloud.google.com/iam/help/conditions/resource-
-  policies). **JSON example:** { "bindings": [ { "role":
-  "roles/resourcemanager.organizationAdmin", "members": [
-  "user:mike@example.com", "group:admins@example.com", "domain:google.com",
-  "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role":
-  "roles/resourcemanager.organizationViewer", "members": [
-  "user:eve@example.com" ], "condition": { "title": "expirable access",
-  "description": "Does not grant access after Sep 2020", "expression":
-  "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag":
-  "BwWWja0YfJA=", "version": 3 } **YAML example:** bindings: - members: -
-  user:mike@example.com - group:admins@example.com - domain:google.com -
-  serviceAccount:my-project-id@appspot.gserviceaccount.com role:
-  roles/resourcemanager.organizationAdmin - members: - user:eve@example.com
-  role: roles/resourcemanager.organizationViewer condition: title: expirable
-  access description: Does not grant access after Sep 2020 expression:
-  request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA=
-  version: 3 For a description of IAM and its features, see the [IAM
-  documentation](https://cloud.google.com/iam/docs/).
-
-  Fields:
-    auditConfigs: Specifies cloud audit logging configuration for this policy.
-    bindings: Associates a list of `members`, or principals, with a `role`.
-      Optionally, may specify a `condition` that determines how and when the
-      `bindings` are applied. Each of the `bindings` must contain at least one
-      principal. The `bindings` in a `Policy` can refer to up to 1,500
-      principals; up to 250 of these principals can be Google groups. Each
-      occurrence of a principal counts towards these limits. For example, if
-      the `bindings` grant 50 different roles to `user:alice@example.com`, and
-      not to any other principal, then you can add another 1,450 principals to
-      the `bindings` in the `Policy`.
-    etag: `etag` is used for optimistic concurrency control as a way to help
-      prevent simultaneous updates of a policy from overwriting each other. It
-      is strongly suggested that systems make use of the `etag` in the read-
-      modify-write cycle to perform policy updates in order to avoid race
-      conditions: An `etag` is returned in the response to `getIamPolicy`, and
-      systems are expected to put that etag in the request to `setIamPolicy`
-      to ensure that their change will be applied to the same version of the
-      policy. **Important:** If you use IAM Conditions, you must include the
-      `etag` field whenever you call `setIamPolicy`. If you omit this field,
-      then IAM allows you to overwrite a version `3` policy with a version `1`
-      policy, and all of the conditions in the version `3` policy are lost.
-    version: Specifies the format of the policy. Valid values are `0`, `1`,
-      and `3`. Requests that specify an invalid value are rejected. Any
-      operation that affects conditional role bindings must specify version
-      `3`. This requirement applies to the following operations: * Getting a
-      policy that includes a conditional role binding * Adding a conditional
-      role binding to a policy * Changing a conditional role binding in a
-      policy * Removing any role binding, with or without a condition, from a
-      policy that includes conditions **Important:** If you use IAM
-      Conditions, you must include the `etag` field whenever you call
-      `setIamPolicy`. If you omit this field, then IAM allows you to overwrite
-      a version `3` policy with a version `1` policy, and all of the
-      conditions in the version `3` policy are lost. If a policy does not
-      include any conditions, operations on that policy may specify any valid
-      version or leave the field unset. To learn which resources support
-      conditions in their IAM policies, see the [IAM
-      documentation](https://cloud.google.com/iam/help/conditions/resource-
-      policies).
-  """
-
-  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
-  bindings = _messages.MessageField('Binding', 2, repeated=True)
-  etag = _messages.BytesField(3)
-  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-
-
 class Runnable(_messages.Message):
   r"""Runnable describes instructions for executing a specific script or
   container as part of a Task.
@@ -1648,29 +1330,40 @@ class Script(_messages.Message):
   r"""Script runnable.
 
   Fields:
-    path: Script file path on the host VM.
-    text: Shell script text.
+    path: Script file path on the host VM. To specify an interpreter, please
+      add a `#!`(also known as [shebang
+      line](https://en.wikipedia.org/wiki/Shebang_(Unix))) as the first line
+      of the file.(For example, to execute the script using bash,
+      `#!/bin/bash` should be the first line of the file. To execute the
+      script using`Python3`, `#!/usr/bin/env python3` should be the first line
+      of the file.) Otherwise, the file will by default be excuted by
+      `/bin/sh`.
+    text: Shell script text. To specify an interpreter, please add a `#!\n` at
+      the beginning of the text.(For example, to execute the script using
+      bash, `#!/bin/bash\n` should be added. To execute the script
+      using`Python3`, `#!/usr/bin/env python3\n` should be added.) Otherwise,
+      the script will by default be excuted by `/bin/sh`.
   """
 
   path = _messages.StringField(1)
   text = _messages.StringField(2)
 
 
-class SetIamPolicyRequest(_messages.Message):
-  r"""Request message for `SetIamPolicy` method.
+class ServiceAccount(_messages.Message):
+  r"""Carries information about a Google Cloud service account.
 
   Fields:
-    policy: REQUIRED: The complete policy to be applied to the `resource`. The
-      size of the policy is limited to a few 10s of KB. An empty policy is a
-      valid policy but certain Google Cloud services (such as Projects) might
-      reject them.
-    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
-      modify. Only the fields in the mask will be modified. If no mask is
-      provided, the following default mask is used: `paths: "bindings, etag"`
+    email: Email address of the service account. If not specified, the default
+      Compute Engine service account for the project will be used. If instance
+      template is being used, the service account has to be specified in the
+      instance template and it has to match the email field here.
+    scopes: List of scopes to be enabled for this service account on the VM,
+      in addition to the cloud-platform API scope that will be added by
+      default.
   """
 
-  policy = _messages.MessageField('Policy', 1)
-  updateMask = _messages.StringField(2)
+  email = _messages.StringField(1)
+  scopes = _messages.StringField(2, repeated=True)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -1790,17 +1483,40 @@ class Status(_messages.Message):
 class StatusEvent(_messages.Message):
   r"""Status event
 
+  Enums:
+    TaskStateValueValuesEnum: Task State
+
   Fields:
     description: Description of the event.
     eventTime: The time this event occurred.
     taskExecution: Task Execution
+    taskState: Task State
     type: Type of the event.
   """
+
+  class TaskStateValueValuesEnum(_messages.Enum):
+    r"""Task State
+
+    Values:
+      STATE_UNSPECIFIED: unknown state
+      PENDING: The Task is created and waiting for resources.
+      ASSIGNED: The Task is assigned to at least one VM.
+      RUNNING: The Task is running.
+      FAILED: The Task has failed.
+      SUCCEEDED: The Task has succeeded.
+    """
+    STATE_UNSPECIFIED = 0
+    PENDING = 1
+    ASSIGNED = 2
+    RUNNING = 3
+    FAILED = 4
+    SUCCEEDED = 5
 
   description = _messages.StringField(1)
   eventTime = _messages.StringField(2)
   taskExecution = _messages.MessageField('TaskExecution', 3)
-  type = _messages.StringField(4)
+  taskState = _messages.EnumField('TaskStateValueValuesEnum', 4)
+  type = _messages.StringField(5)
 
 
 class Task(_messages.Message):
@@ -1844,7 +1560,7 @@ class TaskGroup(_messages.Message):
     requireHostsFile: When true, Batch will populate a file with a list of all
       VMs assigned to the TaskGroup and set the BATCH_HOSTS_FILE environment
       variable to the path of that file. Defaults to false.
-    taskCount: Number of Tasks in the TaskGroup. default is 1
+    taskCount: Number of Tasks in the TaskGroup. Default is 1.
     taskCountPerNode: Max number of tasks that can be run on a VM at the same
       time. If not specified, the system will decide a value based on
       available compute resources on a VM and task requirements.
@@ -1916,20 +1632,16 @@ class TaskSpec(_messages.Message):
   r"""Spec of a task
 
   Messages:
-    EnvironmentsValue: Environment variables to set before running the Task.
-      You can set up to 100 environments.
+    EnvironmentsValue: Deprecated: please use environment(non-plural) instead.
 
   Fields:
     computeResource: ComputeResource requirements.
     environment: Environment variables to set before running the Task.
-    environments: Environment variables to set before running the Task. You
-      can set up to 100 environments.
+    environments: Deprecated: please use environment(non-plural) instead.
     lifecyclePolicies: Lifecycle management schema when any task in a task
-      group is failed. The valid size of lifecycle policies are [0, 10]. For
-      each lifecycle policy, when the condition is met, the action in that
-      policy will execute. If there are multiple policies that the task
-      execution result matches, we use the action from the first matched
-      policy. If task execution result does not meet with any of the defined
+      group is failed. Currently we only support one lifecycle policy. When
+      the lifecycle policy condition is met, the action in the policy will
+      execute. If task execution result does not meet with the defined
       lifecycle policy, we consider it as the default policy. Default policy
       means if the exit code is 0, exit task. If task ends with non-zero exit
       code, retry the task with max_retry_count.
@@ -1951,8 +1663,7 @@ class TaskSpec(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class EnvironmentsValue(_messages.Message):
-    r"""Environment variables to set before running the Task. You can set up
-    to 100 environments.
+    r"""Deprecated: please use environment(non-plural) instead.
 
     Messages:
       AdditionalProperty: An additional property for a EnvironmentsValue
@@ -2018,46 +1729,29 @@ class TaskStatus(_messages.Message):
   statusEvents = _messages.MessageField('StatusEvent', 2, repeated=True)
 
 
-class TestIamPermissionsRequest(_messages.Message):
-  r"""Request message for `TestIamPermissions` method.
-
-  Fields:
-    permissions: The set of permissions to check for the `resource`.
-      Permissions with wildcards (such as `*` or `storage.*`) are not allowed.
-      For more information see [IAM
-      Overview](https://cloud.google.com/iam/docs/overview#permissions).
-  """
-
-  permissions = _messages.StringField(1, repeated=True)
-
-
-class TestIamPermissionsResponse(_messages.Message):
-  r"""Response message for `TestIamPermissions` method.
-
-  Fields:
-    permissions: A subset of `TestPermissionsRequest.permissions` that the
-      caller is allowed.
-  """
-
-  permissions = _messages.StringField(1, repeated=True)
-
-
 class Volume(_messages.Message):
-  r"""Volume and mount parameters to be associated with a TaskSpec. A TaskSpec
-  might describe zero, one, or multiple volumes to be mounted as part of the
-  task.
+  r"""Volume describes a volume and parameters for it to be mounted to a VM.
 
   Fields:
-    deviceName: Device name of an attached disk
-    gcs: A Google Cloud Storage source for the volume.
-    mountOptions: Mount options For Google Cloud Storage, mount options are
-      the global options supported by gcsfuse tool. Batch will use them to
-      mount the volume with the following command: "gcsfuse [global options]
-      bucket mountpoint". For PD, NFS, mount options are these supported by
-      /etc/fstab. Batch will use Fstab to mount such volumes.
-      https://help.ubuntu.com/community/Fstab
-    mountPath: Mount path for the volume, e.g. /mnt/share
-    nfs: An NFS source for the volume (could be a Filestore, for example).
+    deviceName: Device name of an attached disk volume, which should align
+      with a device_name specified by
+      job.allocation_policy.instances[0].policy.disks[i].device_name or
+      defined by the given instance template in
+      job.allocation_policy.instances[0].instance_template.
+    gcs: A Google Cloud Storage (GCS) volume.
+    mountOptions: For Google Cloud Storage (GCS), mount options are the
+      options supported by the gcsfuse tool
+      (https://github.com/GoogleCloudPlatform/gcsfuse). For existing
+      persistent disks, mount options provided by the mount command
+      (https://man7.org/linux/man-pages/man8/mount.8.html) except writing are
+      supported. This is due to restrictions of multi-writer mode
+      (https://cloud.google.com/compute/docs/disks/sharing-disks-between-vms).
+      For other attached disks and Network File System (NFS), mount options
+      are these supported by the mount command (https://man7.org/linux/man-
+      pages/man8/mount.8.html).
+    mountPath: The mount path for the volume, e.g. /mnt/disks/share.
+    nfs: A Network File System (NFS) volume. For example, a Filestore file
+      share.
   """
 
   deviceName = _messages.StringField(1)

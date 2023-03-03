@@ -270,16 +270,12 @@ def ParseExpirationPeriodWithNeverSentinel(value):
   return util.FormatDuration(arg_parsers.Duration()(value))
 
 
-def AddSubscriptionSettingsFlags(parser,
-                                 is_update=False,
-                                 support_enable_exactly_once_delivery=False):
+def AddSubscriptionSettingsFlags(parser, is_update=False):
   """Adds the flags for creating or updating a subscription.
 
   Args:
     parser: The argparse parser.
     is_update: Whether or not this is for the update operation (vs. create).
-    support_enable_exactly_once_delivery: Whether or not this should support
-      enable_exactly_once_delivery
   """
   AddAckDeadlineFlag(parser)
   AddPushConfigFlags(parser)
@@ -365,23 +361,22 @@ def AddSubscriptionSettingsFlags(parser,
       help="""The maximum delay between consecutive deliveries of a given
           message. Value should be between 0 and 600 seconds. Defaults to 10
           seconds. {}""".format(DURATION_HELP_STR))
-  if support_enable_exactly_once_delivery:
-    help_text_suffix = ''
-    if is_update:
-      help_text_suffix = (' To disable exactly-once delivery use '
-                          '`--no-enable-exactly-once-delivery`.')
-    parser.add_argument(
-        '--enable-exactly-once-delivery',
-        action='store_true',
-        default=None,
-        help="""\
-            Whether or not to enable exactly-once delivery on the subscription.
-            If true, Pub/Sub provides the following guarantees for the delivery
-            of a message with a given value of `message_id` on this
-            subscription: The message sent to a subscriber is guaranteed not to
-            be resent before the message's acknowledgment deadline expires. An
-            acknowledged message will not be resent to a subscriber.""" +
-        help_text_suffix)
+  help_text_suffix = ''
+  if is_update:
+    help_text_suffix = (' To disable exactly-once delivery use '
+                        '`--no-enable-exactly-once-delivery`.')
+  parser.add_argument(
+      '--enable-exactly-once-delivery',
+      action='store_true',
+      default=None,
+      help="""\
+          Whether or not to enable exactly-once delivery on the subscription.
+          If true, Pub/Sub provides the following guarantees for the delivery
+          of a message with a given value of `message_id` on this
+          subscription: The message sent to a subscriber is guaranteed not to
+          be resent before the message's acknowledgment deadline expires. An
+          acknowledged message will not be resent to a subscriber.""" +
+      help_text_suffix)
 
 
 def AddPublishMessageFlags(parser, add_deprecated=False):
@@ -419,32 +414,54 @@ def AddPublishMessageFlags(parser, add_deprecated=False):
           Pub/Sub receives them.""")
 
 
-def AddSchemaSettingsFlags(parser):
+def AddSchemaSettingsFlags(parser, is_update=False):
   """Adds the flags for filling the SchemaSettings message.
 
   Args:
     parser: The argparse parser.
+    is_update: (bool) If true, add another group with clear-schema-settings as a
+      mutually exclusive argument.
   """
   current_group = parser
+  if is_update:
+    mutual_exclusive_group = current_group.add_mutually_exclusive_group()
+    mutual_exclusive_group.add_argument(
+        '--clear-schema-settings',
+        action='store_true',
+        default=None,
+        help="""If set, clear the Schema Settings from the topic.""")
+    current_group = mutual_exclusive_group
   set_schema_settings_group = current_group.add_argument_group(
-      help="""Schema settings. The schema that messages published to this topic must conform to and the expected message encoding."""
-  )
+      # pylint: disable=line-too-long
+      help="""Schema settings. The schema that messages published to this topic must conform to and the expected message encoding.""")
 
-  schema_help_text = ('that messages published to this topic must conform to.')
+  schema_help_text = 'that messages published to this topic must conform to.'
   schema = resource_args.CreateSchemaResourceArg(
-      schema_help_text, positional=False, plural=False, required=True)
+      schema_help_text, positional=False, plural=False, required=True
+  )
   resource_args.AddResourceArgs(set_schema_settings_group, [schema])
-
   set_schema_settings_group.add_argument(
       '--message-encoding',
       type=arg_parsers.ArgList(
           element_type=lambda x: str(x).lower(),
           min_length=1,
           max_length=1,
-          choices=['json', 'binary']),
+          choices=['json', 'binary'],
+      ),
       metavar='ENCODING',
       help="""The encoding of messages validated against the schema.""",
-      required=True)
+      required=True,
+  )
+  set_schema_settings_group.add_argument(
+      '--first-revision-id',
+      help="""The id of the oldest
+      revision allowed for the specified schema.""",
+      required=False)
+  set_schema_settings_group.add_argument(
+      '--last-revision-id',
+      help="""The id of the most recent
+      revision allowed for the specified schema""",
+      required=False)
 
 
 def AddCommitSchemaFlags(parser):

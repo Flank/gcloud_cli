@@ -43,20 +43,12 @@ class Status(base.DescribeCommand):
 
   @classmethod
   def Args(cls, parser):
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(
-          parser,
-          plural=True,
-          membership_help=(
-              'The membership names for which to display the Policy Controller '
-              'runtime status.'))
-    else:
-      parser.add_argument(
-          '--memberships',
-          type=str,
-          help=(
-              'The membership names for which to display the Policy Controller '
-              'runtime status.'))
+    resources.AddMembershipResourceArg(
+        parser,
+        plural=True,
+        membership_help=(
+            'The membership names for which to display the Policy Controller '
+            'runtime status.'))
 
   def Run(self, args):
     calliope_base.EnableUserProjectQuota()
@@ -71,19 +63,13 @@ class Status(base.DescribeCommand):
     status = {}
 
     if args.memberships is not None:
-      if resources.UseRegionalMemberships(self.ReleaseTrack()):
-        memberships_filter = args.memberships
-      else:
-        memberships_filter = args.memberships.split(',')
+      memberships_filter = args.memberships
     else:
       memberships_filter = None
 
-    request = status_messages.AnthospolicycontrollerstatusPaProjectsMembershipsListRequest(
-        parent='projects/' + project_id
-    )
-    response = status_client.projects_memberships.List(request)
-
-    for membership in response.memberships:
+    memberships = status_api_utils.ListMemberships(status_client,
+                                                   status_messages, project_id)
+    for membership in memberships:
       if memberships_filter and membership.ref.name not in memberships_filter:
         continue
 

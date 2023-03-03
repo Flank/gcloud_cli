@@ -18,15 +18,58 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import enum
+
+from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.core import properties
 
 
 REQUIRED_INVENTORY_REPORTS_METADATA_FIELDS = ('project', 'bucket', 'name')
 OPTIONAL_INVENTORY_REPORTS_METADATA_FIELDS = (
-    'location', 'size', 'timeCreated', 'type',
+    'location', 'size', 'timeCreated', 'timeDeleted',
     'updated', 'storageClass', 'etag', 'retentionExpirationTime', 'crc32c',
     'md5Hash', 'generation', 'metageneration', 'contentType',
     'contentEncoding', 'timeStorageClassUpdated')
+ALL_INVENTORY_REPORTS_METADATA_FIELDS = (
+    REQUIRED_INVENTORY_REPORTS_METADATA_FIELDS +
+    OPTIONAL_INVENTORY_REPORTS_METADATA_FIELDS)
+
+
+class ReplicationStrategy(enum.Enum):
+  """Enum class for specifying the replication setting."""
+  DEFAULT = 'DEFAULT'
+  ASYNC_TURBO = 'ASYNC_TURBO'
+
+
+def add_additional_headers_flag(parser):
+  """Adds a flag that allows users to specify arbitrary headers in API calls."""
+  parser.add_argument(
+      '--additional-headers',
+      action=actions.StoreProperty(
+          properties.VALUES.storage.additional_headers),
+      metavar='HEADER=VALUE',
+      help='Includes arbitrary headers in storage API calls.'
+      ' Accepts a comma separated list of key=value pairs, e.g.'
+      ' `header1=value1,header2=value2`.')
+
+
+def add_fetch_encrypted_object_hashes_flag(parser, is_list=True):
+  """Adds flag to commands that need object hashes."""
+  if is_list:
+    help_text = (
+        'API requests to the LIST endpoint do not fetch the hashes for'
+        ' encrypted objects by default. If this flag is set, a GET request'
+        ' is sent for each encrypted object in order to fetch hashes. This'
+        ' can significantly increase the cost of the command.')
+  else:
+    help_text = (
+        'If the initial GET request returns an object encrypted with a'
+        ' customer-supplied encryption key, the hash fields will be null.'
+        ' If the matching decryption key is present on the system, this flag'
+        ' retries the GET request with the key.')
+  parser.add_argument(
+      '--fetch-encrypted-object-hashes', action='store_true', help=help_text)
 
 
 def add_predefined_acl_flag(parser):
@@ -40,20 +83,57 @@ def add_predefined_acl_flag(parser):
       '/storage/docs/access-control/lists#predefined-acl')
 
 
-def add_object_acl_setter_flags(parser):
-  """Adds flags common among commands that modify object ACLs."""
-  acl_flags_group = parser.add_group(mutex=True)
-  acl_flags_group.add_argument(
+def add_preserve_acl_flag(parser):
+  """Adds preserve ACL flag."""
+  parser.add_argument(
       '--preserve-acl',
       '-p',
       action=arg_parsers.StoreTrueFalseAction,
-      help='Preserves ACLs when copying in the cloud. This option is Google'
-      ' Cloud Storage-only, and you need OWNER access to all copied objects.'
-      ' If all objects in the destination bucket should have the same ACL,'
-      ' you can also set a default object ACL on that bucket instead of using'
-      ' this flag.\nPreserving ACLs is the default behavior for updating'
-      ' existing objects.')
-  add_predefined_acl_flag(acl_flags_group)
+      help=(
+          'Preserves ACLs when copying in the cloud. This option is Google'
+          ' Cloud Storage-only, and you need OWNER access to all copied'
+          ' objects. If all objects in the destination bucket should have the'
+          ' same ACL, you can also set a default object ACL on that bucket'
+          ' instead of using this flag.\nPreserving ACLs is the default'
+          ' behavior for updating existing objects.'
+      ),
+  )
+
+
+def add_acl_modifier_flags(parser):
+  """Adds flags common among commands that modify ACLs."""
+  add_predefined_acl_flag(parser)
+  parser.add_argument(
+      '--acl-file',
+      help=(
+          'Path to a local JSON or YAML formatted file containing a valid'
+          ' policy. The output of `gcloud storage [buckets|objects] describe`'
+          ' `--format="multi(acl:format=json)"` is a valid file and can be'
+          ' edited for more fine-grained control.'
+      ),
+  )
+  parser.add_argument(
+      '--add-acl-grant',
+      action='append',
+      metavar='ACL_GRANT',
+      type=arg_parsers.ArgDict(),
+      help=(
+          'Key-value pairs mirroring the JSON accepted by your cloud provider.'
+          ' For example, for Google Cloud Storage,'
+          '`--add-acl-grant=entity=user-tim@gmail.com,role=OWNER`'
+      ),
+  )
+  parser.add_argument(
+      '--remove-acl-grant',
+      action='append',
+      help=(
+          'Key-value pairs mirroring the JSON accepted by your cloud provider.'
+          ' For example, for Google Cloud Storage, `--remove-acl-grant=ENTITY`,'
+          ' where `ENTITY` has a valid ACL entity format,'
+          ' such as `user-tim@gmail.com`,'
+          ' `group-admins`, `allUsers`, etc.'
+      ),
+  )
 
 
 def add_precondition_flags(parser):
@@ -253,19 +333,33 @@ def _get_optional_help_text(require_create_flags, flag_name):
   return optional_text_map[flag_name] if require_create_flags else ''
 
 
+class ArgListWithRequiredFieldsCheck(arg_parsers.ArgList):
+  """ArgList that raises errror if required fields are not present."""
+
+  def __call__(self, arg_value):
+    arglist = super(ArgListWithRequiredFieldsCheck, self).__call__(arg_value)
+    missing_required_fields = (
+        set(REQUIRED_INVENTORY_REPORTS_METADATA_FIELDS) - set(arglist))
+    if missing_required_fields:
+      raise arg_parsers.ArgumentTypeError(
+          'Fields {} are REQUIRED.'.format(
+              ','.join(sorted(missing_required_fields))))
+    return arglist
+
+
 def add_inventory_reports_metadata_fields_flag(parser,
                                                require_create_flags=False):
   """Adds the metadata-fields flag."""
   parser.add_argument(
       '--metadata-fields',
       metavar='METADATA_FIELDS',
-      default=(list(OPTIONAL_INVENTORY_REPORTS_METADATA_FIELDS)
+      default=(list(ALL_INVENTORY_REPORTS_METADATA_FIELDS)
                if require_create_flags else None),
-      type=arg_parsers.ArgList(
-          choices=OPTIONAL_INVENTORY_REPORTS_METADATA_FIELDS),
+      type=ArgListWithRequiredFieldsCheck(
+          choices=ALL_INVENTORY_REPORTS_METADATA_FIELDS),
       help=(
           'The metadata fields to be included in the inventory '
-          'report. The required fields: "{}" get added automatically. '.format(
+          'report. The fields: "{}" are REQUIRED. '.format(
               ', '.join(REQUIRED_INVENTORY_REPORTS_METADATA_FIELDS)) +
           _get_optional_help_text(require_create_flags, 'metadata_fields')))
 
@@ -327,8 +421,44 @@ def add_inventory_reports_flags(parser, require_create_flags=False):
       type=arg_parsers.Day.Parse,
       metavar='END_DATE',
       help=(
-          'Sets date after which you want to stop generating inventory reports. '
-          'For example, 2022-03-30.' +
-          _get_optional_help_text(require_create_flags, 'end_date')))
+          'Sets date after which you want to stop generating inventory reports.'
+          ' For example, 2022-03-30.'
+          + _get_optional_help_text(require_create_flags, 'end_date')))
   if require_create_flags:
     add_inventory_reports_metadata_fields_flag(parser, require_create_flags)
+
+
+def add_raw_display_flag(parser):
+  parser.add_argument(
+      '--raw',
+      action='store_true',
+      hidden=True,
+      help=(
+          'Shows metadata in the format returned by the API instead of'
+          ' standardizing it.'
+      ),
+  )
+
+
+def add_recovery_point_objective_flag(parser):
+  """Adds the recovery point objective flag for buckets commands.
+
+  Args:
+    parser (parser_arguments.ArgumentInterceptor): Parser passed to surface.
+  """
+  parser.add_argument(
+      '--recovery-point-objective',
+      '--rpo',
+      choices=sorted([option.value for option in ReplicationStrategy]),
+      metavar='SETTING',
+      type=str,
+      help=('Sets the [recovery point objective](https://cloud.google.com'
+            '/architecture/dr-scenarios-planning-guide#basics_of_dr_planning)'
+            ' of a bucket. This flag can only be used with multi-region and'
+            ' dual-region buckets. `DEFAULT` option is valid for multi-region'
+            ' and dual-regions buckets. `ASYNC_TURBO` option is only valid for'
+            ' dual-region buckets. If unspecified when the bucket is created,'
+            ' it defaults to `DEFAULT` for dual-region and multi-region'
+            ' buckets. For more information, see'
+            ' [Turbo Replication](https://cloud.google.com/storage/docs'
+            '/turbo-replication).'))

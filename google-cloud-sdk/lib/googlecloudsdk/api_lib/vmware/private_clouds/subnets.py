@@ -29,15 +29,29 @@ class SubnetsClient(util.VmwareClientBase):
     super(SubnetsClient, self).__init__()
     self.service = self.client.projects_locations_privateClouds_subnets
 
-  def List(self, resource, page_size=None):
+  def List(self, resource):
     address_name = resource.RelativeName()
     request = self.messages.VmwareengineProjectsLocationsPrivateCloudsSubnetsListRequest(
         parent=address_name)
-    if page_size:
-      request.pageSize = page_size
     return list_pager.YieldFromList(
         self.service,
         request,
         batch_size_attribute='pageSize',
-        batch_size=page_size,
         field='subnets')
+
+  def Get(self, resource):
+    request = self.messages.VmwareengineProjectsLocationsPrivateCloudsSubnetsGetRequest(
+        name=resource.RelativeName())
+    response = self.service.Get(request)
+    return response
+
+  def Update(self, resource, ip_cidr_range):
+    subnet = self.Get(resource)
+    subnet.ipCidrRange = ip_cidr_range
+    update_mask = ['ip_cidr_range']
+    request = self.messages.VmwareengineProjectsLocationsPrivateCloudsSubnetsPatchRequest(
+        subnet=subnet,
+        name=resource.RelativeName(),
+        updateMask=','.join(update_mask),
+    )
+    return self.service.Patch(request)

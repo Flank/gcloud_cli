@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Library for obtaining API clients and messages.
 
 This should only be called by api_lib.util.apis, core.resources, gcloud meta
@@ -23,13 +22,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import re
+
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import transport
 from googlecloudsdk.generated_clients.apis import apis_map
-
 import six
+from six.moves.urllib.parse import urljoin
 from six.moves.urllib.parse import urlparse
 
 
@@ -150,8 +151,8 @@ def _GetClientInstance(api_name,
     api_name: str, The API name (or the command surface name, if different).
     api_version: str, The version of the API.
     no_http: bool, True to not create an http object for this client.
-    http_client: bring your own http client to use.
-      Incompatible with no_http=True.
+    http_client: bring your own http client to use. Incompatible with
+      no_http=True.
     check_response_func: error handling callback to give to apitools.
     http_timeout_sec: int, seconds of http timeout to set, defaults if None.
 
@@ -194,8 +195,8 @@ def _GetGapicClientClass(api_name,
   Args:
     api_name: str, The API name (or the command surface name, if different).
     api_version: str, The version of the API.
-    transport_choice: apis_util.GapicTransport,
-        The transport to be used by the client.
+    transport_choice: apis_util.GapicTransport, The transport to be used by the
+      client.
   """
   api_def = _GetApiDef(api_name, api_version)
   if transport_choice == apis_util.GapicTransport.GRPC_ASYNCIO:
@@ -227,18 +228,13 @@ def _GetGapicClientInstance(api_name,
     api_version: str, The version of the API.
     credentials: google.auth.credentials.Credentials, the credentials to use.
     address_override_func: function, function to call to override the client
-        host. It takes a single argument which is the original host.
-    transport_choice: apis_util.GapicTransport,
-        The transport to be used by the client.
+      host. It takes a single argument which is the original host.
+    transport_choice: apis_util.GapicTransport, The transport to be used by the
+      client.
 
   Returns:
     An instance of the specified GAPIC API client.
   """
-  api_def = _GetApiDef(api_name, api_version)
-  mtls_enabled = (
-      api_def.enable_mtls and
-      properties.VALUES.context_aware.use_client_certificate.GetBool())
-
   def AddressOverride(address):
     endpoint_overrides = properties.VALUES.api_endpoint_overrides.AllValues()
     endpoint_override = endpoint_overrides.get(api_name)
@@ -252,8 +248,10 @@ def _GetGapicClientInstance(api_name,
   client_class = _GetGapicClientClass(
       api_name, api_version, transport_choice=transport_choice)
 
-  return client_class(credentials, address_override_func=AddressOverride,
-                      mtls_enabled=mtls_enabled)
+  return client_class(
+      credentials,
+      address_override_func=AddressOverride,
+      mtls_enabled=_MtlsEnabled(api_name, api_version))
 
 
 def _GetMtlsEndpoint(api_name, api_version, client_class=None):
@@ -263,8 +261,14 @@ def _GetMtlsEndpoint(api_name, api_version, client_class=None):
   return api_def.mtls_endpoint_override or client_class.MTLS_BASE_URL
 
 
-def _MtlsAllowed(api_name, api_version):
-  """Checks if the api of the given version is in the mTLS allowlist.
+def _MtlsEnabled(api_name, api_version):
+  """Checks if the API of the given version should use mTLS.
+
+  If context_aware/always_use_mtls_endpoint is True, then mTLS will always be
+  used.
+
+  If context_aware/use_client_certificate is True, then mTLS will be used only
+  if the API version is in the mTLS allowlist.
 
   gcloud maintains a client-side allowlist for the mTLS feature
   (go/gcloud-rollout-mtls).
@@ -276,34 +280,87 @@ def _MtlsAllowed(api_name, api_version):
   Returns:
     True if the given service and version is in the mTLS allowlist.
   """
+  if properties.VALUES.context_aware.always_use_mtls_endpoint.GetBool():
+    return True
+
+  if not properties.VALUES.context_aware.use_client_certificate.GetBool():
+    return False
+
   api_def = _GetApiDef(api_name, api_version)
   return api_def.enable_mtls
+
+
+def _BuildEndpointOverride(endpoint_override, base_url):
+  """Constructs a normalized endpoint URI depending on the client base_url."""
+  url_base = urlparse(base_url)
+  url_endpoint_override = urlparse(endpoint_override)
+  if url_base.path == '/' or url_endpoint_override.path != '/':
+    return endpoint_override
+  return urljoin(
+      '{}://{}'.format(url_endpoint_override.scheme,
+                       url_endpoint_override.netloc), url_base.path)
 
 
 def _GetEffectiveApiEndpoint(api_name, api_version, client_class=None):
   """Returns effective endpoint for given api."""
   endpoint_overrides = properties.VALUES.api_endpoint_overrides.AllValues()
   endpoint_override = endpoint_overrides.get(api_name)
-  if endpoint_override:
-    return endpoint_override
   client_class = client_class or _GetClientClass(api_name, api_version)
-  if properties.VALUES.context_aware.always_use_mtls_endpoint.GetBool():
-    return _GetMtlsEndpoint(api_name, api_version, client_class)
-  if (properties.VALUES.context_aware.use_client_certificate.GetBool() and
-      _MtlsAllowed(api_name, api_version)):
+  if endpoint_override:
+    return _BuildEndpointOverride(endpoint_override, client_class.BASE_URL)
+  if _MtlsEnabled(api_name, api_version):
     return _GetMtlsEndpoint(api_name, api_version, client_class)
   return client_class.BASE_URL
 
 
-def _GetDefaultEndpointUrl(url):
-  """Looks up default endpoint based on overridden endpoint value."""
-  endpoint_overrides = properties.VALUES.api_endpoint_overrides.AllValues()
-  for api_name, overridden_url in six.iteritems(endpoint_overrides):
-    if url.startswith(overridden_url):
-      api_version = _GetDefaultVersion(api_name)
-      return (_GetClientClass(api_name, api_version).BASE_URL +
-              url[len(overridden_url):])
-  return url
+_LEGACY_URL_FORMAT = r'(http|https)://www\.(.+?)/(.+?)/(.*)'
+
+
+def _ConvertLegacyToStandardURL(url):
+  """Convert a legacy reference format URL to the standard URL format.
+
+  Some URLs for resources, such as from GCE, are in the legacy URI reference
+  format. For example:
+    https://compute.googleapis.com/compute/v1/projects/{project}/zones/us-west4-c/instances/foo
+  Is returned as:
+    https://www.googleapis.com/compute/v1/projects/{project}/zones/us-west4-c/instances/foo
+
+  This methods converts URIs matching:
+    http(s)://www.googleapis.com/{api}/{version}/{resource-path}
+  into:
+    http(s)://{api}.googleapis.com/{api}/{version}/{resource-path}
+
+  Args:
+    url: str, URL.
+
+  Returns:
+    URL in standard reference format.
+  """
+  return re.sub(_LEGACY_URL_FORMAT, r'\1://\3.\2/\3/\4', url)
+
+
+def IsOverriddenURL(url):
+  """Check if a URL is the result of an endpoint override."""
+  api_name, _, _ = resource_util.SplitDefaultEndpointUrl(url)
+  try:
+    endpoint_override = properties.VALUES.api_endpoint_overrides.Property(
+        api_name).Get()
+  except properties.NoSuchPropertyError:
+    return False
+
+  if not endpoint_override:
+    return False
+  if re.match(_LEGACY_URL_FORMAT, url):
+    normalized_url = _ConvertLegacyToStandardURL(url)
+  else:
+    normalized_url = url
+  if re.match(_LEGACY_URL_FORMAT, endpoint_override):
+    normalized_endpoint_override = _ConvertLegacyToStandardURL(
+        endpoint_override)
+  else:
+    normalized_endpoint_override = endpoint_override
+
+  return normalized_url.startswith(normalized_endpoint_override)
 
 
 def _GetMessagesModule(api_name, api_version):
@@ -319,8 +376,8 @@ def _GetMessagesModule(api_name, api_version):
   api_def = _GetApiDef(api_name, api_version)
   # fromlist below must not be empty, see:
   # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist.
-  return __import__(api_def.apitools.messages_full_modulepath,
-                    fromlist=['something'])
+  return __import__(
+      api_def.apitools.messages_full_modulepath, fromlist=['something'])
 
 
 def _GetResourceModule(api_name, api_version):
@@ -329,8 +386,8 @@ def _GetResourceModule(api_name, api_version):
   api_def = _GetApiDef(api_name, api_version)
   # fromlist below must not be empty, see:
   # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist.
-  return __import__(api_def.apitools.class_path + '.' + 'resources',
-                    fromlist=['something'])
+  return __import__(
+      api_def.apitools.class_path + '.' + 'resources', fromlist=['something'])
 
 
 def _GetApiCollections(api_name, api_version):

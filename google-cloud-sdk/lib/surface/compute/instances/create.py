@@ -74,18 +74,18 @@ DETAILED_HELP = {
           $ {command} example-instance-1 example-instance-2 example-instance-3 --zone=us-central1-a
 
         To create an instance called 'instance-1' from a source snapshot called
-        'instance-snapshot' in zone 'us-central2-a' and attached regional disk
+        'instance-snapshot' in zone 'us-central1-a' and attached regional disk
         'disk-1', run:
 
-          $ {command} instance-1 --source-snapshot=https://compute.googleapis.com/compute/v1/projects/myproject/global/snapshots/instance-snapshot --zone=central2-a --disk=name=disk1,scope=regional
+          $ {command} instance-1 --source-snapshot=https://compute.googleapis.com/compute/v1/projects/myproject/global/snapshots/instance-snapshot --zone=us-central1-a --disk=name=disk1,scope=regional
 
         To create an instance called instance-1 as a Shielded VM instance with
         Secure Boot, virtual trusted platform module (vTPM) enabled and
         integrity monitoring, run:
 
-          $ {command} instance-1 --zone=central2-a --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring
+          $ {command} instance-1 --zone=us-central1-a --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring
 
-        To create an preemptible instance called 'instance-1', run:
+        To create a preemptible instance called 'instance-1', run:
 
           $ {command} instance-1 --machine-type=n1-standard-1 --zone=us-central1-b --preemptible --no-restart-on-failure --maintenance-policy=terminate
 
@@ -108,7 +108,8 @@ def _CommonArgs(parser,
                 support_network_queue_count=False,
                 support_instance_kms=False,
                 support_max_run_duration=False,
-                support_provisioned_throughput=False):
+                support_provisioned_throughput=False,
+                support_network_attachments=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
@@ -128,7 +129,8 @@ def _CommonArgs(parser,
       instances=True,
       support_subinterface=support_subinterface,
       instance_create=True,
-      support_network_queue_count=support_network_queue_count)
+      support_network_queue_count=support_network_queue_count,
+      support_network_attachments=support_network_attachments)
   instances_flags.AddAcceleratorArgs(parser)
   instances_flags.AddMachineTypeArgs(parser)
   instances_flags.AddMaintenancePolicyArgs(
@@ -171,6 +173,8 @@ def _CommonArgs(parser,
   instances_flags.AddNetworkPerformanceConfigsArgs(parser)
   instances_flags.AddProvisioningModelVmArgs(parser)
   instances_flags.AddInstanceTerminationActionVmArgs(parser)
+  instances_flags.AddIPv6AddressArgs(parser)
+  instances_flags.AddIPv6PrefixLengthArgs(parser)
 
   instances_flags.AddReservationAffinityGroup(
       parser,
@@ -244,6 +248,7 @@ class Create(base.CreateCommand):
   _support_max_run_duration = False
   _support_ipv6_assignment = False
   _support_confidential_compute_type = False
+  _support_network_attachments = False
 
   @classmethod
   def Args(cls, parser):
@@ -260,7 +265,8 @@ class Create(base.CreateCommand):
         support_instance_kms=cls._support_instance_kms,
         support_max_run_duration=cls._support_max_run_duration,
         support_provisioned_throughput=cls._support_provisioned_throughput,
-        supports_erase_vss=cls._support_erase_vss)
+        supports_erase_vss=cls._support_erase_vss,
+        support_network_attachments=cls._support_network_attachments)
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -457,8 +463,11 @@ class Create(base.CreateCommand):
         instance.secureTags = secure_tags_utils.GetSecureTags(args.secure_tags)
 
       if args.resource_manager_tags:
-        ret_resource_manager_tags = resource_manager_tags_utils.GetResourceManagerTags(
-            args.resource_manager_tags)
+        ret_resource_manager_tags = (
+            resource_manager_tags_utils.GetResourceManagerTags(
+                args.resource_manager_tags
+            )
+        )
         if ret_resource_manager_tags is not None:
           params = compute_client.messages.InstanceParams
           instance.params = params(
@@ -482,7 +491,9 @@ class Create(base.CreateCommand):
           args.threads_per_core is not None or
           (self._support_numa_node_count and args.numa_node_count is not None)
           or has_visible_core_count or args.enable_uefi_networking is not None):
-        visible_core_count = args.visible_core_count if has_visible_core_count else None
+        visible_core_count = (
+            args.visible_core_count if has_visible_core_count else None
+        )
         instance.advancedMachineFeatures = (
             instance_utils.CreateAdvancedMachineFeaturesMessage(
                 compute_client.messages, args.enable_nested_virtualization,
@@ -518,15 +529,15 @@ class Create(base.CreateCommand):
             args.post_key_revocation_action_type, compute_client.messages
             .Instance.PostKeyRevocationActionTypeValueValuesEnum)
 
-      if args.IsSpecified(
-          'key_revocation_action_type'):
+      if args.IsSpecified('key_revocation_action_type'):
         instance.keyRevocationActionType = arg_utils.ChoiceToEnum(
             args.key_revocation_action_type, compute_client.messages.Instance
             .KeyRevocationActionTypeValueValuesEnum)
 
       if args.IsSpecified('network_performance_configs'):
-        instance.networkPerformanceConfig = instance_utils.GetNetworkPerformanceConfig(
-            args, compute_client)
+        instance.networkPerformanceConfig = (
+            instance_utils.GetNetworkPerformanceConfig(args, compute_client)
+        )
 
       request = compute_client.messages.ComputeInstancesInsertRequest(
           instance=instance,
@@ -555,8 +566,9 @@ class Create(base.CreateCommand):
         request.instance.displayDevice = compute_client.messages.DisplayDevice(
             enableDisplay=args.enable_display_device)
 
-      request.instance.reservationAffinity = instance_utils.GetReservationAffinity(
-          args, compute_client)
+      request.instance.reservationAffinity = (
+          instance_utils.GetReservationAffinity(args, compute_client)
+      )
 
       requests.append(
           (compute_client.apitools_client.instances, 'Insert', request))
@@ -664,10 +676,11 @@ class CreateBeta(Create):
   _support_host_error_timeout_seconds = True
   _support_numa_node_count = False
   _support_visible_core_count = True
-  _support_network_queue_count = False
+  _support_network_queue_count = True
   _support_instance_kms = False
-  _support_max_run_duration = False
+  _support_max_run_duration = True
   _support_ipv6_assignment = False
+  _support_network_attachments = False
 
   def GetSourceMachineImage(self, args, resources):
     """Retrieves the specified source machine image's selflink.
@@ -695,12 +708,14 @@ class CreateBeta(Create):
         support_replica_zones=cls._support_replica_zones,
         support_multi_writer=cls._support_multi_writer,
         support_subinterface=cls._support_subinterface,
-        support_host_error_timeout_seconds=cls
-        ._support_host_error_timeout_seconds,
+        support_host_error_timeout_seconds=cls._support_host_error_timeout_seconds,
         support_numa_node_count=cls._support_numa_node_count,
         support_instance_kms=cls._support_instance_kms,
         support_max_run_duration=cls._support_max_run_duration,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_network_attachments=cls._support_network_attachments,
+        support_network_queue_count=cls._support_network_queue_count,
+    )
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -748,6 +763,7 @@ class CreateAlpha(CreateBeta):
   _support_max_run_duration = True
   _support_ipv6_assignment = True
   _support_confidential_compute_type = True
+  _support_network_attachments = True
 
   @classmethod
   def Args(cls, parser):
@@ -768,7 +784,8 @@ class CreateAlpha(CreateBeta):
         support_network_queue_count=cls._support_network_queue_count,
         support_instance_kms=cls._support_instance_kms,
         support_max_run_duration=cls._support_max_run_duration,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_network_attachments=cls._support_network_attachments)
 
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
@@ -789,8 +806,8 @@ class CreateAlpha(CreateBeta):
     instances_flags.AddSecureTagsArgs(parser)
     instances_flags.AddVisibleCoreCountArgs(parser)
     instances_flags.AddKeyRevocationActionTypeArgs(parser)
-    instances_flags.AddIPv6AddressArgs(parser)
-    instances_flags.AddIPv6PrefixLengthArgs(parser)
+    instances_flags.AddIPv6AddressAlphaArgs(parser)
+    instances_flags.AddIPv6PrefixLengthAlphaArgs(parser)
     instances_flags.AddInternalIPv6AddressArgs(parser)
     instances_flags.AddInternalIPv6PrefixLengthArgs(parser)
 

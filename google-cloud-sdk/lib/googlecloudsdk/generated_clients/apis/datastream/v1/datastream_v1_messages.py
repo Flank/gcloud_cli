@@ -450,6 +450,7 @@ class DatastreamProjectsLocationsPrivateConnectionsCreateRequest(_messages.Messa
   r"""A DatastreamProjectsLocationsPrivateConnectionsCreateRequest object.
 
   Fields:
+    force: Optional. If set to true, will skip validations.
     parent: Required. The parent that owns the collection of
       PrivateConnections.
     privateConnection: A PrivateConnection resource to be passed as the
@@ -468,10 +469,11 @@ class DatastreamProjectsLocationsPrivateConnectionsCreateRequest(_messages.Messa
       (00000000-0000-0000-0000-000000000000).
   """
 
-  parent = _messages.StringField(1, required=True)
-  privateConnection = _messages.MessageField('PrivateConnection', 2)
-  privateConnectionId = _messages.StringField(3)
-  requestId = _messages.StringField(4)
+  force = _messages.BooleanField(1)
+  parent = _messages.StringField(2, required=True)
+  privateConnection = _messages.MessageField('PrivateConnection', 3)
+  privateConnectionId = _messages.StringField(4)
+  requestId = _messages.StringField(5)
 
 
 class DatastreamProjectsLocationsPrivateConnectionsDeleteRequest(_messages.Message):
@@ -1301,6 +1303,9 @@ class MysqlSourceConfig(_messages.Message):
   Fields:
     excludeObjects: MySQL objects to exclude from the stream.
     includeObjects: MySQL objects to retrieve from the source.
+    maxConcurrentBackfillTasks: Maximum number of concurrent backfill tasks.
+      The number should be non negative. If not set (or set to 0), the
+      system's default value will be used.
     maxConcurrentCdcTasks: Maximum number of concurrent CDC tasks. The number
       should be non negative. If not set (or set to 0), the system's default
       value will be used.
@@ -1308,7 +1313,8 @@ class MysqlSourceConfig(_messages.Message):
 
   excludeObjects = _messages.MessageField('MysqlRdbms', 1)
   includeObjects = _messages.MessageField('MysqlRdbms', 2)
-  maxConcurrentCdcTasks = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  maxConcurrentBackfillTasks = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  maxConcurrentCdcTasks = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class MysqlSslConfig(_messages.Message):
@@ -1606,9 +1612,12 @@ class OracleSourceConfig(_messages.Message):
     dropLargeObjects: Drop large object values.
     excludeObjects: Oracle objects to exclude from the stream.
     includeObjects: Oracle objects to include in the stream.
+    maxConcurrentBackfillTasks: Maximum number of concurrent backfill tasks.
+      The number should be non-negative. If not set (or set to 0), the
+      system's default value is used.
     maxConcurrentCdcTasks: Maximum number of concurrent CDC tasks. The number
-      should be non negative. If not set (or set to 0), the system's default
-      value will be used.
+      should be non-negative. If not set (or set to 0), the system's default
+      value is used.
     streamLargeObjects: Stream large object values. NOTE: This feature is
       currently experimental.
   """
@@ -1616,8 +1625,9 @@ class OracleSourceConfig(_messages.Message):
   dropLargeObjects = _messages.MessageField('DropLargeObjects', 1)
   excludeObjects = _messages.MessageField('OracleRdbms', 2)
   includeObjects = _messages.MessageField('OracleRdbms', 3)
-  maxConcurrentCdcTasks = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  streamLargeObjects = _messages.MessageField('StreamLargeObjects', 5)
+  maxConcurrentBackfillTasks = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  maxConcurrentCdcTasks = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  streamLargeObjects = _messages.MessageField('StreamLargeObjects', 6)
 
 
 class OracleTable(_messages.Message):
@@ -1715,6 +1725,9 @@ class PostgresqlSourceConfig(_messages.Message):
   Fields:
     excludeObjects: PostgreSQL objects to exclude from the stream.
     includeObjects: PostgreSQL objects to include in the stream.
+    maxConcurrentBackfillTasks: Maximum number of concurrent backfill tasks.
+      The number should be non negative. If not set (or set to 0), the
+      system's default value will be used.
     publication: Required. The name of the publication that includes the set
       of all tables that are defined in the stream's include_objects.
     replicationSlot: Required. Immutable. The name of the logical replication
@@ -1723,8 +1736,9 @@ class PostgresqlSourceConfig(_messages.Message):
 
   excludeObjects = _messages.MessageField('PostgresqlRdbms', 1)
   includeObjects = _messages.MessageField('PostgresqlRdbms', 2)
-  publication = _messages.StringField(3)
-  replicationSlot = _messages.StringField(4)
+  maxConcurrentBackfillTasks = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  publication = _messages.StringField(4)
+  replicationSlot = _messages.StringField(5)
 
 
 class PostgresqlTable(_messages.Message):
@@ -1883,7 +1897,7 @@ class SingleTargetDataset(_messages.Message):
   r"""A single target dataset to which all data will be streamed.
 
   Fields:
-    datasetId: A string attribute.
+    datasetId: The dataset ID of the target dataset.
   """
 
   datasetId = _messages.StringField(1)

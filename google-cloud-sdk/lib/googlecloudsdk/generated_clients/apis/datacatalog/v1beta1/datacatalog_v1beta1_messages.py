@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 from apitools.base.protorpclite import messages as _messages
 from apitools.base.py import encoding
+from apitools.base.py import extra_types
 
 
 package = 'datacatalog'
@@ -45,7 +46,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -62,9 +65,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -813,6 +814,8 @@ class DatacatalogProjectsLocationsTaxonomiesListRequest(_messages.Message):
   r"""A DatacatalogProjectsLocationsTaxonomiesListRequest object.
 
   Fields:
+    filter: Supported field for filter is 'service' and value is 'dataplex'.
+      Eg: service=dataplex.
     pageSize: The maximum number of items to return. Must be a value between 1
       and 1000. If not set, defaults to 50.
     pageToken: The next_page_token value returned from a previous list
@@ -820,9 +823,10 @@ class DatacatalogProjectsLocationsTaxonomiesListRequest(_messages.Message):
     parent: Required. Resource name of the project to list the taxonomies of.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
 
 
 class DatacatalogProjectsLocationsTaxonomiesPatchRequest(_messages.Message):
@@ -1083,6 +1087,131 @@ class GetPolicyOptions(_messages.Message):
   """
 
   requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class GoogleCloudDatacatalogV1ImportEntriesMetadata(_messages.Message):
+  r"""Metadata message for long-running operation returned by the
+  ImportEntries.
+
+  Enums:
+    StateValueValuesEnum: State of the import operation.
+
+  Fields:
+    errors: Partial errors that are encountered during the ImportEntries
+      operation. There is no guarantee that all the encountered errors are
+      reported. However, if no errors are reported, it means that no errors
+      were encountered.
+    state: State of the import operation.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""State of the import operation.
+
+    Values:
+      IMPORT_STATE_UNSPECIFIED: Default value. This value is unused.
+      IMPORT_QUEUED: The dump with entries has been queued for import.
+      IMPORT_IN_PROGRESS: The import of entries is in progress.
+      IMPORT_DONE: The import of entries has been finished.
+      IMPORT_OBSOLETE: The import of entries has been abandoned in favor of a
+        newer request.
+    """
+    IMPORT_STATE_UNSPECIFIED = 0
+    IMPORT_QUEUED = 1
+    IMPORT_IN_PROGRESS = 2
+    IMPORT_DONE = 3
+    IMPORT_OBSOLETE = 4
+
+  errors = _messages.MessageField('Status', 1, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
+class GoogleCloudDatacatalogV1ImportEntriesResponse(_messages.Message):
+  r"""Response message for long-running operation returned by the
+  ImportEntries.
+
+  Fields:
+    deletedEntriesCount: Number of entries deleted as a result of import
+      operation.
+    upsertedEntriesCount: Cumulative number of entries created and entries
+      updated as a result of import operation.
+  """
+
+  deletedEntriesCount = _messages.IntegerField(1)
+  upsertedEntriesCount = _messages.IntegerField(2)
+
+
+class GoogleCloudDatacatalogV1ReconcileTagsMetadata(_messages.Message):
+  r"""Long-running operation metadata message returned by the ReconcileTags.
+
+  Enums:
+    StateValueValuesEnum: State of the reconciliation operation.
+
+  Messages:
+    ErrorsValue: Maps the name of each tagged column (or empty string for a
+      sole entry) to tagging operation status.
+
+  Fields:
+    errors: Maps the name of each tagged column (or empty string for a sole
+      entry) to tagging operation status.
+    state: State of the reconciliation operation.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""State of the reconciliation operation.
+
+    Values:
+      RECONCILIATION_STATE_UNSPECIFIED: Default value. This value is unused.
+      RECONCILIATION_QUEUED: The reconciliation has been queued and awaits for
+        execution.
+      RECONCILIATION_IN_PROGRESS: The reconciliation is in progress.
+      RECONCILIATION_DONE: The reconciliation has been finished.
+    """
+    RECONCILIATION_STATE_UNSPECIFIED = 0
+    RECONCILIATION_QUEUED = 1
+    RECONCILIATION_IN_PROGRESS = 2
+    RECONCILIATION_DONE = 3
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ErrorsValue(_messages.Message):
+    r"""Maps the name of each tagged column (or empty string for a sole entry)
+    to tagging operation status.
+
+    Messages:
+      AdditionalProperty: An additional property for a ErrorsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type ErrorsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ErrorsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A Status attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('Status', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  errors = _messages.MessageField('ErrorsValue', 1)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
+class GoogleCloudDatacatalogV1ReconcileTagsResponse(_messages.Message):
+  r"""Long-running operation response message returned by ReconcileTags.
+
+  Fields:
+    createdTagsCount: Number of tags created in the request.
+    deletedTagsCount: Number of tags deleted in the request.
+    updatedTagsCount: Number of tags updated in the request.
+  """
+
+  createdTagsCount = _messages.IntegerField(1)
+  deletedTagsCount = _messages.IntegerField(2)
+  updatedTagsCount = _messages.IntegerField(3)
 
 
 class GoogleCloudDatacatalogV1beta1BigQueryDateShardedSpec(_messages.Message):
@@ -1620,9 +1749,9 @@ class GoogleCloudDatacatalogV1beta1SearchCatalogRequestScope(_messages.Message):
   r"""The criteria that select the subspace used for query matching.
 
   Fields:
-    includeGcpPublicDatasets: If `true`, include Google Cloud Platform (GCP)
-      public datasets in the search results. Info on GCP public datasets is
-      available at https://cloud.google.com/public-datasets/. By default, GCP
+    includeGcpPublicDatasets: If `true`, include Google Cloud public datasets
+      in the search results. Info on Google Cloud public datasets is available
+      at https://cloud.google.com/public-datasets/. By default, Google Cloud
       public datasets are excluded.
     includeOrgIds: The list of organization IDs to search within. To find your
       organization ID, follow instructions in
@@ -1911,12 +2040,12 @@ class GoogleCloudDatacatalogV1beta1TagFieldEnumValue(_messages.Message):
 
 class GoogleCloudDatacatalogV1beta1TagTemplate(_messages.Message):
   r"""A tag template defines a tag, which can have one or more typed fields.
-  The template is used to create and attach the tag to GCP resources. [Tag
-  template roles](https://cloud.google.com/iam/docs/understanding-roles#data-
-  catalog-roles) provide permissions to create, edit, and use the template.
-  See, for example, the [TagTemplate User](https://cloud.google.com/data-
-  catalog/docs/how-to/template-user) role, which includes permission to use
-  the tag template to tag resources.
+  The template is used to create and attach the tag to Google Cloud resources.
+  [Tag template roles](https://cloud.google.com/iam/docs/understanding-
+  roles#data-catalog-roles) provide permissions to create, edit, and use the
+  template. See, for example, the [TagTemplate
+  User](https://cloud.google.com/data-catalog/docs/how-to/template-user) role,
+  which includes permission to use the tag template to tag resources.
 
   Messages:
     FieldsValue: Required. Map of tag template field IDs to the settings for
@@ -2030,6 +2159,9 @@ class GoogleCloudDatacatalogV1beta1Taxonomy(_messages.Message):
       "projects/{project_number}/locations/{location_id}/taxonomies/{id}".
     policyTagCount: Output only. Number of policy tags contained in this
       taxonomy.
+    service: Output only. Identity of the service which owns the Taxonomy.
+      This field is only populated when the taxonomy is created by a Google
+      Cloud service. Currently only 'DATAPLEX' is supported.
     taxonomyTimestamps: Output only. Timestamps about this taxonomy. Only
       create_time and update_time are used.
   """
@@ -2050,7 +2182,35 @@ class GoogleCloudDatacatalogV1beta1Taxonomy(_messages.Message):
   displayName = _messages.StringField(3)
   name = _messages.StringField(4)
   policyTagCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  taxonomyTimestamps = _messages.MessageField('GoogleCloudDatacatalogV1beta1SystemTimestamps', 6)
+  service = _messages.MessageField('GoogleCloudDatacatalogV1beta1TaxonomyService', 6)
+  taxonomyTimestamps = _messages.MessageField('GoogleCloudDatacatalogV1beta1SystemTimestamps', 7)
+
+
+class GoogleCloudDatacatalogV1beta1TaxonomyService(_messages.Message):
+  r"""The source system of the Taxonomy.
+
+  Enums:
+    NameValueValuesEnum: The Google Cloud service name.
+
+  Fields:
+    identity: P4SA Identity of the service.
+    name: The Google Cloud service name.
+  """
+
+  class NameValueValuesEnum(_messages.Enum):
+    r"""The Google Cloud service name.
+
+    Values:
+      MANAGING_SYSTEM_UNSPECIFIED: Default value
+      MANAGING_SYSTEM_DATAPLEX: Dataplex.
+      MANAGING_SYSTEM_OTHER: Other
+    """
+    MANAGING_SYSTEM_UNSPECIFIED = 0
+    MANAGING_SYSTEM_DATAPLEX = 1
+    MANAGING_SYSTEM_OTHER = 2
+
+  identity = _messages.StringField(1)
+  name = _messages.EnumField('NameValueValuesEnum', 2)
 
 
 class GoogleCloudDatacatalogV1beta1UsageSignal(_messages.Message):
@@ -2281,6 +2441,57 @@ class StandardQueryParameters(_messages.Message):
   trace = _messages.StringField(10)
   uploadType = _messages.StringField(11)
   upload_protocol = _messages.StringField(12)
+
+
+class Status(_messages.Message):
+  r"""The `Status` type defines a logical error model that is suitable for
+  different programming environments, including REST APIs and RPC APIs. It is
+  used by [gRPC](https://github.com/grpc). Each `Status` message contains
+  three pieces of data: error code, error message, and error details. You can
+  find out more about this error model and how to work with it in the [API
+  Design Guide](https://cloud.google.com/apis/design/errors).
+
+  Messages:
+    DetailsValueListEntry: A DetailsValueListEntry object.
+
+  Fields:
+    code: The status code, which should be an enum value of google.rpc.Code.
+    details: A list of messages that carry the error details. There is a
+      common set of message types for APIs to use.
+    message: A developer-facing error message, which should be in English. Any
+      user-facing error message should be localized and sent in the
+      google.rpc.Status.details field, or localized by the client.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class DetailsValueListEntry(_messages.Message):
+    r"""A DetailsValueListEntry object.
+
+    Messages:
+      AdditionalProperty: An additional property for a DetailsValueListEntry
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a DetailsValueListEntry object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
+  message = _messages.StringField(3)
 
 
 class TestIamPermissionsRequest(_messages.Message):

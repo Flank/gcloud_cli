@@ -2,7 +2,9 @@
 """A library of functions to handle bq flags consistently."""
 
 import codecs
+import http.client
 import json
+import logging
 import os
 import pkgutil
 import platform
@@ -38,12 +40,13 @@ _BIGQUERY_TOS_MESSAGE = (
     'quickstart-command-line\n\n'
     'Once you have completed the sign-up process, please try your command '
     'again.')
+_VERSION_FILENAME = 'VERSION'
 
 
 def _GetVersion():
   """Returns content of VERSION file found in same dir as the cli binary."""
   root = 'bq_utils'
-  return six.ensure_str(pkgutil.get_data(root, 'VERSION'))
+  return six.ensure_str(pkgutil.get_data(root, _VERSION_FILENAME)).strip()
 
 
 VERSION_NUMBER = _GetVersion()
@@ -122,7 +125,10 @@ def ProcessError(
     message_prefix='You have encountered a bug in the BigQuery CLI.'):
   """Translate an error message into some printing and a return code."""
 
+  logger = logging.getLogger(__name__)
+
   if isinstance(err, SystemExit):
+    logger.exception('An error has caused the tool to exit', exc_info=err)
     return err.code  # sys.exit called somewhere, hopefully intentionally.
 
   response = []
@@ -210,7 +216,7 @@ def ProcessError(
           '\n\n'
           'If this problem still occurs, you may have encountered a bug '
           'in the bigquery client.')
-    elif (isinstance(err, six.moves.http_client.HTTPException) or
+    elif (isinstance(err, http.client.HTTPException) or
           isinstance(err, googleapiclient.errors.Error) or
           isinstance(err, httplib2.HttpLib2Error)):
       message_prefix = (
@@ -228,10 +234,15 @@ def ProcessError(
     response.append('Unexpected exception in %s operation: %s' %
                     (name, message))
 
+  if not FLAGS.apilog:
+    response.append(
+        'If the error provided does not help solve your issue, please run the '
+        'command again with the `--apilog=stderr flag`.')
   response_message = '\n'.join(response)
   wrap_error_message = True
   if wrap_error_message:
     response_message = flags.text_wrap(response_message)
+  logger.exception(response_message, exc_info=err)
   print(response_message)
   return retcode
 

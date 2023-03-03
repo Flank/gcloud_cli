@@ -2,24 +2,10 @@
 # 2.0, and the BSD License. See the LICENSE file in the root of this repository
 # for complete details.
 
-import typing
-
-_default_backend: typing.Any = None
+from cryptography.hazmat.backends.interfaces import Backend
 
 
-def default_backend():
-    global _default_backend
+def default_backend() -> Backend:
+    from cryptography.hazmat.backends.openssl.backend import backend
 
-    if _default_backend is None:
-        from cryptography.hazmat.backends.openssl.backend import backend
-
-        _default_backend = backend
-
-    return _default_backend
-
-
-def _get_backend(backend):
-    if backend is None:
-        return default_backend()
-    else:
-        return backend
+    return backend

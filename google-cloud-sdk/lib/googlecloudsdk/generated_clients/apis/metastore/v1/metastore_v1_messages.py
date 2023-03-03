@@ -88,9 +88,8 @@ class BackendMetastore(_messages.Message):
     metastoreType: The type of the backend metastore.
     name: The relative resource name of the metastore that is being federated.
       The formats of the relative resource names for the currently supported
-      metastores are listed below: Dataplex:
-      projects/{project_id}/locations/{location}/lakes/{lake_id} BigQuery:
-      projects/{project_id} Dataproc Metastore:
+      metastores are listed below: BigQuery projects/{project_id} Dataproc
+      Metastore
       projects/{project_id}/locations/{location}/services/{service_id}
   """
 
@@ -183,7 +182,9 @@ class Binding(_messages.Message):
       (https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-
       service-accounts). For example, my-project.svc.id.goog[my-namespace/my-
       kubernetes-sa]. group:{emailid}: An email address that represents a
-      Google group. For example, admins@example.com.
+      Google group. For example, admins@example.com. domain:{domain}: The G
+      Suite domain (primary) that represents all the users of that domain. For
+      example, google.com or example.com.
       deleted:user:{emailid}?uid={uniqueid}: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, alice@example.com?uid=123456789012345678901. If the user is
@@ -200,9 +201,7 @@ class Binding(_messages.Message):
       been recently deleted. For example,
       admins@example.com?uid=123456789012345678901. If the group is recovered,
       this value reverts to group:{emailid} and the recovered group retains
-      the role in the binding. domain:{domain}: The G Suite domain (primary)
-      that represents all the users of that domain. For example, google.com or
-      example.com.
+      the role in the binding.
     role: Role that is assigned to the list of members, or principals. For
       example, roles/viewer, roles/editor, or roles/owner.
   """
@@ -222,13 +221,13 @@ class Consumer(_messages.Message):
   Fields:
     endpointUri: Output only. The URI of the endpoint used to access the
       metastore service.
-    subnetwork: The subnetwork of the customer project from which an IP
-      address is reserved and used as the Dataproc Metastore service's
+    subnetwork: Immutable. The subnetwork of the customer project from which
+      an IP address is reserved and used as the Dataproc Metastore service's
       endpoint. It is accessible to hosts in the subnet and to all hosts in a
       subnet in the same region and same network. There must be at least one
       IP address available in the subnet's primary range. The subnet is
-      specified in the following form:`projects/{project_number}/regions/{regi
-      on_id}/subnetworks/{subnetwork_id}
+      specified in the following form:projects/{project_number}/regions/{regio
+      n_id}/subnetworks/{subnetwork_id}
   """
 
   endpointUri = _messages.StringField(1)
@@ -932,19 +931,6 @@ class MetadataManagementActivity(_messages.Message):
   restores = _messages.MessageField('Restore', 2, repeated=True)
 
 
-class MetastoreOperationsCancelRequest(_messages.Message):
-  r"""A MetastoreOperationsCancelRequest object.
-
-  Fields:
-    cancelOperationRequest: A CancelOperationRequest resource to be passed as
-      the request body.
-    name: The name of the operation resource to be cancelled.
-  """
-
-  cancelOperationRequest = _messages.MessageField('CancelOperationRequest', 1)
-  name = _messages.StringField(2, required=True)
-
-
 class MetastoreProjectsLocationsFederationsCreateRequest(_messages.Message):
   r"""A MetastoreProjectsLocationsFederationsCreateRequest object.
 
@@ -1151,6 +1137,19 @@ class MetastoreProjectsLocationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
+
+
+class MetastoreProjectsLocationsOperationsCancelRequest(_messages.Message):
+  r"""A MetastoreProjectsLocationsOperationsCancelRequest object.
+
+  Fields:
+    cancelOperationRequest: A CancelOperationRequest resource to be passed as
+      the request body.
+    name: The name of the operation resource to be cancelled.
+  """
+
+  cancelOperationRequest = _messages.MessageField('CancelOperationRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class MetastoreProjectsLocationsOperationsDeleteRequest(_messages.Message):
@@ -1952,6 +1951,45 @@ class RestoreServiceRequest(_messages.Message):
   restoreType = _messages.EnumField('RestoreTypeValueValuesEnum', 3)
 
 
+class ScalingConfig(_messages.Message):
+  r"""Represents the scaling configuration of a metastore service.
+
+  Enums:
+    InstanceSizeValueValuesEnum: An enum of readable instance sizes, with each
+      instance size mapping to a float value (e.g. InstanceSize.EXTRA_SMALL =
+      scaling_factor(0.1))
+
+  Fields:
+    instanceSize: An enum of readable instance sizes, with each instance size
+      mapping to a float value (e.g. InstanceSize.EXTRA_SMALL =
+      scaling_factor(0.1))
+    scalingFactor: Scaling factor, increments of 0.1 for values less than 1.0,
+      and increments of 1.0 for values greater than 1.0.
+  """
+
+  class InstanceSizeValueValuesEnum(_messages.Enum):
+    r"""An enum of readable instance sizes, with each instance size mapping to
+    a float value (e.g. InstanceSize.EXTRA_SMALL = scaling_factor(0.1))
+
+    Values:
+      INSTANCE_SIZE_UNSPECIFIED: Unspecified instance size
+      EXTRA_SMALL: Extra small instance size, maps to a scaling factor of 0.1.
+      SMALL: Small instance size, maps to a scaling factor of 0.5.
+      MEDIUM: Medium instance size, maps to a scaling factor of 1.0.
+      LARGE: Large instance size, maps to a scaling factor of 3.0.
+      EXTRA_LARGE: Extra large instance size, maps to a scaling factor of 6.0.
+    """
+    INSTANCE_SIZE_UNSPECIFIED = 0
+    EXTRA_SMALL = 1
+    SMALL = 2
+    MEDIUM = 3
+    LARGE = 4
+    EXTRA_LARGE = 5
+
+  instanceSize = _messages.EnumField('InstanceSizeValueValuesEnum', 1)
+  scalingFactor = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
+
+
 class Secret(_messages.Message):
   r"""A securely stored value.
 
@@ -2005,15 +2043,18 @@ class Service(_messages.Message):
     network: Immutable. The relative resource name of the VPC network on which
       the instance can be accessed. It is specified in the following
       form:projects/{project_number}/global/networks/{network_id}.
-    networkConfig: Immutable. The configuration specifying the network
-      settings for the Dataproc Metastore service.
+    networkConfig: The configuration specifying the network settings for the
+      Dataproc Metastore service.
     port: The TCP port at which the metastore service is reached. Default:
       9083.
     releaseChannel: Immutable. The release channel of the service. If
       unspecified, defaults to STABLE.
+    scalingConfig: Scaling configuration of the metastore service.
     state: Output only. The current state of the metastore service.
     stateMessage: Output only. Additional information about the current state
       of the metastore service, if available.
+    telemetryConfig: The configuration specifying telemetry settings for the
+      Dataproc Metastore service. If unspecified defaults to JSON.
     tier: The tier of the service.
     uid: Output only. The globally unique resource identifier of the metastore
       service.
@@ -2131,11 +2172,13 @@ class Service(_messages.Message):
   networkConfig = _messages.MessageField('NetworkConfig', 12)
   port = _messages.IntegerField(13, variant=_messages.Variant.INT32)
   releaseChannel = _messages.EnumField('ReleaseChannelValueValuesEnum', 14)
-  state = _messages.EnumField('StateValueValuesEnum', 15)
-  stateMessage = _messages.StringField(16)
-  tier = _messages.EnumField('TierValueValuesEnum', 17)
-  uid = _messages.StringField(18)
-  updateTime = _messages.StringField(19)
+  scalingConfig = _messages.MessageField('ScalingConfig', 15)
+  state = _messages.EnumField('StateValueValuesEnum', 16)
+  stateMessage = _messages.StringField(17)
+  telemetryConfig = _messages.MessageField('TelemetryConfig', 18)
+  tier = _messages.EnumField('TierValueValuesEnum', 19)
+  uid = _messages.StringField(20)
+  updateTime = _messages.StringField(21)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -2267,6 +2310,32 @@ class Status(_messages.Message):
   code = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
   message = _messages.StringField(3)
+
+
+class TelemetryConfig(_messages.Message):
+  r"""Telemetry Configuration for the Dataproc Metastore service.
+
+  Enums:
+    LogFormatValueValuesEnum: The output format of the Dataproc Metastore
+      service's logs.
+
+  Fields:
+    logFormat: The output format of the Dataproc Metastore service's logs.
+  """
+
+  class LogFormatValueValuesEnum(_messages.Enum):
+    r"""The output format of the Dataproc Metastore service's logs.
+
+    Values:
+      LOG_FORMAT_UNSPECIFIED: The LOG_FORMAT is not set.
+      LEGACY: Logging output uses the legacy textPayload format.
+      JSON: Logging output uses the jsonPayload format.
+    """
+    LOG_FORMAT_UNSPECIFIED = 0
+    LEGACY = 1
+    JSON = 2
+
+  logFormat = _messages.EnumField('LogFormatValueValuesEnum', 1)
 
 
 class TestIamPermissionsRequest(_messages.Message):

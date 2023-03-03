@@ -31,6 +31,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 import six
 
+_MEMBERSHIP_RE = re.compile('projects/.+/locations/.+/memberships/.+')
+
 
 def _ComputeClient():
   api_version = core_apis.ResolveVersion('compute')
@@ -76,6 +78,7 @@ def UpdateMembership(name,
                      membership,
                      update_mask,
                      release_track,
+                     description=None,
                      external_id=None,
                      infra_type=None,
                      clear_labels=False,
@@ -93,6 +96,7 @@ def UpdateMembership(name,
     membership: Membership resource that needs to be updated.
     update_mask: Field names of membership resource to be updated.
     release_track: The release_track used in the gcloud command.
+    description: the value to put in the description field
     external_id: the unique id associated with the cluster, or None if it is not
       available.
     infra_type: The infrastructure type that the cluster is running on
@@ -150,6 +154,8 @@ def UpdateMembership(name,
     else:
       request.membership.endpoint = endpoint
 
+  if description:
+    request.membership.description = description
   if external_id:
     request.membership.externalId = external_id
   if infra_type == 'on-prem':
@@ -159,7 +165,7 @@ def UpdateMembership(name,
 
   if clear_labels or update_labels or remove_labels:
     mem_labels = {}
-    if not clear_labels:
+    if not clear_labels and membership.labels:
       for item in membership.labels.additionalProperties:
         mem_labels[item.key] = six.text_type(item.value)
     if update_labels:
@@ -278,8 +284,12 @@ def GetMembership(name, release_track=None):
 
   Raises:
     apitools.base.py.HttpError: if the request returns an HTTP error
+    exceptions.Error: if the membership name is missing the ID or improperly
+      formatted
   """
 
+  if _MEMBERSHIP_RE.match(name) is None:
+    raise InvalidMembershipFormatError(name)
   client = gkehub_api_util.GetApiClientForTrack(release_track)
   return client.projects_locations_memberships.Get(
       client.MESSAGES_MODULE.GkehubProjectsLocationsMembershipsGetRequest(
@@ -329,12 +339,10 @@ def _ClusterUUIDForMembershipName(membership_name):
     exceptions.Error: if the membership was malformed.
   """
 
-  match_membership = 'projects/.+/locations/global/memberships/(.+)'
-  matches = re.compile(match_membership).findall(membership_name)
+  matches = _MEMBERSHIP_RE.findall(membership_name)
   if len(matches) != 1:
     # This should never happen.
-    raise exceptions.Error(
-        'unable to parse membership {}'.format(membership_name))
+    raise InvalidMembershipFormatError(membership_name)
   return matches[0]
 
 
@@ -480,9 +488,12 @@ def GenerateConnectAgentManifest(membership_ref,
 # This will get full membership resource name format which should be used most
 # of the time, this is a supported format in resource args, API function
 # request/response objects, etc.
-def ListMembershipsFull():
+def ListMembershipsFull(filter_cluster_missing=False):
   """Lists full Membership names in the fleet for the current project.
 
+  Args:
+    filter_cluster_missing: whether to filter out memberships that are missing
+    a cluster.
   Returns:
     A list of full membership resource names in the fleet in the form
     'projects/*/locations/*/memberships/*'.
@@ -493,12 +504,29 @@ def ListMembershipsFull():
       client.MESSAGES_MODULE.GkehubProjectsLocationsMembershipsListRequest(
           parent=hub_base.HubCommand.LocationResourceName(location='-')))
 
-  return [
-      m.name for m in response.resources if not _ClusterMissing(m.endpoint)
-  ], response.unreachable
+  if filter_cluster_missing:
+    return [
+        m.name for m in response.resources if not _ClusterMissing(m.endpoint)
+    ], response.unreachable
+  return [m.name for m in response.resources], response.unreachable
 
 
 def _ClusterMissing(m):
   for t in ['gkeCluster', 'multiCloudCluster', 'onPremCluster']:
     if hasattr(m, t):
       return getattr(getattr(m, t), 'clusterMissing', False)
+
+
+def InvalidMembershipFormatError(name):
+  """Returns error for invalid membership resource names.
+
+  Args:
+    name: The membership resource name.
+
+  Returns:
+   An exceptions.Error for malformed membership names.
+  """
+  return exceptions.Error(
+      ('Failed to get membership: {} does not match format '
+       'projects/PROJECT_ID/locations/LOCATION/memberships/MEMBERSHIP_ID'
+      ).format(name))

@@ -54,6 +54,57 @@ class Artifact(_messages.Message):
   names = _messages.StringField(4, repeated=True)
 
 
+class Assessment(_messages.Message):
+  r"""Assessment provides all information that is related to a single
+  vulnerability for this product.
+
+  Enums:
+    StateValueValuesEnum: Provides the state of this Vulnerability assessment.
+
+  Fields:
+    cve: Holds the MITRE standard Common Vulnerabilities and Exposures (CVE)
+      tracking number for the vulnerability.
+    longDescription: A detailed description of this Vex.
+    relatedUris: Holds a list of references associated with this vulnerability
+      item and assessment. These uris have additional information about the
+      vulnerability and the assessment itself. E.g. Link to a document which
+      details how this assessment concluded the state of this vulnerability.
+    remediations: Specifies details on how to handle (and presumably, fix) a
+      vulnerability.
+    shortDescription: A one sentence description of this Vex.
+    state: Provides the state of this Vulnerability assessment.
+    threats: Contains information about this vulnerability, this will change
+      with time.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Provides the state of this Vulnerability assessment.
+
+    Values:
+      STATE_UNSPECIFIED: No state is specified.
+      AFFECTED: This product is known to be affected by this vulnerability.
+      NOT_AFFECTED: This product is known to be not affected by this
+        vulnerability.
+      FIXED: This product contains a fix for this vulnerability.
+      UNDER_INVESTIGATION: It is not known yet whether these versions are or
+        are not affected by the vulnerability. However, it is still under
+        investigation.
+    """
+    STATE_UNSPECIFIED = 0
+    AFFECTED = 1
+    NOT_AFFECTED = 2
+    FIXED = 3
+    UNDER_INVESTIGATION = 4
+
+  cve = _messages.StringField(1)
+  longDescription = _messages.StringField(2)
+  relatedUris = _messages.MessageField('URI', 3, repeated=True)
+  remediations = _messages.MessageField('Remediation', 4, repeated=True)
+  shortDescription = _messages.StringField(5)
+  state = _messages.EnumField('StateValueValuesEnum', 6)
+  threats = _messages.MessageField('Threat', 7, repeated=True)
+
+
 class Attestation(_messages.Message):
   r"""Occurrence that represents a single "attestation". The authenticity of
   an Attestation can be verified using the attached signature. If the verifier
@@ -151,7 +202,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -168,9 +221,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -324,6 +375,134 @@ class BuildSignature(_messages.Message):
   keyType = _messages.EnumField('KeyTypeValueValuesEnum', 2)
   publicKey = _messages.StringField(3)
   signature = _messages.StringField(4)
+
+
+class BuildStep(_messages.Message):
+  r"""A step in the build pipeline. Next ID: 20
+
+  Enums:
+    StatusValueValuesEnum: Output only. Status of the build step. At this
+      time, build step status is only updated on build completion; step status
+      is not updated in real-time as the build progresses.
+
+  Fields:
+    allowExitCodes: Allow this build step to fail without failing the entire
+      build if and only if the exit code is one of the specified codes. If
+      allow_failure is also specified, this field will take precedence.
+    allowFailure: Allow this build step to fail without failing the entire
+      build. If false, the entire build will fail if this step fails.
+      Otherwise, the build will succeed, but this step will still have a
+      failure status. Error information will be reported in the failure_detail
+      field.
+    args: A list of arguments that will be presented to the step when it is
+      started. If the image used to run the step's container has an
+      entrypoint, the `args` are used as arguments to that entrypoint. If the
+      image does not define an entrypoint, the first element in args is used
+      as the entrypoint, and the remainder will be used as arguments.
+    dir: Working directory to use when running this step's container. If this
+      value is a relative path, it is relative to the build's working
+      directory. If this value is absolute, it may be outside the build's
+      working directory, in which case the contents of the path may not be
+      persisted across build step executions, unless a `volume` for that path
+      is specified. If the build specifies a `RepoSource` with `dir` and a
+      step with a `dir`, which specifies an absolute path, the `RepoSource`
+      `dir` is ignored for the step's execution.
+    entrypoint: Entrypoint to be used instead of the build step image's
+      default entrypoint. If unset, the image's default entrypoint is used.
+    env: A list of environment variable definitions to be used when running a
+      step. The elements are of the form "KEY=VALUE" for the environment
+      variable "KEY" being given the value "VALUE".
+    exitCode: Output only. Return code from running the step.
+    id: Unique identifier for this build step, used in `wait_for` to reference
+      this build step as a dependency.
+    name: Required. The name of the container image that will run this
+      particular build step. If the image is available in the host's Docker
+      daemon's cache, it will be run directly. If not, the host will attempt
+      to pull the image first, using the builder service account's credentials
+      if necessary. The Docker daemon's cache will already have the latest
+      versions of all of the officially supported build steps
+      ([https://github.com/GoogleCloudPlatform/cloud-
+      builders](https://github.com/GoogleCloudPlatform/cloud-builders)). The
+      Docker daemon will also have cached many of the layers for some popular
+      images, like "ubuntu", "debian", but they will be refreshed at the time
+      you attempt to use them. If you built an image in a previous build step,
+      it will be stored in the host's Docker daemon's cache and is available
+      to use as the name for a later build step.
+    pullTiming: Output only. Stores timing information for pulling this build
+      step's builder image only.
+    script: A shell script to be executed in the step. When script is
+      provided, the user cannot specify the entrypoint or args.
+    secretEnv: A list of environment variables which are encrypted using a
+      Cloud Key Management Service crypto key. These values must be specified
+      in the build's `Secret`.
+    status: Output only. Status of the build step. At this time, build step
+      status is only updated on build completion; step status is not updated
+      in real-time as the build progresses.
+    timeout: Time limit for executing this build step. If not defined, the
+      step has no time limit and will be allowed to continue to run until
+      either it completes or the build itself times out.
+    timing: Output only. Stores timing information for executing this build
+      step.
+    volumes: List of volumes to mount into the build step. Each volume is
+      created as an empty volume prior to execution of the build step. Upon
+      completion of the build, volumes and their contents are discarded. Using
+      a named volume in only one step is not valid as it is indicative of a
+      build request with an incorrect configuration.
+    waitFor: The ID(s) of the step(s) that this build step depends on. This
+      build step will not start until all the build steps in `wait_for` have
+      completed successfully. If `wait_for` is empty, this build step will
+      start when all previous build steps in the `Build.Steps` list have
+      completed successfully.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""Output only. Status of the build step. At this time, build step status
+    is only updated on build completion; step status is not updated in real-
+    time as the build progresses.
+
+    Values:
+      STATUS_UNKNOWN: Status of the build is unknown.
+      PENDING: Build has been created and is pending execution and queuing. It
+        has not been queued.
+      QUEUING: Build has been received and is being queued.
+      QUEUED: Build or step is queued; work has not yet begun.
+      WORKING: Build or step is being executed.
+      SUCCESS: Build or step finished successfully.
+      FAILURE: Build or step failed to complete successfully.
+      INTERNAL_ERROR: Build or step failed due to an internal cause.
+      TIMEOUT: Build or step took longer than was allowed.
+      CANCELLED: Build or step was canceled by a user.
+      EXPIRED: Build was enqueued for longer than the value of `queue_ttl`.
+    """
+    STATUS_UNKNOWN = 0
+    PENDING = 1
+    QUEUING = 2
+    QUEUED = 3
+    WORKING = 4
+    SUCCESS = 5
+    FAILURE = 6
+    INTERNAL_ERROR = 7
+    TIMEOUT = 8
+    CANCELLED = 9
+    EXPIRED = 10
+
+  allowExitCodes = _messages.IntegerField(1, repeated=True, variant=_messages.Variant.INT32)
+  allowFailure = _messages.BooleanField(2)
+  args = _messages.StringField(3, repeated=True)
+  dir = _messages.StringField(4)
+  entrypoint = _messages.StringField(5)
+  env = _messages.StringField(6, repeated=True)
+  exitCode = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  id = _messages.StringField(8)
+  name = _messages.StringField(9)
+  pullTiming = _messages.MessageField('TimeSpan', 10)
+  script = _messages.StringField(11)
+  secretEnv = _messages.StringField(12, repeated=True)
+  status = _messages.EnumField('StatusValueValuesEnum', 13)
+  timeout = _messages.StringField(14)
+  timing = _messages.MessageField('TimeSpan', 15)
+  volumes = _messages.MessageField('Volume', 16, repeated=True)
+  waitFor = _messages.StringField(17, repeated=True)
 
 
 class BuildType(_messages.Message):
@@ -733,6 +912,12 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Artifacts(_messages.Message):
       account's credentials. The digests of the pushed images will be stored
       in the Build resource's results field. If any of the images fail to be
       pushed, the build is marked FAILURE.
+    mavenArtifacts: A list of Maven artifacts to be uploaded to Artifact
+      Registry upon successful completion of all build steps. Artifacts in the
+      workspace matching specified paths globs will be uploaded to the
+      specified Artifact Registry repository using the builder service
+      account's credentials. If any artifacts fail to be pushed, the build is
+      marked FAILURE.
     objects: A list of objects to be uploaded to Cloud Storage upon successful
       completion of all build steps. Files in the workspace matching specified
       paths globs will be uploaded to the specified Cloud Storage location
@@ -740,10 +925,16 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Artifacts(_messages.Message):
       generation of the uploaded objects will be stored in the Build
       resource's results field. If any objects fail to be pushed, the build is
       marked FAILURE.
+    pythonPackages: A list of Python packages to be uploaded to Artifact
+      Registry upon successful completion of all build steps. The build
+      service account credentials will be used to perform the upload. If any
+      objects fail to be pushed, the build is marked FAILURE.
   """
 
   images = _messages.StringField(1, repeated=True)
-  objects = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsArtifactObjects', 2)
+  mavenArtifacts = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact', 2, repeated=True)
+  objects = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsArtifactObjects', 3)
+  pythonPackages = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage', 4, repeated=True)
 
 
 class ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsArtifactObjects(_messages.Message):
@@ -764,6 +955,53 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsArtifactObjects(_messa
   location = _messages.StringField(1)
   paths = _messages.StringField(2, repeated=True)
   timing = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan', 3)
+
+
+class ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact(_messages.Message):
+  r"""A Maven artifact to upload to Artifact Registry upon successful
+  completion of all build steps.
+
+  Fields:
+    artifactId: Maven `artifactId` value used when uploading the artifact to
+      Artifact Registry.
+    groupId: Maven `groupId` value used when uploading the artifact to
+      Artifact Registry.
+    path: Path to an artifact in the build's workspace to be uploaded to
+      Artifact Registry. This can be either an absolute path, e.g.
+      /workspace/my-app/target/my-app-1.0.SNAPSHOT.jar or a relative path from
+      /workspace, e.g. my-app/target/my-app-1.0.SNAPSHOT.jar.
+    repository: Artifact Registry repository, in the form "https://$REGION-
+      maven.pkg.dev/$PROJECT/$REPOSITORY" Artifact in the workspace specified
+      by path will be uploaded to Artifact Registry with this location as a
+      prefix.
+    version: Maven `version` value used when uploading the artifact to
+      Artifact Registry.
+  """
+
+  artifactId = _messages.StringField(1)
+  groupId = _messages.StringField(2)
+  path = _messages.StringField(3)
+  repository = _messages.StringField(4)
+  version = _messages.StringField(5)
+
+
+class ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage(_messages.Message):
+  r"""Python package to upload to Artifact Registry upon successful completion
+  of all build steps. A package can encapsulate multiple objects to be
+  uploaded to a single repository.
+
+  Fields:
+    paths: Path globs used to match files in the build's workspace. For
+      Python/ Twine, this is usually `dist/*`, and sometimes additionally an
+      `.asc` file.
+    repository: Artifact Registry repository, in the form "https://$REGION-
+      python.pkg.dev/$PROJECT/$REPOSITORY" Files in the workspace matching any
+      path pattern will be uploaded to Artifact Registry with this location as
+      a prefix.
+  """
+
+  paths = _messages.StringField(1, repeated=True)
+  repository = _messages.StringField(2)
 
 
 class ContaineranalysisGoogleDevtoolsCloudbuildV1Build(_messages.Message):
@@ -787,9 +1025,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Build(_messages.Message):
     SubstitutionsValue: Substitutions data for `Build` resource.
     TimingValue: Output only. Stores timing information for phases of the
       build. Valid keys are: * BUILD: time to execute all build steps. * PUSH:
-      time to push all specified images. * FETCHSOURCE: time to fetch source.
-      * SETUPBUILD: time to set up build. If the build does not specify source
-      or images, these keys will not be included.
+      time to push all artifacts including docker images and non docker
+      artifacts. * FETCHSOURCE: time to fetch source. * SETUPBUILD: time to
+      set up build. If the build does not specify source or images, these keys
+      will not be included.
 
   Fields:
     approval: Output only. Describes this build's approval configuration,
@@ -847,12 +1086,13 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Build(_messages.Message):
     timeout: Amount of time that this build should be allowed to run, to
       second granularity. If this amount of time elapses, work on the build
       will cease and the build status will be `TIMEOUT`. `timeout` starts
-      ticking from `startTime`. Default time is ten minutes.
+      ticking from `startTime`. Default time is 60 minutes.
     timing: Output only. Stores timing information for phases of the build.
       Valid keys are: * BUILD: time to execute all build steps. * PUSH: time
-      to push all specified images. * FETCHSOURCE: time to fetch source. *
-      SETUPBUILD: time to set up build. If the build does not specify source
-      or images, these keys will not be included.
+      to push all artifacts including docker images and non docker artifacts.
+      * FETCHSOURCE: time to fetch source. * SETUPBUILD: time to set up build.
+      If the build does not specify source or images, these keys will not be
+      included.
     warnings: Output only. Non-fatal problems encountered during the execution
       of the build.
   """
@@ -913,9 +1153,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Build(_messages.Message):
   class TimingValue(_messages.Message):
     r"""Output only. Stores timing information for phases of the build. Valid
     keys are: * BUILD: time to execute all build steps. * PUSH: time to push
-    all specified images. * FETCHSOURCE: time to fetch source. * SETUPBUILD:
-    time to set up build. If the build does not specify source or images,
-    these keys will not be included.
+    all artifacts including docker images and non docker artifacts. *
+    FETCHSOURCE: time to fetch source. * SETUPBUILD: time to set up build. If
+    the build does not specify source or images, these keys will not be
+    included.
 
     Messages:
       AdditionalProperty: An additional property for a TimingValue object.
@@ -1061,7 +1302,7 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions(_messages.Message)
       operating system and build utilities. Also note that this is the minimum
       disk size that will be allocated for the build -- the build may run with
       a larger disk than requested. At present, the maximum disk size is
-      1000GB; builds that request more than the maximum are rejected with an
+      2000GB; builds that request more than the maximum are rejected with an
       error.
     dynamicSubstitutions: Option to specify whether or not to apply bash style
       string operations to the substitutions. NOTE: this is always enabled for
@@ -1549,9 +1790,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Results(_messages.Message):
   r"""Artifacts created by the build pipeline.
 
   Fields:
-    artifactManifest: Path to the artifact manifest. Only populated when
-      artifacts are uploaded.
-    artifactTiming: Time to push all non-container artifacts.
+    artifactManifest: Path to the artifact manifest for non-container
+      artifacts uploaded to Cloud Storage. Only populated when artifacts are
+      uploaded to Cloud Storage.
+    artifactTiming: Time to push all non-container artifacts to Cloud Storage.
     buildStepImages: List of build step digests, in the order corresponding to
       build step indices.
     buildStepOutputs: List of build step outputs, produced by builder images,
@@ -1560,8 +1802,12 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Results(_messages.Message):
       produce this output by writing to `$BUILDER_OUTPUT/output`. Only the
       first 4KB of data is stored.
     images: Container images that were built as a part of the build.
-    numArtifacts: Number of artifacts uploaded. Only populated when artifacts
-      are uploaded.
+    mavenArtifacts: Maven artifacts uploaded to Artifact Registry at the end
+      of the build.
+    numArtifacts: Number of non-container artifacts uploaded to Cloud Storage.
+      Only populated when artifacts are uploaded to Cloud Storage.
+    pythonPackages: Python artifacts uploaded to Artifact Registry at the end
+      of the build.
   """
 
   artifactManifest = _messages.StringField(1)
@@ -1569,7 +1815,9 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1Results(_messages.Message):
   buildStepImages = _messages.StringField(3, repeated=True)
   buildStepOutputs = _messages.BytesField(4, repeated=True)
   images = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1BuiltImage', 5, repeated=True)
-  numArtifacts = _messages.IntegerField(6)
+  mavenArtifacts = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact', 6, repeated=True)
+  numArtifacts = _messages.IntegerField(7)
+  pythonPackages = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedPythonPackage', 8, repeated=True)
 
 
 class ContaineranalysisGoogleDevtoolsCloudbuildV1Secret(_messages.Message):
@@ -1795,6 +2043,36 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan(_messages.Message):
 
   endTime = _messages.StringField(1)
   startTime = _messages.StringField(2)
+
+
+class ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact(_messages.Message):
+  r"""A Maven artifact uploaded using the MavenArtifact directive.
+
+  Fields:
+    fileHashes: Hash types and values of the Maven Artifact.
+    pushTiming: Output only. Stores timing information for pushing the
+      specified artifact.
+    uri: URI of the uploaded artifact.
+  """
+
+  fileHashes = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes', 1)
+  pushTiming = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan', 2)
+  uri = _messages.StringField(3)
+
+
+class ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedPythonPackage(_messages.Message):
+  r"""Artifact uploaded using the PythonPackage directive.
+
+  Fields:
+    fileHashes: Hash types and values of the Python Artifact.
+    pushTiming: Output only. Stores timing information for pushing the
+      specified artifact.
+    uri: URI of the uploaded artifact.
+  """
+
+  fileHashes = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes', 1)
+  pushTiming = _messages.MessageField('ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan', 2)
+  uri = _messages.StringField(3)
 
 
 class ContaineranalysisGoogleDevtoolsCloudbuildV1Volume(_messages.Message):
@@ -2072,6 +2350,7 @@ class ContaineranalysisProjectsOccurrencesListRequest(_messages.Message):
       SPDX_FILE: This represents an SPDX File.
       SPDX_RELATIONSHIP: This represents an SPDX Relationship.
       DSSE_ATTESTATION: This represents a DSSE attestation Note
+      VULNERABILITY_ASSESSMENT: This represents a Vulnerability Assessment.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -2088,6 +2367,7 @@ class ContaineranalysisProjectsOccurrencesListRequest(_messages.Message):
     SPDX_FILE = 12
     SPDX_RELATIONSHIP = 13
     DSSE_ATTESTATION = 14
+    VULNERABILITY_ASSESSMENT = 15
 
   filter = _messages.StringField(1)
   kind = _messages.EnumField('KindValueValuesEnum', 2)
@@ -2638,6 +2918,7 @@ class Discovery(_messages.Message):
       SPDX_FILE: This represents an SPDX File.
       SPDX_RELATIONSHIP: This represents an SPDX Relationship.
       DSSE_ATTESTATION: This represents a DSSE attestation Note
+      VULNERABILITY_ASSESSMENT: This represents a Vulnerability Assessment.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -2654,6 +2935,7 @@ class Discovery(_messages.Message):
     SPDX_FILE = 12
     SPDX_RELATIONSHIP = 13
     DSSE_ATTESTATION = 14
+    VULNERABILITY_ASSESSMENT = 15
 
   analysisKind = _messages.EnumField('AnalysisKindValueValuesEnum', 1)
 
@@ -3449,6 +3731,35 @@ class Hash(_messages.Message):
   value = _messages.BytesField(2)
 
 
+class IdentifierHelper(_messages.Message):
+  r"""Helps in identifying the underlying product. This should be treated like
+  a one-of field. Only one field should be set in this proto. This is a
+  workaround because spanner indexes on one-of fields restrict addition and
+  deletion of fields.
+
+  Enums:
+    FieldValueValuesEnum: The field that is set in the API proto.
+
+  Fields:
+    field: The field that is set in the API proto.
+    genericUri: Contains a URI which is vendor-specific. Example: The artifact
+      repository URL of an image.
+  """
+
+  class FieldValueValuesEnum(_messages.Enum):
+    r"""The field that is set in the API proto.
+
+    Values:
+      IDENTIFIER_HELPER_FIELD_UNSPECIFIED: The helper isn't set.
+      GENERIC_URI: The generic_uri one-of field is set.
+    """
+    IDENTIFIER_HELPER_FIELD_UNSPECIFIED = 0
+    GENERIC_URI = 1
+
+  field = _messages.EnumField('FieldValueValuesEnum', 1)
+  genericUri = _messages.StringField(2)
+
+
 class InTotoProvenance(_messages.Message):
   r"""A InTotoProvenance object.
 
@@ -3803,6 +4114,7 @@ class Note(_messages.Message):
     updateTime: Output only. The time this note was last updated. This field
       can be used as a filter in list requests.
     upgrade: A note describing an upgrade.
+    vulnerabilityAssessment: A note describing a vulnerability assessment.
     vulnerabilityType: A package vulnerability type of note.
   """
 
@@ -3831,6 +4143,7 @@ class Note(_messages.Message):
       SPDX_FILE: This represents an SPDX File.
       SPDX_RELATIONSHIP: This represents an SPDX Relationship.
       DSSE_ATTESTATION: This represents a DSSE attestation Note
+      VULNERABILITY_ASSESSMENT: This represents a Vulnerability Assessment.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -3847,6 +4160,7 @@ class Note(_messages.Message):
     SPDX_FILE = 12
     SPDX_RELATIONSHIP = 13
     DSSE_ATTESTATION = 14
+    VULNERABILITY_ASSESSMENT = 15
 
   attestationAuthority = _messages.MessageField('AttestationAuthority', 1)
   baseImage = _messages.MessageField('Basis', 2)
@@ -3869,7 +4183,8 @@ class Note(_messages.Message):
   spdxRelationship = _messages.MessageField('RelationshipNote', 19)
   updateTime = _messages.StringField(20)
   upgrade = _messages.MessageField('UpgradeNote', 21)
-  vulnerabilityType = _messages.MessageField('VulnerabilityType', 22)
+  vulnerabilityAssessment = _messages.MessageField('VulnerabilityAssessmentNote', 22)
+  vulnerabilityType = _messages.MessageField('VulnerabilityType', 23)
 
 
 class Occurrence(_messages.Message):
@@ -3943,6 +4258,7 @@ class Occurrence(_messages.Message):
       SPDX_FILE: This represents an SPDX File.
       SPDX_RELATIONSHIP: This represents an SPDX Relationship.
       DSSE_ATTESTATION: This represents a DSSE attestation Note
+      VULNERABILITY_ASSESSMENT: This represents a Vulnerability Assessment.
     """
     KIND_UNSPECIFIED = 0
     PACKAGE_VULNERABILITY = 1
@@ -3959,6 +4275,7 @@ class Occurrence(_messages.Message):
     SPDX_FILE = 12
     SPDX_RELATIONSHIP = 13
     DSSE_ATTESTATION = 14
+    VULNERABILITY_ASSESSMENT = 15
 
   attestation = _messages.MessageField('Attestation', 1)
   buildDetails = _messages.MessageField('BuildDetails', 2)
@@ -4437,6 +4754,41 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
+class Product(_messages.Message):
+  r"""Product contains information about a product and how to uniquely
+  identify it.
+
+  Fields:
+    id: Token that identifies a product so that it can be referred to from
+      other parts in the document. There is no predefined format as long as it
+      uniquely identifies a group in the context of the current document.
+    identifierHelper: Helps in identifying the underlying product.
+    name: Name of the product.
+  """
+
+  id = _messages.StringField(1)
+  identifierHelper = _messages.MessageField('IdentifierHelper', 2)
+  name = _messages.StringField(3)
+
+
+class Publisher(_messages.Message):
+  r"""Publisher contains information about the publisher of this Note.
+
+  Fields:
+    context: The context or namespace. Contains a URL which is under control
+      of the issuing party and can be used as a globally unique identifier for
+      that issuing party. Example: https://csaf.io
+    issuingAuthority: Provides information about the authority of the issuing
+      party to release the document, in particular, the party's constituency
+      and responsibilities or other obligations.
+    name: Name of the publisher. Examples: 'Google', 'Google Cloud Platform'.
+  """
+
+  context = _messages.StringField(1)
+  issuingAuthority = _messages.StringField(2)
+  name = _messages.StringField(3)
+
+
 class Recipe(_messages.Message):
   r"""Steps taken to build the artifact. For a TaskRun, typically each
   container corresponds to one step in the recipe.
@@ -4835,6 +5187,47 @@ class RelationshipOccurrence(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 4)
 
 
+class Remediation(_messages.Message):
+  r"""Specifies details on how to handle (and presumably, fix) a
+  vulnerability.
+
+  Enums:
+    RemediationTypeValueValuesEnum: The type of remediation that can be
+      applied.
+
+  Fields:
+    details: Contains a comprehensive human-readable discussion of the
+      remediation.
+    remediationTime: Contains the date from which the remediation is
+      available.
+    remediationType: The type of remediation that can be applied.
+    remediationUri: Contains the URL where to obtain the remediation.
+  """
+
+  class RemediationTypeValueValuesEnum(_messages.Enum):
+    r"""The type of remediation that can be applied.
+
+    Values:
+      REMEDIATION_TYPE_UNSPECIFIED: No remediation type specified.
+      MITIGATION: A MITIGATION is available.
+      NO_FIX_PLANNED: No fix is planned.
+      NONE_AVAILABLE: Not available.
+      VENDOR_FIX: A vendor fix is available.
+      WORKAROUND: A workaround is available.
+    """
+    REMEDIATION_TYPE_UNSPECIFIED = 0
+    MITIGATION = 1
+    NO_FIX_PLANNED = 2
+    NONE_AVAILABLE = 3
+    VENDOR_FIX = 4
+    WORKAROUND = 5
+
+  details = _messages.StringField(1)
+  remediationTime = _messages.StringField(2)
+  remediationType = _messages.EnumField('RemediationTypeValueValuesEnum', 3)
+  remediationUri = _messages.MessageField('URI', 4)
+
+
 class RepoSource(_messages.Message):
   r"""RepoSource describes the location of the source in a Google Cloud Source
   Repository.
@@ -5193,7 +5586,7 @@ class Source(_messages.Message):
       package such as a gzipped tarfile (.tar.gz), the FileHash will be for
       the single path to that file.
     repoSource: If provided, get source from this location in a Cloud Repo.
-    storageSource: If provided, get the source from this location in in Google
+    storageSource: If provided, get the source from this location in Google
       Cloud Storage.
   """
 
@@ -5434,6 +5827,58 @@ class TestIamPermissionsResponse(_messages.Message):
   permissions = _messages.StringField(1, repeated=True)
 
 
+class Threat(_messages.Message):
+  r"""Contains the vulnerability kinetic information. This information can
+  change as the vulnerability ages and new information becomes available.
+
+  Enums:
+    ThreatTypeValueValuesEnum: The type of threat.
+
+  Fields:
+    details: Represents a thorough human-readable discussion of the threat.
+    threatType: The type of threat.
+  """
+
+  class ThreatTypeValueValuesEnum(_messages.Enum):
+    r"""The type of threat.
+
+    Values:
+      THREAT_TYPE_UNSPECIFIED: No threat type specified.
+      IMPACT: IMPACT
+      EXPLOIT_STATUS: EXPLOIT_STATUS
+    """
+    THREAT_TYPE_UNSPECIFIED = 0
+    IMPACT = 1
+    EXPLOIT_STATUS = 2
+
+  details = _messages.StringField(1)
+  threatType = _messages.EnumField('ThreatTypeValueValuesEnum', 2)
+
+
+class TimeSpan(_messages.Message):
+  r"""Start and end times for a build execution phase. Next ID: 3
+
+  Fields:
+    endTime: End of time span.
+    startTime: Start of time span.
+  """
+
+  endTime = _messages.StringField(1)
+  startTime = _messages.StringField(2)
+
+
+class URI(_messages.Message):
+  r"""An URI message.
+
+  Fields:
+    label: A label for the URI.
+    uri: The unique resource identifier.
+  """
+
+  label = _messages.StringField(1)
+  uri = _messages.StringField(2)
+
+
 class UpdateOperationRequest(_messages.Message):
   r"""Request for updating an existing operation
 
@@ -5549,11 +5994,107 @@ class Version(_messages.Message):
   revision = _messages.StringField(5)
 
 
+class VexAssessment(_messages.Message):
+  r"""VexAssessment provides all publisher provided Vex information that is
+  related to this vulnerability.
+
+  Enums:
+    StateValueValuesEnum: Provides the state of this Vulnerability assessment.
+
+  Fields:
+    cve: Holds the MITRE standard Common Vulnerabilities and Exposures (CVE)
+      tracking number for the vulnerability.
+    noteName: The VulnerabilityAssessment note from which this VexAssessment
+      was generated. This will be of the form:
+      `projects/[PROJECT_ID]/notes/[NOTE_ID]`.
+    relatedUris: Holds a list of references associated with this vulnerability
+      item and assessment. These uris have additional information about the
+      vulnerability and the assessment itself. E.g. Link to a document which
+      details how this assessment concluded the state of this vulnerability.
+    remediations: Specifies details on how to handle (and presumably, fix) a
+      vulnerability.
+    state: Provides the state of this Vulnerability assessment.
+    threats: Contains information about this vulnerability, this will change
+      with time.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Provides the state of this Vulnerability assessment.
+
+    Values:
+      STATE_UNSPECIFIED: No state is specified.
+      AFFECTED: This product is known to be affected by this vulnerability.
+      NOT_AFFECTED: This product is known to be not affected by this
+        vulnerability.
+      FIXED: This product contains a fix for this vulnerability.
+      UNDER_INVESTIGATION: It is not known yet whether these versions are or
+        are not affected by the vulnerability. However, it is still under
+        investigation.
+    """
+    STATE_UNSPECIFIED = 0
+    AFFECTED = 1
+    NOT_AFFECTED = 2
+    FIXED = 3
+    UNDER_INVESTIGATION = 4
+
+  cve = _messages.StringField(1)
+  noteName = _messages.StringField(2)
+  relatedUris = _messages.MessageField('URI', 3, repeated=True)
+  remediations = _messages.MessageField('Remediation', 4, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
+  threats = _messages.MessageField('Threat', 6, repeated=True)
+
+
+class Volume(_messages.Message):
+  r"""Volume describes a Docker container volume which is mounted into build
+  steps in order to persist files across build step execution. Next ID: 3
+
+  Fields:
+    name: Name of the volume to mount. Volume names must be unique per build
+      step and must be valid names for Docker volumes. Each named volume must
+      be used by at least two build steps.
+    path: Path at which to mount the volume. Paths must be absolute and cannot
+      conflict with other volume paths on the same build step or with certain
+      reserved volume paths.
+  """
+
+  name = _messages.StringField(1)
+  path = _messages.StringField(2)
+
+
+class VulnerabilityAssessmentNote(_messages.Message):
+  r"""A single VulnerabilityAssessmentNote represents one particular product's
+  vulnerability assessment for one CVE. Multiple VulnerabilityAssessmentNotes
+  together form a Vex statement. Please go/sds-vex-example for a sample Vex
+  statement in the CSAF format.
+
+  Fields:
+    assessment: Represents a vulnerability assessment for the product.
+    languageCode: Identifies the language used by this document, corresponding
+      to IETF BCP 47 / RFC 5646.
+    longDescription: A detailed description of this Vex.
+    product: The product affected by this vex.
+    publisher: Publisher details of this Note.
+    shortDescription: A one sentence description of this Vex.
+    title: The title of the note. E.g. `Vex-Debian-11.4`
+  """
+
+  assessment = _messages.MessageField('Assessment', 1)
+  languageCode = _messages.StringField(2)
+  longDescription = _messages.StringField(3)
+  product = _messages.MessageField('Product', 4)
+  publisher = _messages.MessageField('Publisher', 5)
+  shortDescription = _messages.StringField(6)
+  title = _messages.StringField(7)
+
+
 class VulnerabilityDetails(_messages.Message):
   r"""Used by Occurrence to point to where the vulnerability exists and how to
   fix it.
 
   Enums:
+    CvssVersionValueValuesEnum: Output only. CVSS version used to populate
+      cvss_score and severity.
     EffectiveSeverityValueValuesEnum: The distro assigned severity for this
       vulnerability when that is available and note provider assigned severity
       when distro has not yet assigned a severity for this vulnerability. When
@@ -5572,7 +6113,10 @@ class VulnerabilityDetails(_messages.Message):
     cvssScore: Output only. The CVSS score of this vulnerability. CVSS score
       is on a scale of 0-10 where 0 indicates low severity and 10 indicates
       high severity.
+    cvssV2: The CVSS v2 score of this vulnerability.
     cvssV3: The CVSS v3 score of this vulnerability.
+    cvssVersion: Output only. CVSS version used to populate cvss_score and
+      severity.
     effectiveSeverity: The distro assigned severity for this vulnerability
       when that is available and note provider assigned severity when distro
       has not yet assigned a severity for this vulnerability. When there are
@@ -5591,7 +6135,21 @@ class VulnerabilityDetails(_messages.Message):
     type: The type of package; whether native or non native(ruby gems, node.js
       packages etc). This may be deprecated in the future because we can have
       multiple PackageIssues with different package types.
+    vexAssessment: VexAssessment provides all publisher provided Vex
+      information that is related to this vulnerability for this resource.
   """
+
+  class CvssVersionValueValuesEnum(_messages.Enum):
+    r"""Output only. CVSS version used to populate cvss_score and severity.
+
+    Values:
+      CVSS_VERSION_UNSPECIFIED: CVSS Version unspecified.
+      CVSS_VERSION_2: CVSS v2.
+      CVSS_VERSION_3: CVSS v3.
+    """
+    CVSS_VERSION_UNSPECIFIED = 0
+    CVSS_VERSION_2 = 1
+    CVSS_VERSION_3 = 2
 
   class EffectiveSeverityValueValuesEnum(_messages.Enum):
     r"""The distro assigned severity for this vulnerability when that is
@@ -5639,11 +6197,14 @@ class VulnerabilityDetails(_messages.Message):
     CRITICAL = 5
 
   cvssScore = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  cvssV3 = _messages.MessageField('CVSS', 2)
-  effectiveSeverity = _messages.EnumField('EffectiveSeverityValueValuesEnum', 3)
-  packageIssue = _messages.MessageField('PackageIssue', 4, repeated=True)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 5)
-  type = _messages.StringField(6)
+  cvssV2 = _messages.MessageField('CVSS', 2)
+  cvssV3 = _messages.MessageField('CVSS', 3)
+  cvssVersion = _messages.EnumField('CvssVersionValueValuesEnum', 4)
+  effectiveSeverity = _messages.EnumField('EffectiveSeverityValueValuesEnum', 5)
+  packageIssue = _messages.MessageField('PackageIssue', 6, repeated=True)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 7)
+  type = _messages.StringField(8)
+  vexAssessment = _messages.MessageField('VexAssessment', 9)
 
 
 class VulnerabilityLocation(_messages.Message):
@@ -5669,12 +6230,15 @@ class VulnerabilityType(_messages.Message):
   r"""VulnerabilityType provides metadata about a security vulnerability.
 
   Enums:
+    CvssVersionValueValuesEnum: CVSS version used to populate cvss_score and
+      severity.
     SeverityValueValuesEnum: Note provider assigned impact of the
       vulnerability
 
   Fields:
     cvssScore: The CVSS score for this Vulnerability.
     cvssV2: The full description of the CVSS for version 2.
+    cvssVersion: CVSS version used to populate cvss_score and severity.
     cwe: A list of CWE for this vulnerability. For details, see:
       https://cwe.mitre.org/index.html
     details: All information about the package to specifically identify this
@@ -5682,6 +6246,18 @@ class VulnerabilityType(_messages.Message):
       vulnerability has manifested in.
     severity: Note provider assigned impact of the vulnerability
   """
+
+  class CvssVersionValueValuesEnum(_messages.Enum):
+    r"""CVSS version used to populate cvss_score and severity.
+
+    Values:
+      CVSS_VERSION_UNSPECIFIED: CVSS Version unspecified.
+      CVSS_VERSION_2: CVSS v2.
+      CVSS_VERSION_3: CVSS v3.
+    """
+    CVSS_VERSION_UNSPECIFIED = 0
+    CVSS_VERSION_2 = 1
+    CVSS_VERSION_3 = 2
 
   class SeverityValueValuesEnum(_messages.Enum):
     r"""Note provider assigned impact of the vulnerability
@@ -5703,9 +6279,10 @@ class VulnerabilityType(_messages.Message):
 
   cvssScore = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
   cvssV2 = _messages.MessageField('CVSS', 2)
-  cwe = _messages.StringField(3, repeated=True)
-  details = _messages.MessageField('Detail', 4, repeated=True)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 5)
+  cvssVersion = _messages.EnumField('CvssVersionValueValuesEnum', 3)
+  cwe = _messages.StringField(4, repeated=True)
+  details = _messages.MessageField('Detail', 5, repeated=True)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 6)
 
 
 encoding.AddCustomJsonFieldMapping(

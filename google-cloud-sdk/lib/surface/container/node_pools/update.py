@@ -51,6 +51,7 @@ def _Args(parser):
   """
   flags.AddNodePoolNameArg(parser, 'The name of the node pool.')
   flags.AddNodePoolClusterFlag(parser, 'The name of the cluster.')
+  flags.AddAsyncFlag(parser)
   # Timeout in seconds for operation
   parser.add_argument(
       '--timeout',
@@ -92,7 +93,7 @@ class Update(base.UpdateCommand):
         upgrade_settings_group, for_node_pool=True)
 
     flags.AddSystemConfigFlag(group, hidden=False)
-    flags.AddLabelsFlag(group, for_node_pool=True, hidden=True)
+    flags.AddLabelsFlag(group, for_node_pool=True)
     flags.AddNodeLabelsFlag(group, for_node_pool=True, for_update=True)
     flags.AddNodeTaintsFlag(group, for_node_pool=True, for_update=True)
     flags.AddTagsNodePoolUpdate(group)
@@ -104,7 +105,7 @@ class Update(base.UpdateCommand):
     flags.AddNodePoolEnablePrivateNodes(group)
     flags.AddEnableFastSocketFlag(group)
     flags.AddLoggingVariantFlag(group, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(group, hidden=True)
+    flags.AddWindowsOsVersionFlag(group)
 
   def ParseUpdateNodePoolOptions(self, args):
     flags.ValidateSurgeUpgradeSettings(args)
@@ -196,6 +197,11 @@ class Update(base.UpdateCommand):
     try:
       operation_ref = adapter.UpdateNodePool(pool_ref, options)
 
+      if args.async_:
+        op = adapter.GetOperation(operation_ref)
+        if not args.IsSpecified('format'):
+          args.format = util.OPERATIONS_FORMAT
+        return op
       adapter.WaitForOperation(
           operation_ref,
           'Updating node pool {0}'.format(pool_ref.nodePoolId),
@@ -242,7 +248,7 @@ class UpdateBeta(Update):
 
     flags.AddSystemConfigFlag(group, hidden=False)
 
-    flags.AddLabelsFlag(group, for_node_pool=True, hidden=True)
+    flags.AddLabelsFlag(group, for_node_pool=True)
     flags.AddNodeLabelsFlag(group, for_node_pool=True, for_update=True)
     flags.AddNodeTaintsFlag(group, for_node_pool=True, for_update=True)
     flags.AddTagsNodePoolUpdate(group)
@@ -255,7 +261,7 @@ class UpdateBeta(Update):
         group, for_node_pool=True, is_update=True)
     flags.AddEnableFastSocketFlag(group)
     flags.AddLoggingVariantFlag(group, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(group, hidden=True)
+    flags.AddWindowsOsVersionFlag(group)
 
   def ParseUpdateNodePoolOptions(self, args):
     flags.ValidateSurgeUpgradeSettings(args)
@@ -331,7 +337,7 @@ class UpdateAlpha(Update):
 
     flags.AddSystemConfigFlag(group, hidden=False)
 
-    flags.AddLabelsFlag(group, for_node_pool=True, hidden=True)
+    flags.AddLabelsFlag(group, for_node_pool=True)
     flags.AddNodeLabelsFlag(group, for_node_pool=True, for_update=True)
     flags.AddNodeTaintsFlag(group, for_node_pool=True, for_update=True)
     flags.AddTagsNodePoolUpdate(group)
@@ -344,7 +350,7 @@ class UpdateAlpha(Update):
         group, for_node_pool=True, is_update=True)
     flags.AddEnableFastSocketFlag(group)
     flags.AddLoggingVariantFlag(group, for_node_pool=True)
-    flags.AddWindowsOsVersionFlag(group, hidden=True)
+    flags.AddWindowsOsVersionFlag(group)
 
   def ParseUpdateNodePoolOptions(self, args):
     flags.ValidateSurgeUpgradeSettings(args)

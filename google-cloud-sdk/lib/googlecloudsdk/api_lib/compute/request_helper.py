@@ -22,9 +22,12 @@ import copy
 import json
 
 from googlecloudsdk.api_lib.compute import batch_helper
+from googlecloudsdk.api_lib.compute import single_request_helper
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.compute import waiters
 from googlecloudsdk.core import log
+from googlecloudsdk.core import properties
+
 import six
 from six.moves import zip  # pylint: disable=redefined-builtin
 
@@ -117,7 +120,14 @@ def _HandleMessageList(response, service, method, errors):
   return items, response.nextPageToken
 
 
-def _ListCore(requests, http, batch_url, errors, response_handler):
+def _ListCore(
+    requests,
+    http,
+    batch_url,
+    errors,
+    response_handler,
+    enable_single_request=False,
+):
   """Makes a series of list and/or aggregatedList batch requests.
 
   Args:
@@ -130,15 +140,40 @@ def _ListCore(requests, http, batch_url, errors, response_handler):
     errors: A list for capturing errors. If any response contains an error, it
       is added to this list.
     response_handler: The function to extract information responses.
+    enable_single_request: if requests is single, send single request instead of
+      batch request
 
   Yields:
     Resources encapsulated in format chosen by response_handler as they are
       received from the server.
   """
+  if requests:
+    service, method, _ = requests[0]
+    # TODO(b/241230388): testing single request feature on disks.list and
+    # disk.aggregatedList APIs will remove this line after single request
+    # feature fully rollout
+    if type(service) is type(service.client.disks) and method in (
+        'List',
+        'AggregatedList',
+    ):
+      enable_single_request = True
+
   while requests:
-    responses, request_errors = batch_helper.MakeRequests(
-        requests=requests, http=http, batch_url=batch_url)
-    errors.extend(request_errors)
+    if (
+        not _ForceBatchRequest()
+        and enable_single_request
+        and len(requests) == 1
+    ):
+      service, method, request_body = requests[0]
+      responses, request_errors = single_request_helper.MakeSingleRequest(
+          service, method, request_body
+      )
+      errors.extend(request_errors)
+    else:
+      responses, request_errors = batch_helper.MakeRequests(
+          requests=requests, http=http, batch_url=batch_url
+      )
+      errors.extend(request_errors)
 
     new_requests = []
 
@@ -161,7 +196,7 @@ def _ListCore(requests, http, batch_url, errors, response_handler):
     requests = new_requests
 
 
-def _List(requests, http, batch_url, errors):
+def _List(requests, http, batch_url, errors, enable_single_request=False):
   """Makes a series of list and/or aggregatedList batch requests.
 
   Args:
@@ -173,12 +208,21 @@ def _List(requests, http, batch_url, errors):
     batch_url: The handler for making batch requests.
     errors: A list for capturing errors. If any response contains an error, it
       is added to this list.
+    enable_single_request: if requests is single, send single request instead of
+      batch request
 
   Returns:
     Resources encapsulated as protocol buffers as they are received
       from the server.
   """
-  return _ListCore(requests, http, batch_url, errors, _HandleMessageList)
+  return _ListCore(
+      requests,
+      http,
+      batch_url,
+      errors,
+      _HandleMessageList,
+      enable_single_request,
+  )
 
 
 def _IsEmptyOperation(operation, service):
@@ -202,7 +246,12 @@ def _IsEmptyOperation(operation, service):
   return True
 
 
-def ListJson(requests, http, batch_url, errors):
+def _ForceBatchRequest():
+  """Check if compute/force_batch_request property is set."""
+  return properties.VALUES.compute.force_batch_request.GetBool()
+
+
+def ListJson(requests, http, batch_url, errors, enable_single_request=False):
   """Makes a series of list and/or aggregatedList batch requests.
 
   This function does all of:
@@ -221,6 +270,8 @@ def ListJson(requests, http, batch_url, errors):
     batch_url: The handler for making batch requests.
     errors: A list for capturing errors. If any response contains an error, it
       is added to this list.
+    enable_single_request: if requests is single, send single request instead of
+      batch request
 
   Yields:
     Resources in dicts as they are received from the server.
@@ -228,7 +279,14 @@ def ListJson(requests, http, batch_url, errors):
   # This is compute-specific helper. It is assumed at this point that all
   # requests are being sent to the same client (for example Compute).
   with requests[0][0].client.JsonResponseModel():
-    for item in _ListCore(requests, http, batch_url, errors, _HandleJsonList):
+    for item in _ListCore(
+        requests,
+        http,
+        batch_url,
+        errors,
+        _HandleJsonList,
+        enable_single_request=enable_single_request,
+    ):
       yield item
 
 
@@ -243,7 +301,8 @@ def MakeRequests(requests,
                  followup_overrides=None,
                  log_result=True,
                  log_warnings=True,
-                 timeout=None):
+                 timeout=None,
+                 enable_single_request=False):
   """Makes one or more requests to the API.
 
   Each request can be either a synchronous API call or an asynchronous
@@ -284,6 +343,8 @@ def MakeRequests(requests,
     log_warnings: Whether warnings for completed operation should be printed.
     timeout: The maximum amount of time, in seconds, to wait for the
       operations to reach the DONE state.
+    enable_single_request: if requests is single, send single request instead
+      of batch request
 
   Yields:
     A response for each request. For deletion requests, no corresponding
@@ -291,11 +352,24 @@ def MakeRequests(requests,
   """
   if _RequestsAreListRequests(requests):
     for item in _List(
-        requests=requests, http=http, batch_url=batch_url, errors=errors):
+        requests=requests,
+        http=http,
+        batch_url=batch_url,
+        errors=errors,
+        enable_single_request=enable_single_request,
+    ):
       yield item
     return
-  responses, new_errors = batch_helper.MakeRequests(
-      requests=requests, http=http, batch_url=batch_url)
+
+  # send single request only if the requests size one and if enable_single_
+  # request is set to true
+  if not _ForceBatchRequest() and enable_single_request and len(requests) == 1:
+    service, method, request_body = requests[0]
+    responses, new_errors = single_request_helper.MakeSingleRequest(
+        service=service, method=method, request_body=request_body)
+  else:
+    responses, new_errors = batch_helper.MakeRequests(
+        requests=requests, http=http, batch_url=batch_url)
   errors.extend(new_errors)
 
   operation_service = None
@@ -361,7 +435,8 @@ def MakeRequests(requests,
         progress_tracker=progress_tracker,
         errors=errors,
         log_result=log_result,
-        timeout=timeout):
+        timeout=timeout,
+        enable_single_request=enable_single_request):
       yield response
 
     if warnings and log_warnings:

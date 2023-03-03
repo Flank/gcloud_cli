@@ -209,6 +209,13 @@ class Collections(enum.Enum):
       ['project', 'zone', 'instanceGroup'],
       True
   )
+  INSTANCESETTINGS = (
+      'instanceSettings',
+      'projects/{project}/zones/{zone}/instanceSettings',
+      {},
+      ['project', 'zone'],
+      True
+  )
   INSTANCETEMPLATES = (
       'instanceTemplates',
       'projects/{project}/global/instanceTemplates/{instanceTemplate}',
@@ -520,6 +527,14 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/securityPolicies/{securityPolicy}',
       {},
       ['project', 'region', 'securityPolicy'],
+      True
+  )
+  REGIONSECURITYPOLICYRULES = (
+      'regionSecurityPolicyRules',
+      'projects/{project}/regions/{region}/securityPolicies/{securityPolicy}/'
+      'securityPolicyRules/{securityPolicyRule}',
+      {},
+      ['project', 'region', 'securityPolicy', 'securityPolicyRule'],
       True
   )
   REGIONSSLCERTIFICATES = (

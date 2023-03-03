@@ -12,6 +12,7 @@ from cryptography.exceptions import (
 from cryptography.hazmat.backends.openssl.utils import (
     _calculate_digest_and_algorithm,
     _check_not_prehashed,
+    _evp_pkey_derive,
     _warn_sign_verify_deprecated,
 )
 from cryptography.hazmat.primitives import hashes, serialization
@@ -40,8 +41,8 @@ def _ec_key_curve_sn(backend, ec_key):
     # The following check is to find EC keys with unnamed curves and raise
     # an error for now.
     if nid == backend._lib.NID_undef:
-        raise NotImplementedError(
-            "ECDSA keys with unnamed curves are unsupported at this time"
+        raise ValueError(
+            "ECDSA keys with explicit parameters are unsupported at this time"
         )
 
     # This is like the above check, but it also catches the case where you
@@ -51,8 +52,8 @@ def _ec_key_curve_sn(backend, ec_key):
         not backend._lib.CRYPTOGRAPHY_IS_LIBRESSL
         and backend._lib.EC_GROUP_get_asn1_flag(group) == 0
     ):
-        raise NotImplementedError(
-            "ECDSA keys with unnamed curves are unsupported at this time"
+        raise ValueError(
+            "ECDSA keys with explicit parameters are unsupported at this time"
         )
 
     curve_name = backend._lib.OBJ_nid2sn(nid)
@@ -195,19 +196,7 @@ class _EllipticCurvePrivateKey(ec.EllipticCurvePrivateKey):
                 "peer_public_key and self are not on the same curve"
             )
 
-        group = self._backend._lib.EC_KEY_get0_group(self._ec_key)
-        z_len = (self._backend._lib.EC_GROUP_get_degree(group) + 7) // 8
-        self._backend.openssl_assert(z_len > 0)
-        z_buf = self._backend._ffi.new("uint8_t[]", z_len)
-        peer_key = self._backend._lib.EC_KEY_get0_public_key(
-            peer_public_key._ec_key  # type: ignore[attr-defined]
-        )
-
-        r = self._backend._lib.ECDH_compute_key(
-            z_buf, z_len, peer_key, self._ec_key, self._backend._ffi.NULL
-        )
-        self._backend.openssl_assert(r > 0)
-        return self._backend._ffi.buffer(z_buf)[:z_len]
+        return _evp_pkey_derive(self._backend, self._evp_pkey, peer_public_key)
 
     def public_key(self) -> ec.EllipticCurvePublicKey:
         group = self._backend._lib.EC_KEY_get0_group(self._ec_key)

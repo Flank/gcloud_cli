@@ -17,6 +17,11 @@
             --collection-group=Events
             --disable-indexes
 
+        $ {command} timestamp \
+            --database=(default)
+            --collection-group=Events
+            --disable-indexes
+
       The following command creates an exemption for the `timestamp` field in the `Events`
       collection group, in which the list of indexes is explicitly set to [ASCENDING, DESCENDING]:
 
@@ -33,9 +38,11 @@
 
   request:
     collection: firestore.projects.databases.collectionGroups.fields
-    # The update API call uses a different field mask than the message field being updated, so the
-    # declarative automatic request creation won't work. Hence we must create the request ourselves.
-    create_request_hook: googlecloudsdk.command_lib.firestore.util:CreateFieldUpdateRequest
+    static_fields:
+      updateMask: indexConfig
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.firestore.util:ValidateFieldUpdateRequest
+    - googlecloudsdk.command_lib.firestore.util:AddIndexConfigToUpdateRequest
 
   async:
     collection: firestore.projects.databases.operations
@@ -43,14 +50,20 @@
 
   update:
     read_modify_update: false
+    disable_auto_field_mask: true
 
   arguments:
     resource:
       help_text: Field to update.
-      removed_flags:
-      - database
       # Since it's currently not possible to update database default or collection group default
       # index settings, we use 'field' here instead of 'field_with_default'
       spec: !REF googlecloudsdk.command_lib.firestore.resources:field
 
-    additional_arguments_hook: googlecloudsdk.command_lib.firestore.flags:AddFieldUpdateArgs
+    params:
+    - group:
+        mutex: true
+        required: true
+        params:
+        - _REF_: googlecloudsdk.command_lib.firestore.flags:index
+        - _REF_: googlecloudsdk.command_lib.firestore.flags:disable_indexes
+        - _REF_: googlecloudsdk.command_lib.firestore.flags:clear_exemption

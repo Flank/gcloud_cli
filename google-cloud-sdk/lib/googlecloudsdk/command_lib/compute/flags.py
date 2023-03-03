@@ -20,7 +20,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import copy
+import enum
 import functools
+import re
 
 from googlecloudsdk.api_lib.compute import filter_rewrite
 from googlecloudsdk.api_lib.compute.regions import service as regions_service
@@ -38,6 +40,13 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_projection_spec
 from googlecloudsdk.core.util import text
 import six
+
+_GLOBAL_RELATIVE_PATH_REGEX = 'projects/([^/]+)/global/([^/]+)/'
+
+_REGIONAL_RELATIVE_PATH_REGEX = 'projects/([^/]+)/regions/([^/]+)/'
+
+_ZONAL_RELATIVE_PATH_REGEX = 'projects/([^/]+)/zones/([^/]+)/'
+
 
 ZONE_PROPERTY_EXPLANATION = """\
 If not specified and the ``compute/zone'' property isn't set, you
@@ -100,6 +109,13 @@ A list of regions can be fetched by running:
 """
 
 
+class ScopeFlagsUsage(enum.Enum):
+  """Enum representing gCloud flag generation options for ResourceArgument."""
+  GENERATE_DEDICATED_SCOPE_FLAGS = 1
+  USE_EXISTING_SCOPE_FLAGS = 2
+  DONT_USE_SCOPE_FLAGS = 3
+
+
 class ScopesFetchingException(exceptions.Error):
   pass
 
@@ -117,9 +133,9 @@ def AddZoneFlag(parser, resource_type, operation_type, flag_prefix=None,
   Args:
     parser: argparse parser.
     resource_type: str, human readable name for the resource type this flag is
-                   qualifying, for example "instance group".
+      qualifying, for example "instance group".
     operation_type: str, human readable name for the operation, for example
-                    "update" or "delete".
+      "update" or "delete".
     flag_prefix: str, flag will be named --{flag_prefix}-zone.
     explanation: str, detailed explanation of the flag.
     help_text: str, help text will be overridden with this value.
@@ -152,9 +168,9 @@ def AddRegionFlag(parser, resource_type, operation_type,
   Args:
     parser: argparse parser.
     resource_type: str, human readable name for the resource type this flag is
-                   qualifying, for example "instance group".
+      qualifying, for example "instance group".
     operation_type: str, human readable name for the operation, for example
-                    "update" or "delete".
+      "update" or "delete".
     flag_prefix: str, flag will be named --{flag_prefix}-region.
     explanation: str, detailed explanation of the flag.
     help_text: str, help text will be overridden with this value.
@@ -250,6 +266,16 @@ class ResourceArgScopes(object):
       scope_value = getattr(args, resource_scope.flag_name, None)
       if scope_value is not None:
         return resource_scope, scope_value
+    return None, None
+
+  def SpecifiedByValue(self, value):
+    """Given resource value return selected scope and its value."""
+    if re.match(_GLOBAL_RELATIVE_PATH_REGEX, value):
+      return self.scopes[compute_scope.ScopeEnum.GLOBAL], 'global'
+    elif re.match(_REGIONAL_RELATIVE_PATH_REGEX, value):
+      return self.scopes[compute_scope.ScopeEnum.REGION], 'region'
+    elif re.match(_ZONAL_RELATIVE_PATH_REGEX, value):
+      return self.scopes[compute_scope.ScopeEnum.ZONE], 'zone'
     return None, None
 
   def GetImplicitScope(self, default_scope=None):
@@ -644,26 +670,27 @@ class ResourceArgument(object):
     and zonal qualifiers (or any combination of) for each resource.
   """
 
-  def __init__(self,
-               name=None,
-               resource_name=None,
-               completer=None,
-               plural=False,
-               required=True,
-               zonal_collection=None,
-               regional_collection=None,
-               global_collection=None,
-               global_help_text=None,
-               region_explanation=None,
-               region_help_text=None,
-               region_hidden=False,
-               zone_explanation=None,
-               zone_help_text=None,
-               zone_hidden=False,
-               short_help=None,
-               detailed_help=None,
-               custom_plural=None,
-               use_existing_default_scope=None):
+  def __init__(
+      self,
+      name=None,
+      resource_name=None,
+      completer=None,
+      plural=False,
+      required=True,
+      zonal_collection=None,
+      regional_collection=None,
+      global_collection=None,
+      global_help_text=None,
+      region_explanation=None,
+      region_help_text=None,
+      region_hidden=False,
+      zone_explanation=None,
+      zone_help_text=None,
+      zone_hidden=False,
+      short_help=None,
+      detailed_help=None,
+      custom_plural=None,
+      scope_flags_usage=ScopeFlagsUsage.GENERATE_DEDICATED_SCOPE_FLAGS):
 
     """Constructor.
 
@@ -691,16 +718,22 @@ class ResourceArgument(object):
                              by default.
       zone_help_text: str, if provided, zone flag help text will be overridden
                            with this value.
-      zone_hidden: bool, Hide region in help if True.
+      zone_hidden: bool, Hide zone in help if True.
       short_help: str, help for the flag being added, if not provided help text
                        will be 'The name[s] of the ${resource_name}[s].'.
       detailed_help: str, detailed help for the flag being added, if not
                           provided there will be no detailed help for the flag.
       custom_plural: str, If plural is True then this string will be used as
                           plural resource name.
-      use_existing_default_scope: bool, when set to True, already existing
+      scope_flags_usage: ScopeFlagsUsage, when set to
+                                  USE_EXISTING_SCOPE_FLAGS, already existing
                                   zone and/or region flags will be used for
-                                  this argument.
+                                  this argument,
+                                  GENERATE_DEDICATED_SCOPE_FLAGS, new scope
+                                  flags will be created,
+                                  DONT_USE_SCOPE_FLAGS to not generate
+                                  additional flags and use single argument for
+                                  all scopes.
 
     Raises:
       exceptions.Error: if there some inconsistency in arguments.
@@ -708,11 +741,12 @@ class ResourceArgument(object):
     self.name_arg = name or 'name'
     self._short_help = short_help
     self._detailed_help = detailed_help
-    self.use_existing_default_scope = use_existing_default_scope
+    self.scope_flags_usage = scope_flags_usage
     if self.name_arg.startswith('--'):
       self.is_flag = True
       self.name = self.name_arg[2:].replace('-', '_')
-      flag_prefix = (None if self.use_existing_default_scope else
+      flag_prefix = (None if self.scope_flags_usage
+                     == ScopeFlagsUsage.USE_EXISTING_SCOPE_FLAGS else
                      self.name_arg[2:])
       self.scopes = ResourceArgScopes(flag_prefix=flag_prefix)
     else:  # positional
@@ -746,11 +780,14 @@ class ResourceArgument(object):
 
   # TODO(b/31933786) remove cust_metavar once surface supports metavars for
   # plural flags.
-  def AddArgument(self,
-                  parser,
-                  mutex_group=None,
-                  operation_type='operate on',
-                  cust_metavar=None):
+  def AddArgument(
+      self,
+      parser,
+      mutex_group=None,
+      operation_type='operate on',
+      cust_metavar=None,
+      category=None
+  ):
     """Add this set of arguments to argparse parser."""
 
     params = dict(
@@ -783,6 +820,9 @@ class ResourceArgument(object):
 
     if self.name_arg.startswith('--'):
       params['required'] = self.required
+      if not self.required:
+        # Only not required flags can be group by category.
+        params['category'] = category
       if self.plural:
         params['type'] = arg_parsers.ArgList(min_length=1)
     else:
@@ -794,11 +834,11 @@ class ResourceArgument(object):
 
     (mutex_group or parser).add_argument(self.name_arg, **params)
 
-    if self.use_existing_default_scope:
+    if self.scope_flags_usage != ScopeFlagsUsage.GENERATE_DEDICATED_SCOPE_FLAGS:
       return
 
     if len(self.scopes) > 1:
-      scope = parser.add_mutually_exclusive_group()
+      scope = parser.add_group(mutex=True, category=category)
     else:
       scope = parser
 
@@ -826,13 +866,14 @@ class ResourceArgument(object):
           plural=self.plural,
           custom_plural=self.custom_plural)
 
-    if not self.plural:
-      resource_mention = '{} is'.format(self.resource_name)
-    elif self.plural and not self.custom_plural:
-      resource_mention = '{}s are'.format(self.resource_name)
-    else:
-      resource_mention = '{} are'.format(self.custom_plural)
     if compute_scope.ScopeEnum.GLOBAL in self.scopes and len(self.scopes) > 1:
+      if not self.plural:
+        resource_mention = '{} is'.format(self.resource_name)
+      elif self.plural and not self.custom_plural:
+        resource_mention = '{}s are'.format(self.resource_name)
+      else:
+        resource_mention = '{} are'.format(self.custom_plural)
+
       scope.add_argument(
           self.scopes[compute_scope.ScopeEnum.GLOBAL].flag,
           action='store_true',
@@ -868,6 +909,11 @@ class ResourceArgument(object):
     """
     names = self._GetResourceNames(args)
     resource_scope, scope_value = self.scopes.SpecifiedByArgs(args)
+    if (
+        resource_scope is None
+        and self.scope_flags_usage == ScopeFlagsUsage.DONT_USE_SCOPE_FLAGS
+    ):
+      resource_scope, scope_value = self.scopes.SpecifiedByValue(names[0])
     if resource_scope is not None:
       resource_scope = resource_scope.scope_enum
       # Complain if scope was specified without actual resource(s).

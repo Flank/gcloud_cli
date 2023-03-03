@@ -46,7 +46,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -63,9 +65,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -133,6 +133,8 @@ class Endpoint(_messages.Message):
       that you have the servicedirectory.networks.attach permission on the
       project specified.
     port: Optional. Service Directory rejects values outside of `[0, 65535]`.
+    uid: Output only. The globally unique identifier of the endpoint in the
+      UUID4 format.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -178,6 +180,7 @@ class Endpoint(_messages.Message):
   name = _messages.StringField(3)
   network = _messages.StringField(4)
   port = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  uid = _messages.StringField(6)
 
 
 class Expr(_messages.Message):
@@ -395,6 +398,8 @@ class Namespace(_messages.Message):
       and values can be no longer than 63 characters.
     name: Immutable. The resource name for the namespace in the format
       `projects/*/locations/*/namespaces/*`.
+    uid: Output only. The globally unique identifier of the namespace in the
+      UUID4 format.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -425,6 +430,7 @@ class Namespace(_messages.Message):
 
   labels = _messages.MessageField('LabelsValue', 1)
   name = _messages.StringField(2)
+  uid = _messages.StringField(3)
 
 
 class Policy(_messages.Message):
@@ -594,6 +600,8 @@ class Service(_messages.Message):
       RegistrationService.ListEndpoints.
     name: Immutable. The resource name for the service in the format
       `projects/*/locations/*/namespaces/*/services/*`.
+    uid: Output only. The globally unique identifier of the service in the
+      UUID4 format.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -637,6 +645,7 @@ class Service(_messages.Message):
   annotations = _messages.MessageField('AnnotationsValue', 1)
   endpoints = _messages.MessageField('Endpoint', 2, repeated=True)
   name = _messages.StringField(3)
+  uid = _messages.StringField(4)
 
 
 class ServicedirectoryProjectsLocationsGetRequest(_messages.Message):

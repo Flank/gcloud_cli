@@ -42,7 +42,11 @@ class Create(base.CreateCommand):
 
   @staticmethod
   def Args(parser):
-    resource_args.AddAzureClusterAndClientResourceArgs(parser)
+    auth_config_group = parser.add_argument_group(
+        'Authentication configuration', mutex=True, required=True)
+    resource_args.AddAzureClusterAndClientResourceArgs(parser,
+                                                       auth_config_group)
+    flags.AddAzureServicesAuthentication(auth_config_group)
     flags.AddAzureRegion(parser)
     flags.AddEndpointSubnetId(parser)
     flags.AddVnetId(parser)
@@ -97,4 +101,4 @@ class CreateAlpha(Create):
   def Args(parser, track=base.ReleaseTrack.ALPHA):
     """Registers alpha track flags for this command."""
     Create.Args(parser)
-    flags.AddMonitoringConfig(parser)
+    flags.AddMonitoringConfig(parser, True)

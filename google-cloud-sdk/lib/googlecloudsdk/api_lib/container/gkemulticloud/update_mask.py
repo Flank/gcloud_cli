@@ -23,6 +23,11 @@ ATTACHED_CLUSTER_ARGS_TO_UPDATE_MASKS = {
     'annotations': 'annotations',
     'platform_version': 'platform_version',
     'admin_users': 'authorization.admin_users',
+    'logging': 'logging_config.component_config.enable_components',
+    'enable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
+    'disable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
 }
 
 AWS_CLUSTER_ARGS_TO_UPDATE_MASKS = {
@@ -64,6 +69,10 @@ AWS_CLUSTER_ARGS_TO_UPDATE_MASKS = {
         'control_plane.iam_instance_profile',
     'logging':
         'logging_config.component_config.enable_components',
+    'enable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
+    'disable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
     'description':
         'description',
     'clear_description':
@@ -79,24 +88,52 @@ AWS_CLUSTER_ARGS_TO_UPDATE_MASKS = {
 }
 
 AWS_NODEPOOL_ARGS_TO_UPDATE_MASKS = {
-    'node_version': 'version',
-    'min_nodes': 'autoscaling.minNodeCount',
-    'max_nodes': 'autoscaling.maxNodeCount',
-    'clear_security_group_ids': 'config.security_group_ids',
-    'security_group_ids': 'config.security_group_ids',
-    'config_encryption_kms_key_arn': 'config.config_encryption.kms_key_arn',
-    'root_volume_size': 'config.root_volume.size_gib',
-    'root_volume_type': 'config.root_volume.volume_type',
-    'root_volume_iops': 'config.root_volume.iops',
-    'root_volume_kms_key_arn': 'config.root_volume.kms_key_arn',
-    'clear_proxy_config': 'config.proxy_config',
-    'proxy_secret_arn': 'config.proxy_config.secret_arn',
-    'proxy_secret_version_id': 'config.proxy_config.secret_version',
-    'ssh_ec2_key_pair': 'config.ssh_config.ec2_key_pair',
-    'clear_ssh_ec2_key_pair': 'config.ssh_config.ec2_key_pair',
-    'iam_instance_profile': 'config.iam_instance_profile',
-    'annotations': 'annotations',
-    'clear_annotations': 'annotations'
+    'node_version':
+        'version',
+    'min_nodes':
+        'autoscaling.minNodeCount',
+    'max_nodes':
+        'autoscaling.maxNodeCount',
+    'clear_security_group_ids':
+        'config.security_group_ids',
+    'security_group_ids':
+        'config.security_group_ids',
+    'config_encryption_kms_key_arn':
+        'config.config_encryption.kms_key_arn',
+    'root_volume_size':
+        'config.root_volume.size_gib',
+    'root_volume_type':
+        'config.root_volume.volume_type',
+    'root_volume_iops':
+        'config.root_volume.iops',
+    'root_volume_kms_key_arn':
+        'config.root_volume.kms_key_arn',
+    'clear_proxy_config':
+        'config.proxy_config',
+    'proxy_secret_arn':
+        'config.proxy_config.secret_arn',
+    'proxy_secret_version_id':
+        'config.proxy_config.secret_version',
+    'ssh_ec2_key_pair':
+        'config.ssh_config.ec2_key_pair',
+    'clear_ssh_ec2_key_pair':
+        'config.ssh_config.ec2_key_pair',
+    'iam_instance_profile':
+        'config.iam_instance_profile',
+    'annotations':
+        'annotations',
+    'clear_annotations':
+        'annotations',
+    'tags':
+        'config.tags',
+    'clear_tags':
+        'config.tags',
+    'autoscaling_metrics_granularity':
+        'config.autoscaling_metrics_collection.granularity',
+    'autoscaling_metrics':
+        'config.autoscaling_metrics_collection.metrics',
+    'clear_autoscaling_metrics':
+        'config.autoscaling_metrics_collection'
 }
 
 AZURE_CLUSTER_ARGS_TO_UPDATE_MASKS = {
@@ -106,10 +143,16 @@ AZURE_CLUSTER_ARGS_TO_UPDATE_MASKS = {
     'admin_users': 'authorization.admin_users',
     'ssh_public_key': 'control_plane.ssh_config.authorized_key',
     'logging': 'logging_config.component_config.enable_components',
+    'enable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
+    'disable_managed_prometheus':
+        'monitoring_config.managed_prometheus_config.enabled',
     'description': 'description',
     'clear_description': 'description',
     'annotations': 'annotations',
-    'clear_annotations': 'annotations'
+    'clear_annotations': 'annotations',
+    'azure_tenant_id': 'azure_services_authentication.tenant_id',
+    'azure_application_id': 'azure_services_authentication.application_id'
 }
 
 AZURE_NODEPOOL_ARGS_TO_UPDATE_MASKS = {

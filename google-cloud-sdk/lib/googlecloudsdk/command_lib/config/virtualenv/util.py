@@ -1,4 +1,4 @@
-  # -*- coding: utf-8 -*- #
+# -*- coding: utf-8 -*- #
 # Copyright 2021 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,14 @@ from googlecloudsdk.core.util import platforms
 import six
 
 # Python modules to install into virtual env environment
-MODULES = ['crcmod', 'grpcio', 'cryptography', 'google_crc32c', 'certifi']
+MODULES = [
+    'crcmod',
+    'grpcio',
+    'cryptography==36.0.2',
+    'pyopenssl==22.0.0',
+    'google_crc32c',
+    'certifi',
+]
 
 # Enable file name.
 ENABLE_FILE = 'enabled'

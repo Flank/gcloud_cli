@@ -28,7 +28,7 @@ from googlecloudsdk.command_lib.functions.v2.logs.read import command as command
 _DEFAULT_TABLE_FORMAT = 'table(level,name,execution_id,time_utc,log)'
 
 
-def _CommonArgs(parser, track):
+def _CommonArgs(parser):
   """Register flags for this command."""
   flags.AddRegionFlag(
       parser,
@@ -38,40 +38,52 @@ def _CommonArgs(parser, track):
   parser.add_argument(
       'name',
       nargs='?',
-      help=('Name of the function which logs are to be displayed. If no name '
-            'is specified, logs from all functions are displayed.'))
+      help=(
+          'Name of the function which logs are to be displayed. If no name '
+          'is specified, logs from all functions are displayed.'
+      ),
+  )
   parser.add_argument(
-      '--execution-id',
-      help=('Execution ID for which logs are to be displayed.'))
+      '--execution-id', help='Execution ID for which logs are to be displayed.'
+  )
   parser.add_argument(
       '--start-time',
       required=False,
       type=arg_parsers.Datetime.Parse,
-      help=('Return only log entries in which timestamps are not earlier '
-            'than the specified time. If *--start-time* is not specified, a '
-            'default start time of 1 week ago is assumed. See $ gcloud '
-            'topic datetimes for information on time formats.'))
+      help=(
+          'Return only log entries in which timestamps are not earlier '
+          'than the specified time. If *--start-time* is not specified, a '
+          'default start time of 1 week ago is assumed. See $ gcloud '
+          'topic datetimes for information on time formats.'
+      ),
+  )
   parser.add_argument(
       '--end-time',
       required=False,
       type=arg_parsers.Datetime.Parse,
-      help=('Return only log entries which timestamps are not later than '
-            'the specified time. If *--end-time* is specified but '
-            '*--start-time* is not, the command returns *--limit* latest '
-            'log entries which appeared before --end-time. See '
-            '*$ gcloud topic datetimes* for information on time formats.'))
+      help=(
+          'Return only log entries which timestamps are not later than '
+          'the specified time. If *--end-time* is specified but '
+          '*--start-time* is not, the command returns *--limit* latest '
+          'log entries which appeared before --end-time. See '
+          '*$ gcloud topic datetimes* for information on time formats.'
+      ),
+  )
   parser.add_argument(
       '--limit',
       required=False,
       type=arg_parsers.BoundedInt(1, 1000),
       default=20,
-      help=('Number of log entries to be fetched; must not be greater than '
-            '1000. Note that the most recent entries in the specified time '
-            'range are returned, rather than the earliest.'))
+      help=(
+          'Number of log entries to be fetched; must not be greater than '
+          '1000. Note that the most recent entries in the specified time '
+          'range are returned, rather than the earliest.'
+      ),
+  )
   flags.AddMinLogLevelFlag(parser)
   parser.display_info.AddCacheUpdater(None)
 
-  flags.AddGen2Flag(parser, track)
+  flags.AddGen2Flag(parser)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -80,7 +92,7 @@ class GetLogs(base.ListCommand):
 
   @staticmethod
   def Args(parser):
-    _CommonArgs(parser, base.ReleaseTrack.GA)
+    _CommonArgs(parser)
 
   @util.CatchHTTPErrorRaiseHTTPException
   def Run(self, args):
@@ -103,17 +115,7 @@ class GetLogs(base.ListCommand):
 class GetLogsBeta(GetLogs):
   """Display log entries produced by Google Cloud Functions."""
 
-  @staticmethod
-  def Args(parser):
-    """Register flags for this command."""
-    _CommonArgs(parser, base.ReleaseTrack.BETA)
-
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class GetLogsAlpha(GetLogsBeta):
   """Display log entries produced by Google Cloud Functions."""
-
-  @staticmethod
-  def Args(parser):
-    """Register flags for this command."""
-    _CommonArgs(parser, base.ReleaseTrack.ALPHA)

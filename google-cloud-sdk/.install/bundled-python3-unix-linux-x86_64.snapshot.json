@@ -2,7 +2,7 @@
   "components": [
     {
       "data": {
-        "contents_checksum": "2aa3b48f270bdc5b8e2bbf512b7ff80b36f2bbadd57c61628b19b623d71ebed4",
+        "contents_checksum": "12d51cef1c4fea807a8df8fe542e176a71adfab8e684b3a243bfdc51e00d8990",
         "source": "",
         "type": "tar"
       },
@@ -11,7 +11,7 @@
         "core"
       ],
       "details": {
-        "description": "Provides stand-alone Python 3.9.12 installation for UNIX.",
+        "description": "Provides stand-alone Python 3.9.16 installation for UNIX.",
         "display_name": "Bundled Python 3.9"
       },
       "id": "bundled-python3-unix-linux-x86_64",
@@ -28,16 +28,16 @@
       },
       "platform_required": false,
       "version": {
-        "build_number": 20221021130956,
-        "version_string": "3.9.12"
+        "build_number": 20230224152814,
+        "version_string": "3.9.16"
       }
     }
   ],
-  "revision": 20221021130956,
+  "revision": 20230224152814,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "407.0.0"
+  "version": "420.0.0"
 }

@@ -45,19 +45,23 @@ from googlecloudsdk.core import log
 import six
 
 
-def _CommonArgs(parser,
-                release_track,
-                support_source_instance,
-                support_local_ssd_size=False,
-                support_kms=False,
-                support_multi_writer=False,
-                support_mesh=False,
-                support_host_error_timeout_seconds=False,
-                support_numa_node_count=False,
-                support_visible_core_count=False,
-                support_max_run_duration=False,
-                support_region_instance_template=False,
-                support_provisioned_throughput=False):
+def _CommonArgs(
+    parser,
+    release_track,
+    support_source_instance,
+    support_local_ssd_size=False,
+    support_kms=False,
+    support_multi_writer=False,
+    support_mesh=False,
+    support_host_error_timeout_seconds=False,
+    support_numa_node_count=False,
+    support_visible_core_count=False,
+    support_max_run_duration=False,
+    support_region_instance_template=False,
+    support_provisioned_throughput=False,
+    support_network_attachments=False,
+    support_replica_zones=False,
+):
   """Adding arguments applicable for creating instance templates."""
   parser.display_info.AddFormat(instance_templates_flags.DEFAULT_LIST_FORMAT)
   metadata_utils.AddMetadataArgs(parser)
@@ -67,13 +71,19 @@ def _CommonArgs(parser,
       enable_kms=support_kms,
       support_boot=True,
       support_multi_writer=support_multi_writer,
-      support_provisioned_throughput=support_provisioned_throughput)
+      support_provisioned_throughput=support_provisioned_throughput,
+      support_replica_zones=support_replica_zones,
+  )
   if support_local_ssd_size:
     instances_flags.AddLocalSsdArgsWithSize(parser)
   else:
     instances_flags.AddLocalSsdArgs(parser)
   instances_flags.AddCanIpForwardArgs(parser)
-  instances_flags.AddAddressArgs(parser, instances=False)
+  instances_flags.AddAddressArgs(
+      parser,
+      instances=False,
+      support_network_attachments=support_network_attachments,
+  )
   instances_flags.AddAcceleratorArgs(parser)
   instances_flags.AddMachineTypeArgs(parser)
   deprecate_maintenance_policy = release_track in [base.ReleaseTrack.ALPHA]
@@ -102,6 +112,8 @@ def _CommonArgs(parser,
                                             'instance-template')
   instances_flags.AddProvisioningModelVmArgs(parser)
   instances_flags.AddInstanceTerminationActionVmArgs(parser)
+  instances_flags.AddIPv6AddressArgs(parser)
+  instances_flags.AddIPv6PrefixLengthArgs(parser)
 
   if support_max_run_duration:
     instances_flags.AddMaxRunDurationVmArgs(parser)
@@ -244,8 +256,11 @@ def BuildShieldedInstanceConfigMessage(messages, args):
   if args.shielded_vm_integrity_monitoring is not None:
     enable_integrity_monitoring = args.shielded_vm_integrity_monitoring
   # compute message for shielded VM configuration.
-  shielded_instance_config_message = instance_utils.CreateShieldedInstanceConfigMessage(
-      messages, enable_secure_boot, enable_vtpm, enable_integrity_monitoring)
+  shielded_instance_config_message = (
+      instance_utils.CreateShieldedInstanceConfigMessage(
+          messages, enable_secure_boot, enable_vtpm, enable_integrity_monitoring
+      )
+  )
 
   return shielded_instance_config_message
 
@@ -287,7 +302,10 @@ def AddScopesForServiceProxy(args):
     if args.scopes is None:
       args.scopes = constants.DEFAULT_SCOPES[:]
 
-    if 'cloud-platform' not in args.scopes and 'https://www.googleapis.com/auth/cloud-platform' not in args.scopes:
+    if (
+        'cloud-platform' not in args.scopes
+        and 'https://www.googleapis.com/auth/cloud-platform' not in args.scopes
+    ):
       args.scopes.append('cloud-platform')
 
 
@@ -415,7 +433,10 @@ def ConfigureMeshTemplate(args, instance_template_ref, network_interfaces):
     # Add the required scopes.
     if args.scopes is None:
       args.scopes = constants.DEFAULT_SCOPES[:]
-    if 'cloud-platform' not in args.scopes and 'https://www.googleapis.com/auth/cloud-platform' not in args.scopes:
+    if (
+        'cloud-platform' not in args.scopes
+        and 'https://www.googleapis.com/auth/cloud-platform' not in args.scopes
+    ):
       args.scopes.append('cloud-platform')
 
     workload_namespace, workload_name = mesh_util.ParseWorkload(
@@ -464,7 +485,11 @@ def _RunCreate(compute_api,
                support_max_run_duration=False,
                support_region_instance_template=False,
                support_confidential_compute_type=False,
-               support_provisioned_throughput=False):
+               support_provisioned_throughput=False,
+               support_ipv6_reservation=False,
+               support_internal_ipv6_reservation=False,
+               support_replica_zones=False,
+               ):
   """Common routine for creating instance template.
 
   This is shared between various release tracks.
@@ -493,6 +518,11 @@ def _RunCreate(compute_api,
         is used.
       support_provisioned_throughput: Indicate the provisioned throughput is
         set.
+      support_ipv6_reservation: Indicate the external IPv6 address is supported.
+      support_internal_ipv6_reservation: Indicate the internal IPv6 address is
+        supported.
+      support_replica_zones: Indicate the replicaZones param is supported for
+        create-on-create disk.
 
   Returns:
       A resource object dispatched by display.Displayer().
@@ -537,11 +567,29 @@ def _RunCreate(compute_api,
     network_tier = getattr(args, 'network_tier', None)
     stack_type = getattr(args, 'stack_type', None)
     ipv6_network_tier = getattr(args, 'ipv6_network_tier', None)
+    external_ipv6_address = getattr(args, 'external_ipv6_address', None)
+    external_ipv6_prefix_length = getattr(args, 'external_ipv6_prefix_length',
+                                          None)
+    ipv6_address = None
+    ipv6_prefix_length = None
+    internal_ipv6_address = None
+    internal_ipv6_prefix_length = None
     subnet_region = None
+
     if support_region_instance_template:
       subnet_region = getattr(args, 'subnet_region', None)
     else:
       subnet_region = getattr(args, 'region', None)
+
+    if support_ipv6_reservation:
+      ipv6_address = getattr(args, 'ipv6_address', None)
+      ipv6_prefix_length = getattr(args, 'ipv6_prefix_length', None)
+
+    if support_internal_ipv6_reservation:
+      internal_ipv6_address = getattr(args, 'internal_ipv6_address', None)
+      internal_ipv6_prefix_length = getattr(args, 'internal_ipv6_prefix_length',
+                                            None)
+
     network_interfaces = [
         instance_template_utils.CreateNetworkInterfaceMessage(
             resources=compute_api.resources,
@@ -556,7 +604,13 @@ def _RunCreate(compute_api,
                      args.address),
             network_tier=network_tier,
             stack_type=stack_type,
-            ipv6_network_tier=ipv6_network_tier)
+            ipv6_network_tier=ipv6_network_tier,
+            ipv6_address=ipv6_address,
+            ipv6_prefix_length=ipv6_prefix_length,
+            external_ipv6_address=external_ipv6_address,
+            external_ipv6_prefix_length=external_ipv6_prefix_length,
+            internal_ipv6_address=internal_ipv6_address,
+            internal_ipv6_prefix_length=internal_ipv6_prefix_length)
     ]
 
   if support_mesh:
@@ -675,7 +729,9 @@ def _RunCreate(compute_api,
       create_boot_disk=create_boot_disk,
       support_kms=support_kms,
       support_multi_writer=support_multi_writer,
-      support_provisioned_throughput=support_provisioned_throughput)
+      support_provisioned_throughput=support_provisioned_throughput,
+      support_replica_zones=support_replica_zones,
+      )
 
   machine_type = instance_utils.InterpretMachineType(
       machine_type=args.machine_type,
@@ -726,10 +782,13 @@ def _RunCreate(compute_api,
         name=instance_template_ref.Name(),
     )
 
-  instance_template.properties.shieldedInstanceConfig = shieldedinstance_config_message
+  instance_template.properties.shieldedInstanceConfig = (
+      shieldedinstance_config_message
+  )
 
-  instance_template.properties.reservationAffinity = instance_utils.GetReservationAffinity(
-      args, client)
+  instance_template.properties.reservationAffinity = (
+      instance_utils.GetReservationAffinity(args, client)
+  )
 
   instance_template.properties.confidentialInstanceConfig = (
       confidential_instance_config_message)
@@ -762,13 +821,18 @@ def _RunCreate(compute_api,
   # Create an AdvancedMachineFeatures message if any of the features requiring
   # one have been specified.
   has_visible_core_count = (
-      support_visible_core_count and args.visible_core_count is not None)
-  if (args.enable_nested_virtualization is not None or
-      args.threads_per_core is not None or
-      (support_numa_node_count and args.numa_node_count is not None) or
-      has_visible_core_count or args.enable_uefi_networking is not None):
-
-    visible_core_count = args.visible_core_count if has_visible_core_count else None
+      support_visible_core_count and args.visible_core_count is not None
+  )
+  if (
+      args.enable_nested_virtualization is not None
+      or args.threads_per_core is not None
+      or (support_numa_node_count and args.numa_node_count is not None)
+      or has_visible_core_count
+      or args.enable_uefi_networking is not None
+  ):
+    visible_core_count = (
+        args.visible_core_count if has_visible_core_count else None
+    )
     instance_template.properties.advancedMachineFeatures = (
         instance_utils.CreateAdvancedMachineFeaturesMessage(
             client.messages, args.enable_nested_virtualization,
@@ -777,33 +841,43 @@ def _RunCreate(compute_api,
             visible_core_count, args.enable_uefi_networking))
 
   if args.resource_manager_tags:
-    ret_resource_manager_tags = resource_manager_tags_utils.GetResourceManagerTags(
-        args.resource_manager_tags)
+    ret_resource_manager_tags = (
+        resource_manager_tags_utils.GetResourceManagerTags(
+            args.resource_manager_tags
+        )
+    )
     if ret_resource_manager_tags is not None:
       properties = client.messages.InstanceProperties
-      instance_template.properties.resourceManagerTags = properties.ResourceManagerTagsValue(
-          additionalProperties=[
-              properties.ResourceManagerTagsValue.AdditionalProperty(
-                  key=key, value=value) for key, value in sorted(
-                      six.iteritems(ret_resource_manager_tags))
-          ])
+      instance_template.properties.resourceManagerTags = (
+          properties.ResourceManagerTagsValue(
+              additionalProperties=[
+                  properties.ResourceManagerTagsValue.AdditionalProperty(
+                      key=key, value=value)
+                  for key, value in sorted(
+                      six.iteritems(ret_resource_manager_tags))])
+      )
 
   request = client.messages.ComputeInstanceTemplatesInsertRequest(
       instanceTemplate=instance_template, project=instance_template_ref.project)
 
-  request.instanceTemplate.properties.labels = ParseCreateArgsWithServiceProxy(
-      args, client.messages.InstanceProperties.LabelsValue)
-
-  _AddSourceInstanceToTemplate(compute_api, args, instance_template,
-                               support_source_instance)
   if support_region_instance_template and args.IsSpecified(
       'instance_template_region'):
     request = client.messages.ComputeRegionInstanceTemplatesInsertRequest(
         instanceTemplate=instance_template,
         project=instance_template_ref.project,
         region=instance_template.region)
-    request.instanceTemplate.properties.labels = ParseCreateArgsWithServiceProxy(
-        args, client.messages.InstanceProperties.LabelsValue)
+
+  request.instanceTemplate.properties.labels = ParseCreateArgsWithServiceProxy(
+      args, client.messages.InstanceProperties.LabelsValue
+  )
+
+  _AddSourceInstanceToTemplate(
+      compute_api, args, instance_template, support_source_instance
+  )
+
+  if support_region_instance_template and args.IsSpecified(
+      'instance_template_region'
+  ):
     return client.MakeRequests([(client.apitools_client.regionInstanceTemplates,
                                  'Insert', request)])
   else:
@@ -835,6 +909,8 @@ class Create(base.CreateCommand):
   _support_max_run_duration = False
   _support_region_instance_template = False
   _support_provisioned_throughput = False
+  _support_network_attachments = False
+  _support_replica_zones = False
 
   @classmethod
   def Args(cls, parser):
@@ -849,7 +925,10 @@ class Create(base.CreateCommand):
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_region_instance_template=cls._support_region_instance_template,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_network_attachments=cls._support_network_attachments,
+        support_replica_zones=cls._support_replica_zones,
+    )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.GA)
     instances_flags.AddPrivateIpv6GoogleAccessArgForTemplate(
         parser, utils.COMPUTE_GA_API_VERSION)
@@ -871,15 +950,16 @@ class Create(base.CreateCommand):
         args,
         support_source_instance=self._support_source_instance,
         support_kms=self._support_kms,
-        support_post_key_revocation_action_type=self
-        ._support_post_key_revocation_action_type,
+        support_post_key_revocation_action_type=self._support_post_key_revocation_action_type,
         support_multi_writer=self._support_multi_writer,
         support_mesh=self._support_mesh,
         support_numa_node_count=self._support_numa_node_count,
         support_visible_core_count=self._support_visible_core_count,
         support_max_run_duration=self._support_max_run_duration,
         support_region_instance_template=self._support_region_instance_template,
-        support_provisioned_throughput=self._support_provisioned_throughput)
+        support_provisioned_throughput=self._support_provisioned_throughput,
+        support_replica_zones=self._support_replica_zones,
+    )
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -904,9 +984,11 @@ class CreateBeta(Create):
   _support_host_error_timeout_seconds = True
   _support_numa_node_count = False
   _support_visible_core_count = True
-  _support_max_run_duration = False
+  _support_max_run_duration = True
   _support_region_instance_template = False
   _support_provisioned_throughput = False
+  _support_network_attachments = False
+  _support_replica_zones = False
 
   @classmethod
   def Args(cls, parser):
@@ -918,12 +1000,14 @@ class CreateBeta(Create):
         support_kms=cls._support_kms,
         support_multi_writer=cls._support_multi_writer,
         support_mesh=cls._support_mesh,
-        support_host_error_timeout_seconds=cls
-        ._support_host_error_timeout_seconds,
+        support_host_error_timeout_seconds=cls._support_host_error_timeout_seconds,
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_region_instance_template=cls._support_region_instance_template,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_network_attachments=cls._support_network_attachments,
+        support_replica_zones=cls._support_replica_zones,
+    )
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
     instances_flags.AddPrivateIpv6GoogleAccessArgForTemplate(
         parser, utils.COMPUTE_BETA_API_VERSION)
@@ -946,17 +1030,17 @@ class CreateBeta(Create):
         args=args,
         support_source_instance=self._support_source_instance,
         support_kms=self._support_kms,
-        support_post_key_revocation_action_type=self
-        ._support_post_key_revocation_action_type,
+        support_post_key_revocation_action_type=self._support_post_key_revocation_action_type,
         support_multi_writer=self._support_multi_writer,
         support_mesh=self._support_mesh,
-        support_host_error_timeout_seconds=self
-        ._support_host_error_timeout_seconds,
+        support_host_error_timeout_seconds=self._support_host_error_timeout_seconds,
         support_numa_node_count=self._support_numa_node_count,
         support_visible_core_count=self._support_visible_core_count,
         support_max_run_duration=self._support_max_run_duration,
         support_region_instance_template=self._support_region_instance_template,
-        support_provisioned_throughput=self._support_provisioned_throughput)
+        support_provisioned_throughput=self._support_provisioned_throughput,
+        support_replica_zones=self._support_replica_zones,
+    )
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -985,6 +1069,8 @@ class CreateAlpha(Create):
   _support_region_instance_template = True
   _support_confidential_compute_type = True
   _support_provisioned_throughput = True
+  _support_network_attachments = True
+  _support_replica_zones = True
 
   @classmethod
   def Args(cls, parser):
@@ -996,13 +1082,15 @@ class CreateAlpha(Create):
         support_kms=cls._support_kms,
         support_multi_writer=cls._support_multi_writer,
         support_mesh=cls._support_mesh,
-        support_host_error_timeout_seconds=cls
-        ._support_host_error_timeout_seconds,
+        support_host_error_timeout_seconds=cls._support_host_error_timeout_seconds,
         support_numa_node_count=cls._support_numa_node_count,
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_region_instance_template=cls._support_region_instance_template,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_network_attachments=cls._support_network_attachments,
+        support_replica_zones=cls._support_replica_zones,
+    )
     instances_flags.AddLocalNvdimmArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddConfidentialComputeArgs(
@@ -1010,6 +1098,10 @@ class CreateAlpha(Create):
     instances_flags.AddPrivateIpv6GoogleAccessArgForTemplate(
         parser, utils.COMPUTE_ALPHA_API_VERSION)
     instances_flags.AddPostKeyRevocationActionTypeArgs(parser)
+    instances_flags.AddIPv6AddressAlphaArgs(parser)
+    instances_flags.AddIPv6PrefixLengthAlphaArgs(parser)
+    instances_flags.AddInternalIPv6AddressArgs(parser)
+    instances_flags.AddInternalIPv6PrefixLengthArgs(parser)
     instance_templates_flags.AddKeyRevocationActionTypeArgs(parser)
 
   def Run(self, args):
@@ -1027,19 +1119,18 @@ class CreateAlpha(Create):
         args=args,
         support_source_instance=self._support_source_instance,
         support_kms=self._support_kms,
-        support_post_key_revocation_action_type=self
-        ._support_post_key_revocation_action_type,
+        support_post_key_revocation_action_type=self._support_post_key_revocation_action_type,
         support_multi_writer=self._support_multi_writer,
         support_mesh=self._support_mesh,
-        support_host_error_timeout_seconds=self
-        ._support_host_error_timeout_seconds,
+        support_host_error_timeout_seconds=self._support_host_error_timeout_seconds,
         support_numa_node_count=self._support_numa_node_count,
         support_visible_core_count=self._support_visible_core_count,
         support_max_run_duration=self._support_max_run_duration,
         support_region_instance_template=self._support_region_instance_template,
-        support_confidential_compute_type=self
-        ._support_confidential_compute_type,
-        support_provisioned_throughput=self._support_provisioned_throughput)
+        support_confidential_compute_type=self._support_confidential_compute_type,
+        support_provisioned_throughput=self._support_provisioned_throughput,
+        support_replica_zones=self._support_replica_zones,
+    )
 
 
 DETAILED_HELP = {

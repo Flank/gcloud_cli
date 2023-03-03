@@ -3,6 +3,7 @@
 # Copyright 2012 Google Inc. All Rights Reserved.
 """Python script for interacting with BigQuery."""
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -96,14 +97,14 @@ ReservationReference = bigquery_client.ApiClientHelper.ReservationReference
 AutoscaleAlphaReservationReference = bigquery_client.ApiClientHelper.AutoscaleAlphaReservationReference
 AutoscalePreviewReservationReference = bigquery_client.ApiClientHelper.AutoscalePreviewReservationReference
 BetaReservationReference = bigquery_client.ApiClientHelper.BetaReservationReference
-EditionPreviewReservationReference = bigquery_client.ApiClientHelper.EditionPreviewReservationReference
-EditionPreviewCapacityCommitmentReference = bigquery_client.ApiClientHelper.EditionPreviewCapacityCommitmentReference
 CapacityCommitmentReference = bigquery_client.ApiClientHelper.CapacityCommitmentReference  # pylint: disable=line-too-long
 ReservationAssignmentReference = bigquery_client.ApiClientHelper.ReservationAssignmentReference  # pylint: disable=line-too-long
 BetaReservationAssignmentReference = bigquery_client.ApiClientHelper.BetaReservationAssignmentReference  # pylint: disable=line-too-long
 ConnectionReference = bigquery_client.ApiClientHelper.ConnectionReference
 
 # pylint: enable=g-bad-name
+
+CONNECTION_ID_PATTERN = re.compile(r'[\w-]+')
 
 if os.environ.get('CLOUDSDK_WRAPPER') == '1':
   _CLIENT_ID = '32555940559.apps.googleusercontent.com'
@@ -430,7 +431,11 @@ class TablePrinter(object):
   def _NormalizeTimestamp(unused_field, value):
     """Returns bq-specific formatting of a TIMESTAMP type."""
     try:
-      date = datetime.datetime.utcfromtimestamp(float(value))
+      date = datetime.datetime.fromtimestamp(
+          0,
+          tz=datetime.timezone.utc) + datetime.timedelta(seconds=float(value))
+      # Remove the extra timezone info "+00:00" at the end of the date.
+      date = date.replace(tzinfo=None)
       # Our goal is the equivalent of '%Y-%m-%d %H:%M:%S' via strftime but that
       # doesn't work for dates with years prior to 1900.  Instead we zero out
       # fractional seconds then call isoformat with a space separator.
@@ -562,6 +567,9 @@ class Client(object):
     if FLAGS.discovery_file:
       with open(FLAGS.discovery_file) as f:
         client_args['discovery_document'] = f.read()
+    client_args['enable_resumable_uploads'] = (
+        True if FLAGS.enable_resumable_uploads is None else
+        FLAGS.enable_resumable_uploads)
 
     return client_args
 
@@ -876,10 +884,15 @@ class _Load(BigqueryCmd):
         flag_values=fv)
     flags.DEFINE_enum(
         'encoding',
-        None, ['UTF-8', 'ISO-8859-1'],
+        None,
+        [
+            'UTF-8',
+            'ISO-8859-1',
+        ],
         'The character encoding used by the input file.  Options include:'
         '\n ISO-8859-1 (also known as Latin-1)'
-        '\n UTF-8',
+        '\n UTF-8'
+        ,
         short_name='E',
         flag_values=fv)
     flags.DEFINE_integer(
@@ -1044,20 +1057,20 @@ class _Load(BigqueryCmd):
     flags.DEFINE_string(
         'hive_partitioning_mode',
         None,
-        '(experimental) Enables hive partitioning.  AUTO indicates to perform '
+        'Enables hive partitioning.  AUTO indicates to perform '
         'automatic type inference.  STRINGS indicates to treat all hive '
         'partition keys as STRING typed.  No other values are accepted',
         flag_values=fv)
     flags.DEFINE_string(
         'hive_partitioning_source_uri_prefix',
-        None, '(experimental) Prefix after which hive partition '
+        None, 'Prefix after which hive partition '
         'encoding begins.  For URIs like gs://bucket/path/key1=value/file, '
         'the value should be gs://bucket/path.',
         flag_values=fv)
     flags.DEFINE_multi_enum(
         'decimal_target_types',
         None, ['NUMERIC', 'BIGNUMERIC', 'STRING'],
-        '(experimental) Specifies the list of possible BigQuery data types to '
+        'Specifies the list of possible BigQuery data types to '
         'which the source decimal values are converted. This list and the '
         'precision and the scale parameters of the decimal field determine the '
         'target type in the following preference order, and '
@@ -1313,6 +1326,7 @@ def _CreateExternalTableDefinition(
       JSON, specify 'NEWLINE_DELIMITED_JSON'. For Cloud Datastore backup,
       specify 'DATASTORE_BACKUP'. For Avro files, specify 'AVRO'. For Orc files,
       specify 'ORC'. For Parquet files, specify 'PARQUET'.
+      For Iceberg tables, specify 'ICEBERG'.
     source_uris: Comma separated list of URIs that contain data for this table.
     schema: Either an inline schema or path to a schema file.
     autodetect: Indicates if format options, compression mode and schema be auto
@@ -1351,7 +1365,8 @@ def _CreateExternalTableDefinition(
         'AVRO',
         'ORC',
         'PARQUET',
-        'GOOGLE_SHEETS'
+        'GOOGLE_SHEETS',
+        'ICEBERG'
     ]
 
     if source_format not in supported_formats:
@@ -1421,6 +1436,15 @@ def _CreateExternalTableDefinition(
     elif external_table_def['sourceFormat'] == 'ORC':
       if reference_file_schema_uri is not None:
         external_table_def['referenceFileSchemaUri'] = reference_file_schema_uri
+    elif external_table_def['sourceFormat'] == 'ICEBERG':
+      if autodetect is not None and not autodetect or schema:
+        raise app.UsageError(
+            'Cannot create Iceberg table from user-specified schema.')
+      # Always autodetect schema for ICEBERG from manifest
+      external_table_def['autodetect'] = True
+      if len(source_uris.split(',')) != 1:
+        raise app.UsageError(
+            'Must provide only one source_uri for Iceberg table.')
 
     if ignore_unknown_values:
       external_table_def['ignoreUnknownValues'] = True
@@ -1473,19 +1497,19 @@ class _MakeExternalTableDefinition(BigqueryCmd):
     flags.DEFINE_string(
         'hive_partitioning_mode',
         None,
-        '(experimental) Enables hive partitioning.  AUTO indicates to perform '
+        'Enables hive partitioning.  AUTO indicates to perform '
         'automatic type inference.  STRINGS indicates to treat all hive '
         'partition keys as STRING typed.  No other values are accepted',
         flag_values=fv)
     flags.DEFINE_string(
         'hive_partitioning_source_uri_prefix',
-        None, '(experimental) Prefix after which hive partition '
+        None, 'Prefix after which hive partition '
         'encoding begins.  For URIs like gs://bucket/path/key1=value/file, '
         'the value should be gs://bucket/path.',
         flag_values=fv)
     flags.DEFINE_boolean(
         'require_hive_partition_filter',
-        None, '(experimental) Whether queries against a table are required to '
+        None, 'Whether queries against a table are required to '
         'include a hive partition key in a query predicate.',
         flag_values=fv)
     flags.DEFINE_enum(
@@ -1498,7 +1522,8 @@ class _MakeExternalTableDefinition(BigqueryCmd):
             'DATASTORE_BACKUP',
             'ORC',
             'PARQUET',
-            'AVRO'
+            'AVRO',
+            'ICEBERG'
         ],
         'Format of source data. Options include:'
         '\n CSV'
@@ -1507,6 +1532,7 @@ class _MakeExternalTableDefinition(BigqueryCmd):
         '\n DATASTORE_BACKUP'
         '\n ORC'
         '\n PARQUET'
+        '\n ICEBERG (preview)'
         '\n AVRO',
         flag_values=fv)
     flags.DEFINE_string(
@@ -1730,8 +1756,7 @@ class _Query(BigqueryCmd):
         None, 'Specifies a table name and either an inline table definition '
         'or a path to a file containing a JSON table definition to use in the '
         'query. The format is "table_name::path_to_file_with_json_def" or '
-        '"table_name::schema@format=uri@connection". Note using connection is '
-        'an experimental feature and is still under development.'
+        '"table_name::schema@format=uri@connection". '
         'For example, '
         '"--external_table_definition=Example::/tmp/example_table_def.txt" '
         'will define a table named "Example" using the URIs and schema '
@@ -1755,8 +1780,10 @@ class _Query(BigqueryCmd):
     flags.DEFINE_boolean(
         'use_legacy_sql',
         None,
-        ('Whether to use Legacy SQL for the query. If not set, the default '
-         'value is true.'),
+        ('The choice of using Legacy SQL for the query is optional. If not '
+         'specified, the server will automatically determine the dialect based '
+         'on query information, such as dialect prefixes. If no prefixes are '
+         'found, it will default to Legacy SQL.'),
         flag_values=fv)
     flags.DEFINE_multi_string(
         'schema_update_option',
@@ -1864,6 +1891,12 @@ class _Query(BigqueryCmd):
         'https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format '  # pylint: disable=line-too-long
         'for the schedule format',
         flag_values=fv)
+    flags.DEFINE_bool(
+        'no_auto_scheduling',
+        False,
+        'Create a scheduled query configuration with automatic scheduling '
+        'disabled.',
+        flag_values=fv)
     flags.DEFINE_string(
         'display_name',
         '',
@@ -1957,6 +1990,9 @@ class _Query(BigqueryCmd):
     if self.destination_schema and not self.destination_table:
       raise app.UsageError(
           'destination_schema can only be used with destination_table.')
+    read_schema = None
+    if self.destination_schema:
+      read_schema = BigqueryClient.ReadSchema(self.destination_schema)
     if self.destination_kms_key:
       kwds['destination_encryption_configuration'] = {
           'kmsKeyName': self.destination_kms_key
@@ -1974,7 +2010,7 @@ class _Query(BigqueryCmd):
           if value is not None
       }
 
-    if self.schedule:
+    if self.schedule or self.no_auto_scheduling:
       transfer_client = client.GetTransferV1ApiClient()
       reference = 'projects/' + (client.GetProjectReference().projectId)
       scheduled_queries_reference = (reference + '/dataSources/scheduled_query')
@@ -1998,7 +2034,8 @@ class _Query(BigqueryCmd):
         auth_info = RetrieveAuthorizationInfo(reference, 'scheduled_query',
                                               transfer_client)
       schedule_args = bigquery_client.TransferScheduleArgs(
-          schedule=self.schedule)
+          schedule=self.schedule,
+          disable_auto_scheduling=self.no_auto_scheduling)
       params = {
           'query': query,
       }
@@ -2111,10 +2148,10 @@ class _Query(BigqueryCmd):
         self.PrintJobStartInfo(job)
       else:
         self._PrintQueryJobResults(client, job)
-    if self.destination_schema:
+    if read_schema:
       client.UpdateTable(
           client.GetTableReference(self.destination_table),
-          BigqueryClient.ReadSchema(self.destination_schema))
+          read_schema)
 
   def _PrintQueryJobResults(self, client, job):
     """Prints the results of a successful query job.
@@ -2915,8 +2952,6 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
     elif self.capacity_commitment:
       try:
         object_type = CapacityCommitmentReference
-        if FLAGS.api_version == 'edition_preview':
-          object_type = EditionPreviewCapacityCommitmentReference
         reference = client.GetCapacityCommitmentReference(
             identifier=identifier,
             default_location=FLAGS.location,
@@ -2933,16 +2968,13 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
         raise bigquery_client.BigqueryError(
             "Failed to list capacity commitments '%s': %s" % (identifier, e))
     elif self.reservation:
-      has_bi_response = None
-      response = []
+      response = None
       if FLAGS.api_version == 'autoscale_alpha':
         object_type = AutoscaleAlphaReservationReference
       elif FLAGS.api_version == 'autoscale_preview':
         object_type = AutoscalePreviewReservationReference
       elif FLAGS.api_version == 'v1beta1':
         object_type = BetaReservationReference
-      elif FLAGS.api_version == 'edition_preview':
-        object_type = EditionPreviewReservationReference
       else:
         object_type = ReservationReference
       reference = client.GetReservationReference(
@@ -2950,14 +2982,13 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
           default_location=FLAGS.location,
           default_reservation_id=' ')
       try:
-        list_bi_reservations = True
-        if list_bi_reservations:
-          bi_response = client.ListBiReservations(reference)
-          has_bi_response = 'size' in bi_response
-          if has_bi_response:
-            size_in_bytes = int(bi_response['size'])
-            size_in_gbytes = size_in_bytes / (1024 * 1024 * 1024)
-            print('BI Engine reservation: %sGB' % size_in_gbytes)
+        if True:
+          response = client.ListBiReservations(reference)
+          results = [response]
+        if response and 'size' in response:
+          size_in_bytes = int(response['size'])
+          size_in_gbytes = size_in_bytes / (1024 * 1024 * 1024)
+          print('BI Engine reservation: %sGB' % size_in_gbytes)
       except bigquery_client.BigqueryNotFoundError:
         pass
       except BaseException as e:
@@ -2965,21 +2996,19 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
             "Failed to list BI reservations '%s': %s" % (identifier, e))
 
       try:
-        list_slot_reservations = True
-        if list_slot_reservations:
+        if True:
           response = client.ListReservations(
               reference=reference,
               page_size=self.max_results,
               page_token=self.page_token)
+          results = (response['reservations'] if 'reservations' in response
+                     else [])
       except BaseException as e:
         raise bigquery_client.BigqueryError(
             "Failed to list reservations '%s': %s" % (identifier, e))
-      if 'reservations' in response:
-        results = response['reservations']
-      else:
-        if not has_bi_response:
-          print('No reservations found.')
-      if 'nextPageToken' in response:
+      if not results:
+        print('No reservations found.')
+      if response and 'nextPageToken' in response:
         _PrintPageToken(response)
     elif self.transfer_config:
       object_type = TransferConfigReference
@@ -3738,8 +3767,7 @@ class _Make(BigqueryCmd):
         'file containing a JSON table definition. '
         'The format of inline definition is "schema@format=uri@connection", '
         'where "schema@", "format=", and "connection" are optional and "format"'
-        'has the default value of "CSV" if not specified. Note using '
-        'connection is an experimental feature and is still under development.',
+        'has the default value of "CSV" if not specified. ',
         flag_values=fv)
     flags.DEFINE_string(
         'view', '', 'Create view with this SQL query.', flag_values=fv)
@@ -3780,8 +3808,10 @@ class _Make(BigqueryCmd):
     flags.DEFINE_boolean(
         'use_legacy_sql',
         None,
-        ('Whether to use Legacy SQL for the view. If not set, the default '
-         'behavior is true.'),
+        ('The choice of using Legacy SQL for the query is optional. If not '
+         'specified, the server will automatically determine the dialect based '
+         'on query information, such as dialect prefixes. If no prefixes are '
+         'found, it will default to Legacy SQL.'),
         flag_values=fv)
     flags.DEFINE_string(
         'time_partitioning_type',
@@ -3862,19 +3892,19 @@ class _Make(BigqueryCmd):
         flag_values=fv)
     flags.DEFINE_enum(
         'renewal_plan',
-        None, [
+        None,
+        [
             'FLEX',
             'MONTHLY',
             'ANNUAL',
-            'NONE',
-        ], 'The plan this capacity commitment is converted to after committed '
+        ],
+        'The plan this capacity commitment is converted to after committed '
         'period ends. Options include:'
         '\n NONE'
         '\n FLEX'
         '\n MONTHLY'
         '\n ANNUAL'
-        '\n NONE can only be used in conjunction with --edition, '
-        '\n while FLEX and MONTHLY cannot be used together with --edition.',
+        ,
         flag_values=fv)
     flags.DEFINE_integer(
         'slots',
@@ -3942,7 +3972,7 @@ class _Make(BigqueryCmd):
         flag_values=fv)
     flags.DEFINE_enum(
         'job_type',
-        None, ['QUERY', 'PIPELINE', 'ML_EXTERNAL', 'BACKGROUND'],
+        None, ['QUERY', 'PIPELINE', 'ML_EXTERNAL', 'BACKGROUND', 'SPARK'],
         'Type of jobs to create reservation assignment for. Options include:'
         '\n QUERY'
         '\n PIPELINE'
@@ -3957,7 +3987,13 @@ class _Make(BigqueryCmd):
         'from other reservations.'
         '\n BACKGROUND'
         '\n BigQuery CDC background merge will use BACKGROUND reservations to '
-        'execute if created.',
+        'execute if created.'
+        '\n SPARK'
+        '\n BigQuery Spark jobs that use services external to BQ for executing '
+        'SPARK procedure job. Slots used by these jobs are not preemptible, '
+        'i.e., they are not available for other jobs running in the '
+        'reservation. These jobs will not utilize idle slots from other '
+        'reservations.',
         flag_values=fv)
     flags.DEFINE_enum(
         'priority',
@@ -3995,17 +4031,6 @@ class _Make(BigqueryCmd):
         None,
         'Project/folder/organization ID, to which the reservation is assigned. '
         'Used in conjunction with --reservation_assignment.',
-        flag_values=fv)
-    flags.DEFINE_enum(
-        'edition',
-        None, ['BASIC', 'ENTERPRISE', 'MISSION_CRITICAL'],
-        'Type of editions for the reservation or capacity commitment. '
-        'Options include:'
-        '\n BASIC'
-        '\n ENTERPRISE'
-        '\n MISSION_CRITICAL'
-        '\n Used in conjunction with --reservation or --capacity_commitment.'
-        '\n BASIC cannot be used together with --capacity_commitment.',
         flag_values=fv)
     flags.DEFINE_boolean(
         'connection', None, 'Create a connection.', flag_values=fv)
@@ -4186,7 +4211,6 @@ class _Make(BigqueryCmd):
             reference=reference,
             slots=self.slots,
             ignore_idle_slots=ignore_idle_arg,
-            edition=self.edition,
             target_job_concurrency=concurrency,
             enable_queuing_and_priorities=self.enable_queuing_and_priorities,
             multi_region_auxiliary=self.multi_region_auxiliary,
@@ -4205,7 +4229,6 @@ class _Make(BigqueryCmd):
       try:
         object_info = client.CreateCapacityCommitment(
             reference,
-            self.edition,
             self.slots,
             self.plan,
             self.renewal_plan,
@@ -4346,6 +4369,8 @@ class _Make(BigqueryCmd):
             created_connection, flag_format=FLAGS.format)
     elif self.d or not identifier:
       reference = client.GetDatasetReference(identifier)
+      if reference.datasetId and identifier:
+        ValidateDatasetName(reference.datasetId)
     else:
       reference = client.GetReference(identifier)
       _Typecheck(reference, (DatasetReference, TableReference),
@@ -4446,6 +4471,7 @@ class _Make(BigqueryCmd):
             self.preserve_ascii_control_characters,
             self.reference_file_schema_uri,
         )
+
 
       view_udf_resources = None
       if self.view_udf_resource:
@@ -5053,9 +5079,7 @@ class _Update(BigqueryCmd):
         'Specifies a table definition to use to update an external table. '
         'The value can be either an inline table definition or a path to a '
         'file containing a JSON table definition.'
-        'The format of inline definition is "schema@format=uri@connection". '
-        'Note using connection is an experiment feature and is still under '
-        'development.',
+        'The format of inline definition is "schema@format=uri@connection". ',
         flag_values=fv)
     flags.DEFINE_enum(
         'metadata_cache_mode',
@@ -5080,8 +5104,10 @@ class _Update(BigqueryCmd):
     flags.DEFINE_boolean(
         'use_legacy_sql',
         None,
-        ('Whether to use Legacy SQL for the view. If not set, the default '
-         'behavior is true.'),
+        ('The choice of using Legacy SQL for the query is optional. If not '
+         'specified, the server will automatically determine the dialect based '
+         'on query information, such as dialect prefixes. If no prefixes are '
+         'found, it will default to Legacy SQL.'),
         flag_values=fv)
     flags.DEFINE_string(
         'time_partitioning_type',
@@ -5792,12 +5818,13 @@ class _Show(BigqueryCmd):
         flag_values=fv)
     flags.DEFINE_enum(
         'job_type',
-        None, ['QUERY', 'PIPELINE', 'ML_EXTERNAL', 'BACKGROUND'],
+        None, ['QUERY', 'PIPELINE', 'ML_EXTERNAL', 'BACKGROUND', 'SPARK'],
         'Type of jobs to search reservation assignment for. Options include:'
         '\n QUERY'
         '\n PIPELINE'
         '\n ML_EXTERNAL'
         '\n BACKGROUND'
+        '\n SPARK'
         '\n Used in conjunction with --reservation_assignment.',
         flag_values=fv)
     flags.DEFINE_enum(
@@ -6263,6 +6290,14 @@ class _Insert(BigqueryCmd):
         'instance table, using the schema of the base template table.',
         short_name='x',
         flag_values=fv)
+    flags.DEFINE_string(
+        'insert_id',
+        None,
+        'Used to ensure repeat executions do not add unintended data. '
+        'A present insert_id value will be appended to the row number of '
+        'each row to be inserted and used as the insertId field for the row. '
+        'Internally the insertId field is used for deduping of inserted rows.',
+        flag_values=fv)
     self._ProcessCommandRc(fv)
 
   def RunWithArgs(self, identifier='', filename=None):
@@ -6288,21 +6323,24 @@ class _Insert(BigqueryCmd):
             json_file,
             skip_invalid_rows=self.skip_invalid_rows,
             ignore_unknown_values=self.ignore_unknown_values,
-            template_suffix=self.template_suffix)
+            template_suffix=self.template_suffix,
+            insert_id=self.insert_id)
     else:
       return self._DoInsert(
           identifier,
           sys.stdin,
           skip_invalid_rows=self.skip_invalid_rows,
           ignore_unknown_values=self.ignore_unknown_values,
-          template_suffix=self.template_suffix)
+          template_suffix=self.template_suffix,
+          insert_id=self.insert_id)
 
   def _DoInsert(self,
                 identifier,
                 json_file,
                 skip_invalid_rows=None,
                 ignore_unknown_values=None,
-                template_suffix=None):
+                template_suffix=None,
+                insert_id=None):
     """Insert the contents of the file into a table."""
     client = Client.Get()
     reference = client.GetReference(identifier)
@@ -6326,7 +6364,10 @@ class _Insert(BigqueryCmd):
     lineno = 1
     for line in json_file:
       try:
-        batch.append(bigquery_client.JsonToInsertEntry(None, line))
+        unique_insert_id = None
+        if insert_id is not None:
+          unique_insert_id = insert_id + '_' + str(lineno)
+        batch.append(bigquery_client.JsonToInsertEntry(unique_insert_id, line))
         lineno += 1
       except bigquery_client.BigqueryClientError as e:
         raise app.UsageError('Line %d: %s' % (lineno, str(e)))
@@ -7255,6 +7296,24 @@ def _ParseUdfResources(udf_resources):
     for uri in external_udf_resources:
       udfs.append({'resourceUri': uri})
   return udfs
+
+
+def ValidateDatasetName(dataset_name):
+  """A regex to ensure the dataset name is valid.
+
+
+   Args:
+     dataset_name: string name of the dataset to be validated.
+
+   Raises:
+     UsageError: An error occurred due to invalid dataset string.
+  """
+  is_valid = re.fullmatch(r'[a-zA-Z0-9\_]{1,1024}', dataset_name)
+  if not is_valid:
+    raise app.UsageError(
+        'Dataset name: %s is invalid, must be letters '
+        '(uppercase or lowercase), numbers, and underscores up to '
+        '1024 characters.' % dataset_name)
 
 
 def _ParseParameters(parameters):

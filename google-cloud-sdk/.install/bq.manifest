@@ -11,6 +11,8 @@ platform/bq/bq_flags.py
 platform/bq/bq_utils.py
 platform/bq/credential_loader.py
 platform/bq/discovery/httpswwwgoogleapiscom.bigquery.v2.rest.json
+platform/bq/discovery_documents/discovery_document_cache.py
+platform/bq/discovery_documents/discovery_document_loader.py
 platform/bq/discovery_next/bigquery.json
 platform/bq/discovery_next/iam-policy.json
 platform/bq/remove_pyreadline.py
@@ -50,6 +52,7 @@ platform/bq/third_party/cachetools/ttl.py
 platform/bq/third_party/certifi/__init__.py
 platform/bq/third_party/certifi/cacert.pem
 platform/bq/third_party/certifi/core.py
+platform/bq/third_party/chardet/LICENSE
 platform/bq/third_party/chardet/__init__.py
 platform/bq/third_party/chardet/big5freq.py
 platform/bq/third_party/chardet/big5prober.py
@@ -112,6 +115,7 @@ platform/bq/third_party/gflags/gflags_validators.py
 platform/bq/third_party/gflags/setup.cfg
 platform/bq/third_party/gflags/setup.py
 platform/bq/third_party/google/__init__.py
+platform/bq/third_party/google/api_core/LICENSE
 platform/bq/third_party/google/api_core/__init__.py
 platform/bq/third_party/google/api_core/client_options.py
 platform/bq/third_party/google/apputils/LICENSE
@@ -127,9 +131,11 @@ platform/bq/third_party/google/apputils/run_script_module.py
 platform/bq/third_party/google/apputils/setup_command.py
 platform/bq/third_party/google/apputils/shellutil.py
 platform/bq/third_party/google/apputils/stopwatch.py
+platform/bq/third_party/google/auth/LICENSE
 platform/bq/third_party/google/auth/__init__.py
 platform/bq/third_party/google/auth/_cloud_sdk.py
 platform/bq/third_party/google/auth/_default.py
+platform/bq/third_party/google/auth/_exponential_backoff.py
 platform/bq/third_party/google/auth/_helpers.py
 platform/bq/third_party/google/auth/_service_account_info.py
 platform/bq/third_party/google/auth/aws.py
@@ -143,6 +149,7 @@ platform/bq/third_party/google/auth/crypt/rsa.py
 platform/bq/third_party/google/auth/environment_vars.py
 platform/bq/third_party/google/auth/exceptions.py
 platform/bq/third_party/google/auth/external_account.py
+platform/bq/third_party/google/auth/external_account_authorized_user.py
 platform/bq/third_party/google/auth/identity_pool.py
 platform/bq/third_party/google/auth/impersonated_credentials.py
 platform/bq/third_party/google/auth/jwt.py
@@ -153,6 +160,7 @@ platform/bq/third_party/google/auth/transport/_mtls_helper.py
 platform/bq/third_party/google/auth/transport/mtls.py
 platform/bq/third_party/google/auth/transport/requests.py
 platform/bq/third_party/google/auth/version.py
+platform/bq/third_party/google/oauth2/LICENSE
 platform/bq/third_party/google/oauth2/__init__.py
 platform/bq/third_party/google/oauth2/_client.py
 platform/bq/third_party/google/oauth2/credentials.py
@@ -321,6 +329,7 @@ platform/bq/third_party/pyu2f/hid/windows.py
 platform/bq/third_party/pyu2f/hidtransport.py
 platform/bq/third_party/pyu2f/model.py
 platform/bq/third_party/pyu2f/u2f.py
+platform/bq/third_party/requests/LICENSE
 platform/bq/third_party/requests/__init__.py
 platform/bq/third_party/requests/__version__.py
 platform/bq/third_party/requests/_internal_utils.py
@@ -366,6 +375,7 @@ platform/bq/third_party/uritemplate/api.py
 platform/bq/third_party/uritemplate/orderedset.py
 platform/bq/third_party/uritemplate/template.py
 platform/bq/third_party/uritemplate/variable.py
+platform/bq/third_party/urllib3/LICENSE
 platform/bq/third_party/urllib3/__init__.py
 platform/bq/third_party/urllib3/_collections.py
 platform/bq/third_party/urllib3/_version.py

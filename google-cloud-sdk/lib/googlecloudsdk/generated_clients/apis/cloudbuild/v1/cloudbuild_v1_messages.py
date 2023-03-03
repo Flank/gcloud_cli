@@ -466,7 +466,7 @@ class Build(_messages.Message):
     timeout: Amount of time that this build should be allowed to run, to
       second granularity. If this amount of time elapses, work on the build
       will cease and the build status will be `TIMEOUT`. `timeout` starts
-      ticking from `startTime`. Default time is ten minutes.
+      ticking from `startTime`. Default time is 60 minutes.
     timing: Output only. Stores timing information for phases of the build.
       Valid keys are: * BUILD: time to execute all build steps. * PUSH: time
       to push all artifacts including docker images and non docker artifacts.
@@ -661,7 +661,7 @@ class BuildOptions(_messages.Message):
       operating system and build utilities. Also note that this is the minimum
       disk size that will be allocated for the build -- the build may run with
       a larger disk than requested. At present, the maximum disk size is
-      1000GB; builds that request more than the maximum are rejected with an
+      2000GB; builds that request more than the maximum are rejected with an
       error.
     dockerDaemon: Optional. Option to specify how (or if) a Docker daemon is
       provided for the build.
@@ -1430,8 +1430,8 @@ class CloudbuildProjectsGithubEnterpriseConfigsDeleteRequest(_messages.Message):
   Fields:
     configId: Unique identifier of the `GitHubEnterpriseConfig`
     name: This field should contain the name of the enterprise config
-      resource. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource. For example: "projects/{$project_id}/locations/{$location_id}/
+      githubEnterpriseConfigs/{$config_id}"
     projectId: ID of the project
   """
 
@@ -1445,8 +1445,8 @@ class CloudbuildProjectsGithubEnterpriseConfigsGetAppRequest(_messages.Message):
 
   Fields:
     enterpriseConfigResource: Required. The name of the enterprise config
-      resource associated with the GitHub App. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource associated with the GitHub App. For example: "projects/{$projec
+      t_id}/locations/{location_id}/githubEnterpriseConfigs/{$config_id}"
   """
 
   enterpriseConfigResource = _messages.StringField(1, required=True)
@@ -1458,8 +1458,8 @@ class CloudbuildProjectsGithubEnterpriseConfigsGetRequest(_messages.Message):
   Fields:
     configId: Unique identifier of the `GitHubEnterpriseConfig`
     name: This field should contain the name of the enterprise config
-      resource. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource. For example: "projects/{$project_id}/locations/{$location_id}/
+      githubEnterpriseConfigs/{$config_id}"
     projectId: ID of the project
   """
 
@@ -1488,7 +1488,8 @@ class CloudbuildProjectsGithubEnterpriseConfigsPatchRequest(_messages.Message):
     gitHubEnterpriseConfig: A GitHubEnterpriseConfig resource to be passed as
       the request body.
     name: Optional. The full resource name for the GitHubEnterpriseConfig For
-      example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      example: "projects/{$project_id}/locations/{$location_id}/githubEnterpri
+      seConfigs/{$config_id}"
     updateMask: Update mask for the resource. If this is set, the server will
       only update the fields specified in the field mask. Otherwise, a full
       update of the mutable resource fields will be performed.
@@ -2008,8 +2009,8 @@ class CloudbuildProjectsLocationsGithubEnterpriseConfigsDeleteRequest(_messages.
   Fields:
     configId: Unique identifier of the `GitHubEnterpriseConfig`
     name: This field should contain the name of the enterprise config
-      resource. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource. For example: "projects/{$project_id}/locations/{$location_id}/
+      githubEnterpriseConfigs/{$config_id}"
     projectId: ID of the project
   """
 
@@ -2024,8 +2025,8 @@ class CloudbuildProjectsLocationsGithubEnterpriseConfigsGetAppRequest(_messages.
 
   Fields:
     enterpriseConfigResource: Required. The name of the enterprise config
-      resource associated with the GitHub App. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource associated with the GitHub App. For example: "projects/{$projec
+      t_id}/locations/{location_id}/githubEnterpriseConfigs/{$config_id}"
   """
 
   enterpriseConfigResource = _messages.StringField(1, required=True)
@@ -2037,8 +2038,8 @@ class CloudbuildProjectsLocationsGithubEnterpriseConfigsGetRequest(_messages.Mes
   Fields:
     configId: Unique identifier of the `GitHubEnterpriseConfig`
     name: This field should contain the name of the enterprise config
-      resource. For example:
-      "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      resource. For example: "projects/{$project_id}/locations/{$location_id}/
+      githubEnterpriseConfigs/{$config_id}"
     projectId: ID of the project
   """
 
@@ -2067,7 +2068,8 @@ class CloudbuildProjectsLocationsGithubEnterpriseConfigsPatchRequest(_messages.M
     gitHubEnterpriseConfig: A GitHubEnterpriseConfig resource to be passed as
       the request body.
     name: Optional. The full resource name for the GitHubEnterpriseConfig For
-      example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      example: "projects/{$project_id}/locations/{$location_id}/githubEnterpri
+      seConfigs/{$config_id}"
     updateMask: Update mask for the resource. If this is set, the server will
       only update the fields specified in the field mask. Otherwise, a full
       update of the mutable resource fields will be performed.
@@ -2306,12 +2308,16 @@ class CloudbuildProjectsLocationsTriggersPatchRequest(_messages.Message):
       `projects/{project}/locations/{location}/triggers/{trigger}`, where
       {trigger} is a unique identifier generated by the service.
     triggerId: Required. ID of the `BuildTrigger` to update.
+    updateMask: Update mask for the resource. If this is set, the server will
+      only update the fields specified in the field mask. Otherwise, a full
+      update of the mutable resource fields will be performed.
   """
 
   buildTrigger = _messages.MessageField('BuildTrigger', 1)
   projectId = _messages.StringField(2)
   resourceName = _messages.StringField(3, required=True)
   triggerId = _messages.StringField(4)
+  updateMask = _messages.StringField(5)
 
 
 class CloudbuildProjectsLocationsTriggersRunRequest(_messages.Message):
@@ -2509,11 +2515,15 @@ class CloudbuildProjectsTriggersPatchRequest(_messages.Message):
     buildTrigger: A BuildTrigger resource to be passed as the request body.
     projectId: Required. ID of the project that owns the trigger.
     triggerId: Required. ID of the `BuildTrigger` to update.
+    updateMask: Update mask for the resource. If this is set, the server will
+      only update the fields specified in the field mask. Otherwise, a full
+      update of the mutable resource fields will be performed.
   """
 
   buildTrigger = _messages.MessageField('BuildTrigger', 1)
   projectId = _messages.StringField(2, required=True)
   triggerId = _messages.StringField(3, required=True)
+  updateMask = _messages.StringField(4)
 
 
 class CloudbuildProjectsTriggersRunRequest(_messages.Message):
@@ -2848,6 +2858,10 @@ class GitFileSource(_messages.Message):
       `projects/{project}/githubEnterpriseConfigs/{id}`.
     path: The path of the file, with the repo root as the root of the path.
     repoType: See RepoType above.
+    repository: The fully qualified resource name of the Repo API repository.
+      Either uri or repository can be specified. If unspecified, the repo from
+      which the trigger invocation originated is assumed to be the repo from
+      which to read the specified path.
     revision: The branch, tag, arbitrary ref, or SHA version of the repo to
       use when resolving the filename (optional). This field respects the same
       syntax/resolution as described here: https://git-
@@ -2869,18 +2883,21 @@ class GitFileSource(_messages.Message):
       GITHUB: A GitHub-hosted repo not necessarily on "github.com" (i.e.
         GitHub Enterprise).
       BITBUCKET_SERVER: A Bitbucket Server-hosted repo.
+      GITLAB: A GitLab-hosted repo.
     """
     UNKNOWN = 0
     CLOUD_SOURCE_REPOSITORIES = 1
     GITHUB = 2
     BITBUCKET_SERVER = 3
+    GITLAB = 4
 
   bitbucketServerConfig = _messages.StringField(1)
   githubEnterpriseConfig = _messages.StringField(2)
   path = _messages.StringField(3)
   repoType = _messages.EnumField('RepoTypeValueValuesEnum', 4)
-  revision = _messages.StringField(5)
-  uri = _messages.StringField(6)
+  repository = _messages.StringField(5)
+  revision = _messages.StringField(6)
+  uri = _messages.StringField(7)
 
 
 class GitHubEnterpriseApp(_messages.Message):
@@ -2913,7 +2930,8 @@ class GitHubEnterpriseConfig(_messages.Message):
     displayName: Name to display for this config.
     hostUrl: The URL of the github enterprise host the configuration is for.
     name: Optional. The full resource name for the GitHubEnterpriseConfig For
-      example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      example: "projects/{$project_id}/locations/{$location_id}/githubEnterpri
+      seConfigs/{$config_id}"
     peeredNetwork: Optional. The network to be used when reaching out to the
       GitHub Enterprise server. The VPC network must be enabled for private
       service connection. This should be set if the GitHub Enterprise server
@@ -2982,7 +3000,8 @@ class GitHubEventsConfig(_messages.Message):
       config specified in the enterprise_config_resource_name field.
     enterpriseConfigResourceName: Optional. The resource name of the github
       enterprise config that should be applied to this installation. For
-      example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      example: "projects/{$project_id}/locations/{$location_id}/githubEnterpri
+      seConfigs/{$config_id}"
     installationId: The installationID that emits the GitHub event.
     name: Name of the repository. For example: The name for
       https://github.com/googlecloudplatform/cloud-builders is "cloud-
@@ -3177,6 +3196,8 @@ class GitRepoSource(_messages.Message):
       `projects/{project}/githubEnterpriseConfigs/{id}`.
     ref: The branch or tag to use. Must start with "refs/" (required).
     repoType: See RepoType below.
+    repository: The qualified resource name of the Repo API repository Either
+      uri or repository can be specified and is required.
     uri: The URI of the repo. Either uri or repository can be specified and is
       required.
   """
@@ -3191,17 +3212,20 @@ class GitRepoSource(_messages.Message):
       GITHUB: A GitHub-hosted repo not necessarily on "github.com" (i.e.
         GitHub Enterprise).
       BITBUCKET_SERVER: A Bitbucket Server-hosted repo.
+      GITLAB: A GitLab-hosted repo.
     """
     UNKNOWN = 0
     CLOUD_SOURCE_REPOSITORIES = 1
     GITHUB = 2
     BITBUCKET_SERVER = 3
+    GITLAB = 4
 
   bitbucketServerConfig = _messages.StringField(1)
   githubEnterpriseConfig = _messages.StringField(2)
   ref = _messages.StringField(3)
   repoType = _messages.EnumField('RepoTypeValueValuesEnum', 4)
-  uri = _messages.StringField(5)
+  repository = _messages.StringField(5)
+  uri = _messages.StringField(6)
 
 
 class GitSource(_messages.Message):
@@ -3243,41 +3267,70 @@ class GoogleDevtoolsCloudbuildV1BuildOptionsPoolOptionWorkerConfig(_messages.Mes
   vcpuCount = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
 
 
-class GoogleDevtoolsCloudbuildV2OperationMetadata(_messages.Message):
-  r"""Represents the metadata of the long-running operation.
+class GoogleDevtoolsCloudbuildV1NetworkConfig(_messages.Message):
+  r"""Network configuration for a PrivatePool.
+
+  Enums:
+    EgressOptionValueValuesEnum: Immutable. Define whether workloads on the
+      PrivatePool can talk to public IPs. If unset, the value NO_PUBLIC_EGRESS
+      will be used.
 
   Fields:
-    apiVersion: Output only. API version used to start the operation.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    requestedCancellation: Output only. Identifies whether the user has
-      requested cancellation of the operation. Operations that have
-      successfully been cancelled have Operation.error value with a
-      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
-    statusMessage: Output only. Human-readable status of the operation, if
-      any.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-    verb: Output only. Name of the verb executed by the operation.
+    egressOption: Immutable. Define whether workloads on the PrivatePool can
+      talk to public IPs. If unset, the value NO_PUBLIC_EGRESS will be used.
+    peeredNetwork: Required. Immutable. The network definition that the
+      workers are peered to. If this section is left empty, the workers will
+      be peered to `WorkerPool.project_id` on the service producer network.
+      Must be in the format `projects/{project}/global/networks/{network}`,
+      where `{project}` is a project number, such as `12345`, and `{network}`
+      is the name of a VPC network in the project. See [Understanding network
+      configuration options](https://cloud.google.com/build/docs/private-
+      pools/set-up-private-pool-environment)
   """
 
-  apiVersion = _messages.StringField(1)
-  createTime = _messages.StringField(2)
-  endTime = _messages.StringField(3)
-  requestedCancellation = _messages.BooleanField(4)
-  statusMessage = _messages.StringField(5)
-  target = _messages.StringField(6)
-  verb = _messages.StringField(7)
+  class EgressOptionValueValuesEnum(_messages.Enum):
+    r"""Immutable. Define whether workloads on the PrivatePool can talk to
+    public IPs. If unset, the value NO_PUBLIC_EGRESS will be used.
+
+    Values:
+      EGRESS_OPTION_UNSPECIFIED: Unspecified policy - this is treated as
+        NO_PUBLIC_EGRESS.
+      NO_PUBLIC_EGRESS: Public egress is disallowed.
+      PUBLIC_EGRESS: Public egress is allowed.
+    """
+    EGRESS_OPTION_UNSPECIFIED = 0
+    NO_PUBLIC_EGRESS = 1
+    PUBLIC_EGRESS = 2
+
+  egressOption = _messages.EnumField('EgressOptionValueValuesEnum', 1)
+  peeredNetwork = _messages.StringField(2)
 
 
-class HTTPDelivery(_messages.Message):
-  r"""HTTPDelivery is the delivery configuration for an HTTP notification.
+class GoogleDevtoolsCloudbuildV1PrivatePoolConfigWorkerConfig(_messages.Message):
+  r"""Defines the configuration to be used for creating workers in the pool.
 
   Fields:
-    uri: The URI to which JSON-containing HTTP POST requests should be sent.
+    machineType: Machine type of the workers in the pool. This field does not
+      currently support mutations.
   """
 
-  uri = _messages.StringField(1)
+  machineType = _messages.StringField(1)
+
+
+class GoogleDevtoolsCloudbuildV1ScalingConfig(_messages.Message):
+  r"""Defines the scaling configuration for the pool.
+
+  Fields:
+    maxWorkersPerZone: Max number of workers in the Private Pool per zone.
+      Cloud Build will run workloads in three zones per Private Pool for
+      reliability.
+    readyWorkers: The number of preemptible workers (pods) that will run with
+      the minimum vCPU and memory to keep resources ready for customer
+      workloads in the cluster. If unset, a value of 0 will be used.
+  """
+
+  maxWorkersPerZone = _messages.IntegerField(1)
+  readyWorkers = _messages.IntegerField(2)
 
 
 class Hash(_messages.Message):
@@ -3487,7 +3540,8 @@ class Installation(_messages.Message):
       config specified in the enterprise_config_resource_name field.
     enterpriseConfigResourceName: Optional: The resource name of the github
       enterprise config that should be applied to this installation. For
-      example: "projects/{$project_id}/githubEnterpriseConfigs/{$config_id}"
+      example: "projects/{$project_id}/locations/{$location_id}/githubEnterpri
+      seConfigs/{$config_id}"
     id: GitHub installation ID, created by GitHub.
     name: The `Installation` name with format:
       `projects/{project}/locations/{location}/installations/{installation}`,
@@ -3679,6 +3733,13 @@ class NetworkConfig(_messages.Message):
       is the name of a VPC network in the project. See [Understanding network
       configuration options](https://cloud.google.com/build/docs/private-
       pools/set-up-private-pool-environment)
+    peeredNetworkIpRange: Immutable. Subnet IP range within the peered
+      network. This is specified in CIDR notation with a slash and the subnet
+      prefix size. You can optionally specify an IP address before the subnet
+      prefix value. e.g. `192.168.0.0/29` would specify an IP range starting
+      at 192.168.0.0 with a prefix size of 29 bits. `/16` would specify a
+      prefix size of 16 bits, with an automatically determined IP within the
+      peered VPC. If unspecified, a value of `/24` will be used.
   """
 
   class EgressOptionValueValuesEnum(_messages.Enum):
@@ -3698,130 +3759,7 @@ class NetworkConfig(_messages.Message):
 
   egressOption = _messages.EnumField('EgressOptionValueValuesEnum', 1)
   peeredNetwork = _messages.StringField(2)
-
-
-class Notification(_messages.Message):
-  r"""Notification is the container which holds the data that is relevant to
-  this particular notification.
-
-  Messages:
-    StructDeliveryValue: Escape hatch for users to supply custom delivery
-      configs.
-
-  Fields:
-    filter: The filter string to use for notification filtering. Currently,
-      this is assumed to be a CEL program. See
-      https://opensource.google/projects/cel for more.
-    httpDelivery: Configuration for HTTP delivery.
-    slackDelivery: Configuration for Slack delivery.
-    smtpDelivery: Configuration for SMTP (email) delivery.
-    structDelivery: Escape hatch for users to supply custom delivery configs.
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class StructDeliveryValue(_messages.Message):
-    r"""Escape hatch for users to supply custom delivery configs.
-
-    Messages:
-      AdditionalProperty: An additional property for a StructDeliveryValue
-        object.
-
-    Fields:
-      additionalProperties: Properties of the object.
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a StructDeliveryValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A extra_types.JsonValue attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('extra_types.JsonValue', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  filter = _messages.StringField(1)
-  httpDelivery = _messages.MessageField('HTTPDelivery', 2)
-  slackDelivery = _messages.MessageField('SlackDelivery', 3)
-  smtpDelivery = _messages.MessageField('SMTPDelivery', 4)
-  structDelivery = _messages.MessageField('StructDeliveryValue', 5)
-
-
-class NotifierConfig(_messages.Message):
-  r"""NotifierConfig is the top-level configuration message.
-
-  Fields:
-    apiVersion: The API version of this configuration format.
-    kind: The type of notifier to use (e.g. SMTPNotifier).
-    metadata: Metadata for referring to/handling/deploying this notifier.
-    spec: The actual configuration for this notifier.
-  """
-
-  apiVersion = _messages.StringField(1)
-  kind = _messages.StringField(2)
-  metadata = _messages.MessageField('NotifierMetadata', 3)
-  spec = _messages.MessageField('NotifierSpec', 4)
-
-
-class NotifierMetadata(_messages.Message):
-  r"""NotifierMetadata contains the data which can be used to reference or
-  describe this notifier.
-
-  Fields:
-    name: The human-readable and user-given name for the notifier. For
-      example: "repo-merge-email-notifier".
-    notifier: The string representing the name and version of notifier to
-      deploy. Expected to be of the form of "/:". For example: "gcr.io/my-
-      project/notifiers/smtp:1.2.34".
-  """
-
-  name = _messages.StringField(1)
-  notifier = _messages.StringField(2)
-
-
-class NotifierSecret(_messages.Message):
-  r"""NotifierSecret is the container that maps a secret name (reference) to
-  its Google Cloud Secret Manager resource path.
-
-  Fields:
-    name: Name is the local name of the secret, such as the verbatim string
-      "my-smtp-password".
-    value: Value is interpreted to be a resource path for fetching the actual
-      (versioned) secret data for this secret. For example, this would be a
-      Google Cloud Secret Manager secret version resource path like:
-      "projects/my-project/secrets/my-secret/versions/latest".
-  """
-
-  name = _messages.StringField(1)
-  value = _messages.StringField(2)
-
-
-class NotifierSecretRef(_messages.Message):
-  r"""NotifierSecretRef contains the reference to a secret stored in the
-  corresponding NotifierSpec.
-
-  Fields:
-    secretRef: The value of `secret_ref` should be a `name` that is registered
-      in a `Secret` in the `secrets` list of the `Spec`.
-  """
-
-  secretRef = _messages.StringField(1)
-
-
-class NotifierSpec(_messages.Message):
-  r"""NotifierSpec is the configuration container for notifications.
-
-  Fields:
-    notification: The configuration of this particular notifier.
-    secrets: Configurations for secret resources used by this particular
-      notifier.
-  """
-
-  notification = _messages.MessageField('Notification', 1)
-  secrets = _messages.MessageField('NotifierSecret', 2, repeated=True)
+  peeredNetworkIpRange = _messages.StringField(3)
 
 
 class OAuthRegistrationURI(_messages.Message):
@@ -3988,6 +3926,83 @@ class PoolOption(_messages.Message):
 
   name = _messages.StringField(1)
   workerConfig = _messages.MessageField('GoogleDevtoolsCloudbuildV1BuildOptionsPoolOptionWorkerConfig', 2)
+
+
+class PrivatePoolConfig(_messages.Message):
+  r"""Configuration for a PrivatePool.
+
+  Enums:
+    PrivilegedModeValueValuesEnum: Immutable. Specifies the privileged mode
+      for the worker pool. Once created, this setting cannot be changed on the
+      worker pool, as we are unable to guarantee that the cluster has not been
+      altered by misuse of privileged Docker daemon.
+
+  Messages:
+    LoggingSasValue: Output only.
+
+  Fields:
+    loggingSas: Output only.
+    networkConfig: Network configuration for the pool.
+    privilegedMode: Immutable. Specifies the privileged mode for the worker
+      pool. Once created, this setting cannot be changed on the worker pool,
+      as we are unable to guarantee that the cluster has not been altered by
+      misuse of privileged Docker daemon.
+    scalingConfig: Configuration options for worker pool.
+    securityConfig: Security configuration for the pool.
+    workerConfig: Configuration options for individual workers.
+  """
+
+  class PrivilegedModeValueValuesEnum(_messages.Enum):
+    r"""Immutable. Specifies the privileged mode for the worker pool. Once
+    created, this setting cannot be changed on the worker pool, as we are
+    unable to guarantee that the cluster has not been altered by misuse of
+    privileged Docker daemon.
+
+    Values:
+      PRIVILEGED_MODE_UNSPECIFIED: Unspecified - this is treated as
+        NON_PRIVILEGED_ONLY.
+      NON_PRIVILEGED_ONLY: Users can only run builds using a non-privileged
+        Docker daemon. This is suitable for most cases.
+      PRIVILEGED_PERMITTED: Users are allowed to run builds using a privileged
+        Docker daemon. This setting should be used with caution, as using a
+        privileged Docker daemon introduces a security risk. A user would want
+        this if they need to run "docker-in-docker", i.e. their builds use
+        docker or docker-compose.
+    """
+    PRIVILEGED_MODE_UNSPECIFIED = 0
+    NON_PRIVILEGED_ONLY = 1
+    PRIVILEGED_PERMITTED = 2
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LoggingSasValue(_messages.Message):
+    r"""Output only.
+
+    Messages:
+      AdditionalProperty: An additional property for a LoggingSasValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LoggingSasValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LoggingSasValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  loggingSas = _messages.MessageField('LoggingSasValue', 1)
+  networkConfig = _messages.MessageField('GoogleDevtoolsCloudbuildV1NetworkConfig', 2)
+  privilegedMode = _messages.EnumField('PrivilegedModeValueValuesEnum', 3)
+  scalingConfig = _messages.MessageField('GoogleDevtoolsCloudbuildV1ScalingConfig', 4)
+  securityConfig = _messages.MessageField('SecurityConfig', 5)
+  workerConfig = _messages.MessageField('GoogleDevtoolsCloudbuildV1PrivatePoolConfigWorkerConfig', 6)
 
 
 class PrivatePoolV1Config(_messages.Message):
@@ -4254,10 +4269,12 @@ class RepositoryEventConfig(_messages.Message):
         GITHUB.
       GITHUB: The SCM repo is GITHUB.
       GITHUB_ENTERPRISE: The SCM repo is GITHUB Enterprise.
+      GITLAB_ENTERPRISE: The SCM repo is GITLAB Enterprise.
     """
     REPOSITORY_TYPE_UNSPECIFIED = 0
     GITHUB = 1
     GITHUB_ENTERPRISE = 2
+    GITLAB_ENTERPRISE = 3
 
   pullRequest = _messages.MessageField('PullRequestFilter', 1)
   push = _messages.MessageField('PushFilter', 2)
@@ -4327,57 +4344,6 @@ class RunBuildTriggerRequest(_messages.Message):
   projectId = _messages.StringField(1)
   source = _messages.MessageField('RepoSource', 2)
   triggerId = _messages.StringField(3)
-
-
-class RunWorkflowCustomOperationMetadata(_messages.Message):
-  r"""Represents the custom metadata of the RunWorkflow long-running
-  operation.
-
-  Fields:
-    apiVersion: Output only. API version used to start the operation.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    pipelineRunId: Output only. ID of the pipeline run created by RunWorkflow.
-    requestedCancellation: Output only. Identifies whether the user has
-      requested cancellation of the operation. Operations that have
-      successfully been cancelled have Operation.error value with a
-      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-    verb: Output only. Name of the verb executed by the operation.
-  """
-
-  apiVersion = _messages.StringField(1)
-  createTime = _messages.StringField(2)
-  endTime = _messages.StringField(3)
-  pipelineRunId = _messages.StringField(4)
-  requestedCancellation = _messages.BooleanField(5)
-  target = _messages.StringField(6)
-  verb = _messages.StringField(7)
-
-
-class SMTPDelivery(_messages.Message):
-  r"""SMTPDelivery is the delivery configuration for an SMTP (email)
-  notification.
-
-  Fields:
-    fromAddress: This is the SMTP account/email that appears in the `From:` of
-      the email. If empty, it is assumed to be sender.
-    password: The SMTP sender's password.
-    port: The SMTP port of the server.
-    recipientAddresses: This is the list of addresses to which we send the
-      email (i.e. in the `To:` of the email).
-    senderAddress: This is the SMTP account/email that is used to send the
-      message.
-    server: The address of the SMTP server.
-  """
-
-  fromAddress = _messages.StringField(1)
-  password = _messages.MessageField('NotifierSecretRef', 2)
-  port = _messages.StringField(3)
-  recipientAddresses = _messages.StringField(4, repeated=True)
-  senderAddress = _messages.StringField(5)
-  server = _messages.StringField(6)
 
 
 class Secret(_messages.Message):
@@ -4465,6 +4431,10 @@ class Secrets(_messages.Message):
   secretManager = _messages.MessageField('SecretManagerSecret', 2, repeated=True)
 
 
+class SecurityConfig(_messages.Message):
+  r"""Defines the security configuration for the pool."""
+
+
 class ServiceDirectoryConfig(_messages.Message):
   r"""ServiceDirectoryConfig represents Service Directory configuration for a
   SCM host connection.
@@ -4475,19 +4445,6 @@ class ServiceDirectoryConfig(_messages.Message):
   """
 
   service = _messages.StringField(1)
-
-
-class SlackDelivery(_messages.Message):
-  r"""SlackDelivery is the delivery configuration for delivering Slack
-  messages via webhooks. See Slack webhook documentation at:
-  https://api.slack.com/messaging/webhooks.
-
-  Fields:
-    webhookUri: The secret reference for the Slack webhook URI for sending
-      messages to a channel.
-  """
-
-  webhookUri = _messages.MessageField('NotifierSecretRef', 1)
 
 
 class Source(_messages.Message):
@@ -4921,7 +4878,7 @@ class WorkerConfig(_messages.Message):
   Fields:
     diskSizeGb: Size of the disk attached to the worker, in GB. See [Worker
       pool config file](https://cloud.google.com/build/docs/private-
-      pools/worker-pool-config-file-schema). Specify a value of up to 1000. If
+      pools/worker-pool-config-file-schema). Specify a value of up to 2000. If
       `0` is specified, Cloud Build will use a standard disk size.
     machineType: Machine type of a worker, such as `e2-medium`. See [Worker
       pool config file](https://cloud.google.com/build/docs/private-
@@ -4972,6 +4929,7 @@ class WorkerPool(_messages.Message):
       value of `{worker_pool}` is provided by `worker_pool_id` in
       `CreateWorkerPool` request and the value of `{location}` is determined
       by the endpoint accessed.
+    privatePoolConfig: Private Pool configuration.
     privatePoolV1Config: Legacy Private Pool configuration.
     state: Output only. `WorkerPool` state.
     uid: Output only. A unique identifier for the `WorkerPool`.
@@ -5031,10 +4989,11 @@ class WorkerPool(_messages.Message):
   etag = _messages.StringField(5)
   hybridPoolConfig = _messages.MessageField('HybridPoolConfig', 6)
   name = _messages.StringField(7)
-  privatePoolV1Config = _messages.MessageField('PrivatePoolV1Config', 8)
-  state = _messages.EnumField('StateValueValuesEnum', 9)
-  uid = _messages.StringField(10)
-  updateTime = _messages.StringField(11)
+  privatePoolConfig = _messages.MessageField('PrivatePoolConfig', 8)
+  privatePoolV1Config = _messages.MessageField('PrivatePoolV1Config', 9)
+  state = _messages.EnumField('StateValueValuesEnum', 10)
+  uid = _messages.StringField(11)
+  updateTime = _messages.StringField(12)
 
 
 encoding.AddCustomJsonFieldMapping(

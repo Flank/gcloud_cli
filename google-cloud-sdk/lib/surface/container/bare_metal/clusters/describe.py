@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.gkeonprem import bare_metal_clusters as apis
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.container.bare_metal import flags
+from googlecloudsdk.command_lib.container.bare_metal import cluster_flags as flags
 
 _EXAMPLES = """
 To describe a cluster named ``my-cluster'' managed in location ``us-west1'',
@@ -30,7 +30,6 @@ $ {command} my-cluster --location=us-west1
 """
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
   """Describe an Anthos cluster on bare metal."""
@@ -40,7 +39,7 @@ class Describe(base.DescribeCommand):
   @staticmethod
   def Args(parser):
     """Registers flags for this command."""
-    flags.AddClusterResourceArg(parser, 'to describe')
+    flags.AddClusterResourceArg(parser, verb='to describe')
 
   def Run(self, args):
     """Runs the describe command."""

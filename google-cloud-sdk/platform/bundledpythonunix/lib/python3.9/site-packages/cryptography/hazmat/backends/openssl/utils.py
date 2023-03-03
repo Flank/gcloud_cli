@@ -25,7 +25,8 @@ def _evp_pkey_derive(backend, evp_pkey, peer_public_key):
     buf = backend._ffi.new("unsigned char[]", keylen[0])
     res = backend._lib.EVP_PKEY_derive(ctx, buf, keylen)
     if res != 1:
-        raise ValueError("Null shared key derived from public/private pair.")
+        errors_with_text = backend._consume_errors_with_text()
+        raise ValueError("Error computing shared key.", errors_with_text)
 
     return backend._ffi.buffer(buf, keylen[0])[:]
 
@@ -58,8 +59,9 @@ def _check_not_prehashed(signature_algorithm):
 
 def _warn_sign_verify_deprecated():
     warnings.warn(
-        "signer and verifier have been deprecated. Please use sign "
-        "and verify instead.",
+        "signer and verifier have been deprecated since 2.1. Please use sign "
+        "and verify instead. Support for these functions will be dropped"
+        " in the next release of cryptography (37.0).",
         utils.PersistentlyDeprecated2017,
         stacklevel=3,
     )

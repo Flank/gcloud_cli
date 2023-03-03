@@ -123,8 +123,8 @@ class Register(base.CreateCommand):
       $ {command} my-cluster \
         --gke-uri=my-cluster-gke-uri
 
-   Register a GKE cluster referenced from a GKE URI, and install the Connect
-   agent using service account key file:
+    Register a GKE cluster referenced from a GKE URI, and install the Connect
+    agent using service account key file:
 
       $ {command} my-cluster \
         --gke-uri=my-cluster-gke-uri \
@@ -147,7 +147,7 @@ class Register(base.CreateCommand):
       $ {command} my-cluster \
         --gke-cluster=my-cluster-region-or-zone/my-cluster \
         --install-connect-agent \
-        --version=gkeconnect_20190802_02_00 \
+        --version=20220819-00-00 \
         --service-account-key-file=/tmp/keyfile.json
 
     Register a GKE cluster and output a manifest that can be used to install the
@@ -338,6 +338,10 @@ class Register(base.CreateCommand):
       api_adapter = gke_api_adapter.NewAPIAdapter('v1')
 
     location = 'global'
+
+    # if we are using alpha + autopush or using an allowlisted project, use the
+    # final regional behavior that assumes membership region based on cluster
+    # region.
     if resources.UseRegionalMemberships(
         self.ReleaseTrack()) or (resources.InProdRegionalAllowlist(
             project, self.ReleaseTrack())):
@@ -347,6 +351,11 @@ class Register(base.CreateCommand):
         location = args.location
       elif hub_util.LocationFromGKEArgs(args):
         location = hub_util.LocationFromGKEArgs(args)
+    # if we are using alpha + staging or alpha + prod, use the --location flag
+    # if provided, else still default to global
+    elif self.ReleaseTrack() is base.ReleaseTrack.ALPHA:
+      if args.location:
+        location = args.location
 
     # Register GKE cluster with simple Add-to-Hub API call. Connect agent will
     # not get installed. And Kubernetes Client is not needed.
@@ -578,7 +587,7 @@ class Register(base.CreateCommand):
           exclusivity_util.DeleteMembershipResources(kube_client)
         raise
       log.status.Print(
-          'Finished registering the cluster [{}] with the Fleet.'.format(
+          'Finished registering the cluster [{}] with the fleet.'.format(
               args.MEMBERSHIP_NAME))
       return obj
 

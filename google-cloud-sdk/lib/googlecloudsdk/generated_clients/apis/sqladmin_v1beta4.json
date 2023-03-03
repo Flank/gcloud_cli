@@ -6,7 +6,7 @@
   "canonicalName": "SQL Admin",
   "version": "v1beta4",
   "revision": "0",
-  "title": "Cloud SQL Admin API",
+  "title": "sqladmin API (prod)",
   "description": "API for Cloud SQL database instance management",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -404,6 +404,7 @@
               }
             },
             "striped": {
+              "description": "Whether or not the backup set being restored is striped. Applies only to Cloud SQL for SQL Server.",
               "type": "boolean"
             }
           }
@@ -505,12 +506,16 @@
           "type": "boolean"
         },
         "bakExportOptions": {
+          "description": "Options for exporting data as BAK files.",
+          "description": "Options for exporting BAK files (SQL Server-only)",
           "type": "object",
           "properties": {
             "striped": {
+              "description": "Whether or not the export should be striped.",
               "type": "boolean"
             },
             "stripeCount": {
+              "description": "Option for specifying how many stripes to use for the export. If blank, and the value of the striped field is true, the number of stripes is automatically chosen.",
               "type": "integer",
               "format": "int32"
             }
@@ -872,6 +877,8 @@
               "The database major version is MySQL 8.0 and the minor version is 28.",
               "The database major version is MySQL 8.0 and the minor version is 29.",
               "The database major version is MySQL 8.0 and the minor version is 30.",
+              "The database major version is MySQL 8.0 and the minor version is 31.",
+              "The database major version is MySQL 8.0 and the minor version is 32.",
               "The database version is SQL Server 2019 Standard.",
               "The database version is SQL Server 2019 Enterprise.",
               "The database version is SQL Server 2019 Express.",
@@ -900,6 +907,8 @@
               "MYSQL_8_0_28",
               "MYSQL_8_0_29",
               "MYSQL_8_0_30",
+              "MYSQL_8_0_31",
+              "MYSQL_8_0_32",
               "SQLSERVER_2019_STANDARD",
               "SQLSERVER_2019_ENTERPRISE",
               "SQLSERVER_2019_EXPRESS",
@@ -1198,6 +1207,8 @@
             "The database major version is MySQL 8.0 and the minor version is 28.",
             "The database major version is MySQL 8.0 and the minor version is 29.",
             "The database major version is MySQL 8.0 and the minor version is 30.",
+            "The database major version is MySQL 8.0 and the minor version is 31.",
+            "The database major version is MySQL 8.0 and the minor version is 32.",
             "The database version is SQL Server 2019 Standard.",
             "The database version is SQL Server 2019 Enterprise.",
             "The database version is SQL Server 2019 Express.",
@@ -1226,6 +1237,8 @@
             "MYSQL_8_0_28",
             "MYSQL_8_0_29",
             "MYSQL_8_0_30",
+            "MYSQL_8_0_31",
+            "MYSQL_8_0_32",
             "SQLSERVER_2019_STANDARD",
             "SQLSERVER_2019_ENTERPRISE",
             "SQLSERVER_2019_EXPRESS",
@@ -1429,6 +1442,8 @@
             "The database major version is MySQL 8.0 and the minor version is 28.",
             "The database major version is MySQL 8.0 and the minor version is 29.",
             "The database major version is MySQL 8.0 and the minor version is 30.",
+            "The database major version is MySQL 8.0 and the minor version is 31.",
+            "The database major version is MySQL 8.0 and the minor version is 32.",
             "The database version is SQL Server 2019 Standard.",
             "The database version is SQL Server 2019 Enterprise.",
             "The database version is SQL Server 2019 Express.",
@@ -1457,6 +1472,8 @@
             "MYSQL_8_0_28",
             "MYSQL_8_0_29",
             "MYSQL_8_0_30",
+            "MYSQL_8_0_31",
+            "MYSQL_8_0_32",
             "SQLSERVER_2019_STANDARD",
             "SQLSERVER_2019_ENTERPRISE",
             "SQLSERVER_2019_EXPRESS",
@@ -1487,6 +1504,16 @@
         },
         "maintenanceVersion": {
           "description": "The current software version on the instance.",
+          "type": "string"
+        },
+        "pscServiceAttachmentLink": {
+          "description": "Output only. The link to service attachment of PSC instance.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "dnsName": {
+          "description": "Output only. The dns name of the instance.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -1712,6 +1739,10 @@
         "timeZone": {
           "description": "Server timezone, relevant only for Cloud SQL for SQL Server.",
           "type": "string"
+        },
+        "advancedMachineFeatures": {
+          "description": "Specifies advance machine configuration for the instance relevant only for SQL Server.",
+          "$ref": "AdvancedMachineFeatures"
         }
       }
     },
@@ -1750,6 +1781,10 @@
         "enablePrivatePathForGoogleCloudServices": {
           "description": "Controls connectivity to private IP instances from Google services, such as BigQuery.",
           "type": "boolean"
+        },
+        "pscConfig": {
+          "description": "PSC settings for this instance.",
+          "$ref": "PscConfig"
         }
       }
     },
@@ -1774,6 +1809,24 @@
         "kind": {
           "description": "This is always `sql#aclEntry`.",
           "type": "string"
+        }
+      }
+    },
+    "PscConfig": {
+      "id": "PscConfig",
+      "description": "PSC settings for a Cloud SQL instance.",
+      "type": "object",
+      "properties": {
+        "pscEnabled": {
+          "description": "Whether PSC connectivity is enabled for this instance.",
+          "type": "boolean"
+        },
+        "allowedConsumerProjects": {
+          "description": "List of consumer projects that are allow-listed for PSC connections to this instance. This instance can be connected to with PSC from any network in these projects. Each consumer project in this list may be represented by a project number (numeric) or by a project id (alphanumeric).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -2013,7 +2066,7 @@
           "type": "boolean"
         },
         "passwordChangeInterval": {
-          "description": "Minimum interval after which the password can be changed. This flag is only supported for PostgresSQL.",
+          "description": "Minimum interval after which the password can be changed. This flag is only supported for PostgreSQL.",
           "type": "string",
           "format": "google-duration"
         },
@@ -2045,6 +2098,18 @@
           "description": "How often to upload generated audit files.",
           "type": "string",
           "format": "google-duration"
+        }
+      }
+    },
+    "AdvancedMachineFeatures": {
+      "id": "AdvancedMachineFeatures",
+      "description": "Specifies options for controlling advanced machine features.",
+      "type": "object",
+      "properties": {
+        "threadsPerCore": {
+          "description": "The number of threads per physical core.",
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -2734,6 +2799,41 @@
         }
       }
     },
+    "PerformDiskShrinkContext": {
+      "id": "PerformDiskShrinkContext",
+      "description": "Perform disk shrink context.",
+      "type": "object",
+      "properties": {
+        "targetSizeGb": {
+          "description": "The target disk shrink size in GigaBytes.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "SqlInstancesGetDiskShrinkConfigResponse": {
+      "id": "SqlInstancesGetDiskShrinkConfigResponse",
+      "description": "Instance get disk shrink config response.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "This is always `sql#getDiskShrinkConfig`.",
+          "type": "string"
+        },
+        "minimalTargetSizeGb": {
+          "description": "The minimum size to which a disk can be shrunk in GigaBytes.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "SqlInstancesResetReplicaSizeRequest": {
+      "id": "SqlInstancesResetReplicaSizeRequest",
+      "description": "Instance reset replica size request.",
+      "type": "object",
+      "properties": {
+      }
+    },
     "OperationsListResponse": {
       "id": "OperationsListResponse",
       "description": "Operations list response.",
@@ -2754,6 +2854,13 @@
           "description": "The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.",
           "type": "string"
         }
+      }
+    },
+    "Empty": {
+      "id": "Empty",
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "type": "object",
+      "properties": {
       }
     },
     "SslCertsInsertRequest": {
@@ -2873,6 +2980,8 @@
             "The database major version is MySQL 8.0 and the minor version is 28.",
             "The database major version is MySQL 8.0 and the minor version is 29.",
             "The database major version is MySQL 8.0 and the minor version is 30.",
+            "The database major version is MySQL 8.0 and the minor version is 31.",
+            "The database major version is MySQL 8.0 and the minor version is 32.",
             "The database version is SQL Server 2019 Standard.",
             "The database version is SQL Server 2019 Enterprise.",
             "The database version is SQL Server 2019 Express.",
@@ -2901,6 +3010,8 @@
             "MYSQL_8_0_28",
             "MYSQL_8_0_29",
             "MYSQL_8_0_30",
+            "MYSQL_8_0_31",
+            "MYSQL_8_0_32",
             "SQLSERVER_2019_STANDARD",
             "SQLSERVER_2019_ENTERPRISE",
             "SQLSERVER_2019_EXPRESS",
@@ -3168,7 +3279,51 @@
           }
         },
         "nextPageToken": {
-          "description": "An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.",
+          "description": "Unused.",
+          "type": "string"
+        }
+      }
+    },
+    "OperationMetadata": {
+      "id": "OperationMetadata",
+      "description": "Represents the metadata of the long-running operation.",
+      "type": "object",
+      "properties": {
+        "createTime": {
+          "description": "Output only. The time the operation was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "target": {
+          "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "verb": {
+          "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "statusDetail": {
+          "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "cancelRequested": {
+          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
+          "type": "boolean"
+        },
+        "apiVersion": {
+          "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
           "type": "string"
         }
       }
@@ -4598,6 +4753,108 @@
                 "https://www.googleapis.com/auth/sqlservice.admin"
               ],
               "description": "Start External primary instance migration."
+            },
+            "performDiskShrink": {
+              "id": "sql.projects.instances.performDiskShrink",
+              "path": "sql/v1beta4/projects/{project}/instances/{instance}/performDiskShrink",
+              "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}/performDiskShrink",
+              "httpMethod": "POST",
+              "parameters": {
+                "project": {
+                  "description": "Project ID of the project that contains the instance.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "instance": {
+                  "description": "Cloud SQL instance ID. This does not include the project ID.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "project",
+                "instance"
+              ],
+              "request": {
+                "$ref": "PerformDiskShrinkContext"
+              },
+              "response": {
+                "$ref": "Operation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/sqlservice.admin"
+              ],
+              "description": "Perform Disk Shrink on primary instance."
+            },
+            "getDiskShrinkConfig": {
+              "id": "sql.projects.instances.getDiskShrinkConfig",
+              "path": "sql/v1beta4/projects/{project}/instances/{instance}/getDiskShrinkConfig",
+              "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}/getDiskShrinkConfig",
+              "httpMethod": "GET",
+              "parameters": {
+                "project": {
+                  "description": "Project ID of the project that contains the instance.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "instance": {
+                  "description": "Cloud SQL instance ID. This does not include the project ID.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "project",
+                "instance"
+              ],
+              "response": {
+                "$ref": "SqlInstancesGetDiskShrinkConfigResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/sqlservice.admin"
+              ],
+              "description": "Get Disk Shrink Config for a given instance."
+            },
+            "resetReplicaSize": {
+              "id": "sql.projects.instances.resetReplicaSize",
+              "path": "sql/v1beta4/projects/{project}/instances/{instance}/resetReplicaSize",
+              "flatPath": "sql/v1beta4/projects/{project}/instances/{instance}/resetReplicaSize",
+              "httpMethod": "POST",
+              "parameters": {
+                "project": {
+                  "description": "ID of the project that contains the read replica.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "instance": {
+                  "description": "Cloud SQL read replica instance name.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "project",
+                "instance"
+              ],
+              "request": {
+                "$ref": "SqlInstancesResetReplicaSizeRequest"
+              },
+              "response": {
+                "$ref": "Operation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/sqlservice.admin"
+              ],
+              "description": "Reset Replica Size to primary instance disk size."
             }
           }
         }
@@ -4677,6 +4934,38 @@
             "https://www.googleapis.com/auth/sqlservice.admin"
           ],
           "description": "Lists all instance operations that have been performed on the given Cloud SQL instance in the reverse chronological order of the start time."
+        },
+        "cancel": {
+          "id": "sql.operations.cancel",
+          "path": "sql/v1beta4/projects/{project}/operations/{operation}/cancel",
+          "flatPath": "sql/v1beta4/projects/{project}/operations/{operation}/cancel",
+          "httpMethod": "POST",
+          "parameters": {
+            "project": {
+              "description": "Project ID of the project that contains the instance.",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            },
+            "operation": {
+              "description": "Instance operation ID.",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+            "project",
+            "operation"
+          ],
+          "response": {
+            "$ref": "Empty"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/sqlservice.admin"
+          ],
+          "description": "Cancels an instance operation that has been performed on an instance."
         }
       }
     },
@@ -4849,9 +5138,14 @@
               "type": "string"
             },
             "name": {
-              "description": "User of the instance. If the database user has a host, this is specified as {username}@{host} else as {username}.",
+              "description": "User of the instance.",
               "location": "path",
               "required": true,
+              "type": "string"
+            },
+            "host": {
+              "description": "Host of a user of the instance.",
+              "location": "query",
               "type": "string"
             }
           },

@@ -41,8 +41,7 @@ class _BaseRun(object):
   """Invoke a test in Firebase Test Lab for Android and view test results."""
 
   detailed_help = {
-      'DESCRIPTION':
-          """
+      'DESCRIPTION': """
           *{command}* invokes and monitors tests in Firebase Test Lab for
           Android.
 
@@ -72,8 +71,7 @@ class _BaseRun(object):
           and/or within an argument file. Run *$ gcloud topic arg-files* for
           more information about argument files.
           """,
-      'EXAMPLES':
-          """
+      'EXAMPLES': """
           To invoke a robo test lasting 100 seconds against the default device
           environment, run:
 
@@ -115,6 +113,11 @@ class _BaseRun(object):
           The above command will generate a test matrix with a total of 300 test
           executions, but only the subset of executions with valid dimension
           combinations will actually run your tests.
+
+          To help you identify and locate your test matrix in the Firebase
+          console, run:
+
+            $ {command} --app=APP_APK --client-details=matrixLabel="Example matrix label"
 
           Controlling Results Storage
 
@@ -180,7 +183,7 @@ class _BaseRun(object):
     if args.async_ and not args.IsSpecified('format'):
       args.format = """
           value(format(
-            'Final test results will be available at [{0}].', [])
+            'Final test results will be available at [ {0} ].', [])
           )
       """
     log.status.Print('\nHave questions, feedback, or issues? Get support by '
@@ -234,7 +237,7 @@ class _BaseRun(object):
       log.status.Print('')
       if args.async_:
         return url
-      log.status.Print('Test results will be streamed to [{0}].'.format(url))
+      log.status.Print('Test results will be streamed to [ {0} ].'.format(url))
 
       # If we have exactly one testExecution, show detailed progress info.
       if len(supported_executions) == 1 and args.num_flaky_test_attempts == 0:
@@ -242,7 +245,7 @@ class _BaseRun(object):
       else:
         monitor.MonitorTestMatrixProgress()
 
-    log.status.Print('\nMore details are available at [{0}].'.format(url))
+    log.status.Print('\nMore details are available at [ {0} ].'.format(url))
     # Fetch the per-dimension test outcomes list, and also the "rolled-up"
     # matrix outcome from the Tool Results service.
     summary_fetcher = results_summary.ToolResultsSummaryFetcher(

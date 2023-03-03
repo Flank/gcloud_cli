@@ -5,7 +5,7 @@
   "name": "firestore",
   "canonicalName": "Firestore",
   "version": "v1beta1",
-  "revision": "20220926",
+  "revision": "20230221",
   "title": "Cloud Firestore API",
   "description": "Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ",
   "ownerDomain": "google.com",
@@ -448,7 +448,7 @@
           }
         },
         "nextPageToken": {
-          "description": "The next page token.",
+          "description": "A token to retrieve the next page of documents. If this field is omitted, there are no subsequent pages.",
           "type": "string"
         }
       }
@@ -907,11 +907,13 @@
           "type": "string",
           "enumDescriptions": [
             "Unspecified. This value must not be used.",
-            "Documents are required to satisfy all of the combined filters."
+            "Documents are required to satisfy all of the combined filters.",
+            "Documents are required to satisfy at least one of the combined filters."
           ],
           "enum": [
             "OPERATOR_UNSPECIFIED",
-            "AND"
+            "AND",
+            "OR"
           ]
         },
         "filters": {
@@ -2070,24 +2072,24 @@
                       "type": "string"
                     },
                     "collectionId": {
-                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`.",
+                      "description": "Optional. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`. This is optional, and when not provided, Firestore will list documents from all collections under the provided `parent`.",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "pageSize": {
-                      "description": "The maximum number of documents to return.",
+                      "description": "Optional. The maximum number of documents to return in a single response. Firestore may return fewer than this value.",
                       "location": "query",
                       "type": "integer",
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "The `next_page_token` value returned from a previous List request, if any.",
+                      "description": "Optional. A page token, received from a previous `ListDocuments` response. Provide this to retrieve the subsequent page. When paginating, all other parameters (with the exception of `page_size`) must match the values set in the request that generated the page token.",
                       "location": "query",
                       "type": "string"
                     },
                     "orderBy": {
-                      "description": "The order to sort results by. For example: `priority desc, name`.",
+                      "description": "Optional. The optional ordering of the documents to return. For example: `priority desc, __name__ desc`. This mirrors the `ORDER BY` used in Firestore queries but in a string representation. When absent, documents are ordered based on `__name__ ASC`.",
                       "location": "query",
                       "type": "string"
                     },
@@ -2098,19 +2100,19 @@
                       "type": "string"
                     },
                     "transaction": {
-                      "description": "Reads documents in a transaction.",
+                      "description": "Perform the read as part of an already active transaction.",
                       "location": "query",
                       "type": "string",
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads documents as they were at the given time. This may not be older than 270 seconds.",
+                      "description": "Perform the read at the provided time. This may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
                     },
                     "showMissing": {
-                      "description": "If the list should show missing documents. A missing document is a document that does not exist but has sub-documents. These documents will be returned with a key but will not have fields, Document.create_time, or Document.update_time set. Requests with `show_missing` may not specify `where` or `order_by`.",
+                      "description": "If the list should show missing documents. A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, `create_time`, or `update_time` set. Requests with `show_missing` may not specify `where` or `order_by`.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -2142,24 +2144,24 @@
                       "type": "string"
                     },
                     "collectionId": {
-                      "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`.",
+                      "description": "Optional. The collection ID, relative to `parent`, to list. For example: `chatrooms` or `messages`. This is optional, and when not provided, Firestore will list documents from all collections under the provided `parent`.",
                       "location": "path",
                       "required": true,
                       "type": "string"
                     },
                     "pageSize": {
-                      "description": "The maximum number of documents to return.",
+                      "description": "Optional. The maximum number of documents to return in a single response. Firestore may return fewer than this value.",
                       "location": "query",
                       "type": "integer",
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "The `next_page_token` value returned from a previous List request, if any.",
+                      "description": "Optional. A page token, received from a previous `ListDocuments` response. Provide this to retrieve the subsequent page. When paginating, all other parameters (with the exception of `page_size`) must match the values set in the request that generated the page token.",
                       "location": "query",
                       "type": "string"
                     },
                     "orderBy": {
-                      "description": "The order to sort results by. For example: `priority desc, name`.",
+                      "description": "Optional. The optional ordering of the documents to return. For example: `priority desc, __name__ desc`. This mirrors the `ORDER BY` used in Firestore queries but in a string representation. When absent, documents are ordered based on `__name__ ASC`.",
                       "location": "query",
                       "type": "string"
                     },
@@ -2170,19 +2172,19 @@
                       "type": "string"
                     },
                     "transaction": {
-                      "description": "Reads documents in a transaction.",
+                      "description": "Perform the read as part of an already active transaction.",
                       "location": "query",
                       "type": "string",
                       "format": "byte"
                     },
                     "readTime": {
-                      "description": "Reads documents as they were at the given time. This may not be older than 270 seconds.",
+                      "description": "Perform the read at the provided time. This may not be older than 270 seconds.",
                       "location": "query",
                       "type": "string",
                       "format": "google-datetime"
                     },
                     "showMissing": {
-                      "description": "If the list should show missing documents. A missing document is a document that does not exist but has sub-documents. These documents will be returned with a key but will not have fields, Document.create_time, or Document.update_time set. Requests with `show_missing` may not specify `where` or `order_by`.",
+                      "description": "If the list should show missing documents. A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, `create_time`, or `update_time` set. Requests with `show_missing` may not specify `where` or `order_by`.",
                       "location": "query",
                       "type": "boolean"
                     }
@@ -2606,7 +2608,7 @@
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/datastore"
                   ],
-                  "description": "Streams batches of document updates and deletes, in order."
+                  "description": "Streams batches of document updates and deletes, in order. This method is only available via the gRPC API (not REST)."
                 },
                 "listen": {
                   "id": "firestore.projects.databases.documents.listen",
@@ -2635,7 +2637,7 @@
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/datastore"
                   ],
-                  "description": "Listens to changes."
+                  "description": "Listens to changes. This method is only available via the gRPC API (not REST)."
                 },
                 "listCollectionIds": {
                   "id": "firestore.projects.databases.documents.listCollectionIds",

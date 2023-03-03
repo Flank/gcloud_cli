@@ -38,7 +38,6 @@ from googlecloudsdk.command_lib.compute.managed_instance_groups import auto_heal
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import properties
 
-
 # API allows up to 58 characters but asked us to send only 54 (unless user
 # explicitly asks us for more).
 _MAX_LEN_FOR_DEDUCED_BASE_INSTANCE_NAME = 54
@@ -47,23 +46,18 @@ _MAX_LEN_FOR_DEDUCED_BASE_INSTANCE_NAME = 54
 REGIONAL_FLAGS = ['instance_redistribution_type', 'target_distribution_shape']
 
 
-def _AddInstanceGroupManagerArgs(parser):
+def _AddInstanceGroupManagerArgs(parser, region_instance_template_enabled):
   """Adds args."""
   parser.add_argument(
-      '--template',
-      required=True,
-      help=('Specifies the instance template to use when creating new '
-            'instances.'))
-  parser.add_argument(
       '--base-instance-name',
-      help=('The base name to use for the Compute Engine instances that will '
+      help=('Base name to use for the Compute Engine instances that will '
             'be created with the managed instance group. If not provided '
             'base instance name will be the prefix of instance group name.'))
   parser.add_argument(
       '--size',
       required=True,
       type=arg_parsers.BoundedInt(0, sys.maxsize, unlimited=True),
-      help='The initial number of instances you want in this group.')
+      help='Initial number of instances you want in this group.')
   instance_groups_flags.AddDescriptionFlag(parser)
   parser.add_argument(
       '--target-pool',
@@ -71,6 +65,17 @@ def _AddInstanceGroupManagerArgs(parser):
       metavar='TARGET_POOL',
       help=('Specifies any target pools you want the instances of this '
             'managed instance group to be part of.'))
+  if region_instance_template_enabled:
+    managed_flags.INSTANCE_TEMPLATE_ARG.AddArgument(parser)
+  else:
+    parser.add_argument(
+        '--template',
+        required=True,
+        help=(
+            'Specifies the instance template to use when creating new '
+            'instances.'
+        ),
+    )
 
 
 def _IsZonalGroup(ref):
@@ -109,11 +114,13 @@ class CreateGA(base.CreateCommand):
   """Create Compute Engine managed instance groups."""
 
   support_any_single_zone = False
+  support_update_policy_min_ready_flag = False
+  region_instance_template_enabled = False
 
   @classmethod
   def Args(cls, parser):
     parser.display_info.AddFormat(managed_flags.DEFAULT_CREATE_OR_LIST_FORMAT)
-    _AddInstanceGroupManagerArgs(parser)
+    _AddInstanceGroupManagerArgs(parser, cls.region_instance_template_enabled)
     auto_healing_utils.AddAutohealingArgs(parser)
     igm_arg = instance_groups_flags.GetInstanceGroupManagerArg(zones_flag=True)
     igm_arg.AddArgument(parser, operation_type='create')
@@ -122,6 +129,9 @@ class CreateGA(base.CreateCommand):
     managed_flags.AddMigInstanceRedistributionTypeFlag(parser)
     managed_flags.AddMigDistributionPolicyTargetShapeFlag(
         parser, cls.support_any_single_zone)
+    managed_flags.AddMigListManagedInstancesResultsFlag(parser)
+    managed_flags.AddMigUpdatePolicyFlags(
+        parser, support_min_ready_flag=cls.support_update_policy_min_ready_flag)
     # When adding RMIG-specific flag, update REGIONAL_FLAGS constant.
 
   def _HandleStatefulArgs(self, instance_group_manager, args, client):
@@ -156,10 +166,11 @@ class CreateGA(base.CreateCommand):
           },
           collection='compute.regionInstanceGroupManagers')
     group_ref = (
-        instance_groups_flags.GetInstanceGroupManagerArg().
-        ResolveAsResource)(args, resources,
-                           default_scope=compute_scope.ScopeEnum.ZONE,
-                           scope_lister=flags.GetDefaultScopeLister(client))
+        instance_groups_flags.GetInstanceGroupManagerArg().ResolveAsResource)(
+            args,
+            resources,
+            default_scope=compute_scope.ScopeEnum.ZONE,
+            scope_lister=flags.GetDefaultScopeLister(client))
     if _IsZonalGroup(group_ref):
       zonal_resource_fetcher = zone_utils.ZoneResourceFetcher(client)
       zonal_resource_fetcher.WarnForZonalCreation([group_ref])
@@ -217,23 +228,24 @@ class CreateGA(base.CreateCommand):
           project=group_ref.project,
           region=group_ref.region)
 
-  def _GetInstanceGroupManagerTargetPools(
-      self, target_pools, group_ref, holder):
+  def _GetInstanceGroupManagerTargetPools(self, target_pools, group_ref,
+                                          holder):
     pool_refs = []
     if target_pools:
       region = self._GetRegionForGroup(group_ref)
       for pool in target_pools:
-        pool_refs.append(holder.resources.Parse(
-            pool,
-            params={
-                'project': properties.VALUES.core.project.GetOrFail,
-                'region': region
-            },
-            collection='compute.targetPools'))
+        pool_refs.append(
+            holder.resources.Parse(
+                pool,
+                params={
+                    'project': properties.VALUES.core.project.GetOrFail,
+                    'region': region
+                },
+                collection='compute.targetPools'))
     return [pool_ref.SelfLink() for pool_ref in pool_refs]
 
-  def _CreateInstanceGroupManager(
-      self, args, group_ref, template_ref, client, holder):
+  def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
+                                  holder):
     """Create parts of Instance Group Manager shared for the track."""
     managed_flags.ValidateRegionalMigFlagsUsage(args, REGIONAL_FLAGS, group_ref)
     instance_groups_flags.ValidateManagedInstanceGroupScopeArgs(
@@ -245,10 +257,8 @@ class CreateGA(base.CreateCommand):
             client.messages, health_check, args.initial_delay))
     managed_instance_groups_utils.ValidateAutohealingPolicies(
         auto_healing_policies)
-    update_policy = (managed_instance_groups_utils
-                     .ApplyInstanceRedistributionTypeToUpdatePolicy)(
-                         client, args.GetValue('instance_redistribution_type'),
-                         None)
+    update_policy = managed_instance_groups_utils.PatchUpdatePolicy(
+        client, args, None)
 
     instance_group_manager = client.messages.InstanceGroupManager(
         name=group_ref.Name(),
@@ -263,6 +273,12 @@ class CreateGA(base.CreateCommand):
             args, holder.resources, client.messages),
         updatePolicy=update_policy,
     )
+
+    if args.IsSpecified('list_managed_instances_results'):
+      instance_group_manager.listManagedInstancesResults = (
+          client.messages.InstanceGroupManager
+          .ListManagedInstancesResultsValueValuesEnum)(
+              args.list_managed_instances_results.upper())
 
     self._HandleStatefulArgs(instance_group_manager, args, client)
 
@@ -304,10 +320,16 @@ class CreateGA(base.CreateCommand):
 
     group_ref = self._CreateGroupReference(args, client, holder.resources)
 
-    template_ref = holder.resources.Parse(
-        args.template,
-        params={'project': properties.VALUES.core.project.GetOrFail},
-        collection='compute.instanceTemplates')
+    if self.region_instance_template_enabled:
+      template_ref = managed_flags.INSTANCE_TEMPLATE_ARG.ResolveAsResource(
+          args,
+          holder.resources,
+          default_scope=flags.compute_scope.ScopeEnum.GLOBAL)
+    else:
+      template_ref = holder.resources.Parse(
+          args.template,
+          params={'project': properties.VALUES.core.project.GetOrFail},
+          collection='compute.instanceTemplates')
 
     instance_group_manager = self._CreateInstanceGroupManager(
         args, group_ref, template_ref, client, holder)
@@ -319,19 +341,19 @@ class CreateGA(base.CreateCommand):
 
 
 CreateGA.detailed_help = {
-    'brief':
-        'Create a Compute Engine managed instance group',
-    'DESCRIPTION':
-        """\
+    'brief': 'Create a Compute Engine managed instance group',
+    'DESCRIPTION': """\
         *{command}* creates a Compute Engine managed instance group.
+    """,
+    'EXAMPLES': """\
+      Running:
 
-For example, running:
+              $ {command} example-managed-instance-group --zone=us-central1-a --template=example-global-instance-template --size=1
 
-        $ {command} example-managed-instance-group --zone us-central1-a --template example-instance-template --size 1
-
-will create one managed instance group called 'example-managed-instance-group'
-in the ``us-central1-a'' zone.
-""",
+      will create one managed instance group called 'example-managed-instance-group'
+      in the ``us-central1-a'' zone with global instance template resource:
+      'example-global-instance-template'.
+    """,
 }
 
 
@@ -339,11 +361,15 @@ in the ``us-central1-a'' zone.
 class CreateBeta(CreateGA):
   """Create Compute Engine managed instance groups."""
 
+  support_any_single_zone = True
+  support_update_policy_min_ready_flag = True
+  region_instance_template_enabled = False
+
   @classmethod
   def Args(cls, parser):
     super(CreateBeta, cls).Args(parser)
     instance_groups_flags.AddMigCreateStatefulIPsFlags(parser)
-    managed_flags.AddMigListManagedInstancesResultsFlag(parser)
+    managed_flags.AddMigForceUpdateOnRepairFlags(parser)
 
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):
@@ -352,11 +378,8 @@ class CreateBeta(CreateGA):
                                        args, group_ref, template_ref, client,
                                        holder)
 
-    if args.list_managed_instances_results:
-      instance_group_manager.listManagedInstancesResults = (
-          client.messages.InstanceGroupManager
-          .ListManagedInstancesResultsValueValuesEnum)(
-              args.list_managed_instances_results.upper())
+    instance_group_manager.instanceLifecyclePolicy = managed_instance_groups_utils.CreateInstanceLifecyclePolicy(
+        client.messages, args)
 
     return instance_group_manager
 
@@ -370,8 +393,8 @@ class CreateBeta(CreateGA):
           self._CreateStatefulPolicy(args, client))
 
   def _CreateStatefulPolicy(self, args, client):
-    stateful_policy = super(CreateBeta, self)._CreateStatefulPolicy(args,
-                                                                    client)
+    stateful_policy = super(CreateBeta,
+                            self)._CreateStatefulPolicy(args, client)
     stateful_internal_ips = []
     for stateful_ip_dict in args.stateful_internal_ip or []:
       stateful_internal_ips.append(
@@ -394,6 +417,7 @@ class CreateBeta(CreateGA):
 
     return stateful_policy
 
+
 CreateBeta.detailed_help = CreateGA.detailed_help
 
 
@@ -401,12 +425,11 @@ CreateBeta.detailed_help = CreateGA.detailed_help
 class CreateAlpha(CreateBeta):
   """Create Compute Engine managed instance groups."""
 
-  support_any_single_zone = True
+  region_instance_template_enabled = True
 
   @classmethod
   def Args(cls, parser):
     super(CreateAlpha, cls).Args(parser)
-    managed_flags.AddMigForceUpdateOnRepairFlags(parser)
 
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):
@@ -414,9 +437,33 @@ class CreateAlpha(CreateBeta):
                                    self)._CreateInstanceGroupManager(
                                        args, group_ref, template_ref, client,
                                        holder)
-    instance_group_manager.instanceLifecyclePolicy = managed_instance_groups_utils.CreateInstanceLifecyclePolicy(
-        client.messages, args)
-
     return instance_group_manager
 
-CreateAlpha.detailed_help = CreateBeta.detailed_help
+
+CreateAlpha.detailed_help = {
+    'brief': 'Create a Compute Engine managed instance group',
+    'DESCRIPTION': """\
+        *{command}* creates a Compute Engine managed instance group.
+    """,
+    'EXAMPLES': """\
+      Running:
+
+              $ {command} example-managed-instance-group --zone=us-central1-a --template=example-global-instance-template --size=1
+
+      will create one managed instance group called 'example-managed-instance-group'
+      in the ``us-central1-a'' zone with global instance template resource:
+      'example-global-instance-template'.
+
+      To use a regional instance template, specify its full URL.
+
+      Running:
+
+              $ {command} example-managed-instance-group --zone=us-central1-a \\
+            --template=https://www.googleapis.com/compute/alpha/projects/example-project/regions/us-central1/instanceTemplates/example-regional-instance-template \\
+            --size=1
+
+      will create one managed instance group called
+      'example-managed-instance-group' in the us-central1-a zone with regional
+      instance template resource: 'example-instance-template'.
+    """,
+}

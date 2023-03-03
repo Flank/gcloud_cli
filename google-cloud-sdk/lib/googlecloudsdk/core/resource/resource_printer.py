@@ -39,6 +39,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core import log
+from googlecloudsdk.core import properties as core_properties
 from googlecloudsdk.core.resource import config_printer
 from googlecloudsdk.core.resource import csv_printer
 from googlecloudsdk.core.resource import diff_printer
@@ -48,6 +50,7 @@ from googlecloudsdk.core.resource import list_printer
 from googlecloudsdk.core.resource import object_printer
 from googlecloudsdk.core.resource import resource_lex
 from googlecloudsdk.core.resource import resource_printer_base
+from googlecloudsdk.core.resource import resource_printer_types as formats
 from googlecloudsdk.core.resource import resource_projection_spec
 from googlecloudsdk.core.resource import resource_projector
 from googlecloudsdk.core.resource import resource_property
@@ -71,7 +74,8 @@ class ProjectionFormatRequiredError(Error):
 class DefaultPrinter(yaml_printer.YamlPrinter):
   """An alias for YamlPrinter.
 
-  An alias for the *yaml* format.
+  An alias for the *yaml* format. To override use *gcloud config set
+  core/default_format* property.
   """
 
 
@@ -159,22 +163,22 @@ class PrinterAttributes(resource_printer_base.ResourcePrinter):
 
 
 _FORMATTERS = {
-    'config': config_printer.ConfigPrinter,
-    'csv': csv_printer.CsvPrinter,
-    'default': DefaultPrinter,
-    'diff': diff_printer.DiffPrinter,
-    'disable': DisablePrinter,
-    'flattened': flattened_printer.FlattenedPrinter,
-    'get': csv_printer.GetPrinter,
-    'json': json_printer.JsonPrinter,
-    'list': list_printer.ListPrinter,
-    'multi': MultiPrinter,
-    'none': NonePrinter,
-    'object': object_printer.ObjectPrinter,
-    'table': table_printer.TablePrinter,
-    'text': TextPrinter,
-    'value': csv_printer.ValuePrinter,
-    'yaml': yaml_printer.YamlPrinter,
+    formats.CONFIG: config_printer.ConfigPrinter,
+    formats.CSV: csv_printer.CsvPrinter,
+    formats.DEFAULT: DefaultPrinter,
+    formats.DIFF: diff_printer.DiffPrinter,
+    formats.DISABLE: DisablePrinter,
+    formats.FLATTENED: flattened_printer.FlattenedPrinter,
+    formats.GET: csv_printer.GetPrinter,
+    formats.JSON: json_printer.JsonPrinter,
+    formats.LIST: list_printer.ListPrinter,
+    formats.MULTI: MultiPrinter,
+    formats.NONE: NonePrinter,
+    formats.OBJECT: object_printer.ObjectPrinter,
+    formats.TABLE: table_printer.TablePrinter,
+    formats.TEXT: TextPrinter,
+    formats.VALUE: csv_printer.ValuePrinter,
+    formats.YAML: yaml_printer.YamlPrinter,
 }
 
 _HIDDEN_FORMATTERS = {}
@@ -204,6 +208,7 @@ def SupportedFormats():
   return sorted(_FORMATTERS)
 
 
+# TODO(b/265207164): Replace this with an abstract factory.
 def Printer(print_format, out=None, defaults=None, console_attr=None):
   """Returns a resource printer given a format string.
 
@@ -221,9 +226,21 @@ def Printer(print_format, out=None, defaults=None, console_attr=None):
   Returns:
     An initialized ResourcePrinter class or None if printing is disabled.
   """
+  default_format_property = core_properties.VALUES.core.default_format.Get()
+  # Detect 'default' print format and ensure that
+  # core/default_format is used instead of YAML if specified.
+  if print_format.endswith(formats.DEFAULT) and default_format_property:
+    chosen_print_format = default_format_property
+  else:
+    chosen_print_format = print_format
+
+  log.debug('Chosen display Format:{}'.format(chosen_print_format))
   projector = resource_projector.Compile(
-      expression=print_format, defaults=resource_projection_spec.ProjectionSpec(
-          defaults=defaults, symbols=resource_transform.GetTransforms()))
+      expression=chosen_print_format,
+      defaults=resource_projection_spec.ProjectionSpec(
+          defaults=defaults, symbols=resource_transform.GetTransforms()
+      ),
+  )
   printer_name = projector.Projection().Name()
   if not printer_name:
     # Do not print, do not consume resources.

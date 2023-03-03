@@ -14,7 +14,7 @@
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
    },
-  "documentationLink": "http://cloud.google.com",
+  "documentationLink": "https://cloud.google.com/vpc/docs/configure-serverless-vpc-access",
   "protocol": "rest",
   "rootUrl": "https://vpcaccess.googleapis.com/",
   "mtlsRootUrl": "https://vpcaccess.mtls.googleapis.com/",
@@ -374,7 +374,7 @@
           "type": "boolean"
         },
         "projectNumber": {
-          "description": "The numeric project id of the VM.",
+          "description": "The host project number for the VPC network that the VM is programmed to talk to. In shared VPC this may differ from the project number that the Connector and Serverless app attached to it belong to.",
           "type": "string"
         }
       }

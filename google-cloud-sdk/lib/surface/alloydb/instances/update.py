@@ -30,7 +30,8 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
   """Updates an AlloyDB instance within a given cluster."""
 
@@ -60,6 +61,14 @@ class Update(base.UpdateCommand):
     flags.AddCPUCount(parser, required=False)
     flags.AddReadPoolNodeCount(parser)
     flags.AddRegion(parser)
+    flags.AddInsightsConfigQueryStringLength(parser)
+    flags.AddInsightsConfigQueryPlansPerMinute(parser)
+    flags.AddInsightsConfigRecordApplicationTags(
+        parser, show_negated_in_help=True
+    )
+    flags.AddInsightsConfigRecordClientAddress(
+        parser, show_negated_in_help=True
+    )
     # TODO(b/185795425): Add --ssl-required and --labels later once we
     # understand the use cases
 

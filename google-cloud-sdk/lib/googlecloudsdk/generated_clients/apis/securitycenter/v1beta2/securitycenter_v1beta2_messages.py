@@ -52,12 +52,15 @@ class Access(_messages.Message):
       ys/{key}"
     serviceName: This is the API service that the service account made a call
       to, e.g. "iam.googleapis.com"
-    userAgentFamily: What kind of user agent is associated, e.g. operating
-      system shells, embedded or stand-alone applications, etc.
-    username: A string representing a username. This is likely not an IAM
-      principal. For instance, this may be the system user name if the finding
-      is VM-related, or this may be some type of application login user name,
-      depending on the type of finding.
+    userAgentFamily: What kind of user agent is associated, for example
+      operating system shells, embedded or stand-alone applications, etc.
+    userName: A string that represents the username of a user, user account,
+      or other entity involved in the access event. What the entity is and
+      what its role in the access event is depends on the finding that this
+      field appears in. The entity is likely not an IAM principal, but could
+      be a user that is logged into an operating system, if the finding is VM-
+      related, or a user that is logged into some type of application that is
+      involved in the access event.
   """
 
   callerIp = _messages.StringField(1)
@@ -69,7 +72,7 @@ class Access(_messages.Message):
   serviceAccountKeyName = _messages.StringField(7)
   serviceName = _messages.StringField(8)
   userAgentFamily = _messages.StringField(9)
-  username = _messages.StringField(10)
+  userName = _messages.StringField(10)
 
 
 class AccessReview(_messages.Message):
@@ -96,6 +99,22 @@ class AccessReview(_messages.Message):
   subresource = _messages.StringField(5)
   verb = _messages.StringField(6)
   version = _messages.StringField(7)
+
+
+class AssociatedFinding(_messages.Message):
+  r"""A finding that is associated with this node in the exposure path.
+
+  Fields:
+    canonicalFindingName: Canonical name of the associated findings. Example:
+      organizations/123/sources/456/findings/789
+    findingCategory: The additional taxonomy group within findings from a
+      given source.
+    name: Full resource name of the finding.
+  """
+
+  canonicalFindingName = _messages.StringField(1)
+  findingCategory = _messages.StringField(2)
+  name = _messages.StringField(3)
 
 
 class Compliance(_messages.Message):
@@ -220,10 +239,10 @@ class Connection(_messages.Message):
 
 
 class Contact(_messages.Message):
-  r"""Representa a single contact's email address
+  r"""The email address of a contact.
 
   Fields:
-    email: An email address e.g. "person123@company.com"
+    email: An email address. For example, "`person123@company.com`".
   """
 
   email = _messages.StringField(1)
@@ -645,6 +664,19 @@ class Detection(_messages.Message):
   percentPagesMatched = _messages.FloatField(2)
 
 
+class Edge(_messages.Message):
+  r"""Represents a connection between a source node and a destination node in
+  this exposure path.
+
+  Fields:
+    destination: This is the resource name of the destination node.
+    source: This is the resource name of the source node.
+  """
+
+  destination = _messages.StringField(1)
+  source = _messages.StringField(2)
+
+
 class EnvironmentVariable(_messages.Message):
   r"""EnvironmentVariable is a name-value pair to store environment variables
   for Process.
@@ -866,6 +898,7 @@ class Finding(_messages.Message):
       Security Command Center where additional information about the finding
       can be found. This field is guaranteed to be either empty or a well
       formed URL.
+    files: File associated with the finding.
     findingClass: The class of the finding.
     iamBindings: Represents IAM bindings associated with the Finding.
     indicator: Represents what's commonly known as an Indicator of compromise
@@ -873,6 +906,7 @@ class Finding(_messages.Message):
       or in an operating system that, with high confidence, indicates a
       computer intrusion. Reference:
       https://en.wikipedia.org/wiki/Indicator_of_compromise
+    kernelRootkit: Kernel Rootkit signature.
     kubernetes: Kubernetes resources associated with the finding.
     mitreAttack: MITRE ATT&CK tactics and techniques related to this finding.
       See: https://attack.mitre.org
@@ -916,8 +950,8 @@ class Finding(_messages.Message):
       start with a letter and contain alphanumeric characters or underscores
       only.
     state: The state of the finding.
-    vulnerability: Represents vulnerability specific fields like cve, cvss
-      scores etc. CVE stands for Common Vulnerabilities and Exposures
+    vulnerability: Represents vulnerability-specific fields like CVE and CVSS
+      scores. CVE stands for Common Vulnerabilities and Exposures
       (https://cve.mitre.org/about/)
   """
 
@@ -1118,25 +1152,27 @@ class Finding(_messages.Message):
   exfiltration = _messages.MessageField('Exfiltration', 12)
   externalSystems = _messages.MessageField('ExternalSystemsValue', 13)
   externalUri = _messages.StringField(14)
-  findingClass = _messages.EnumField('FindingClassValueValuesEnum', 15)
-  iamBindings = _messages.MessageField('IamBinding', 16, repeated=True)
-  indicator = _messages.MessageField('Indicator', 17)
-  kubernetes = _messages.MessageField('Kubernetes', 18)
-  mitreAttack = _messages.MessageField('MitreAttack', 19)
-  mute = _messages.EnumField('MuteValueValuesEnum', 20)
-  muteInitiator = _messages.StringField(21)
-  muteUpdateTime = _messages.StringField(22)
-  name = _messages.StringField(23)
-  nextSteps = _messages.StringField(24)
-  parent = _messages.StringField(25)
-  parentDisplayName = _messages.StringField(26)
-  processes = _messages.MessageField('Process', 27, repeated=True)
-  resourceName = _messages.StringField(28)
-  securityMarks = _messages.MessageField('SecurityMarks', 29)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 30)
-  sourceProperties = _messages.MessageField('SourcePropertiesValue', 31)
-  state = _messages.EnumField('StateValueValuesEnum', 32)
-  vulnerability = _messages.MessageField('Vulnerability', 33)
+  files = _messages.MessageField('File', 15, repeated=True)
+  findingClass = _messages.EnumField('FindingClassValueValuesEnum', 16)
+  iamBindings = _messages.MessageField('IamBinding', 17, repeated=True)
+  indicator = _messages.MessageField('Indicator', 18)
+  kernelRootkit = _messages.MessageField('KernelRootkit', 19)
+  kubernetes = _messages.MessageField('Kubernetes', 20)
+  mitreAttack = _messages.MessageField('MitreAttack', 21)
+  mute = _messages.EnumField('MuteValueValuesEnum', 22)
+  muteInitiator = _messages.StringField(23)
+  muteUpdateTime = _messages.StringField(24)
+  name = _messages.StringField(25)
+  nextSteps = _messages.StringField(26)
+  parent = _messages.StringField(27)
+  parentDisplayName = _messages.StringField(28)
+  processes = _messages.MessageField('Process', 29, repeated=True)
+  resourceName = _messages.StringField(30)
+  securityMarks = _messages.MessageField('SecurityMarks', 31)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 32)
+  sourceProperties = _messages.MessageField('SourcePropertiesValue', 33)
+  state = _messages.EnumField('StateValueValuesEnum', 34)
+  vulnerability = _messages.MessageField('Vulnerability', 35)
 
 
 class Folder(_messages.Message):
@@ -1167,7 +1203,7 @@ class GoogleCloudSecuritycenterV1BigQueryExport(_messages.Message):
   r"""Configures how to deliver Findings to BigQuery Instance.
 
   Fields:
-    createTime: Output only. The time at which the big query export was
+    createTime: Output only. The time at which the BigQuery export was
       created. This field is set by the server and will be ignored if provided
       on export on creation.
     dataset: The dataset to write findings' updates to. Its format is
@@ -1187,8 +1223,8 @@ class GoogleCloudSecuritycenterV1BigQueryExport(_messages.Message):
       * integer literals without quotes. * boolean literals `true` and `false`
       without quotes.
     mostRecentEditor: Output only. Email address of the user who last edited
-      the big query export. This field is set by the server and will be
-      ignored if provided on export creation or update.
+      the BigQuery export. This field is set by the server and will be ignored
+      if provided on export creation or update.
     name: The relative resource name of this export. See: https://cloud.google
       .com/apis/design/resource_names#relative_resource_name. Example format:
       "organizations/{organization_id}/bigQueryExports/{export_id}" Example
@@ -1197,10 +1233,10 @@ class GoogleCloudSecuritycenterV1BigQueryExport(_messages.Message):
       is provided in responses, and is ignored when provided in create
       requests.
     principal: Output only. The service account that needs permission to
-      create table, upload data to the big query dataset.
-    updateTime: Output only. The most recent time at which the big export was
-      updated. This field is set by the server and will be ignored if provided
-      on export creation or update.
+      create table and upload data to the BigQuery dataset.
+    updateTime: Output only. The most recent time at which the BigQuery export
+      was updated. This field is set by the server and will be ignored if
+      provided on export creation or update.
   """
 
   createTime = _messages.StringField(1)
@@ -1220,8 +1256,8 @@ class GoogleCloudSecuritycenterV1Binding(_messages.Message):
     name: Name for binding.
     ns: Namespace for binding.
     role: The Role or ClusterRole referenced by the binding.
-    subjects: Represents the subjects(s) bound to the role. Not always
-      available for PATCH requests.
+    subjects: Represents one or more subjects that are bound to the role. Not
+      always available for PATCH requests.
   """
 
   name = _messages.StringField(1)
@@ -1235,11 +1271,60 @@ class GoogleCloudSecuritycenterV1BulkMuteFindingsResponse(_messages.Message):
 
 
 class GoogleCloudSecuritycenterV1ExposedResource(_messages.Message):
-  r"""A resource that is exposed as a result of a finding."""
+  r"""A resource that is exposed as a result of a finding.
+
+  Enums:
+    ResourceValueValueValuesEnum: How valuable this resource is.
+
+  Fields:
+    displayName: Human readable name of the resource that is exposed.
+    methods: The ways in which this resource is exposed. Examples: Read, Write
+    name: Exposed Resource Name e.g.:
+      `organizations/123/attackExposureResults/456/exposedResources/789`
+    resource: The name of the resource that is exposed. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+    resourceType: The resource type of the exposed resource. See:
+      https://cloud.google.com/asset-inventory/docs/supported-asset-types
+    resourceValue: How valuable this resource is.
+  """
+
+  class ResourceValueValueValuesEnum(_messages.Enum):
+    r"""How valuable this resource is.
+
+    Values:
+      RESOURCE_VALUE_UNSPECIFIED: The resource value isn't specified.
+      RESOURCE_VALUE_LOW: This is a low value resource.
+      RESOURCE_VALUE_MEDIUM: This is a medium value resource.
+      RESOURCE_VALUE_HIGH: This is a high value resource.
+    """
+    RESOURCE_VALUE_UNSPECIFIED = 0
+    RESOURCE_VALUE_LOW = 1
+    RESOURCE_VALUE_MEDIUM = 2
+    RESOURCE_VALUE_HIGH = 3
+
+  displayName = _messages.StringField(1)
+  methods = _messages.StringField(2, repeated=True)
+  name = _messages.StringField(3)
+  resource = _messages.StringField(4)
+  resourceType = _messages.StringField(5)
+  resourceValue = _messages.EnumField('ResourceValueValueValuesEnum', 6)
 
 
 class GoogleCloudSecuritycenterV1ExposurePath(_messages.Message):
-  r"""A path that an attacker could take to reach an exposed resource."""
+  r"""A path that an attacker could take to reach an exposed resource.
+
+  Fields:
+    edges: A list of the edges between nodes in this exposure path.
+    exposedResource: The leaf node of this exposure path.
+    name: Exposure Path Name e.g.:
+      `organizations/123/attackExposureResults/456/exposurePaths/789`
+    pathNodes: A list of nodes that exist in this exposure path.
+  """
+
+  edges = _messages.MessageField('Edge', 1, repeated=True)
+  exposedResource = _messages.MessageField('GoogleCloudSecuritycenterV1ExposedResource', 2)
+  name = _messages.StringField(3)
+  pathNodes = _messages.MessageField('PathNode', 4, repeated=True)
 
 
 class GoogleCloudSecuritycenterV1ExternalSystem(_messages.Message):
@@ -1252,10 +1337,10 @@ class GoogleCloudSecuritycenterV1ExternalSystem(_messages.Message):
       finding's ticket/tracker was updated in the external system.
     externalUid: Identifier that's used to track the given finding in the
       external system.
-    name: External System Name e.g. jira, demisto, etc. e.g.:
-      `organizations/1234/sources/5678/findings/123456/externalSystems/jira`
-      `folders/1234/sources/5678/findings/123456/externalSystems/jira`
-      `projects/1234/sources/5678/findings/123456/externalSystems/jira`
+    name: Full resource name of the external system, for example:
+      "organizations/1234/sources/5678/findings/123456/externalSystems/jira",
+      "folders/1234/sources/5678/findings/123456/externalSystems/jira",
+      "projects/1234/sources/5678/findings/123456/externalSystems/jira"
     status: Most recent status of the corresponding finding's ticket/tracker
       in the external system.
   """
@@ -1363,7 +1448,15 @@ class GoogleCloudSecuritycenterV1ResourceValueConfig(_messages.Message):
 
   Fields:
     name: Name for the resource value config
+    resourceType: Apply resource_value only to resources that match
+      resource_type. resource_type will be checked with "AND" of other
+      resources. E.g. "storage.googleapis.com/Bucket" with resource_value
+      "HIGH" will apply "HIGH" value only to "storage.googleapis.com/Bucket"
+      resources.
     resourceValue: Required. Resource value level this expression represents
+    scope: Project or folder to scope this config to. For example,
+      "project/456" would apply this config only to resources in "project/456"
+      scope will be checked with "AND" of other resources.
     tagValues: Required. Tag values combined with AND to check against. Values
       in the form "tagValues/123" E.g. [ "tagValues/123", "tagValues/456",
       "tagValues/789" ] https://cloud.google.com/resource-
@@ -1387,8 +1480,10 @@ class GoogleCloudSecuritycenterV1ResourceValueConfig(_messages.Message):
     NONE = 4
 
   name = _messages.StringField(1)
-  resourceValue = _messages.EnumField('ResourceValueValueValuesEnum', 2)
-  tagValues = _messages.StringField(3, repeated=True)
+  resourceType = _messages.StringField(2)
+  resourceValue = _messages.EnumField('ResourceValueValueValuesEnum', 3)
+  scope = _messages.StringField(4)
+  tagValues = _messages.StringField(5, repeated=True)
 
 
 class GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse(_messages.Message):
@@ -1783,14 +1878,16 @@ class IamBinding(_messages.Message):
 
 
 class Indicator(_messages.Message):
-  r"""Represents what's commonly known as an Indicator of compromise (IoC) in
-  computer forensics. This is an artifact observed on a network or in an
+  r"""Represents what's commonly known as an _indicator of compromise_ (IoC)
+  in computer forensics. This is an artifact observed on a network or in an
   operating system that, with high confidence, indicates a computer intrusion.
-  Reference: https://en.wikipedia.org/wiki/Indicator_of_compromise
+  For more information, see [Indicator of
+  compromise](https://en.wikipedia.org/wiki/Indicator_of_compromise).
 
   Fields:
     domains: List of domains associated to the Finding.
-    ipAddresses: List of ip addresses associated to the Finding.
+    ipAddresses: The list of IP addresses that are associated with the
+      finding.
     signatures: The list of matched signatures indicating that the given
       process is present in the environment.
     uris: The list of URIs associated to the Findings.
@@ -1802,8 +1899,45 @@ class Indicator(_messages.Message):
   uris = _messages.StringField(4, repeated=True)
 
 
+class KernelRootkit(_messages.Message):
+  r"""Kernel mode rootkit signatures.
+
+  Fields:
+    name: Rootkit name when available.
+    unexpectedCodeModification: True when unexpected modifications of kernel
+      code memory are present.
+    unexpectedFtraceHandler: True when `ftrace` points are present with
+      callbacks pointing to regions that are not in the expected kernel or
+      module code range.
+    unexpectedInterruptHandler: True when interrupt handlers that are are not
+      in the expected kernel or module code regions are present.
+    unexpectedKernelCodePages: True when kernel code pages that are not in the
+      expected kernel or module code regions are present.
+    unexpectedKprobeHandler: True when `kprobe` points are present with
+      callbacks pointing to regions that are not in the expected kernel or
+      module code range.
+    unexpectedProcessesInRunqueue: True when unexpected processes in the
+      scheduler run queue are present. Such processes are in the run queue,
+      but not in the process task list.
+    unexpectedReadOnlyDataModification: True when unexpected modifications of
+      kernel read-only data memory are present.
+    unexpectedSystemCallHandler: True when system call handlers that are are
+      not in the expected kernel or module code regions are present.
+  """
+
+  name = _messages.StringField(1)
+  unexpectedCodeModification = _messages.BooleanField(2)
+  unexpectedFtraceHandler = _messages.BooleanField(3)
+  unexpectedInterruptHandler = _messages.BooleanField(4)
+  unexpectedKernelCodePages = _messages.BooleanField(5)
+  unexpectedKprobeHandler = _messages.BooleanField(6)
+  unexpectedProcessesInRunqueue = _messages.BooleanField(7)
+  unexpectedReadOnlyDataModification = _messages.BooleanField(8)
+  unexpectedSystemCallHandler = _messages.BooleanField(9)
+
+
 class Kubernetes(_messages.Message):
-  r"""Kubernetes related attributes.
+  r"""Kubernetes-related attributes.
 
   Fields:
     accessReviews: Provides information on any Kubernetes access reviews (i.e.
@@ -1957,6 +2091,7 @@ class MitreAttack(_messages.Message):
       NETWORK_SERVICE_DISCOVERY: T1046
       ACCESS_TOKEN_MANIPULATION: T1134
       ABUSE_ELEVATION_CONTROL_MECHANISM: T1548
+      DEFAULT_ACCOUNTS: T1078.001
     """
     TECHNIQUE_UNSPECIFIED = 0
     ACTIVE_SCANNING = 1
@@ -1993,6 +2128,7 @@ class MitreAttack(_messages.Message):
     NETWORK_SERVICE_DISCOVERY = 32
     ACCESS_TOKEN_MANIPULATION = 33
     ABUSE_ELEVATION_CONTROL_MECHANISM = 34
+    DEFAULT_ACCOUNTS = 35
 
   class PrimaryTacticValueValuesEnum(_messages.Enum):
     r"""The MITRE ATT&CK tactic most closely represented by this finding, if
@@ -2070,6 +2206,7 @@ class MitreAttack(_messages.Message):
       NETWORK_SERVICE_DISCOVERY: T1046
       ACCESS_TOKEN_MANIPULATION: T1134
       ABUSE_ELEVATION_CONTROL_MECHANISM: T1548
+      DEFAULT_ACCOUNTS: T1078.001
     """
     TECHNIQUE_UNSPECIFIED = 0
     ACTIVE_SCANNING = 1
@@ -2106,6 +2243,7 @@ class MitreAttack(_messages.Message):
     NETWORK_SERVICE_DISCOVERY = 32
     ACCESS_TOKEN_MANIPULATION = 33
     ABUSE_ELEVATION_CONTROL_MECHANISM = 34
+    DEFAULT_ACCOUNTS = 35
 
   additionalTactics = _messages.EnumField('AdditionalTacticsValueListEntryValuesEnum', 1, repeated=True)
   additionalTechniques = _messages.EnumField('AdditionalTechniquesValueListEntryValuesEnum', 2, repeated=True)
@@ -2173,6 +2311,27 @@ class OnboardingState(_messages.Message):
 
   name = _messages.StringField(1)
   onboardingLevel = _messages.EnumField('OnboardingLevelValueValuesEnum', 2)
+
+
+class PathNode(_messages.Message):
+  r"""Represents one point that an attacker passes through in this exposure
+  path.
+
+  Fields:
+    associatedFindings: The findings associated with this node in the exposure
+      path.
+    displayName: Human readable name of this resource.
+    resource: The name of the resource at this point in the exposure path. The
+      format of the name is:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+    resourceType: The resource type of this resource. See:
+      https://cloud.google.com/asset-inventory/docs/supported-asset-types
+  """
+
+  associatedFindings = _messages.MessageField('AssociatedFinding', 1, repeated=True)
+  displayName = _messages.StringField(2)
+  resource = _messages.StringField(3)
+  resourceType = _messages.StringField(4)
 
 
 class Pod(_messages.Message):

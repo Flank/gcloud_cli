@@ -32,6 +32,7 @@ import time
 import dateutil
 from google.auth import exceptions as google_auth_exceptions
 from google.auth import external_account as google_auth_external_account
+from google.auth import external_account_authorized_user as google_auth_external_account_authorized_user
 import google.auth.compute_engine as google_auth_gce
 from googlecloudsdk.api_lib.auth import util as auth_util
 from googlecloudsdk.core import config
@@ -625,6 +626,15 @@ def _LoadFromFileOverride(cred_file_override, scopes, use_google_auth):
       json_info['client_secret'] = config.CLOUDSDK_CLIENT_NOTSOSECRET
       cred = type(cred).from_info(json_info, scopes=config.CLOUDSDK_SCOPES)
 
+    if (isinstance(cred,
+                   google_auth_external_account_authorized_user.Credentials)):
+      # Reinitialize with client auth.
+      json_info = cred.info
+      json_info['client_id'] = config.CLOUDSDK_CLIENT_ID
+      json_info['client_secret'] = config.CLOUDSDK_CLIENT_NOTSOSECRET
+      json_info['scopes'] = config.CLOUDSDK_EXTERNAL_ACCOUNT_SCOPES
+      cred = type(cred).from_info(json_info)
+
     # Set token_uri after scopes since token_uri needs to be explicitly
     # preserved when scopes are applied.
     cred_type = c_creds.CredentialTypeGoogleAuth.FromCredentials(cred)
@@ -640,6 +650,10 @@ def _LoadFromFileOverride(cred_file_override, scopes, use_google_auth):
       # pylint: disable=protected-access
       cred._token_uri = token_uri_override
       # pylint: enable=protected-access
+
+    # Enable self signed jwt if applicable for the cred created from the file
+    # override.
+    c_creds.EnableSelfSignedJwtIfApplicable(cred)
 
     # The credential override is not stored in credential store, but we still
     # want to cache access tokens between invocations.
@@ -876,6 +890,20 @@ def _RefreshGoogleAuth(credentials,
   # pylint: enable=g-import-not-at-top
   request_client = requests.GoogleAuthRequest()
   with HandleGoogleAuthCredentialsRefreshError():
+    # If this cred is a service account cred, we may need to enable self signed
+    # jwt if applicable. Depending on how this cred is created:
+    # 1) if it's created using Load method (via cred store or file override),
+    # then the cred has self signed jwt enabled if applicable.
+    # 2) if not (e.g. `gcloud auth activate-service-account` creates the cred
+    # directly), then the cred doesn't have self signed jwt enabled even if it's
+    # applicable.
+    #
+    # In order to cover all cred sources, let's enable self signed jwt here
+    # (again for case 1). It doesn't matter if we enable it more than once. The
+    # best way to solve the issue is to refactor the code to have a unified
+    # place to create creds so we just need to enable it there once.
+    c_creds.EnableSelfSignedJwtIfApplicable(credentials)
+
     credentials.refresh(request_client)
 
     id_token = None
@@ -1000,6 +1028,9 @@ def _RefreshServiceAccountIdTokenGoogleAuth(cred, request_client):
   Returns:
     str, The id_token if refresh was successful. Otherwise None.
   """
+  if properties.VALUES.auth.service_account_disable_id_token_refresh.GetBool():
+    return None
+
   # Import only when necessary to decrease the startup time. Move it to
   # global once google-auth is ready to replace oauth2client.
   # pylint: disable=g-import-not-at-top
@@ -1028,8 +1059,9 @@ def Store(credentials, account=None, scopes=None):
   """Store credentials according for an account address.
 
   gcloud only stores user account credentials, external account credentials,
-  service account credentials and p12 service account credentials. GCE, IAM
-  impersonation, and Devshell credentials are generated in runtime.
+  external account authorized user credential, service account credentials and
+  p12 service account credentials. GCE, IAM impersonation, and Devshell
+  credentials are generated in runtime.
   External account credentials do not contain any sensitive credentials. They
   only provide hints on how to retrieve local external and exchange them for
   Google access tokens.
@@ -1055,6 +1087,7 @@ def Store(credentials, account=None, scopes=None):
   if cred_type.key not in [
       c_creds.USER_ACCOUNT_CREDS_NAME, c_creds.EXTERNAL_ACCOUNT_CREDS_NAME,
       c_creds.EXTERNAL_ACCOUNT_USER_CREDS_NAME,
+      c_creds.EXTERNAL_ACCOUNT_AUTHORIZED_USER_CREDS_NAME,
       c_creds.SERVICE_ACCOUNT_CREDS_NAME, c_creds.P12_SERVICE_ACCOUNT_CREDS_NAME
   ]:
     return
@@ -1089,7 +1122,8 @@ def RevokeCredentials(credentials):
   """
   if (not c_creds.IsUserAccountCredentials(credentials) or
       # External account user credentials cannot be revoked.
-      c_creds.IsExternalAccountUserCredentials(credentials)):
+      c_creds.IsExternalAccountUserCredentials(credentials) or
+      c_creds.IsExternalAccountAuthorizedUserCredentials(credentials)):
     raise RevokeError('The token cannot be revoked from server because it is '
                       'not user account credentials.')
   if c_creds.IsOauth2ClientCredentials(credentials):
@@ -1138,7 +1172,10 @@ def Revoke(account=None):
   try:
     # External account credentials are not revocable.
     if (not account.endswith('.gserviceaccount.com') and
-        not isinstance(credentials, google_auth_external_account.Credentials)):
+        not isinstance(credentials, google_auth_external_account.Credentials)
+        and not isinstance(
+            credentials,
+            google_auth_external_account_authorized_user.Credentials)):
       RevokeCredentials(credentials)
       rv = True
   except (client.TokenRevokeError, c_google_auth.TokenRevokeError) as e:
@@ -1257,11 +1294,12 @@ class _LegacyGenerator(object):
 
   def __init__(self, account, credentials, scopes=None):
     self.credentials = credentials
-    if self._cred_type not in (c_creds.USER_ACCOUNT_CREDS_NAME,
-                               c_creds.SERVICE_ACCOUNT_CREDS_NAME,
-                               c_creds.EXTERNAL_ACCOUNT_CREDS_NAME,
-                               c_creds.EXTERNAL_ACCOUNT_USER_CREDS_NAME,
-                               c_creds.P12_SERVICE_ACCOUNT_CREDS_NAME):
+    if self._cred_type not in (
+        c_creds.USER_ACCOUNT_CREDS_NAME, c_creds.SERVICE_ACCOUNT_CREDS_NAME,
+        c_creds.EXTERNAL_ACCOUNT_CREDS_NAME,
+        c_creds.EXTERNAL_ACCOUNT_USER_CREDS_NAME,
+        c_creds.EXTERNAL_ACCOUNT_AUTHORIZED_USER_CREDS_NAME,
+        c_creds.P12_SERVICE_ACCOUNT_CREDS_NAME):
       raise c_creds.CredentialFileSaveError(
           'Unsupported credentials type {0}'.format(type(self.credentials)))
     if scopes is None:
@@ -1317,6 +1355,11 @@ class _LegacyGenerator(object):
     # recreated here.
     self.Clean()
 
+    if self._cred_type == c_creds.EXTERNAL_ACCOUNT_AUTHORIZED_USER_CREDS_NAME:
+      # TODO(b/251565106): Support for gsutil will be added in a later CL.
+      # TODO(b/251565107): Support for bq will be added in a later CL.
+      return
+
     # Generates credentials used by bq and gsutil.
     if self._cred_type == c_creds.P12_SERVICE_ACCOUNT_CREDS_NAME:
       cred = self.credentials
@@ -1346,9 +1389,7 @@ class _LegacyGenerator(object):
               '[Credentials]',
               'gs_external_account_file = {external_account_file}',
           ]).format(external_account_file=self._adc_path))
-      return
-
-    if self._cred_type == c_creds.USER_ACCOUNT_CREDS_NAME:
+    elif self._cred_type == c_creds.USER_ACCOUNT_CREDS_NAME:
       # We create a small .boto file for gsutil, to be put in BOTO_PATH.
       # Our client_id and client_secret should accompany our refresh token;
       # if a user loaded any other .boto files that specified a different
@@ -1365,12 +1406,15 @@ class _LegacyGenerator(object):
           ]).format(cid=config.CLOUDSDK_CLIENT_ID,
                     secret=config.CLOUDSDK_CLIENT_NOTSOSECRET,
                     token=self.credentials.refresh_token))
-    else:
+    elif self._cred_type == c_creds.SERVICE_ACCOUNT_CREDS_NAME:
       self._WriteFileContents(
           self._gsutil_path, '\n'.join([
               '[Credentials]',
               'gs_service_key_file = {key_file}',
           ]).format(key_file=self._adc_path))
+    else:
+      raise c_creds.CredentialFileSaveError(
+          'Unsupported credentials type {0}'.format(type(self.credentials)))
 
   def _WriteFileContents(self, filepath, contents):
     """Writes contents to a path, ensuring mkdirs.

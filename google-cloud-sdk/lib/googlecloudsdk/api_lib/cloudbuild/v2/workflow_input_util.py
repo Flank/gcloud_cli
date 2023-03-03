@@ -59,6 +59,7 @@ def _WorkflowTransform(workflow):
     _PipelineSpecTransform(pipeline["spec"])
     workflow["pipelineSpec"] = pipeline["spec"]
   elif "ref" in pipeline:
+    input_util.RefTransform(pipeline["ref"])
     workflow["ref"] = pipeline["ref"]
   else:
     raise cloudbuild_exceptions.InvalidYamlError(
@@ -80,9 +81,12 @@ def _ResourcesTransform(workflow):
   has_resources = False
   for resource in workflow.get("resources", []):
     has_resources = True
+    if "kind" not in resource:
+      raise cloudbuild_exceptions.InvalidYamlError(
+          "Kind is required for resource.")
 
     if "ref" in resource and "kind" in resource and resource[
-        "kind"] == "cloudbuild.googleapis.com/SecretManagerSecret":
+        "kind"] == "secretmanager.googleapis.com/SecretVersion":
       resource.pop("kind")
       resource["secret"] = {}
       resource["secret"]["secretVersion"] = resource.pop("ref")
@@ -134,6 +138,7 @@ def _PipelineTaskTransform(pipeline_task):
     pipeline_task["taskSpec"] = {}
     pipeline_task["taskSpec"]["taskSpec"] = popped_task_spec
   elif "taskRef" in pipeline_task:
+    input_util.RefTransform(pipeline_task["taskRef"])
     pipeline_task["taskRef"] = pipeline_task.pop("taskRef")
 
   if "when" in pipeline_task:

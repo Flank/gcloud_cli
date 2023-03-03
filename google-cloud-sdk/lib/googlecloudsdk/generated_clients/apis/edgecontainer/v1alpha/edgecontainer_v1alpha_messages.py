@@ -34,7 +34,7 @@ class CloudRouter(_messages.Message):
   r"""The Cloud Router info.
 
   Fields:
-    name: The created Cloud Router name.
+    name: The associated Cloud Router name.
   """
 
   name = _messages.StringField(1)
@@ -61,8 +61,11 @@ class Cluster(_messages.Message):
       managed by GEC.
     clusterCaCertificate: Output only. The PEM-encoded public certificate of
       the cluster's CA.
+    controlPlane: Optional. The configuration of the cluster control plane.
     controlPlaneVersion: Output only. The control plane release version
     createTime: Output only. The time when the cluster was created.
+    dataPlaneLoadBalancerIpv4AddressPools: Optional. Address pools for cluster
+      data plane load balancing.
     defaultMaxPodsPerNode: Optional. The default maximum number of pods per
       node used if a maximum value is not specified explicitly for a node pool
       in this cluster. If unspecified, the Kubernetes default value will be
@@ -77,6 +80,7 @@ class Cluster(_messages.Message):
     nodeVersion: Output only. The lowest release version among all worker
       nodes. This field can be empty if the cluster does not have any worker
       nodes.
+    systemAddonsConfig: Optional. The configuration of the system add-ons.
     updateTime: Output only. The time when the cluster was last updated.
   """
 
@@ -106,17 +110,20 @@ class Cluster(_messages.Message):
 
   authorization = _messages.MessageField('Authorization', 1)
   clusterCaCertificate = _messages.StringField(2)
-  controlPlaneVersion = _messages.StringField(3)
-  createTime = _messages.StringField(4)
-  defaultMaxPodsPerNode = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  endpoint = _messages.StringField(6)
-  fleet = _messages.MessageField('Fleet', 7)
-  labels = _messages.MessageField('LabelsValue', 8)
-  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 9)
-  name = _messages.StringField(10)
-  networking = _messages.MessageField('ClusterNetworking', 11)
-  nodeVersion = _messages.StringField(12)
-  updateTime = _messages.StringField(13)
+  controlPlane = _messages.MessageField('ControlPlane', 3)
+  controlPlaneVersion = _messages.StringField(4)
+  createTime = _messages.StringField(5)
+  dataPlaneLoadBalancerIpv4AddressPools = _messages.StringField(6, repeated=True)
+  defaultMaxPodsPerNode = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  endpoint = _messages.StringField(8)
+  fleet = _messages.MessageField('Fleet', 9)
+  labels = _messages.MessageField('LabelsValue', 10)
+  maintenancePolicy = _messages.MessageField('MaintenancePolicy', 11)
+  name = _messages.StringField(12)
+  networking = _messages.MessageField('ClusterNetworking', 13)
+  nodeVersion = _messages.StringField(14)
+  systemAddonsConfig = _messages.MessageField('SystemAddonsConfig', 15)
+  updateTime = _messages.StringField(16)
 
 
 class ClusterNetworking(_messages.Message):
@@ -153,6 +160,18 @@ class ClusterUser(_messages.Message):
   """
 
   username = _messages.StringField(1)
+
+
+class ControlPlane(_messages.Message):
+  r"""Configuration of the cluster control plane.
+
+  Fields:
+    local: Local control plane configuration.
+    remote: Remote control plane configuration.
+  """
+
+  local = _messages.MessageField('Local', 1)
+  remote = _messages.MessageField('Remote', 2)
 
 
 class Details(_messages.Message):
@@ -577,6 +596,20 @@ class GenerateAccessTokenResponse(_messages.Message):
   expireTime = _messages.StringField(2)
 
 
+class Ingress(_messages.Message):
+  r"""Config for the Ingress add-on which allows customers to create an
+  Ingress object to manage external access to the servers in a cluster. The
+  add-on consists of istiod and istio-ingress.
+
+  Fields:
+    disabled: Optional. Whether Ingress is disabled.
+    ipv4Vip: Optional. Ingress VIP.
+  """
+
+  disabled = _messages.BooleanField(1)
+  ipv4Vip = _messages.StringField(2)
+
+
 class ListClustersResponse(_messages.Message):
   r"""List of clusters in a location.
 
@@ -657,6 +690,23 @@ class ListVpnConnectionsResponse(_messages.Message):
   nextPageToken = _messages.StringField(1)
   unreachable = _messages.StringField(2, repeated=True)
   vpnConnections = _messages.MessageField('VpnConnection', 3, repeated=True)
+
+
+class Local(_messages.Message):
+  r"""Configuration specific to clusters with a control plane hosted locally.
+
+  Fields:
+    machineFilter: Only machines matching this filter will be allowed to host
+      control plane nodes. The filtering language accepts strings like
+      "name=", and is documented here: [AIP-160](https://google.aip.dev/160).
+    nodeCount: The number of nodes to serve as replicas of the Control Plane.
+    nodeLocation: Name of the Google Distributed Cloud Edge zones where this
+      node pool will be created. For example: `us-central1-edge-customer-a`.
+  """
+
+  machineFilter = _messages.StringField(1)
+  nodeCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  nodeLocation = _messages.StringField(3)
 
 
 class LocalDiskEncryption(_messages.Message):
@@ -845,7 +895,10 @@ class Machine(_messages.Message):
     hostedNode: Canonical resource name of the node that this machine is
       responsible for hosting e.g. projects/{project}/locations/{location}/clu
       sters/{cluster_id}/nodePools/{pool_id}/{node}, Or empty if the machine
-      is not assigned to assume the role of a node.
+      is not assigned to assume the role of a node. For control plane nodes
+      hosted on edge machines, this will return the following format: "project
+      s/{project}/locations/{location}/clusters/{cluster_id}/controlPlaneNodes
+      /{node}".
     labels: Labels associated with this resource.
     name: Required. The resource name of the machine.
     updateTime: Output only. The time when the node pool was last updated.
@@ -1092,6 +1145,8 @@ class OperationMetadata(_messages.Message):
     statusMessage: Human-readable status of the operation, if any.
     target: Server-defined resource path for the target of the operation.
     verb: The verb executed by the operation.
+    warnings: Warnings that do not block the operation, but still hold
+      relevant information for the end user to receive.
   """
 
   apiVersion = _messages.StringField(1)
@@ -1101,6 +1156,7 @@ class OperationMetadata(_messages.Message):
   statusMessage = _messages.StringField(5)
   target = _messages.StringField(6)
   verb = _messages.StringField(7)
+  warnings = _messages.StringField(8, repeated=True)
 
 
 class Quota(_messages.Message):
@@ -1129,6 +1185,12 @@ class RecurringTimeWindow(_messages.Message):
 
   recurrence = _messages.StringField(1)
   window = _messages.MessageField('TimeWindow', 2)
+
+
+class Remote(_messages.Message):
+  r"""Configuration specific to clusters with a control plane hosted remotely.
+  """
+
 
 
 class StandardQueryParameters(_messages.Message):
@@ -1245,6 +1307,16 @@ class Status(_messages.Message):
   message = _messages.StringField(3)
 
 
+class SystemAddonsConfig(_messages.Message):
+  r"""Config that customers are allowed to define for GDCE system add-ons.
+
+  Fields:
+    ingress: Optional. Config for Ingress.
+  """
+
+  ingress = _messages.MessageField('Ingress', 1)
+
+
 class TimeWindow(_messages.Message):
   r"""Represents an arbitrary window of time.
 
@@ -1268,7 +1340,8 @@ class VpcProject(_messages.Message):
       configured by user. It is used to create/delete Cloud Router and Cloud
       HA VPNs for VPN connection. If this SA is changed during/after a VPN
       connection is created, you need to remove the Cloud Router and Cloud VPN
-      resources in |project_id|.
+      resources in |project_id|. It is in the form of
+      service-{project_number}@gcp-sa-edgecontainer.iam.gserviceaccount.com.
   """
 
   projectId = _messages.StringField(1)
@@ -1301,6 +1374,7 @@ class VpnConnection(_messages.Message):
       multiple NAT IPs, the customer needs to configure NAT such that only one
       external IP maps to the GMEC Anthos cluster. This is empty if NAT is not
       used.
+    router: Optional. The VPN connection Cloud Router name.
     updateTime: Output only. The time when the VPN connection was last
       updated.
     vpc: The network ID of VPC to connect to.
@@ -1352,9 +1426,10 @@ class VpnConnection(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 6)
   name = _messages.StringField(7)
   natGatewayIp = _messages.StringField(8)
-  updateTime = _messages.StringField(9)
-  vpc = _messages.StringField(10)
-  vpcProject = _messages.MessageField('VpcProject', 11)
+  router = _messages.StringField(9)
+  updateTime = _messages.StringField(10)
+  vpc = _messages.StringField(11)
+  vpcProject = _messages.MessageField('VpcProject', 12)
 
 
 class ZoneMetadata(_messages.Message):

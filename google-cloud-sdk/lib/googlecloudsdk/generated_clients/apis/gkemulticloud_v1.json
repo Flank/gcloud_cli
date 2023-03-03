@@ -210,7 +210,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
           "type": "string"
         },
         "description": {
@@ -227,6 +227,11 @@
         },
         "distribution": {
           "description": "Required. The Kubernetes distribution of the underlying attached cluster. Supported values: [\"eks\", \"aks\"].",
+          "type": "string"
+        },
+        "clusterRegion": {
+          "description": "Output only. The region where this cluster runs. For EKS clusters, this is a AWS region. For AKS clusters, this is an Azure region.",
+          "readOnly": true,
           "type": "string"
         },
         "fleet": {
@@ -314,12 +319,16 @@
         "authorization": {
           "description": "Optional. Configuration related to the cluster RBAC settings.",
           "$ref": "GoogleCloudGkemulticloudV1AttachedClustersAuthorization"
+        },
+        "monitoringConfig": {
+          "description": "Optional. Monitoring configuration for this cluster.",
+          "$ref": "GoogleCloudGkemulticloudV1MonitoringConfig"
         }
       }
     },
     "GoogleCloudGkemulticloudV1AttachedOidcConfig": {
       "id": "GoogleCloudGkemulticloudV1AttachedOidcConfig",
-      "description": "OIDC discovery information of the target cluster. Kubernetes Service Account (KSA) tokens are JWT tokens signed by the cluster API server. This fields indicates how GCP services validate KSA tokens in order to allow system workloads (such as GKE Connect and telemetry agents) to authenticate back to GCP. Both clusters with public and private issuer URLs are supported. Clusters with public issuers only need to specify the `issuer_url` field while clusters with private issuers need to provide both `issuer_url` and `oidc_jwks`.",
+      "description": "OIDC discovery information of the target cluster. Kubernetes Service Account (KSA) tokens are JWT tokens signed by the cluster API server. This fields indicates how Google Cloud Platform services validate KSA tokens in order to allow system workloads (such as GKE Connect and telemetry agents) to authenticate back to Google Cloud Platform. Both clusters with public and private issuer URLs are supported. Clusters with public issuers only need to specify the `issuer_url` field while clusters with private issuers need to provide both `issuer_url` and `oidc_jwks`.",
       "type": "object",
       "properties": {
         "issuerUrl": {
@@ -439,6 +448,28 @@
         }
       }
     },
+    "GoogleCloudGkemulticloudV1MonitoringConfig": {
+      "id": "GoogleCloudGkemulticloudV1MonitoringConfig",
+      "description": "Parameters that describe the Monitoring configuration in a cluster.",
+      "type": "object",
+      "properties": {
+        "managedPrometheusConfig": {
+          "description": "Enable Google Cloud Managed Service for Prometheus in the cluster.",
+          "$ref": "GoogleCloudGkemulticloudV1ManagedPrometheusConfig"
+        }
+      }
+    },
+    "GoogleCloudGkemulticloudV1ManagedPrometheusConfig": {
+      "id": "GoogleCloudGkemulticloudV1ManagedPrometheusConfig",
+      "description": "ManagedPrometheusConfig defines the configuration for Google Cloud Managed Service for Prometheus.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enable Managed Collection.",
+          "type": "boolean"
+        }
+      }
+    },
     "GoogleCloudGkemulticloudV1ImportAttachedClusterRequest": {
       "id": "GoogleCloudGkemulticloudV1ImportAttachedClusterRequest",
       "description": "Request message for `AttachedClusters.ImportAttachedCluster` method.",
@@ -468,7 +499,7 @@
       "type": "object",
       "properties": {
         "attachedClusters": {
-          "description": "A list of AttachedCluster resources in the specified GCP project and region region.",
+          "description": "A list of AttachedCluster resources in the specified Google Cloud Platform project and region region.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudGkemulticloudV1AttachedCluster"
@@ -526,7 +557,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
           "type": "string"
         },
         "description": {
@@ -896,35 +927,13 @@
         }
       }
     },
-    "GoogleCloudGkemulticloudV1MonitoringConfig": {
-      "id": "GoogleCloudGkemulticloudV1MonitoringConfig",
-      "description": "Parameters that describe the Monitoring configuration in a cluster.",
-      "type": "object",
-      "properties": {
-        "managedPrometheusConfig": {
-          "description": "Enable Google Cloud Managed Service for Prometheus in the cluster.",
-          "$ref": "GoogleCloudGkemulticloudV1ManagedPrometheusConfig"
-        }
-      }
-    },
-    "GoogleCloudGkemulticloudV1ManagedPrometheusConfig": {
-      "id": "GoogleCloudGkemulticloudV1ManagedPrometheusConfig",
-      "description": "ManagedPrometheusConfig defines the configuration for Google Cloud Managed Service for Prometheus.",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "description": "Enable Managed Collection.",
-          "type": "boolean"
-        }
-      }
-    },
     "GoogleCloudGkemulticloudV1ListAwsClustersResponse": {
       "id": "GoogleCloudGkemulticloudV1ListAwsClustersResponse",
       "description": "Response message for `AwsClusters.ListAwsClusters` method.",
       "type": "object",
       "properties": {
         "awsClusters": {
-          "description": "A list of AwsCluster resources in the specified GCP project and region region.",
+          "description": "A list of AwsCluster resources in the specified Google Cloud Platform project and region region.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudGkemulticloudV1AwsCluster"
@@ -1055,7 +1064,7 @@
       "type": "object",
       "properties": {
         "instanceType": {
-          "description": "Optional. The AWS instance type. When unspecified, it uses a default based on the node pool's version.",
+          "description": "Optional. The EC2 instance type when creating on-Demand instances. If unspecified during node pool creation, a default will be chosen based on the node pool version, and assigned to this field.",
           "type": "string"
         },
         "rootVolume": {
@@ -1113,6 +1122,10 @@
         "instancePlacement": {
           "description": "Optional. Placement related info for this node. When unspecified, the VPC's default tenancy will be used.",
           "$ref": "GoogleCloudGkemulticloudV1AwsInstancePlacement"
+        },
+        "autoscalingMetricsCollection": {
+          "description": "Optional. Configuration related to CloudWatch metrics collection on the Auto Scaling group of the node pool. When unspecified, metrics collection is disabled.",
+          "$ref": "GoogleCloudGkemulticloudV1AwsAutoscalingGroupMetricsCollection"
         }
       }
     },
@@ -1144,6 +1157,24 @@
             "PREFER_NO_SCHEDULE",
             "NO_EXECUTE"
           ]
+        }
+      }
+    },
+    "GoogleCloudGkemulticloudV1AwsAutoscalingGroupMetricsCollection": {
+      "id": "GoogleCloudGkemulticloudV1AwsAutoscalingGroupMetricsCollection",
+      "description": "Configuration related to CloudWatch metrics collection in an AWS Auto Scaling group.",
+      "type": "object",
+      "properties": {
+        "granularity": {
+          "description": "Required. The frequency at which EC2 Auto Scaling sends aggregated data to AWS CloudWatch. The only valid value is \"1Minute\".",
+          "type": "string"
+        },
+        "metrics": {
+          "description": "Optional. The metrics to enable. For a list of valid metrics, see https:\/\/docs.aws.amazon.com\/autoscaling\/ec2\/APIReference\/API_EnableMetricsCollection.html. If you specify Granularity and don't specify any metrics, all metrics are enabled.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1365,6 +1396,11 @@
           "description": "Required. The Azure Active Directory Application ID.",
           "type": "string"
         },
+        "reconciling": {
+          "description": "Output only. If set, there are currently pending changes to the client.",
+          "readOnly": true,
+          "type": "boolean"
+        },
         "annotations": {
           "description": "Optional. Annotations on the resource. This field has the same restrictions as Kubernetes annotations. The total size of all keys and values combined is limited to 256k. Keys can have 2 segments: prefix (optional) and name (required), separated by a slash (\/). Prefix must be a DNS subdomain. Name must be 63 characters or less, begin and end with alphanumerics, with dashes (-), underscores (_), dots (.), and alphanumerics between.",
           "type": "object",
@@ -1384,6 +1420,12 @@
         },
         "createTime": {
           "description": "Output only. The time at which this resource was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "description": "Output only. The time at which this client was last updated.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
@@ -1414,7 +1456,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+          "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
           "type": "string"
         },
         "description": {
@@ -1430,7 +1472,7 @@
           "type": "string"
         },
         "azureClient": {
-          "description": "Required. Name of the AzureClient that contains authentication configuration for how the Anthos Multi-Cloud API connects to Azure APIs. The `AzureClient` resource must reside on the same GCP project and region as the `AzureCluster`. `AzureClient` names are formatted as `projects\/\/locations\/\/azureClients\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud resource names.",
+          "description": "Optional. Name of the AzureClient that contains authentication configuration for how the Anthos Multi-Cloud API connects to Azure APIs. Either azure_client or azure_services_authentication should be provided. The `AzureClient` resource must reside on the same Google Cloud Platform project and region as the `AzureCluster`. `AzureClient` names are formatted as `projects\/\/locations\/\/azureClients\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud resource names.",
           "type": "string"
         },
         "networking": {
@@ -1444,6 +1486,10 @@
         "authorization": {
           "description": "Required. Configuration related to the cluster RBAC settings.",
           "$ref": "GoogleCloudGkemulticloudV1AzureAuthorization"
+        },
+        "azureServicesAuthentication": {
+          "description": "Optional. Authentication configuration for management of Azure resources. Either azure_client or azure_services_authentication should be provided.",
+          "$ref": "GoogleCloudGkemulticloudV1AzureServicesAuthentication"
         },
         "state": {
           "description": "Output only. The current state of the cluster.",
@@ -1737,6 +1783,21 @@
         }
       }
     },
+    "GoogleCloudGkemulticloudV1AzureServicesAuthentication": {
+      "id": "GoogleCloudGkemulticloudV1AzureServicesAuthentication",
+      "description": "Authentication configuration for the management of Azure resources.",
+      "type": "object",
+      "properties": {
+        "tenantId": {
+          "description": "Required. The Azure Active Directory Tenant ID.",
+          "type": "string"
+        },
+        "applicationId": {
+          "description": "Required. The Azure Active Directory Application ID.",
+          "type": "string"
+        }
+      }
+    },
     "GoogleCloudGkemulticloudV1AzureClusterResources": {
       "id": "GoogleCloudGkemulticloudV1AzureClusterResources",
       "description": "Managed Azure resources for the cluster. The values could change and be empty, depending on the state of the cluster.",
@@ -1771,7 +1832,7 @@
       "type": "object",
       "properties": {
         "azureClusters": {
-          "description": "A list of AzureCluster resources in the specified GCP project and region region.",
+          "description": "A list of AzureCluster resources in the specified Google Cloud Platform project and region region.",
           "type": "array",
           "items": {
             "$ref": "GoogleCloudGkemulticloudV1AzureCluster"
@@ -2068,7 +2129,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The `AzureServerConfig` resource name. `AzureServerConfig` names are formatted as `projects\/\/locations\/\/azureServerConfig`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+          "description": "The `AzureServerConfig` resource name. `AzureServerConfig` names are formatted as `projects\/\/locations\/\/azureServerConfig`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
           "type": "string"
         },
         "validVersions": {
@@ -2129,6 +2190,16 @@
           "description": "Output only. Human-readable status of any error that occurred during the operation.",
           "readOnly": true,
           "type": "string"
+        },
+        "verb": {
+          "description": "Output only. The verb associated with the API method which triggered this operation. Possible values are \"create\", \"delete\", \"update\" and \"import\".",
+          "readOnly": true,
+          "type": "string"
+        },
+        "requestedCancellation": {
+          "description": "Output only. Identifies whether it has been requested cancellation for the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
+          "type": "boolean"
         }
       }
     }
@@ -2177,7 +2248,7 @@
                   "type": "string"
                 },
                 "attachedClusterId": {
-                  "description": "Required. A client provided ID the resource. Must be unique within the parent resource. The provided ID will be part of the AttachedCluster resource name formatted as `projects\/\/locations\/\/attachedClusters\/`. Valid characters are `\/a-z-\/`. Cannot be longer than 63 characters. When generating an install manifest for importing an existing Membership resource, the attached_cluster_id field must be the Membership id. Membership names are formatted as `resource name formatted as `projects\/\/locations\/\/memberships\/`.",
+                  "description": "Required. A client provided ID of the resource. Must be unique within the parent resource. The provided ID will be part of the AttachedCluster resource name formatted as `projects\/\/locations\/\/attachedClusters\/`. Valid characters are `\/a-z-\/`. Cannot be longer than 63 characters. When generating an install manifest for importing an existing Membership resource, the attached_cluster_id field must be the Membership id. Membership names are formatted as `projects\/\/locations\/\/memberships\/`.",
                   "location": "query",
                   "type": "string"
                 },
@@ -2412,7 +2483,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new AttachedCluster resource on a given GCP project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
+                  "description": "Creates a new AttachedCluster resource on a given Google Cloud Platform project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
                 },
                 "patch": {
                   "id": "gkemulticloud.projects.locations.attachedClusters.patch",
@@ -2421,7 +2492,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/attachedClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2433,7 +2504,7 @@
                       "type": "boolean"
                     },
                     "updateMask": {
-                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AttachedCluster: * `description`. * `annotations`. * `platform_version`. * `authorization.admin_users`.",
+                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AttachedCluster: * `description`. * `annotations`. * `platform_version`. * `authorization.admin_users`. * `logging_config.component_config.enable_components`. * `monitoring_config.managed_prometheus_config.enabled`.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2488,7 +2559,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The name of the AttachedCluster resource to describe. `AttachedCluster` names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The name of the AttachedCluster resource to describe. `AttachedCluster` names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/attachedClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2513,7 +2584,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent location which owns this collection of AttachedCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The parent location which owns this collection of AttachedCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2549,7 +2620,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The resource name the AttachedCluster to delete. `AttachedCluster` names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The resource name the AttachedCluster to delete. `AttachedCluster` names are formatted as `projects\/\/locations\/\/attachedClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/attachedClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2627,7 +2698,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new AwsCluster resource on a given GCP project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
+                  "description": "Creates a new AwsCluster resource on a given Google Cloud Platform project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
                 },
                 "patch": {
                   "id": "gkemulticloud.projects.locations.awsClusters.patch",
@@ -2636,7 +2707,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/awsClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2648,7 +2719,7 @@
                       "type": "boolean"
                     },
                     "updateMask": {
-                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AwsCluster: * `description`. * `annotations`. * `control_plane.version`. * `authorization.admin_users`. * `control_plane.aws_services_authentication.role_arn`. * `control_plane.aws_services_authentication.role_session_name`. * `control_plane.config_encryption.kms_key_arn`. * `control_plane.instance_type`. * `control_plane.security_group_ids`. * `control_plane.proxy_config`. * `control_plane.proxy_config.secret_arn`. * `control_plane.proxy_config.secret_version`. * `control_plane.root_volume.size_gib`. * `control_plane.root_volume.volume_type`. * `control_plane.root_volume.iops`. * `control_plane.root_volume.kms_key_arn`. * `control_plane.ssh_config`. * `control_plane.ssh_config.ec2_key_pair`. * `control_plane.instance_placement.tenancy`. * `control_plane.iam_instance_profile`. * `logging_config.component_config.enable_components`. * `control_plane.tags`.",
+                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AwsCluster: * `description`. * `annotations`. * `control_plane.version`. * `authorization.admin_users`. * `control_plane.aws_services_authentication.role_arn`. * `control_plane.aws_services_authentication.role_session_name`. * `control_plane.config_encryption.kms_key_arn`. * `control_plane.instance_type`. * `control_plane.security_group_ids`. * `control_plane.proxy_config`. * `control_plane.proxy_config.secret_arn`. * `control_plane.proxy_config.secret_version`. * `control_plane.root_volume.size_gib`. * `control_plane.root_volume.volume_type`. * `control_plane.root_volume.iops`. * `control_plane.root_volume.kms_key_arn`. * `control_plane.ssh_config`. * `control_plane.ssh_config.ec2_key_pair`. * `control_plane.instance_placement.tenancy`. * `control_plane.iam_instance_profile`. * `logging_config.component_config.enable_components`. * `control_plane.tags`. * `monitoring_config.managed_prometheus_config.enabled`.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -2675,7 +2746,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The name of the AwsCluster resource to describe. `AwsCluster` names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The name of the AwsCluster resource to describe. `AwsCluster` names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/awsClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2700,7 +2771,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent location which owns this collection of AwsCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The parent location which owns this collection of AwsCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2736,7 +2807,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The resource name the AwsCluster to delete. `AwsCluster` names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The resource name the AwsCluster to delete. `AwsCluster` names are formatted as `projects\/\/locations\/\/awsClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/awsClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -2881,7 +2952,7 @@
                           "type": "boolean"
                         },
                         "updateMask": {
-                          "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AwsNodePool: * `annotations`. * `version`. * `autoscaling.min_node_count`. * `autoscaling.max_node_count`. * `config.config_encryption.kms_key_arn`. * `config.security_group_ids`. * `config.root_volume.iops`. * `config.root_volume.kms_key_arn`. * `config.root_volume.volume_type`. * `config.root_volume.size_gib`. * `config.proxy_config`. * `config.proxy_config.secret_arn`. * `config.proxy_config.secret_version`. * `config.ssh_config`. * `config.ssh_config.ec2_key_pair`. * `config.instance_placement.tenancy`. * `config.iam_instance_profile`. * `config.labels`.",
+                          "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AwsNodePool: * `annotations`. * `version`. * `autoscaling.min_node_count`. * `autoscaling.max_node_count`. * `config.config_encryption.kms_key_arn`. * `config.security_group_ids`. * `config.root_volume.iops`. * `config.root_volume.kms_key_arn`. * `config.root_volume.volume_type`. * `config.root_volume.size_gib`. * `config.proxy_config`. * `config.proxy_config.secret_arn`. * `config.proxy_config.secret_version`. * `config.ssh_config`. * `config.ssh_config.ec2_key_pair`. * `config.instance_placement.tenancy`. * `config.iam_instance_profile`. * `config.labels`. * `config.tags`. * `config.autoscaling_metrics_collection`. * `config.autoscaling_metrics_collection.granularity`. * `config.autoscaling_metrics_collection.metrics`.",
                           "location": "query",
                           "type": "string",
                           "format": "google-fieldmask"
@@ -3107,7 +3178,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent location which owns this collection of AzureClient resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The parent location which owns this collection of AzureClient resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -3211,7 +3282,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Creates a new AzureCluster resource on a given GCP project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
+                  "description": "Creates a new AzureCluster resource on a given Google Cloud Platform project and region. If successful, the response contains a newly created Operation resource that can be described to track the status of the operation."
                 },
                 "patch": {
                   "id": "gkemulticloud.projects.locations.azureClusters.patch",
@@ -3220,7 +3291,7 @@
                   "httpMethod": "PATCH",
                   "parameters": {
                     "name": {
-                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "The name of this resource. Cluster names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/azureClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -3232,7 +3303,7 @@
                       "type": "boolean"
                     },
                     "updateMask": {
-                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AzureCluster: * `description`. * `azureClient`. * `control_plane.version`. * `control_plane.vm_size`. * `annotations`. * `authorization.admin_users`. * `control_plane.root_volume.size_gib`. * `control_plane.proxy_config`. * `control_plane.proxy_config.resource_group_id`. * `control_plane.proxy_config.secret_id`. * `control_plane.ssh_config.authorized_key`. * `logging_config.component_config.enable_components`",
+                      "description": "Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field can only include these fields from AzureCluster: * `description`. * `azureClient`. * `control_plane.version`. * `control_plane.vm_size`. * `annotations`. * `authorization.admin_users`. * `control_plane.root_volume.size_gib`. * `azure_services_authentication`. * `azure_services_authentication.tenant_id`. * `azure_services_authentication.application_id`. * `control_plane.proxy_config`. * `control_plane.proxy_config.resource_group_id`. * `control_plane.proxy_config.secret_id`. * `control_plane.ssh_config.authorized_key`. * `logging_config.component_config.enable_components` * `monitoring_config.managed_prometheus_config.enabled`.",
                       "location": "query",
                       "type": "string",
                       "format": "google-fieldmask"
@@ -3259,7 +3330,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "description": "Required. The name of the AzureCluster resource to describe. `AzureCluster` names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The name of the AzureCluster resource to describe. `AzureCluster` names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/azureClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -3284,7 +3355,7 @@
                   "httpMethod": "GET",
                   "parameters": {
                     "parent": {
-                      "description": "Required. The parent location which owns this collection of AzureCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The parent location which owns this collection of AzureCluster resources. Location names are formatted as `projects\/\/locations\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "location": "path",
                       "required": true,
@@ -3320,7 +3391,7 @@
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "Required. The resource name the AzureCluster to delete. `AzureCluster` names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on GCP resource names.",
+                      "description": "Required. The resource name the AzureCluster to delete. `AzureCluster` names are formatted as `projects\/\/locations\/\/azureClusters\/`. See [Resource Names](https:\/\/cloud.google.com\/apis\/design\/resource_names) for more details on Google Cloud Platform resource names.",
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/azureClusters\/[^\/]+$",
                       "location": "path",
                       "required": true,

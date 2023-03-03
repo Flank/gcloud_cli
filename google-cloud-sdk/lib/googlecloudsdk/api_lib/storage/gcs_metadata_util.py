@@ -27,6 +27,7 @@ from googlecloudsdk.api_lib.storage import gcs_metadata_field_converters
 from googlecloudsdk.api_lib.storage import metadata_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.storage import encryption_util
+from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import gzip_util
 from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import user_request_args_factory
@@ -39,6 +40,8 @@ from googlecloudsdk.command_lib.storage.resources import gcs_resource_reference
 # object ACL.
 PRIVATE_DEFAULT_OBJECT_ACL = apis.GetMessagesModule(
     'storage', 'v1').ObjectAccessControl(id='PRIVATE_DEFAULT_OBJ_ACL')
+
+_NO_TRANSFORM = 'no-transform'
 
 
 def _message_to_dict(message):
@@ -71,7 +74,7 @@ def copy_object_metadata(source_metadata,
       backend must generate and preserving destination address.
 
   Returns:
-    New destination metatdata with data copied from source (messages.Object).
+    New destination metadata with data copied from source (messages.Object).
   """
   if should_deep_copy:
     destination_bucket = destination_metadata.bucket
@@ -129,15 +132,31 @@ def get_bucket_resource_from_metadata(metadata):
   """
   url = storage_url.CloudUrl(
       scheme=storage_url.ProviderPrefix.GCS, bucket_name=metadata.name)
+
+  if metadata.autoclass and metadata.autoclass.enabled:
+    autoclass_enabled_time = metadata.autoclass.toggleTime
+  else:
+    autoclass_enabled_time = None
+
   uniform_bucket_level_access = getattr(
       getattr(metadata.iamConfiguration, 'uniformBucketLevelAccess', None),
       'enabled', None)
+
+  # TODO(b/264528234): Delete `remove_excess_acl_fields`.
   return gcs_resource_reference.GcsBucketResource(
       url,
-      acl=_message_to_dict(metadata.acl),
+      acl=_message_to_dict(
+          gcs_metadata_field_converters.remove_excess_acl_fields(metadata.acl)
+      ),
+      autoclass_enabled_time=autoclass_enabled_time,
       cors_config=_message_to_dict(metadata.cors),
       creation_time=metadata.timeCreated,
-      default_acl=_message_to_dict(metadata.defaultObjectAcl),
+      custom_placement_config=_message_to_dict(metadata.customPlacementConfig),
+      default_acl=_message_to_dict(
+          gcs_metadata_field_converters.remove_excess_acl_fields(
+              metadata.defaultObjectAcl
+          )
+      ),
       default_event_based_hold=metadata.defaultEventBasedHold,
       default_kms_key=getattr(metadata.encryption, 'defaultKmsKeyName', None),
       default_storage_class=metadata.storageClass,
@@ -150,8 +169,9 @@ def get_bucket_resource_from_metadata(metadata):
       metadata=metadata,
       metageneration=metadata.metageneration,
       project_number=metadata.projectNumber,
-      public_access_prevention=getattr(metadata.iamConfiguration,
-                                       'publicAccessPrevention', None),
+      public_access_prevention=getattr(
+          metadata.iamConfiguration, 'publicAccessPrevention', None
+      ),
       requester_pays=getattr(metadata.billing, 'requesterPays', None),
       retention_policy=_message_to_dict(metadata.retentionPolicy),
       rpo=metadata.rpo,
@@ -159,7 +179,8 @@ def get_bucket_resource_from_metadata(metadata):
       uniform_bucket_level_access=uniform_bucket_level_access,
       update_time=metadata.updated,
       versioning_enabled=getattr(metadata.versioning, 'enabled', None),
-      website_config=_message_to_dict(metadata.website))
+      website_config=_message_to_dict(metadata.website),
+  )
 
 
 def get_metadata_from_bucket_resource(resource):
@@ -211,14 +232,17 @@ def get_object_resource_from_metadata(metadata):
       generation=generation)
 
   if metadata.customerEncryption:
-    decryption_key_hash = metadata.customerEncryption.keySha256
+    decryption_key_hash_sha256 = metadata.customerEncryption.keySha256
     encryption_algorithm = metadata.customerEncryption.encryptionAlgorithm
   else:
-    decryption_key_hash = encryption_algorithm = None
+    decryption_key_hash_sha256 = encryption_algorithm = None
 
+  # TODO(b/264528234): Delete `remove_excess_acl_fields`.
   return gcs_resource_reference.GcsObjectResource(
       url,
-      acl=_message_to_dict(metadata.acl),
+      acl=_message_to_dict(
+          gcs_metadata_field_converters.remove_excess_acl_fields(metadata.acl)
+      ),
       cache_control=metadata.cacheControl,
       component_count=metadata.componentCount,
       content_disposition=metadata.contentDisposition,
@@ -227,13 +251,14 @@ def get_object_resource_from_metadata(metadata):
       content_type=metadata.contentType,
       crc32c_hash=metadata.crc32c,
       creation_time=metadata.timeCreated,
-      custom_metadata=_message_to_dict(metadata.metadata),
+      custom_fields=_message_to_dict(metadata.metadata),
       custom_time=metadata.customTime,
-      decryption_key_hash=decryption_key_hash,
+      decryption_key_hash_sha256=decryption_key_hash_sha256,
       encryption_algorithm=encryption_algorithm,
       etag=metadata.etag,
-      event_based_hold=(metadata.eventBasedHold
-                        if metadata.eventBasedHold else None),
+      event_based_hold=(
+          metadata.eventBasedHold if metadata.eventBasedHold else None
+      ),
       kms_key=metadata.kmsKeyName,
       md5_hash=metadata.md5Hash,
       metadata=metadata,
@@ -244,7 +269,103 @@ def get_object_resource_from_metadata(metadata):
       storage_class=metadata.storageClass,
       storage_class_update_time=metadata.timeStorageClassUpdated,
       temporary_hold=metadata.temporaryHold if metadata.temporaryHold else None,
-      update_time=metadata.updated)
+      update_time=metadata.updated,
+  )
+
+
+def _get_list_with_added_and_removed_acl_grants(acl_list,
+                                                resource_args,
+                                                is_bucket=False,
+                                                is_default_object_acl=False):
+  """Returns shallow copy of ACL policy object with requested changes.
+
+  Args:
+    acl_list (list): Contains Apitools ACL objects for buckets or objects.
+    resource_args (request_config_factory._ResourceConfig): Contains desired
+      changes for the ACL policy.
+    is_bucket (bool): Used to determine if ACL for bucket or object. False
+      implies a cloud storage object.
+    is_default_object_acl (bool): Used to determine if target is default object
+      ACL list.
+
+  Returns:
+    list: Shallow copy of acl_list with added and removed grants.
+  """
+
+  new_acl_list = []
+  if is_default_object_acl:
+    acl_grants_to_remove = set(
+        resource_args.default_object_acl_grants_to_remove or [])
+    acl_grants_to_add = resource_args.default_object_acl_grants_to_add or []
+  else:
+    acl_grants_to_remove = set(resource_args.acl_grants_to_remove or [])
+    acl_grants_to_add = resource_args.acl_grants_to_add or []
+
+  found_match = {entity: False for entity in acl_grants_to_remove}
+  for existing_grant in acl_list:
+    if existing_grant.entity in acl_grants_to_remove:
+      found_match[existing_grant.entity] = True
+    else:
+      new_acl_list.append(existing_grant)
+
+  unmatched_entities = [k for k, v in found_match.items() if not v]
+  if unmatched_entities:
+    raise errors.Error(
+        'ACL entities marked for removal did not match existing grants:'
+        ' {}'.format(sorted(unmatched_entities))
+    )
+
+  acl_class = gcs_metadata_field_converters.get_bucket_or_object_acl_class(
+      is_bucket)
+
+  for new_grant in acl_grants_to_add:
+    new_acl_list.append(
+        acl_class(entity=new_grant.get('entity'), role=new_grant.get('role'))
+    )
+
+  return new_acl_list
+
+
+def _get_labels_object_with_added_and_removed_labels(labels_object,
+                                                     resource_args):
+  """Returns shallow copy of bucket labels object with requested changes.
+
+  Args:
+    labels_object (messages.Bucket.LabelsValue|None): Existing labels.
+    resource_args (request_config_factory._BucketConfig): Contains desired
+      changes for labels list.
+
+  Returns:
+    messages.Bucket.LabelsValue|None: Contains shallow copy of labels list with
+      added and removed values or None if there was no original object.
+  """
+  messages = apis.GetMessagesModule('storage', 'v1')
+  if labels_object:
+    existing_labels = labels_object.additionalProperties
+  else:
+    existing_labels = []
+  new_labels = []
+
+  labels_to_remove = set(resource_args.labels_to_remove or [])
+  for existing_label in existing_labels:
+    if existing_label.key in labels_to_remove:
+      # The backend deletes labels whose value is None.
+      new_labels.append(
+          messages.Bucket.LabelsValue.AdditionalProperty(
+              key=existing_label.key, value=None))
+    else:
+      new_labels.append(existing_label)
+
+  labels_to_append = resource_args.labels_to_append or {}
+  for key, value in labels_to_append.items():
+    new_labels.append(
+        messages.Bucket.LabelsValue.AdditionalProperty(key=key, value=value))
+
+  if not (labels_object or new_labels):
+    # Don't send extra data to the API if we're not adding or removing anything.
+    return None
+  # If all label objects have a None value, backend removes the whole property.
+  return messages.Bucket.LabelsValue(additionalProperties=new_labels)
 
 
 def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
@@ -253,6 +374,9 @@ def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
   if not resource_args:
     return
 
+  if resource_args.enable_autoclass is not None:
+    bucket_metadata.autoclass = gcs_metadata_field_converters.process_autoclass(
+        resource_args.enable_autoclass)
   if resource_args.cors_file_path is not None:
     bucket_metadata.cors = gcs_metadata_field_converters.process_cors(
         resource_args.cors_file_path)
@@ -267,9 +391,6 @@ def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
     bucket_metadata.storageClass = (
         gcs_metadata_field_converters.process_default_storage_class(
             resource_args.default_storage_class))
-  if resource_args.labels_file_path is not None:
-    bucket_metadata.labels = gcs_metadata_field_converters.process_labels(
-        resource_args.labels_file_path)
   if resource_args.lifecycle_file_path is not None:
     bucket_metadata.lifecycle = (
         gcs_metadata_field_converters.process_lifecycle(
@@ -281,11 +402,21 @@ def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
     bucket_metadata.logging = gcs_metadata_field_converters.process_log_config(
         bucket_metadata.name, resource_args.log_bucket,
         resource_args.log_object_prefix)
-  if resource_args.public_access_prevention is not None:
+  if resource_args.placement is not None:
+    bucket_metadata.customPlacementConfig = (
+        gcs_metadata_field_converters.process_placement_config(
+            resource_args.placement))
+  if (resource_args.public_access_prevention is not None or
+      resource_args.uniform_bucket_level_access is not None):
+    # Note: The IAM policy (with role grants) is stored separately because it
+    # has its own API.
     bucket_metadata.iamConfiguration = (
-        gcs_metadata_field_converters.process_public_access_prevention(
+        gcs_metadata_field_converters.process_bucket_iam_configuration(
             bucket_metadata.iamConfiguration,
-            resource_args.public_access_prevention))
+            resource_args.public_access_prevention,
+            resource_args.uniform_bucket_level_access))
+  if resource_args.recovery_point_objective is not None:
+    bucket_metadata.rpo = resource_args.recovery_point_objective
   if resource_args.requester_pays is not None:
     bucket_metadata.billing = (
         gcs_metadata_field_converters.process_requester_pays(
@@ -294,11 +425,6 @@ def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
     bucket_metadata.retentionPolicy = (
         gcs_metadata_field_converters.process_retention_period(
             resource_args.retention_period))
-  if resource_args.uniform_bucket_level_access is not None:
-    bucket_metadata.iamConfiguration = (
-        gcs_metadata_field_converters.process_uniform_bucket_level_access(
-            bucket_metadata.iamConfiguration,
-            resource_args.uniform_bucket_level_access))
   if resource_args.versioning is not None:
     bucket_metadata.versioning = (
         gcs_metadata_field_converters.process_versioning(
@@ -308,6 +434,37 @@ def update_bucket_metadata_from_request_config(bucket_metadata, request_config):
     bucket_metadata.website = gcs_metadata_field_converters.process_website(
         resource_args.web_error_page, resource_args.web_main_page_suffix)
 
+  if resource_args.acl_file_path is not None:
+    bucket_metadata.acl = gcs_metadata_field_converters.process_acl_file(
+        resource_args.acl_file_path, is_bucket=True
+    )
+  bucket_metadata.acl = (
+      _get_list_with_added_and_removed_acl_grants(
+          bucket_metadata.acl,
+          resource_args,
+          is_bucket=True,
+          is_default_object_acl=False))
+
+  if resource_args.default_object_acl_file_path is not None:
+    bucket_metadata.defaultObjectAcl = (
+        gcs_metadata_field_converters.process_acl_file(
+            resource_args.default_object_acl_file_path, is_bucket=False
+        )
+    )
+  bucket_metadata.defaultObjectAcl = (
+      _get_list_with_added_and_removed_acl_grants(
+          bucket_metadata.defaultObjectAcl,
+          resource_args,
+          is_bucket=False,
+          is_default_object_acl=True))
+
+  if resource_args.labels_file_path is not None:
+    bucket_metadata.labels = gcs_metadata_field_converters.process_labels(
+        bucket_metadata.labels, resource_args.labels_file_path)
+  # Can still add labels after clear.
+  bucket_metadata.labels = _get_labels_object_with_added_and_removed_labels(
+      bucket_metadata.labels, resource_args)
+
 
 def get_cleared_bucket_fields(request_config):
   """Gets a list of fields to be included in requests despite null values."""
@@ -316,7 +473,14 @@ def get_cleared_bucket_fields(request_config):
   if not resource_args:
     return cleared_fields
 
-  if resource_args.cors_file_path == user_request_args_factory.CLEAR:
+  if (
+      resource_args.cors_file_path == user_request_args_factory.CLEAR
+      or resource_args.cors_file_path
+      and not metadata_util.cached_read_yaml_json_file(
+          resource_args.cors_file_path
+      )
+  ):
+    # Empty JSON object similar to CLEAR flag.
     cleared_fields.append('cors')
 
   if resource_args.default_encryption_key == user_request_args_factory.CLEAR:
@@ -328,26 +492,38 @@ def get_cleared_bucket_fields(request_config):
   if resource_args.labels_file_path == user_request_args_factory.CLEAR:
     cleared_fields.append('labels')
 
-  if resource_args.lifecycle_file_path == user_request_args_factory.CLEAR:
+  if (
+      resource_args.lifecycle_file_path == user_request_args_factory.CLEAR
+      or resource_args.lifecycle_file_path
+      and not metadata_util.cached_read_yaml_json_file(
+          resource_args.lifecycle_file_path
+      )
+  ):
+    # Empty JSON object similar to CLEAR flag.
     cleared_fields.append('lifecycle')
 
-  if (resource_args.log_bucket == resource_args.log_object_prefix ==
-      user_request_args_factory.CLEAR):
+  if (
+      resource_args.log_bucket
+      == resource_args.log_object_prefix
+      == user_request_args_factory.CLEAR
+  ):
     cleared_fields.append('logging')
   elif resource_args.log_bucket == user_request_args_factory.CLEAR:
     cleared_fields.append('logging.logBucket')
   elif resource_args.log_object_prefix == user_request_args_factory.CLEAR:
     cleared_fields.append('logging.logObjectPrefix')
 
-  if (resource_args.public_access_prevention == user_request_args_factory.CLEAR
-     ):
+  if resource_args.public_access_prevention == user_request_args_factory.CLEAR:
     cleared_fields.append('iamConfiguration.publicAccessPrevention')
 
   if resource_args.retention_period == user_request_args_factory.CLEAR:
     cleared_fields.append('retentionPolicy')
 
-  if (resource_args.web_error_page
-      == resource_args.web_main_page_suffix == user_request_args_factory.CLEAR):
+  if (
+      resource_args.web_error_page
+      == resource_args.web_main_page_suffix
+      == user_request_args_factory.CLEAR
+  ):
     cleared_fields.append('website')
   elif resource_args.web_error_page == user_request_args_factory.CLEAR:
     cleared_fields.append('website.notFoundPage')
@@ -389,12 +565,12 @@ def update_object_metadata_from_request_config(object_metadata,
     existing_metadata = encoding_helper.MessageToDict(
         object_metadata.metadata)
 
-  custom_metadata_dict = metadata_util.get_updated_custom_metadata(
+  custom_fields_dict = metadata_util.get_updated_custom_fields(
       existing_metadata, request_config, file_path=file_path)
-  if custom_metadata_dict is not None:
+  if custom_fields_dict is not None:
     messages = apis.GetMessagesModule('storage', 'v1')
     object_metadata.metadata = encoding_helper.DictToMessage(
-        custom_metadata_dict, messages.Object.MetadataValue)
+        custom_fields_dict, messages.Object.MetadataValue)
 
   # Gzip handling.
   should_gzip_locally = gzip_util.should_gzip_locally(
@@ -405,10 +581,14 @@ def update_object_metadata_from_request_config(object_metadata,
     content_encoding = getattr(resource_args, 'content_encoding', None)
   _process_value_or_clear_flag(object_metadata, 'contentEncoding',
                                content_encoding)
+
+  user_cache_control = getattr(resource_args, 'cache_control', None)
   if should_gzip_locally:
-    cache_control = 'no-transform'
+    cache_control = (
+        _NO_TRANSFORM if user_cache_control is None else '{}, {}'.format(
+            user_cache_control, _NO_TRANSFORM))
   else:
-    cache_control = getattr(resource_args, 'cache_control', None)
+    cache_control = user_cache_control
   _process_value_or_clear_flag(object_metadata, 'cacheControl', cache_control)
 
   if not resource_args:
@@ -442,3 +622,10 @@ def update_object_metadata_from_request_config(object_metadata,
     object_metadata.eventBasedHold = resource_args.event_based_hold
   if resource_args.temporary_hold is not None:
     object_metadata.temporaryHold = resource_args.temporary_hold
+
+  if resource_args.acl_file_path is not None:
+    object_metadata.acl = gcs_metadata_field_converters.process_acl_file(
+        resource_args.acl_file_path)
+  object_metadata.acl = (
+      _get_list_with_added_and_removed_acl_grants(
+          object_metadata.acl, resource_args, is_bucket=False))

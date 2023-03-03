@@ -2,10 +2,10 @@
 
   help_text:
     brief: Describe a membership.
-    description: Describe a membership in Fleet.
+    description: Describe a membership in a fleet.
     examples: |
       First retrieve the ID of the membership using the command below. The output of this command
-      lists all the fleet's members, with their unique IDs in the Names column:
+      lists all the fleet's members, with their unique IDs in the NAME column:
 
         $ {parent_command} list
 
@@ -15,9 +15,9 @@
 
   request:
     collection: gkehub.projects.locations.memberships
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.container.fleet.memberships.util:SetMembershipLocation
     ALPHA:
-      modify_request_hooks:
-      - googlecloudsdk.command_lib.container.fleet.memberships.util:SetMembershipLocation
       api_version: v1alpha2
     BETA:
       api_version: v1beta1

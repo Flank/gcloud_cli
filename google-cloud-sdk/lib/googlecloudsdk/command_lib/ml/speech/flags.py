@@ -177,7 +177,7 @@ class RecognizeArgsToRequestMapper:
         default=False,
         help='If True, the server will attempt to filter out profanities, '
         'replacing all but the initial character in each filtered word with '
-        'asterisks, e.g. \"f***\".')
+        'asterisks, e.g. ```f***```.')
     parser.add_argument(
         '--enable-automatic-punctuation',
         action='store_true',
@@ -201,8 +201,13 @@ class RecognizeArgsToRequestMapper:
       config.enableAutomaticPunctuation = args.enable_automatic_punctuation
     if args.model is not None:
       if args.model in [
-          'default', 'command_and_search', 'phone_call', 'latest_long',
-          'latest_short'
+          'default',
+          'command_and_search',
+          'phone_call',
+          'latest_long',
+          'latest_short',
+          'medical_conversation',
+          'medical_dictation',
       ]:
         config.model = args.model
       elif args.model == 'phone_call_enhanced':

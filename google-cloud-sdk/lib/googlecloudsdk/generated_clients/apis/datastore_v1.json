@@ -414,8 +414,51 @@
           "type": "string",
           "format": "byte"
         },
+        "newTransaction": {
+          "description": "Options for beginning a new transaction for this request. The new transaction identifier will be returned in the corresponding response as either LookupResponse.transaction or RunQueryResponse.transaction.",
+          "$ref": "TransactionOptions"
+        },
         "readTime": {
           "description": "Reads entities as they were at the given time. This may not be older than 270 seconds. This value is only supported for Cloud Firestore in Datastore mode.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "TransactionOptions": {
+      "id": "TransactionOptions",
+      "description": "Options for beginning a new transaction. Transactions can be created explicitly with calls to Datastore.BeginTransaction or implicitly by setting ReadOptions.new_transaction in read requests.",
+      "type": "object",
+      "properties": {
+        "readWrite": {
+          "description": "The transaction should allow both reads and writes.",
+          "$ref": "ReadWrite"
+        },
+        "readOnly": {
+          "description": "The transaction should only allow reads.",
+          "$ref": "ReadOnly"
+        }
+      }
+    },
+    "ReadWrite": {
+      "id": "ReadWrite",
+      "description": "Options specific to read \/ write transactions.",
+      "type": "object",
+      "properties": {
+        "previousTransaction": {
+          "description": "The transaction identifier of the transaction being retried.",
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "ReadOnly": {
+      "id": "ReadOnly",
+      "description": "Options specific to read-only transactions.",
+      "type": "object",
+      "properties": {
+        "readTime": {
+          "description": "Reads entities at the given time. This may not be older than 60 seconds.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -504,6 +547,11 @@
             "$ref": "Key"
           }
         },
+        "transaction": {
+          "description": "The identifier of the transaction that was started as part of this Lookup request. Set only when ReadOptions.new_transaction was set in LookupRequest.read_options.",
+          "type": "string",
+          "format": "byte"
+        },
         "readTime": {
           "description": "The time at which these entities were read or found missing.",
           "type": "string",
@@ -524,6 +572,11 @@
           "description": "The version of the entity, a strictly positive number that monotonically increases with changes to the entity. This field is set for `FULL` entity results. For missing entities in `LookupResponse`, this is the version of the snapshot that was used to look up the entity, and it is always set except for eventually consistent reads.",
           "type": "string",
           "format": "int64"
+        },
+        "createTime": {
+          "description": "The time at which the entity was created. This field is set for `FULL` entity results. If this entity is missing, this field will not be set.",
+          "type": "string",
+          "format": "google-datetime"
         },
         "updateTime": {
           "description": "The time at which the entity was last changed. This field is set for `FULL` entity results. If this entity is missing, this field will not be set.",
@@ -800,11 +853,13 @@
           "type": "string",
           "enumDescriptions": [
             "Unspecified. This value must not be used.",
-            "The results are required to satisfy each of the combined filters."
+            "The results are required to satisfy each of the combined filters.",
+            "Documents are required to satisfy at least one of the combined filters."
           ],
           "enum": [
             "OPERATOR_UNSPECIFIED",
-            "AND"
+            "AND",
+            "OR"
           ]
         },
         "filters": {
@@ -837,7 +892,7 @@
             "The given `property` is equal to the given `value`.",
             "The given `property` is equal to at least one value in the given array. Requires: * That `value` is a non-empty `ArrayValue` with at most 10 values. * No other `IN` or `NOT_IN` is in the same query.",
             "The given `property` is not equal to the given `value`. Requires: * No other `NOT_EQUAL` or `NOT_IN` is in the same query. * That `property` comes first in the `order_by`.",
-            "Limit the result set to the given entity and its descendants. Requires: * That `value` is an entity key.",
+            "Limit the result set to the given entity and its descendants. Requires: * That `value` is an entity key. * No other `HAS_ANCESTOR` is in the same query.",
             "The value of the `property` is not in the given array. Requires: * That `value` is a non-empty `ArrayValue` with at most 10 values. * No other `IN`, `NOT_IN`, `NOT_EQUAL` is in the same query. * That `field` comes first in the `order_by`."
           ],
           "enum": [
@@ -941,6 +996,11 @@
         "query": {
           "description": "The parsed form of the `GqlQuery` from the request, if it was set.",
           "$ref": "Query"
+        },
+        "transaction": {
+          "description": "The identifier of the transaction that was started as part of this RunQuery request. Set only when ReadOptions.new_transaction was set in RunQueryRequest.read_options.",
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -1017,6 +1077,149 @@
         }
       }
     },
+    "RunAggregationQueryRequest": {
+      "id": "RunAggregationQueryRequest",
+      "description": "The request for Datastore.RunAggregationQuery.",
+      "type": "object",
+      "properties": {
+        "databaseId": {
+          "description": "The ID of the database against which to make the request. '(default)' is not allowed; please use empty string '' to refer the default database.",
+          "type": "string"
+        },
+        "partitionId": {
+          "description": "Entities are partitioned into subsets, identified by a partition ID. Queries are scoped to a single partition. This partition ID is normalized with the standard default context partition ID.",
+          "$ref": "PartitionId"
+        },
+        "readOptions": {
+          "description": "The options for this query.",
+          "$ref": "ReadOptions"
+        },
+        "aggregationQuery": {
+          "description": "The query to run.",
+          "$ref": "AggregationQuery"
+        },
+        "gqlQuery": {
+          "description": "The GQL query to run. This query must be an aggregation query.",
+          "$ref": "GqlQuery"
+        }
+      }
+    },
+    "AggregationQuery": {
+      "id": "AggregationQuery",
+      "description": "Datastore query for running an aggregation over a Query.",
+      "type": "object",
+      "properties": {
+        "nestedQuery": {
+          "description": "Nested query for aggregation",
+          "$ref": "Query"
+        },
+        "aggregations": {
+          "description": "Optional. Series of aggregations to apply over the results of the `nested_query`. Requires: * A minimum of one and maximum of five aggregations per query.",
+          "type": "array",
+          "items": {
+            "$ref": "Aggregation"
+          }
+        }
+      }
+    },
+    "Aggregation": {
+      "id": "Aggregation",
+      "description": "Defines a aggregation that produces a single result.",
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "Count aggregator.",
+          "$ref": "Count"
+        },
+        "alias": {
+          "description": "Optional. Optional name of the property to store the result of the aggregation. If not provided, Datastore will pick a default name following the format `property_`. For example: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2), COUNT_UP_TO(3) AS count_up_to_3, COUNT_UP_TO(4) OVER ( ... ); ``` becomes: ``` AGGREGATE COUNT_UP_TO(1) AS count_up_to_1, COUNT_UP_TO(2) AS property_1, COUNT_UP_TO(3) AS count_up_to_3, COUNT_UP_TO(4) AS property_2 OVER ( ... ); ``` Requires: * Must be unique across all aggregation aliases. * Conform to entity property name limitations.",
+          "type": "string"
+        }
+      }
+    },
+    "Count": {
+      "id": "Count",
+      "description": "Count of entities that match the query. The `COUNT(*)` aggregation function operates on the entire entity so it does not require a field reference.",
+      "type": "object",
+      "properties": {
+        "upTo": {
+          "description": "Optional. Optional constraint on the maximum number of entities to count. This provides a way to set an upper bound on the number of entities to scan, limiting latency and cost. Unspecified is interpreted as no bound. If a zero value is provided, a count result of zero should always be expected. High-Level Example: ``` AGGREGATE COUNT_UP_TO(1000) OVER ( SELECT * FROM k ); ``` Requires: * Must be non-negative when present.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "RunAggregationQueryResponse": {
+      "id": "RunAggregationQueryResponse",
+      "description": "The response for Datastore.RunAggregationQuery.",
+      "type": "object",
+      "properties": {
+        "batch": {
+          "description": "A batch of aggregation results. Always present.",
+          "$ref": "AggregationResultBatch"
+        },
+        "query": {
+          "description": "The parsed form of the `GqlQuery` from the request, if it was set.",
+          "$ref": "AggregationQuery"
+        },
+        "transaction": {
+          "description": "The identifier of the transaction that was started as part of this RunAggregationQuery request. Set only when ReadOptions.new_transaction was set in RunAggregationQueryRequest.read_options.",
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "AggregationResultBatch": {
+      "id": "AggregationResultBatch",
+      "description": "A batch of aggregation results produced by an aggregation query.",
+      "type": "object",
+      "properties": {
+        "aggregationResults": {
+          "description": "The aggregation results for this batch.",
+          "type": "array",
+          "items": {
+            "$ref": "AggregationResult"
+          }
+        },
+        "moreResults": {
+          "description": "The state of the query after the current batch. Only COUNT(*) aggregations are supported in the initial launch. Therefore, expected result type is limited to `NO_MORE_RESULTS`.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified. This value is never used.",
+            "There may be additional batches to fetch from this query.",
+            "The query is finished, but there may be more results after the limit.",
+            "The query is finished, but there may be more results after the end cursor.",
+            "The query is finished, and there are no more results."
+          ],
+          "enum": [
+            "MORE_RESULTS_TYPE_UNSPECIFIED",
+            "NOT_FINISHED",
+            "MORE_RESULTS_AFTER_LIMIT",
+            "MORE_RESULTS_AFTER_CURSOR",
+            "NO_MORE_RESULTS"
+          ]
+        },
+        "readTime": {
+          "description": "Read timestamp this batch was returned from. In a single transaction, subsequent query result batches for the same query can have a greater timestamp. Each batch's read timestamp is valid for all preceding batches.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "AggregationResult": {
+      "id": "AggregationResult",
+      "description": "The result of a single bucket from a Datastore aggregation query. The keys of `aggregate_properties` are the same for all results in an aggregation query, unlike entity queries which can have different fields present for each result.",
+      "type": "object",
+      "properties": {
+        "aggregateProperties": {
+          "description": "The result of the aggregation functions, ex: `COUNT(*) AS total_entities`. The key is the alias assigned to the aggregation function on input and the size of this map equals the number of aggregation functions in the query.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "Value"
+          }
+        }
+      }
+    },
     "BeginTransactionRequest": {
       "id": "BeginTransactionRequest",
       "description": "The request for Datastore.BeginTransaction.",
@@ -1029,45 +1232,6 @@
         "transactionOptions": {
           "description": "Options for a new transaction.",
           "$ref": "TransactionOptions"
-        }
-      }
-    },
-    "TransactionOptions": {
-      "id": "TransactionOptions",
-      "description": "Options for beginning a new transaction. Transactions can be created explicitly with calls to Datastore.BeginTransaction or implicitly by setting ReadOptions.new_transaction in read requests.",
-      "type": "object",
-      "properties": {
-        "readWrite": {
-          "description": "The transaction should allow both reads and writes.",
-          "$ref": "ReadWrite"
-        },
-        "readOnly": {
-          "description": "The transaction should only allow reads.",
-          "$ref": "ReadOnly"
-        }
-      }
-    },
-    "ReadWrite": {
-      "id": "ReadWrite",
-      "description": "Options specific to read \/ write transactions.",
-      "type": "object",
-      "properties": {
-        "previousTransaction": {
-          "description": "The transaction identifier of the transaction being retried.",
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "ReadOnly": {
-      "id": "ReadOnly",
-      "description": "Options specific to read-only transactions.",
-      "type": "object",
-      "properties": {
-        "readTime": {
-          "description": "Reads entities at the given time. This may not be older than 60 seconds.",
-          "type": "string",
-          "format": "google-datetime"
         }
       }
     },
@@ -1110,6 +1274,10 @@
           "description": "The identifier of the transaction associated with the commit. A transaction identifier is returned by a call to Datastore.BeginTransaction.",
           "type": "string",
           "format": "byte"
+        },
+        "singleUseTransaction": {
+          "description": "Options for beginning a new transaction for this request. The transaction is committed when the request completes. If specified, TransactionOptions.mode must be TransactionOptions.ReadWrite.",
+          "$ref": "TransactionOptions"
         },
         "mutations": {
           "description": "The mutations to perform. When mode is `TRANSACTIONAL`, mutations affecting a single entity are applied in order. The following sequences of mutations affecting a single entity are not permitted in a single `Commit` request: - `insert` followed by `insert` - `update` followed by `insert` - `upsert` followed by `insert` - `delete` followed by `update` When mode is `NON_TRANSACTIONAL`, no two mutations may affect a single entity.",
@@ -1190,6 +1358,11 @@
           "description": "The version of the entity on the server after processing the mutation. If the mutation doesn't change anything on the server, then the version will be the version of the current entity or, if no entity is present, a version that is strictly greater than the version of any previous entity and less than the version of any possible future entity.",
           "type": "string",
           "format": "int64"
+        },
+        "createTime": {
+          "description": "The create time of the entity. This field will not be set after a 'delete'.",
+          "type": "string",
+          "format": "google-datetime"
         },
         "updateTime": {
           "description": "The update time of the entity on the server after processing the mutation. If the mutation doesn't change anything on the server, then the timestamp will be the update timestamp of the current entity. This field will not be set after a 'delete'.",
@@ -1884,6 +2057,34 @@
             "https://www.googleapis.com/auth/datastore"
           ],
           "description": "Queries for entities."
+        },
+        "runAggregationQuery": {
+          "id": "datastore.projects.runAggregationQuery",
+          "path": "v1/projects/{projectId}:runAggregationQuery",
+          "flatPath": "v1/projects/{projectId}:runAggregationQuery",
+          "httpMethod": "POST",
+          "parameters": {
+            "projectId": {
+              "description": "Required. The ID of the project against which to make the request.",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            }
+          },
+          "parameterOrder": [
+            "projectId"
+          ],
+          "request": {
+            "$ref": "RunAggregationQueryRequest"
+          },
+          "response": {
+            "$ref": "RunAggregationQueryResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/datastore"
+          ],
+          "description": "Runs an aggregation query."
         },
         "beginTransaction": {
           "id": "datastore.projects.beginTransaction",

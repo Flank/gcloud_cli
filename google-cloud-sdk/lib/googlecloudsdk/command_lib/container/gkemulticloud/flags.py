@@ -53,6 +53,9 @@ _REPLICAPLACEMENT_FORMAT_HELP = (
 
 _LOGGING_CHOICES = [constants.SYSTEM, constants.WORKLOAD]
 
+_ALLOW_DISABLE_LOGGING_CHOICES = [
+    constants.NONE, constants.SYSTEM, constants.WORKLOAD]
+
 
 def AddRegion(parser):
   """Add the --location flag."""
@@ -541,7 +544,7 @@ def _ReplicaPlacementStrToObject(replicaplacement):
     replicaplacement: Replica placement.
 
   Returns:
-    An GoogleCloudGkemulticloudV1ReplicaPlacement instance.
+    A GoogleCloudGkemulticloudV1ReplicaPlacement instance.
 
   Raises:
     ArgumentError: If the Replica placement format is invalid.
@@ -671,7 +674,7 @@ def GetAdminUsers(args):
   return [properties.VALUES.core.account.GetOrFail()]
 
 
-def AddLogging(parser):
+def AddLogging(parser, allow_disabled=False):
   """Adds the --logging flag."""
   help_text = """
 Set the components that have logging enabled.
@@ -679,20 +682,30 @@ Set the components that have logging enabled.
 Examples:
 
   $ {command} --logging=SYSTEM
-  $ {command} --logging=SYSTEM,WORKLOAD
+  $ {command} --logging=SYSTEM,WORKLOAD"""
+
+  logging_choices = []
+  if allow_disabled:
+    logging_choices = _ALLOW_DISABLE_LOGGING_CHOICES
+    help_text += """
+  $ {command} --logging=NONE
 """
+  else:
+    logging_choices = _LOGGING_CHOICES
+
   parser.add_argument(
       '--logging',
-      type=arg_parsers.ArgList(min_length=1, choices=_LOGGING_CHOICES),
+      type=arg_parsers.ArgList(min_length=1, choices=logging_choices),
       metavar='COMPONENT',
       help=help_text)
 
 
-def GetLogging(args):
+def GetLogging(args, allow_disabled=False):
   """Parses and validates the value of the --logging flag.
 
   Args:
     args: Arguments parsed from the command.
+    allow_disabled: If disabling logging is allowed for this cluster.
 
   Returns:
     The logging config object as GoogleCloudGkemulticloudV1LoggingConfig.
@@ -705,9 +718,26 @@ def GetLogging(args):
   if not logging:
     return None
 
+  if (constants.NONE in logging and
+      (constants.SYSTEM in logging or constants.WORKLOAD in logging)):
+    raise _InvalidValueError(
+        ','.join(logging), '--logging',
+        'Invalid logging config. NONE is not supported with SYSTEM or WORKLOAD.'
+    )
+
   messages = api_util.GetMessagesModule()
   config = messages.GoogleCloudGkemulticloudV1LoggingComponentConfig()
   enum = config.EnableComponentsValueListEntryValuesEnum
+
+  if constants.NONE in logging:
+    if allow_disabled:
+      return messages.GoogleCloudGkemulticloudV1LoggingConfig(
+          componentConfig=config)
+    else:
+      raise _InvalidValueError(
+          ','.join(logging), '--logging',
+          'Invalid logging config. NONE is not supported.')
+
   if constants.SYSTEM not in logging:
     raise _InvalidValueError(
         ','.join(logging), '--logging',
@@ -797,15 +827,51 @@ def GetEndpointSubnetId(args):
   return getattr(args, 'endpoint_subnet_id', None)
 
 
-def AddMonitoringConfig(parser):
-  parser.add_argument(
-      '--enable-managed-prometheus',
-      action='store_true',
-      help=('Enable managed collection for Managed Service for Prometheus.'))
+def AddAzureServicesAuthentication(auth_config_group, create=True):
+  group = auth_config_group.add_argument_group('Azure services authentication')
+  group.add_argument(
+      '--azure-tenant-id',
+      required=create,
+      help=('ID of the Azure Tenant to manage Azure resources.'))
+  group.add_argument(
+      '--azure-application-id',
+      required=create,
+      help=('ID of the Azure Application to manage Azure resources.'))
+
+
+def GetAzureTenantID(args):
+  return getattr(args, 'azure_tenant_id', None)
+
+
+def GetAzureApplicationID(args):
+  return getattr(args, 'azure_application_id', None)
+
+
+def AddMonitoringConfig(parser, for_create=False):
+  """Adds --enable-managed-prometheus and --disable-managed-prometheus flags to parser.
+  """
+  if for_create:
+    parser.add_argument(
+        '--enable-managed-prometheus',
+        action='store_true',
+        default=None,
+        help=('Enable managed collection for Managed Service for Prometheus.'))
+  else:
+    group = parser.add_group('Monitoring Config', mutex=True)
+    group.add_argument(
+        '--disable-managed-prometheus',
+        action='store_true',
+        default=None,
+        help=('Disable managed collection for Managed Service for Prometheus.'))
+    group.add_argument(
+        '--enable-managed-prometheus',
+        action='store_true',
+        default=None,
+        help=('Enable managed collection for Managed Service for Prometheus.'))
 
 
 def GetMonitoringConfig(args):
-  """Parses and validates the value of the --enable-managed-prometheus flag.
+  """Parses and validates the value of the managed prometheus config flags.
 
   Args:
     args: Arguments parsed from the command.
@@ -815,13 +881,30 @@ def GetMonitoringConfig(args):
     None if enable_managed_prometheus is None.
 
   """
-  prometheus = getattr(args, 'enable_managed_prometheus', None)
-  if not prometheus:
-    return None
+  enabled_prometheus = getattr(args, 'enable_managed_prometheus', None)
+  disabled_prometheus = getattr(args, 'disable_managed_prometheus', None)
 
   messages = api_util.GetMessagesModule()
   config = messages.GoogleCloudGkemulticloudV1ManagedPrometheusConfig()
-  config.enabled = True
+  if enabled_prometheus:
+    config.enabled = True
+  elif disabled_prometheus:
+    config.enabled = False
+  else:
+    return None
   return messages.GoogleCloudGkemulticloudV1MonitoringConfig(
       managedPrometheusConfig=config)
 
+
+def AddAllowMissing(parser):
+  help_txt = """Allow idempotent deletion of cluster.
+  The request will still succeed in case the cluster does not exist.
+  """
+  parser.add_argument(
+      '--allow-missing',
+      action='store_true',
+      help=help_txt)
+
+
+def GetAllowMissing(args):
+  return getattr(args, 'allow_missing', None)

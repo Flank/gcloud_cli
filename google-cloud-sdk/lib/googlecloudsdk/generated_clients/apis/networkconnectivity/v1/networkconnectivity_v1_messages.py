@@ -14,6 +14,27 @@ from apitools.base.py import extra_types
 package = 'networkconnectivity'
 
 
+class AcceptSpokeRequest(_messages.Message):
+  r"""The request for HubService.AcceptSpoke.
+
+  Fields:
+    requestId: Optional. A unique request ID (optional). If you specify this
+      ID, you can use it in cases when you need to retry your request. When
+      you need to retry, this ID lets the server know that it can ignore the
+      request if it has already been completed. The server guarantees that for
+      at least 60 minutes after the first request. For example, consider a
+      situation where you make an initial request and the request times out.
+      If you make the request again with the same request ID, the server can
+      check to see whether the original operation was received. If it was, the
+      server ignores the second request. This behavior prevents clients from
+      mistakenly creating duplicate commitments. The request ID must be a
+      valid UUID, with the exception that zero UUID is not supported
+      (00000000-0000-0000-0000-000000000000).
+  """
+
+  requestId = _messages.StringField(1)
+
+
 class ActivateSpokeRequest(_messages.Message):
   r"""The request for HubService.ActivateSpoke.
 
@@ -129,7 +150,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -146,9 +169,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -438,11 +459,12 @@ class GoogleRpcStatus(_messages.Message):
 
 
 class Hub(_messages.Message):
-  r"""A Network Connectivity Center hub is a collection of spokes. A single
-  hub can contain spokes from multiple regions. However, if any of a hub's
-  spokes use the data transfer feature, the resources associated with those
-  spokes must all reside in the same VPC network. Spokes that do not use data
-  transfer can be associated with any VPC network in your project.
+  r"""A Network Connectivity Center hub is a global management resource to
+  which you attach spokes. A single hub can contain spokes from multiple
+  regions. However, if any of a hub's spokes use the site-to-site data
+  transfer feature, the resources associated with those spokes must all be in
+  the same VPC network. Spokes that do not use site-to-site data transfer can
+  be associated with any VPC network in your project.
 
   Enums:
     StateValueValuesEnum: Output only. The current lifecycle state of this
@@ -466,6 +488,10 @@ class Hub(_messages.Message):
     routingVpcs: The VPC networks associated with this hub's spokes. This
       field is read-only. Network Connectivity Center automatically populates
       it based on the set of spokes attached to the hub.
+    spokeSummary: Output only. A summary of the spokes associated with a hub.
+      The summary includes a count of spokes according to type and according
+      to state. If any spokes are inactive, the summary also lists the reasons
+      they are inactive, including a count for each reason.
     state: Output only. The current lifecycle state of this hub.
     uniqueId: Output only. The Google-generated UUID for the hub. This value
       is unique across all hub resources. If a hub is deleted and another with
@@ -478,13 +504,17 @@ class Hub(_messages.Message):
 
     Values:
       STATE_UNSPECIFIED: No state information available
-      CREATING: The resource's create operation is in progress
+      CREATING: The resource's create operation is in progress.
       ACTIVE: The resource is active
-      DELETING: The resource's Delete operation is in progress
-      ACTIVATING: The resource's Activate operation is in progress
-      DEACTIVATING: The resource's Deactivate operation is in progress
-      UPDATING: The resource's Update operation is in progress
+      DELETING: The resource's delete operation is in progress.
+      ACTIVATING: The resource's activate operation is in progress.
+      DEACTIVATING: The resource's deactivate operation is in progress.
+      ACCEPTING: The resource's accept operation is in progress.
+      REJECTING: The resource's reject operation is in progress.
+      UPDATING: The resource's update operation is in progress.
       INACTIVE: The resource is inactive
+      OBSOLETE: The hub associated with this spoke resource has been deleted.
+        This state applies to spoke resources only.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -492,8 +522,11 @@ class Hub(_messages.Message):
     DELETING = 3
     ACTIVATING = 4
     DEACTIVATING = 5
-    UPDATING = 6
-    INACTIVE = 7
+    ACCEPTING = 6
+    REJECTING = 7
+    UPDATING = 8
+    INACTIVE = 9
+    OBSOLETE = 10
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -526,9 +559,10 @@ class Hub(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 3)
   name = _messages.StringField(4)
   routingVpcs = _messages.MessageField('RoutingVPC', 5, repeated=True)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
-  uniqueId = _messages.StringField(7)
-  updateTime = _messages.StringField(8)
+  spokeSummary = _messages.MessageField('SpokeSummary', 6)
+  state = _messages.EnumField('StateValueValuesEnum', 7)
+  uniqueId = _messages.StringField(8)
+  updateTime = _messages.StringField(9)
 
 
 class InterconnectAttachment(_messages.Message):
@@ -544,55 +578,54 @@ class InterconnectAttachment(_messages.Message):
 
 
 class InternalRange(_messages.Message):
-  r"""The InternalRange resource for IPAM operations within a VPC network.
+  r"""The internal range resource for IPAM operations within a VPC network.
   Used to represent a private address range along with behavioral
-  characterstics of that range (it's usage and peering behavior). Networking
+  characterstics of that range (its usage and peering behavior). Networking
   resources can link to this range if they are created as belonging to it.
-  Next id: 14
 
   Enums:
     OverlapsValueListEntryValuesEnum:
-    PeeringValueValuesEnum: The type of peering set for this InternalRange.
+    PeeringValueValuesEnum: The type of peering set for this internal range.
     UsageValueValuesEnum: The type of usage set for this InternalRange.
 
   Messages:
     LabelsValue: User-defined labels.
 
   Fields:
-    createTime: Time when the InternalRange was created.
+    createTime: Time when the internal range was created.
     description: A description of this resource.
-    ipCidrRange: IP range that this InternalRange defines.
+    ipCidrRange: The IP range that this internal range defines.
     labels: User-defined labels.
-    name: Immutable. The name of a InternalRange. Format:
+    name: Immutable. The name of an internal range. Format:
       projects/{project}/locations/{location}/internalRanges/{internal_range}
       See: https://google.aip.dev/122#fields-representing-resource-names
     network: The URL or resource ID of the network in which to reserve the
-      Internal Range. The network cannot be deleted if there are any reserved
-      Internal Ranges referring to it. Legacy network is not supported. This
+      internal range. The network cannot be deleted if there are any reserved
+      internal ranges referring to it. Legacy networks are not supported. This
       can only be specified for a global internal address. Example: - URL:
       /compute/v1/projects/{project}/global/networks/{resourceId} - ID:
       network123
     overlaps: Optional. Types of resources that are allowed to overlap with
-      the current InternalRange.
-    peering: The type of peering set for this InternalRange.
+      the current internal range.
+    peering: The type of peering set for this internal range.
     prefixLength: An alternate to ip_cidr_range. Can be set when trying to
       create a reservation that automatically finds a free range of the given
-      size. If both ip_cidr_range and prefix_length are set, it's an error if
-      the range sizes don't match. Can also be used during updates to change
-      the range size.
+      size. If both ip_cidr_range and prefix_length are set, there is an error
+      if the range sizes do not match. Can also be used during updates to
+      change the range size.
     targetCidrRange: Optional. Can be set to narrow down or pick a different
       address space while searching for a free range. If not set, defaults to
       the "10.0.0.0/8" address space. This can be used to search in other
       rfc-1918 address spaces like "172.16.0.0/12" and "192.168.0.0/16" or
       non-rfc-1918 address spaces used in the VPC.
-    updateTime: Time when the InternalRange was updated.
+    updateTime: Time when the internal range was updated.
     usage: The type of usage set for this InternalRange.
     users: Output only. The list of resources that refer to this internal
-      range. Resources that use the InternalRange for their range allocation
+      range. Resources that use the internal range for their range allocation
       are referred to as users of the range. Other resources mark themselves
-      as users while doing so by creating a reference to this InternalRange.
+      as users while doing so by creating a reference to this internal range.
       Having a user, based on this reference, prevents deletion of the
-      InternalRange referred to. Can be empty.
+      internal range referred to. Can be empty.
   """
 
   class OverlapsValueListEntryValuesEnum(_messages.Enum):
@@ -601,35 +634,35 @@ class InternalRange(_messages.Message):
     Values:
       OVERLAP_UNSPECIFIED: No overlap overrides.
       OVERLAP_ROUTE_RANGE: Allow creation of static routes more specific that
-        the current InternalRange.
+        the current internal range.
     """
     OVERLAP_UNSPECIFIED = 0
     OVERLAP_ROUTE_RANGE = 1
 
   class PeeringValueValuesEnum(_messages.Enum):
-    r"""The type of peering set for this InternalRange.
+    r"""The type of peering set for this internal range.
 
     Values:
       PEERING_UNSPECIFIED: If Peering is left unspecified in
         CreateInternalRange or UpdateInternalRange, it will be defaulted to
         FOR_SELF.
       FOR_SELF: This is the default behavior and represents the case that this
-        InternalRange is intended to be used in the VPC on which it is created
-        and is accessible from it's peers. This implies that peers or peer-of-
-        peer's cannot use this range.
-      FOR_PEER: This behavior can be set when the Internal Range is being
-        reserved for usage by the peers. This means that no resource within
-        the VPC in which it is being created can use this to associate with a
-        GCP resource, but one of the peer's can. This represents "donating" a
-        range for peers to use.
-      NOT_SHARED: This behavior can be set when the Internal Range is being
-        reserved for usage by the VPC on which it is created but not shared
-        with the peers. In a sense it is local to the VPC. This can be used to
-        create Internal Ranges for various purposes like
-        HTTP_INTERNAL_LOAD_BALANCER or for interconnect routes that are not
-        shared with peers. This also implies that peer's cannot use this range
+        internal range is intended to be used in the VPC in which it is
+        created and is accessible from its peers. This implies that peers or
+        peers-of-peers cannot use this range.
+      FOR_PEER: This behavior can be set when the internal range is being
+        reserved for usage by peers. This means that no resource within the
+        VPC in which it is being created can use this to associate with a VPC
+        resource, but one of the peers can. This represents donating a range
+        for peers to use.
+      NOT_SHARED: This behavior can be set when the internal range is being
+        reserved for usage by the VPC in which it is created, but not shared
+        with peers. In a sense, it is local to the VPC. This can be used to
+        create internal ranges for various purposes like
+        HTTP_INTERNAL_LOAD_BALANCER or for Interconnect routes that are not
+        shared with peers. This also implies that peers cannot use this range
         in a way that is visible to this VPC, but can re-use this range as
-        long as it is NOT_SHARED from the peer VPC too.
+        long as it is NOT_SHARED from the peer VPC, too.
     """
     PEERING_UNSPECIFIED = 0
     FOR_SELF = 1
@@ -642,13 +675,13 @@ class InternalRange(_messages.Message):
     Values:
       USAGE_UNSPECIFIED: Unspecified usage is allowed in calls which identify
         the resource by other fields and do not need Usage set to complete.
-        These are i.e.: GetInternalRange and DeleteInternalRange. Usage needs
+        These are, i.e.: GetInternalRange and DeleteInternalRange. Usage needs
         to be specified explicitly in CreateInternalRange or
         UpdateInternalRange calls.
-      FOR_VPC: A GCP resource can use the reserved CIDR block by associating
-        it with the Internal Range resource if usage is set to FOR_VPC.
+      FOR_VPC: A VPC resource can use the reserved CIDR block by associating
+        it with the internal range resource if usage is set to FOR_VPC.
       EXTERNAL_TO_VPC: Ranges created with EXTERNAL_TO_VPC cannot be
-        associated with GCP resources and are meant to block out address
+        associated with VPC resources and are meant to block out address
         ranges for various use cases, like for example, usage on-prem, with
         dynamic route announcements via interconnect.
     """
@@ -771,6 +804,23 @@ class LinkedVpnTunnels(_messages.Message):
   vpcNetwork = _messages.StringField(3)
 
 
+class ListHubSpokesResponse(_messages.Message):
+  r"""The response for HubService.ListHubSpokes.
+
+  Fields:
+    nextPageToken: The token for the next page of the response. To see more
+      results, use this value as the page_token for your next request. If this
+      value is empty, there are no more results.
+    spokes: The requested spokes. The spoke fields can be partially populated
+      based on the `view` field in the request message.
+    unreachable: Locations that could not be reached.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  spokes = _messages.MessageField('Spoke', 2, repeated=True)
+  unreachable = _messages.StringField(3, repeated=True)
+
+
 class ListHubsResponse(_messages.Message):
   r"""Response for HubService.ListHubs method.
 
@@ -791,7 +841,7 @@ class ListInternalRangesResponse(_messages.Message):
   r"""Response for InternalRange.ListInternalRanges
 
   Fields:
-    internalRanges: InternalRanges to be returned.
+    internalRanges: Internal ranges to be returned.
     nextPageToken: The next pagination token in the List response. It should
       be used as page_token for the following request. An empty value means no
       more result.
@@ -1090,7 +1140,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsListRequest(_messages.Messag
   Fields:
     filter: An expression that filters the results listed in the response.
     orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
+    pageSize: The maximum number of results per page to return.
     pageToken: The page token.
     parent: Required. The parent resource's name.
   """
@@ -1100,6 +1150,56 @@ class NetworkconnectivityProjectsLocationsGlobalHubsListRequest(_messages.Messag
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
   parent = _messages.StringField(5, required=True)
+
+
+class NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest
+  object.
+
+  Enums:
+    ViewValueValuesEnum: The view of the spoke to return. The view you use
+      determines which spoke fields are included in the response.
+
+  Fields:
+    filter: An expression that filters the list of results.
+    name: Required. The name of the hub.
+    orderBy: Sort the results by name or create_time.
+    pageSize: The maximum number of results to return per page.
+    pageToken: The page token.
+    spokeLocations: A list of locations. Specify a single region (`us-
+      central1`), `global`, or a combination of values--for example, `[global,
+      us-central1, us-west1]`. If the spoke_locations field is populated, the
+      list of results includes only spokes in the specified location. If the
+      spoke_locations field is not populated, the list of results includes
+      spokes in all locations.
+    view: The view of the spoke to return. The view you use determines which
+      spoke fields are included in the response.
+  """
+
+  class ViewValueValuesEnum(_messages.Enum):
+    r"""The view of the spoke to return. The view you use determines which
+    spoke fields are included in the response.
+
+    Values:
+      SPOKE_VIEW_UNSPECIFIED: The spoke view is unspecified. When the spoke
+        view is unspecified, the API returns the same fields as the `BASIC`
+        view.
+      BASIC: Includes `name`, `create_time`, `hub`, `unique_id`, `state`,
+        `state_reason`, and `spoke_type`. This is the default value.
+      FULL: Include all spoke fields. You can use the `FULL` view only when
+        you set the `spoke_locations` field to `[global]`.
+    """
+    SPOKE_VIEW_UNSPECIFIED = 0
+    BASIC = 1
+    FULL = 2
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  orderBy = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  spokeLocations = _messages.StringField(6, repeated=True)
+  view = _messages.EnumField('ViewValueValuesEnum', 7)
 
 
 class NetworkconnectivityProjectsLocationsGlobalHubsPatchRequest(_messages.Message):
@@ -1153,7 +1253,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsRouteTablesListRequest(_mess
   Fields:
     filter: An expression that filters the results listed in the response.
     orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
+    pageSize: The maximum number of results to return per page.
     pageToken: The page token.
     parent: Required. The parent resource's name.
   """
@@ -1185,7 +1285,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsRouteTablesRoutesListRequest
   Fields:
     filter: An expression that filters the results listed in the response.
     orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
+    pageSize: The maximum number of results to return per page.
     pageToken: The page token.
     parent: Required. The parent resource's name.
   """
@@ -1241,14 +1341,14 @@ class NetworkconnectivityProjectsLocationsGlobalPolicyBasedRoutesCreateRequest(_
     parent: Required. The parent resource's name of the PolicyBasedRoute.
     policyBasedRoute: A PolicyBasedRoute resource to be passed as the request
       body.
-    policyBasedRouteId: Optional. Unique id for the Policy Based Route to
+    policyBasedRouteId: Required. Unique id for the Policy Based Route to
       create.
     requestId: Optional. An optional request ID to identify requests. Specify
       a unique request ID so that if you must retry your request, the server
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes since the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -1274,7 +1374,7 @@ class NetworkconnectivityProjectsLocationsGlobalPolicyBasedRoutesDeleteRequest(_
       will know to ignore the request if it has already been completed. The
       server will guarantee that for at least 60 minutes after the first
       request. For example, consider a situation where you make an initial
-      request and t he request times out. If you make the request again with
+      request and the request times out. If you make the request again with
       the same request ID, the server can check if original operation with the
       same request ID was received, and if so, will ignore the second request.
       This prevents clients from accidentally creating duplicate commitments.
@@ -1387,7 +1487,7 @@ class NetworkconnectivityProjectsLocationsInternalRangesCreateRequest(_messages.
     internalRangeId: Optional. Resource ID (i.e. 'foo' in
       '[...]/projects/p/locations/l/internalRanges/foo') See
       https://google.aip.dev/122#resource-id-segments Unique per location.
-    parent: Required. The parent resource's name of the InternalRange.
+    parent: Required. The parent resource's name of the internal range.
     requestId: Optional. An optional request ID to identify requests. Specify
       a unique request ID so that if you must retry your request, the server
       will know to ignore the request if it has already been completed. The
@@ -1412,7 +1512,7 @@ class NetworkconnectivityProjectsLocationsInternalRangesDeleteRequest(_messages.
   object.
 
   Fields:
-    name: Required. The name of the InternalRange to delete.
+    name: Required. The name of the internal range to delete.
     requestId: Optional. An optional request ID to identify requests. Specify
       a unique request ID so that if you must retry your request, the server
       will know to ignore the request if it has already been completed. The
@@ -1464,7 +1564,7 @@ class NetworkconnectivityProjectsLocationsInternalRangesPatchRequest(_messages.M
 
   Fields:
     internalRange: A InternalRange resource to be passed as the request body.
-    name: Immutable. The name of a InternalRange. Format:
+    name: Immutable. The name of an internal range. Format:
       projects/{project}/locations/{location}/internalRanges/{internal_range}
       See: https://google.aip.dev/122#fields-representing-resource-names
     requestId: Optional. An optional request ID to identify requests. Specify
@@ -1559,6 +1659,205 @@ class NetworkconnectivityProjectsLocationsOperationsListRequest(_messages.Messag
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
+
+
+class NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceClassesGetIamPolicyRequest
+  object.
+
+  Fields:
+    options_requestedPolicyVersion: Optional. The maximum policy version that
+      will be used to format the policy. Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected. Requests for
+      policies with any conditional role bindings must specify version 3.
+      Policies with no conditional role bindings may specify any valid value
+      or leave the field unset. The policy in the response might use the
+      policy version that you specified, or it might use a lower policy
+      version. For example, if you specify version 3, but the policy has no
+      conditional role bindings, the response uses version 1. To learn which
+      resources support conditions in their IAM policies, see the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+  """
+
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
+
+
+class NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceClassesSetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest(_messages.Message):
+  r"""A
+  NetworkconnectivityProjectsLocationsServiceClassesTestIamPermissionsRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest(_messages.Message):
+  r"""A
+  NetworkconnectivityProjectsLocationsServiceConnectionMapsGetIamPolicyRequest
+  object.
+
+  Fields:
+    options_requestedPolicyVersion: Optional. The maximum policy version that
+      will be used to format the policy. Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected. Requests for
+      policies with any conditional role bindings must specify version 3.
+      Policies with no conditional role bindings may specify any valid value
+      or leave the field unset. The policy in the response might use the
+      policy version that you specified, or it might use a lower policy
+      version. For example, if you specify version 3, but the policy has no
+      conditional role bindings, the response uses version 1. To learn which
+      resources support conditions in their IAM policies, see the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+  """
+
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest(_messages.Message):
+  r"""A
+  NetworkconnectivityProjectsLocationsServiceConnectionMapsSetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermissionsRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceConnectionMapsTestIamPermis
+  sionsRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPolicyRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesGetIamPol
+  icyRequest object.
+
+  Fields:
+    options_requestedPolicyVersion: Optional. The maximum policy version that
+      will be used to format the policy. Valid values are 0, 1, and 3.
+      Requests specifying an invalid value will be rejected. Requests for
+      policies with any conditional role bindings must specify version 3.
+      Policies with no conditional role bindings may specify any valid value
+      or leave the field unset. The policy in the response might use the
+      policy version that you specified, or it might use a lower policy
+      version. For example, if you specify version 3, but the policy has no
+      conditional role bindings, the response uses version 1. To learn which
+      resources support conditions in their IAM policies, see the [IAM
+      documentation](https://cloud.google.com/iam/help/conditions/resource-
+      policies).
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+  """
+
+  options_requestedPolicyVersion = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  resource = _messages.StringField(2, required=True)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPolicyRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesSetIamPol
+  icyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPermissionsRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsServiceConnectionPoliciesTestIamPe
+  rmissionsRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See [Resource
+      names](https://cloud.google.com/apis/design/resource_names) for the
+      appropriate value for this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class NetworkconnectivityProjectsLocationsSpokesAcceptRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsSpokesAcceptRequest object.
+
+  Fields:
+    acceptSpokeRequest: A AcceptSpokeRequest resource to be passed as the
+      request body.
+    name: Required. The name of the spoke to accept.
+  """
+
+  acceptSpokeRequest = _messages.MessageField('AcceptSpokeRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class NetworkconnectivityProjectsLocationsSpokesActivateRequest(_messages.Message):
@@ -1679,7 +1978,7 @@ class NetworkconnectivityProjectsLocationsSpokesListRequest(_messages.Message):
   Fields:
     filter: An expression that filters the results listed in the response.
     orderBy: Sort the results by a certain order.
-    pageSize: The maximum number of results per page that should be returned.
+    pageSize: The maximum number of results to return per page.
     pageToken: The page token.
     parent: Required. The parent resource.
   """
@@ -1722,6 +2021,19 @@ class NetworkconnectivityProjectsLocationsSpokesPatchRequest(_messages.Message):
   requestId = _messages.StringField(2)
   spoke = _messages.MessageField('Spoke', 3)
   updateMask = _messages.StringField(4)
+
+
+class NetworkconnectivityProjectsLocationsSpokesRejectRequest(_messages.Message):
+  r"""A NetworkconnectivityProjectsLocationsSpokesRejectRequest object.
+
+  Fields:
+    name: Required. The name of the spoke to reject.
+    rejectSpokeRequest: A RejectSpokeRequest resource to be passed as the
+      request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  rejectSpokeRequest = _messages.MessageField('RejectSpokeRequest', 2)
 
 
 class NetworkconnectivityProjectsLocationsSpokesSetIamPolicyRequest(_messages.Message):
@@ -1954,6 +2266,29 @@ class PolicyBasedRoute(_messages.Message):
   warnings = _messages.MessageField('Warnings', 14, repeated=True)
 
 
+class RejectSpokeRequest(_messages.Message):
+  r"""The request for HubService.RejectSpoke.
+
+  Fields:
+    details: Optional. Additional Details behind the rejection
+    requestId: Optional. A unique request ID (optional). If you specify this
+      ID, you can use it in cases when you need to retry your request. When
+      you need to retry, this ID lets the server know that it can ignore the
+      request if it has already been completed. The server guarantees that for
+      at least 60 minutes after the first request. For example, consider a
+      situation where you make an initial request and the request times out.
+      If you make the request again with the same request ID, the server can
+      check to see whether the original operation was received. If it was, the
+      server ignores the second request. This behavior prevents clients from
+      mistakenly creating duplicate commitments. The request ID must be a
+      valid UUID, with the exception that zero UUID is not supported
+      (00000000-0000-0000-0000-000000000000).
+  """
+
+  details = _messages.StringField(1)
+  requestId = _messages.StringField(2)
+
+
 class Route(_messages.Message):
   r"""A route defines a path from VM instances within a spoke to a specific
   destination resource. Only VPC spokes have routes.
@@ -1977,6 +2312,9 @@ class Route(_messages.Message):
     labels: Optional labels in key:value format. For more information about
       labels, see [Requirements for labels](https://cloud.google.com/resource-
       manager/docs/creating-managing-labels#requirements).
+    location: Output only. The location of the route. Uses the following form:
+      "projects/{project}/locations/{location}" Example:
+      projects/1234/locations/us-central1
     name: Immutable. The name of the route. Route names must be unique. They
       use the following form: `projects/{project_number}/locations/global/hubs
       /{hub}/routeTables/{route_table_id}/routes/{route_id}`
@@ -1999,13 +2337,17 @@ class Route(_messages.Message):
 
     Values:
       STATE_UNSPECIFIED: No state information available
-      CREATING: The resource's create operation is in progress
+      CREATING: The resource's create operation is in progress.
       ACTIVE: The resource is active
-      DELETING: The resource's Delete operation is in progress
-      ACTIVATING: The resource's Activate operation is in progress
-      DEACTIVATING: The resource's Deactivate operation is in progress
-      UPDATING: The resource's Update operation is in progress
+      DELETING: The resource's delete operation is in progress.
+      ACTIVATING: The resource's activate operation is in progress.
+      DEACTIVATING: The resource's deactivate operation is in progress.
+      ACCEPTING: The resource's accept operation is in progress.
+      REJECTING: The resource's reject operation is in progress.
+      UPDATING: The resource's update operation is in progress.
       INACTIVE: The resource is inactive
+      OBSOLETE: The hub associated with this spoke resource has been deleted.
+        This state applies to spoke resources only.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -2013,8 +2355,11 @@ class Route(_messages.Message):
     DELETING = 3
     ACTIVATING = 4
     DEACTIVATING = 5
-    UPDATING = 6
-    INACTIVE = 7
+    ACCEPTING = 6
+    REJECTING = 7
+    UPDATING = 8
+    INACTIVE = 9
+    OBSOLETE = 10
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""Output only. The route's type. Its type is determined by the
@@ -2061,13 +2406,14 @@ class Route(_messages.Message):
   description = _messages.StringField(2)
   ipCidrRange = _messages.StringField(3)
   labels = _messages.MessageField('LabelsValue', 4)
-  name = _messages.StringField(5)
-  nextHopVpcNetwork = _messages.MessageField('NextHopVpcNetwork', 6)
-  spoke = _messages.StringField(7)
-  state = _messages.EnumField('StateValueValuesEnum', 8)
-  type = _messages.EnumField('TypeValueValuesEnum', 9)
-  uid = _messages.StringField(10)
-  updateTime = _messages.StringField(11)
+  location = _messages.StringField(5)
+  name = _messages.StringField(6)
+  nextHopVpcNetwork = _messages.MessageField('NextHopVpcNetwork', 7)
+  spoke = _messages.StringField(8)
+  state = _messages.EnumField('StateValueValuesEnum', 9)
+  type = _messages.EnumField('TypeValueValuesEnum', 10)
+  uid = _messages.StringField(11)
+  updateTime = _messages.StringField(12)
 
 
 class RouteTable(_messages.Message):
@@ -2091,7 +2437,7 @@ class RouteTable(_messages.Message):
       manager/docs/creating-managing-labels#requirements).
     name: Immutable. The name of the route table. Route Table names must be
       unique. They use the following form: `projects/{project_number}/location
-      s/global/hubs/{hub}/routeTables/{route_table_id}
+      s/global/hubs/{hub}/routeTables/{route_table_id}`
     state: Output only. The current lifecycle state of this route table.
     uid: Output only. The Google-generated UUID for the route table. This
       value is unique across all route table resources. If a route table is
@@ -2105,13 +2451,17 @@ class RouteTable(_messages.Message):
 
     Values:
       STATE_UNSPECIFIED: No state information available
-      CREATING: The resource's create operation is in progress
+      CREATING: The resource's create operation is in progress.
       ACTIVE: The resource is active
-      DELETING: The resource's Delete operation is in progress
-      ACTIVATING: The resource's Activate operation is in progress
-      DEACTIVATING: The resource's Deactivate operation is in progress
-      UPDATING: The resource's Update operation is in progress
+      DELETING: The resource's delete operation is in progress.
+      ACTIVATING: The resource's activate operation is in progress.
+      DEACTIVATING: The resource's deactivate operation is in progress.
+      ACCEPTING: The resource's accept operation is in progress.
+      REJECTING: The resource's reject operation is in progress.
+      UPDATING: The resource's update operation is in progress.
       INACTIVE: The resource is inactive
+      OBSOLETE: The hub associated with this spoke resource has been deleted.
+        This state applies to spoke resources only.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -2119,8 +2469,11 @@ class RouteTable(_messages.Message):
     DELETING = 3
     ACTIVATING = 4
     DEACTIVATING = 5
-    UPDATING = 6
-    INACTIVE = 7
+    ACCEPTING = 6
+    REJECTING = 7
+    UPDATING = 8
+    INACTIVE = 9
+    OBSOLETE = 10
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -2208,11 +2561,11 @@ class SetIamPolicyRequest(_messages.Message):
 
 
 class Spoke(_messages.Message):
-  r"""A Network Connectivity Center spoke represents a connection between your
-  Google Cloud network resources and a non-Google-Cloud network. When you
-  create a spoke, you associate it with a hub. You must also identify a value
-  for exactly one of the following fields: * linked_vpn_tunnels *
-  linked_interconnect_attachments * linked_router_appliance_instances
+  r"""A Network Connectivity Center spoke represents one or more network
+  connectivity resources. When you create a spoke, you associate it with a
+  hub. You must also identify a value for exactly one of the following fields:
+  * linked_vpn_tunnels * linked_interconnect_attachments *
+  linked_router_appliance_instances
 
   Enums:
     StateValueValuesEnum: Output only. The current lifecycle state of this
@@ -2240,6 +2593,7 @@ class Spoke(_messages.Message):
     name: Immutable. The name of the spoke. Spoke names must be unique. They
       use the following form:
       `projects/{project_number}/locations/{region}/spokes/{spoke_id}`
+    reasons: The reasons for current state of the spoke.
     state: Output only. The current lifecycle state of this spoke.
     uniqueId: Output only. The Google-generated UUID for the spoke. This value
       is unique across all spoke resources. If a spoke is deleted and another
@@ -2253,13 +2607,17 @@ class Spoke(_messages.Message):
 
     Values:
       STATE_UNSPECIFIED: No state information available
-      CREATING: The resource's create operation is in progress
+      CREATING: The resource's create operation is in progress.
       ACTIVE: The resource is active
-      DELETING: The resource's Delete operation is in progress
-      ACTIVATING: The resource's Activate operation is in progress
-      DEACTIVATING: The resource's Deactivate operation is in progress
-      UPDATING: The resource's Update operation is in progress
+      DELETING: The resource's delete operation is in progress.
+      ACTIVATING: The resource's activate operation is in progress.
+      DEACTIVATING: The resource's deactivate operation is in progress.
+      ACCEPTING: The resource's accept operation is in progress.
+      REJECTING: The resource's reject operation is in progress.
+      UPDATING: The resource's update operation is in progress.
       INACTIVE: The resource is inactive
+      OBSOLETE: The hub associated with this spoke resource has been deleted.
+        This state applies to spoke resources only.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -2267,8 +2625,11 @@ class Spoke(_messages.Message):
     DELETING = 3
     ACTIVATING = 4
     DEACTIVATING = 5
-    UPDATING = 6
-    INACTIVE = 7
+    ACCEPTING = 6
+    REJECTING = 7
+    UPDATING = 8
+    INACTIVE = 9
+    OBSOLETE = 10
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -2305,9 +2666,143 @@ class Spoke(_messages.Message):
   linkedVpcNetwork = _messages.MessageField('LinkedVpcNetwork', 7)
   linkedVpnTunnels = _messages.MessageField('LinkedVpnTunnels', 8)
   name = _messages.StringField(9)
-  state = _messages.EnumField('StateValueValuesEnum', 10)
-  uniqueId = _messages.StringField(11)
-  updateTime = _messages.StringField(12)
+  reasons = _messages.MessageField('StateReason', 10, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 11)
+  uniqueId = _messages.StringField(12)
+  updateTime = _messages.StringField(13)
+
+
+class SpokeStateCount(_messages.Message):
+  r"""The number of spokes that are in a particular state and associated with
+  a given hub.
+
+  Enums:
+    StateValueValuesEnum: Output only. The state of the spokes.
+
+  Fields:
+    count: Output only. The total number of spokes that are in this state and
+      associated with a given hub.
+    state: Output only. The state of the spokes.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The state of the spokes.
+
+    Values:
+      STATE_UNSPECIFIED: No state information available
+      CREATING: The resource's create operation is in progress.
+      ACTIVE: The resource is active
+      DELETING: The resource's delete operation is in progress.
+      ACTIVATING: The resource's activate operation is in progress.
+      DEACTIVATING: The resource's deactivate operation is in progress.
+      ACCEPTING: The resource's accept operation is in progress.
+      REJECTING: The resource's reject operation is in progress.
+      UPDATING: The resource's update operation is in progress.
+      INACTIVE: The resource is inactive
+      OBSOLETE: The hub associated with this spoke resource has been deleted.
+        This state applies to spoke resources only.
+    """
+    STATE_UNSPECIFIED = 0
+    CREATING = 1
+    ACTIVE = 2
+    DELETING = 3
+    ACTIVATING = 4
+    DEACTIVATING = 5
+    ACCEPTING = 6
+    REJECTING = 7
+    UPDATING = 8
+    INACTIVE = 9
+    OBSOLETE = 10
+
+  count = _messages.IntegerField(1)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+
+
+class SpokeStateReasonCount(_messages.Message):
+  r"""The number of spokes in the hub that are inactive for this reason.
+
+  Enums:
+    StateReasonCodeValueValuesEnum: Output only. The reason that a spoke is
+      inactive.
+
+  Fields:
+    count: Output only. The total number of spokes that are inactive for a
+      particular reason and associated with a given hub.
+    stateReasonCode: Output only. The reason that a spoke is inactive.
+  """
+
+  class StateReasonCodeValueValuesEnum(_messages.Enum):
+    r"""Output only. The reason that a spoke is inactive.
+
+    Values:
+      CODE_UNSPECIFIED: No information available.
+      PENDING_REVIEW: The proposed spoke is pending review.
+      REJECTED: The proposed spoke has been rejected by the hub administrator.
+      PAUSED: The spoke has been deactivated internally.
+      FAILED: Network Connectivity Center encountered errors while accepting
+        the spoke.
+    """
+    CODE_UNSPECIFIED = 0
+    PENDING_REVIEW = 1
+    REJECTED = 2
+    PAUSED = 3
+    FAILED = 4
+
+  count = _messages.IntegerField(1)
+  stateReasonCode = _messages.EnumField('StateReasonCodeValueValuesEnum', 2)
+
+
+class SpokeSummary(_messages.Message):
+  r"""Summarizes information about the spokes associated with a hub. The
+  summary includes a count of spokes according to type and according to state.
+  If any spokes are inactive, the summary also lists the reasons they are
+  inactive, including a count for each reason.
+
+  Fields:
+    spokeStateCounts: Output only. Counts the number of spokes that are in
+      each state and associated with a given hub.
+    spokeStateReasonCounts: Output only. Counts the number of spokes that are
+      inactive for each possible reason and associated with a given hub.
+    spokeTypeCounts: Output only. Counts the number of spokes of each type
+      that are associated with a specific hub.
+  """
+
+  spokeStateCounts = _messages.MessageField('SpokeStateCount', 1, repeated=True)
+  spokeStateReasonCounts = _messages.MessageField('SpokeStateReasonCount', 2, repeated=True)
+  spokeTypeCounts = _messages.MessageField('SpokeTypeCount', 3, repeated=True)
+
+
+class SpokeTypeCount(_messages.Message):
+  r"""The number of spokes of a given type that are associated with a specific
+  hub. The type indicates what kind of resource is associated with the spoke.
+
+  Enums:
+    SpokeTypeValueValuesEnum: Output only. The type of the spokes.
+
+  Fields:
+    count: Output only. The total number of spokes of this type that are
+      associated with the hub.
+    spokeType: Output only. The type of the spokes.
+  """
+
+  class SpokeTypeValueValuesEnum(_messages.Enum):
+    r"""Output only. The type of the spokes.
+
+    Values:
+      SPOKE_TYPE_UNSPECIFIED: Unspecified spoke type.
+      VPN_TUNNEL: Spokes associated with VPN tunnels.
+      INTERCONNECT_ATTACHMENT: Spokes associated with VLAN attachments.
+      ROUTER_APPLIANCE: Spokes associated with router appliance instances.
+      VPC_NETWORK: Spokes associated with VPC networks.
+    """
+    SPOKE_TYPE_UNSPECIFIED = 0
+    VPN_TUNNEL = 1
+    INTERCONNECT_ATTACHMENT = 2
+    ROUTER_APPLIANCE = 3
+    VPC_NETWORK = 4
+
+  count = _messages.IntegerField(1)
+  spokeType = _messages.EnumField('SpokeTypeValueValuesEnum', 2)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -2371,6 +2866,41 @@ class StandardQueryParameters(_messages.Message):
   trace = _messages.StringField(10)
   uploadType = _messages.StringField(11)
   upload_protocol = _messages.StringField(12)
+
+
+class StateReason(_messages.Message):
+  r"""The reason a spoke is inactive.
+
+  Enums:
+    CodeValueValuesEnum: The code associated with this reason.
+
+  Fields:
+    code: The code associated with this reason.
+    message: Human-readable details about this reason.
+    userDetails: Additional information provided by the user in the
+      RejectSpoke call.
+  """
+
+  class CodeValueValuesEnum(_messages.Enum):
+    r"""The code associated with this reason.
+
+    Values:
+      CODE_UNSPECIFIED: No information available.
+      PENDING_REVIEW: The proposed spoke is pending review.
+      REJECTED: The proposed spoke has been rejected by the hub administrator.
+      PAUSED: The spoke has been deactivated internally.
+      FAILED: Network Connectivity Center encountered errors while accepting
+        the spoke.
+    """
+    CODE_UNSPECIFIED = 0
+    PENDING_REVIEW = 1
+    REJECTED = 2
+    PAUSED = 3
+    FAILED = 4
+
+  code = _messages.EnumField('CodeValueValuesEnum', 1)
+  message = _messages.StringField(2)
+  userDetails = _messages.StringField(3)
 
 
 class TestIamPermissionsRequest(_messages.Message):

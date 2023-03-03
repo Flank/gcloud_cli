@@ -512,6 +512,17 @@
               "CUSTOMER_MANAGED_KEY_ISSUE"
             ]
           }
+        },
+        "maintenanceVersion": {
+          "description": "Optional. The self service update maintenance version. The version is date based such as \"20210712_00_00\".",
+          "type": "string"
+        },
+        "availableMaintenanceVersions": {
+          "description": "Optional. The available maintenance versions that an instance could update to.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -717,7 +728,7 @@
             "Snapshot every 1 hour.",
             "Snapshot every 6 hours.",
             "Snapshot every 12 hours.",
-            "Snapshot every 24 horus."
+            "Snapshot every 24 hours."
           ],
           "enum": [
             "SNAPSHOT_PERIOD_UNSPECIFIED",
@@ -874,6 +885,31 @@
           "description": "Optional. Timestamp when the maintenance shall be rescheduled to if reschedule_type=SPECIFIC_TIME, in RFC 3339 format, for example `2012-11-15T16:19:00.094Z`.",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "ReconciliationOperationMetadata": {
+      "id": "ReconciliationOperationMetadata",
+      "description": "Operation metadata returned by the CLH during resource state reconciliation.",
+      "type": "object",
+      "properties": {
+        "deleteResource": {
+          "description": "DEPRECATED. Use exclusive_action instead.",
+          "type": "boolean"
+        },
+        "exclusiveAction": {
+          "description": "Excluisive action returned by the CLH.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unknown repair action.",
+            "The resource has to be deleted. When using this bit, the CLH should fail the operation. DEPRECATED. Instead use DELETE_RESOURCE OperationSignal in SideChannel. For more information - go\/ccfe-delete-on-upsert, go\/ccfe-reconciliation-protocol-ug#apply_delete",
+            "This resource could not be repaired but the repair should be tried again at a later time. This can happen if there is a dependency that needs to be resolved first- e.g. if a parent resource must be repaired before a child resource."
+          ],
+          "enum": [
+            "UNKNOWN_REPAIR_ACTION",
+            "DELETE",
+            "RETRY"
+          ]
         }
       }
     },

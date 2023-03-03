@@ -14,6 +14,25 @@ from apitools.base.py import extra_types
 package = 'cloudidentity'
 
 
+class AddIdpCredentialOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSamlSsoProfilesService.AddIdpCredential.
+  """
+
+
+
+class AddIdpCredentialRequest(_messages.Message):
+  r"""The request for creating an IdpCredential with its associated payload.
+  An InboundSamlSsoProfile can own up to 2 credentials.
+
+  Fields:
+    pemData: PEM encoded x509 certificate containing the public key for
+      verifying IdP signatures.
+  """
+
+  pemData = _messages.StringField(1)
+
+
 class AndroidAttributes(_messages.Message):
   r"""Resource representing the Android specific attributes of a Device.
 
@@ -55,7 +74,18 @@ class AndroidAttributes(_messages.Message):
 
 
 class ApproveDeviceUserRequest(_messages.Message):
-  r"""Request message for approving the device to access user data."""
+  r"""Request message for approving the device to access user data.
+
+  Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
+  """
+
+  customer = _messages.StringField(1)
 
 
 class ApproveDeviceUserResponse(_messages.Message):
@@ -69,7 +99,18 @@ class ApproveDeviceUserResponse(_messages.Message):
 
 
 class BlockDeviceUserRequest(_messages.Message):
-  r"""Request message for blocking account on device."""
+  r"""Request message for blocking account on device.
+
+  Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
+  """
+
+  customer = _messages.StringField(1)
 
 
 class BlockDeviceUserResponse(_messages.Message):
@@ -87,7 +128,18 @@ class CancelUserInvitationRequest(_messages.Message):
 
 
 class CancelWipeDeviceRequest(_messages.Message):
-  r"""Request message for cancelling an unfinished device wipe."""
+  r"""Request message for cancelling an unfinished device wipe.
+
+  Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
+  """
+
+  customer = _messages.StringField(1)
 
 
 class CancelWipeDeviceResponse(_messages.Message):
@@ -102,7 +154,18 @@ class CancelWipeDeviceResponse(_messages.Message):
 
 
 class CancelWipeDeviceUserRequest(_messages.Message):
-  r"""Request message for cancelling an unfinished user account wipe."""
+  r"""Request message for cancelling an unfinished user account wipe.
+
+  Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
+  """
+
+  customer = _messages.StringField(1)
 
 
 class CancelWipeDeviceUserResponse(_messages.Message):
@@ -425,13 +488,20 @@ class CloudidentityDevicesDeleteRequest(_messages.Message):
   r"""A CloudidentityDevicesDeleteRequest object.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     name: Required. [Resource
       name](https://cloud.google.com/apis/design/resource_names) of the Device
       in format: `devices/{device_id}`, where device_id is the unique ID
       assigned to the Device.
   """
 
-  name = _messages.StringField(1, required=True)
+  customer = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
 
 
 class CloudidentityDevicesDeviceUsersApproveRequest(_messages.Message):
@@ -508,8 +578,8 @@ class CloudidentityDevicesDeviceUsersClientStatesGetRequest(_messages.Message):
       Context-Aware Access. You may use `my_customer` instead of the customer
       ID for devices managed by your own organization. You may specify `-` in
       place of the `{device_id}`, so the ClientState resource name can be: `de
-      vices/-/deviceUsers/{device_user_resource_id}/clientStates/{partner_id}`
-      .
+      vices/-
+      /deviceUsers/{device_user_resource_id}/clientStates/{partner_id}`.
   """
 
   customer = _messages.StringField(1)
@@ -547,6 +617,12 @@ class CloudidentityDevicesDeviceUsersDeleteRequest(_messages.Message):
   r"""A CloudidentityDevicesDeviceUsersDeleteRequest object.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     name: Required. [Resource
       name](https://cloud.google.com/apis/design/resource_names) of the Device
       in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where
@@ -554,13 +630,20 @@ class CloudidentityDevicesDeviceUsersDeleteRequest(_messages.Message):
       the unique ID assigned to the User.
   """
 
-  name = _messages.StringField(1, required=True)
+  customer = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
 
 
 class CloudidentityDevicesDeviceUsersGetRequest(_messages.Message):
   r"""A CloudidentityDevicesDeviceUsersGetRequest object.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     name: Required. [Resource
       name](https://cloud.google.com/apis/design/resource_names) of the Device
       in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where
@@ -568,13 +651,20 @@ class CloudidentityDevicesDeviceUsersGetRequest(_messages.Message):
       the unique ID assigned to the User.
   """
 
-  name = _messages.StringField(1, required=True)
+  customer = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
 
 
 class CloudidentityDevicesDeviceUsersListRequest(_messages.Message):
   r"""A CloudidentityDevicesDeviceUsersListRequest object.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     filter: Optional. Additional restrictions when fetching list of devices.
       For a list of search fields, refer to [Mobile device search
       fields](https://developers.google.com/admin-sdk/directory/v1/search-
@@ -592,11 +682,12 @@ class CloudidentityDevicesDeviceUsersListRequest(_messages.Message):
       the device. Format: devices/{device}
   """
 
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  parent = _messages.StringField(5, required=True)
+  customer = _messages.StringField(1)
+  filter = _messages.StringField(2)
+  orderBy = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  parent = _messages.StringField(6, required=True)
 
 
 class CloudidentityDevicesDeviceUsersLookupRequest(_messages.Message):
@@ -656,13 +747,18 @@ class CloudidentityDevicesGetRequest(_messages.Message):
   r"""A CloudidentityDevicesGetRequest object.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      Customer in format: `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     name: Required. [Resource
       name](https://cloud.google.com/apis/design/resource_names) of the Device
       in format: `devices/{device_id}`, where device_id is the unique ID
       assigned to the Device.
   """
 
-  name = _messages.StringField(1, required=True)
+  customer = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
 
 
 class CloudidentityDevicesListRequest(_messages.Message):
@@ -672,6 +768,9 @@ class CloudidentityDevicesListRequest(_messages.Message):
     ViewValueValuesEnum: Optional. The view to use for the List request.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer.
     filter: Optional. Additional restrictions when fetching list of devices.
       For a list of search fields, refer to [Mobile device search
       fields](https://developers.google.com/admin-sdk/directory/v1/search-
@@ -708,11 +807,12 @@ class CloudidentityDevicesListRequest(_messages.Message):
     COMPANY_INVENTORY = 1
     USER_ASSIGNED_DEVICES = 2
 
-  filter = _messages.StringField(1)
-  orderBy = _messages.StringField(2)
-  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(4)
-  view = _messages.EnumField('ViewValueValuesEnum', 5)
+  customer = _messages.StringField(1)
+  filter = _messages.StringField(2)
+  orderBy = _messages.StringField(3)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  view = _messages.EnumField('ViewValueValuesEnum', 6)
 
 
 class CloudidentityDevicesWipeRequest(_messages.Message):
@@ -823,7 +923,8 @@ class CloudidentityGroupsListRequest(_messages.Message):
       resources. Must be of the form `identitysources/{identity_source_id}`
       for external- identity-mapped groups or `customers/{customer_id}` for
       Google Groups. The `customer_id` must begin with "C" (for example,
-      'C046psxkn').
+      'C046psxkn'). [Find your customer ID.]
+      (https://support.google.com/cloudidentity/answer/10070793)
     view: The level of detail to be returned. If unspecified, defaults to
       `View.BASIC`.
   """
@@ -1029,6 +1130,42 @@ class CloudidentityGroupsMembershipsModifyMembershipRolesRequest(_messages.Messa
   name = _messages.StringField(2, required=True)
 
 
+class CloudidentityGroupsMembershipsSearchDirectGroupsRequest(_messages.Message):
+  r"""A CloudidentityGroupsMembershipsSearchDirectGroupsRequest object.
+
+  Fields:
+    orderBy: The ordering of membership relation for the display name or email
+      in the response. The syntax for this field can be found at
+      https://cloud.google.com/apis/design/design_patterns#sorting_order.
+      Example: Sort by the ascending display name: order_by="group_name" or
+      order_by="group_name asc". Sort by the descending display name:
+      order_by="group_name desc". Sort by the ascending group key:
+      order_by="group_key" or order_by="group_key asc". Sort by the descending
+      group key: order_by="group_key desc".
+    pageSize: The default page size is 200 (max 1000).
+    pageToken: The next_page_token value returned from a previous list
+      request, if any
+    parent: [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the group
+      to search transitive memberships in. Format: groups/{group_id}, where
+      group_id is always '-' as this API will search across all groups for a
+      given member.
+    query: Required. A CEL expression that MUST include member specification
+      AND label(s). Users can search on label attributes of groups. CONTAINS
+      match ('in') is supported on labels. Identity-mapped groups are uniquely
+      identified by both a `member_key_id` and a `member_key_namespace`, which
+      requires an additional query input: `member_key_namespace`. Example
+      query: `member_key_id == 'member_key_id_value' && 'label_value' in
+      labels`
+  """
+
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  parent = _messages.StringField(4, required=True)
+  query = _messages.StringField(5)
+
+
 class CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest(_messages.Message):
   r"""A CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest object.
 
@@ -1047,7 +1184,14 @@ class CloudidentityGroupsMembershipsSearchTransitiveGroupsRequest(_messages.Mess
       Identity-mapped groups are uniquely identified by both a `member_key_id`
       and a `member_key_namespace`, which requires an additional query input:
       `member_key_namespace`. Example query: `member_key_id ==
-      'member_key_id_value' && in labels`
+      'member_key_id_value' && in labels` Query may optionally contain
+      equality operators on the parent of the group restricting the search
+      within a particular customer, e.g. `parent ==
+      'customers/{customer_id}'`. The `customer_id` must begin with "C" (for
+      example, 'C046psxkn'). This filtering is only supported for Admins with
+      groups read permissons on the input customer. Example query:
+      `member_key_id == 'member_key_id_value' && in labels && parent ==
+      'customers/C046psxkn'`
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1101,6 +1245,11 @@ class CloudidentityGroupsSearchRequest(_messages.Message):
       defaults to `View.BASIC`.
 
   Fields:
+    orderBy: The ordering of groups for the display name or email in the
+      search groups response. The syntax for this field can be found at
+      https://cloud.google.com/apis/design/design_patterns#sorting_order.
+      Example: Sort by the ascending name: order_by="display_name" Sort by the
+      descending group key email: order_by="group_key desc"
     pageSize: The maximum number of results to return. Note that the number of
       results returned may be less than this value even if there are more
       available results. To fetch all results, clients must continue calling
@@ -1110,12 +1259,21 @@ class CloudidentityGroupsSearchRequest(_messages.Message):
       `GroupView.BASIC` or 500 for `GroupView.FULL`.
     pageToken: The `next_page_token` value returned from a previous search
       request, if any.
-    query: Required. The search query. Must be specified in [Common Expression
-      Language](https://opensource.google/projects/cel). May only contain
-      equality operators on the parent and inclusion operators on labels
-      (e.g., `parent == 'customers/{customer_id}' &&
-      'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). The
-      `customer_id` must begin with "C" (for example, 'C046psxkn').
+    query: Required. The search query. * Must be specified in [Common
+      Expression Language](https://opensource.google/projects/cel). * Must
+      contain equality operators on the parent, e.g. `parent ==
+      'customers/{customer_id}'`. The `customer_id` must begin with "C" (for
+      example, 'C046psxkn'). [Find your customer ID.]
+      (https://support.google.com/cloudidentity/answer/10070793) * Can contain
+      optional inclusion operators on `labels` such as
+      `'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). *
+      Can contain an optional equality operator on `domain_name`. e.g.
+      `domain_name == 'abc.com'` * Can contain optional
+      `startsWith/contains/equality` operators on `group_key`, e.g.
+      `group_key.startsWith('dev')`, `group_key.contains('dev'), group_key ==
+      'dev@abc.com'` * Can contain optional `startsWith/contains/equality`
+      operators on `display_name`, such as `display_name.startsWith('dev')` ,
+      `display_name.contains('dev')`, `display_name == 'dev'`
     view: The level of detail to be returned. If unspecified, defaults to
       `View.BASIC`.
   """
@@ -1131,10 +1289,11 @@ class CloudidentityGroupsSearchRequest(_messages.Message):
     BASIC = 0
     FULL = 1
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  query = _messages.StringField(3)
-  view = _messages.EnumField('ViewValueValuesEnum', 4)
+  orderBy = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+  query = _messages.StringField(4)
+  view = _messages.EnumField('ViewValueValuesEnum', 5)
 
 
 class CloudidentityGroupsUpdateSecuritySettingsRequest(_messages.Message):
@@ -1151,6 +1310,206 @@ class CloudidentityGroupsUpdateSecuritySettingsRequest(_messages.Message):
 
   name = _messages.StringField(1, required=True)
   securitySettings = _messages.MessageField('SecuritySettings', 2)
+  updateMask = _messages.StringField(3)
+
+
+class CloudidentityInboundSamlSsoProfilesDeleteRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesDeleteRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      InboundSamlSsoProfile to delete. Format:
+      `inboundSamlSsoProfiles/{sso_profile_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesGetRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesGetRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      InboundSamlSsoProfile to get. Format:
+      `inboundSamlSsoProfiles/{sso_profile_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesIdpCredentialsAddRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesIdpCredentialsAddRequest object.
+
+  Fields:
+    addIdpCredentialRequest: A AddIdpCredentialRequest resource to be passed
+      as the request body.
+    parent: Required. The InboundSamlSsoProfile that owns the IdpCredential.
+      Format: `inboundSamlSsoProfiles/{sso_profile_id}`
+  """
+
+  addIdpCredentialRequest = _messages.MessageField('AddIdpCredentialRequest', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesIdpCredentialsDeleteRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesIdpCredentialsDeleteRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      IdpCredential to delete. Format: `inboundSamlSsoProfiles/{sso_profile_id
+      }/idpCredentials/{idp_credential_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesIdpCredentialsGetRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesIdpCredentialsGetRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      IdpCredential to retrieve. Format: `inboundSamlSsoProfiles/{sso_profile_
+      id}/idpCredentials/{idp_credential_id}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesIdpCredentialsListRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesIdpCredentialsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of `IdpCredential`s to return. The service
+      may return fewer than this value.
+    pageToken: A page token, received from a previous `ListIdpCredentials`
+      call. Provide this to retrieve the subsequent page. When paginating, all
+      other parameters provided to `ListIdpCredentials` must match the call
+      that provided the page token.
+    parent: Required. The parent, which owns this collection of
+      `IdpCredential`s. Format: `inboundSamlSsoProfiles/{sso_profile_id}`
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class CloudidentityInboundSamlSsoProfilesListRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesListRequest object.
+
+  Fields:
+    filter: A [Common Expression Language](https://github.com/google/cel-spec)
+      expression to filter the results. The only supported filter is filtering
+      by customer. For example: `customer=="customers/C0123abc"`. Omitting the
+      filter or specifying a filter of `customer=="customers/my_customer"`
+      will return the profiles for the customer that the caller (authenticated
+      user) belongs to.
+    pageSize: The maximum number of InboundSamlSsoProfiles to return. The
+      service may return fewer than this value. If omitted (or defaulted to
+      zero) the server will use a sensible default. This default may change
+      over time. The maximum allowed value is 100. Requests with page_size
+      greater than that will be silently interpreted as having this maximum
+      value.
+    pageToken: A page token, received from a previous
+      `ListInboundSamlSsoProfiles` call. Provide this to retrieve the
+      subsequent page. When paginating, all other parameters provided to
+      `ListInboundSamlSsoProfiles` must match the call that provided the page
+      token.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+
+
+class CloudidentityInboundSamlSsoProfilesPatchRequest(_messages.Message):
+  r"""A CloudidentityInboundSamlSsoProfilesPatchRequest object.
+
+  Fields:
+    inboundSamlSsoProfile: A InboundSamlSsoProfile resource to be passed as
+      the request body.
+    name: Output only. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the SAML
+      SSO profile.
+    updateMask: Required. The list of fields to be updated.
+  """
+
+  inboundSamlSsoProfile = _messages.MessageField('InboundSamlSsoProfile', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class CloudidentityInboundSsoAssignmentsDeleteRequest(_messages.Message):
+  r"""A CloudidentityInboundSsoAssignmentsDeleteRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      InboundSsoAssignment to delete. Format:
+      `inboundSsoAssignments/{assignment}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSsoAssignmentsGetRequest(_messages.Message):
+  r"""A CloudidentityInboundSsoAssignmentsGetRequest object.
+
+  Fields:
+    name: Required. The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      InboundSsoAssignment to fetch. Format:
+      `inboundSsoAssignments/{assignment}`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class CloudidentityInboundSsoAssignmentsListRequest(_messages.Message):
+  r"""A CloudidentityInboundSsoAssignmentsListRequest object.
+
+  Fields:
+    filter: A CEL expression to filter the results. The only supported filter
+      is filtering by customer. For example: `customer==customers/C0123abc`.
+      Omitting the filter or specifying a filter of
+      `customer==customers/my_customer` will return the assignments for the
+      customer that the caller (authenticated user) belongs to.
+    pageSize: The maximum number of assignments to return. The service may
+      return fewer than this value. If omitted (or defaulted to zero) the
+      server will use a sensible default. This default may change over time.
+      The maximum allowed value is 100, though requests with page_size greater
+      than that will be silently interpreted as having this maximum value.
+      This may increase in the futue.
+    pageToken: A page token, received from a previous
+      `ListInboundSsoAssignments` call. Provide this to retrieve the
+      subsequent page. When paginating, all other parameters provided to
+      `ListInboundSsoAssignments` must match the call that provided the page
+      token.
+  """
+
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+
+
+class CloudidentityInboundSsoAssignmentsPatchRequest(_messages.Message):
+  r"""A CloudidentityInboundSsoAssignmentsPatchRequest object.
+
+  Fields:
+    inboundSsoAssignment: A InboundSsoAssignment resource to be passed as the
+      request body.
+    name: Output only. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      Inbound SSO Assignment.
+    updateMask: Required. The list of fields to be updated.
+  """
+
+  inboundSsoAssignment = _messages.MessageField('InboundSsoAssignment', 1)
+  name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
 
 
@@ -1220,6 +1579,12 @@ class CreateDeviceRequest(_messages.Message):
   r"""Request message for creating a Company Owned device.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     device: Required. The device to be created. The name field within this
       device is ignored in the create method. A new name is created by the
       method, and returned within the response. Only the fields `device_type`,
@@ -1228,7 +1593,22 @@ class CreateDeviceRequest(_messages.Message):
       `serial_number` fields are required.
   """
 
-  device = _messages.MessageField('Device', 1)
+  customer = _messages.StringField(1)
+  device = _messages.MessageField('Device', 2)
+
+
+class CreateInboundSamlSsoProfileOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSamlSsoProfilesService.CreateInboundSamlSsoProfile.
+  """
+
+
+
+class CreateInboundSsoAssignmentOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSsoAssignmentsService.CreateInboundSsoAssignment.
+  """
+
 
 
 class CustomAttributeValue(_messages.Message):
@@ -1245,12 +1625,34 @@ class CustomAttributeValue(_messages.Message):
   stringValue = _messages.StringField(3)
 
 
+class DeleteIdpCredentialOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSamlSsoProfilesService.DeleteIdpCredential.
+  """
+
+
+
+class DeleteInboundSamlSsoProfileOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSamlSsoProfilesService.DeleteInboundSamlSsoProfile.
+  """
+
+
+
+class DeleteInboundSsoAssignmentOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSsoAssignmentsService.DeleteInboundSsoAssignment.
+  """
+
+
+
 class Device(_messages.Message):
   r"""A Device within the Cloud Identity Devices API. Represents a Device
   known to Google Cloud, independent of the device ownership, type, and
   whether it is assigned or in use by a user.
 
   Enums:
+    ClientTypesValueListEntryValuesEnum:
     CompromisedStateValueValuesEnum: Output only. Represents whether the
       Device is compromised.
     DeviceTypeValueValuesEnum: Output only. Type of device.
@@ -1268,6 +1670,7 @@ class Device(_messages.Message):
     bootloaderVersion: Output only. Device bootloader version. Example: 0.6.7.
     brand: Output only. Device brand. Example: Samsung.
     buildNumber: Output only. Build number of the device.
+    clientTypes: List of the clients the device is reporting to.
     compromisedState: Output only. Represents whether the Device is
       compromised.
     createTime: Output only. When the Company-Owned device was imported. This
@@ -1281,6 +1684,7 @@ class Device(_messages.Message):
     encryptionState: Output only. Device encryption state.
     endpointVerificationSpecificAttributes: Output only. Attributes specific
       to Endpoint Verification devices.
+    hostname: Host name of the device.
     imei: Output only. IMEI number of device if GSM device; empty otherwise.
     kernelVersion: Output only. Kernel version of the device.
     lastSyncTime: Most recent time when device synced with this service.
@@ -1307,6 +1711,25 @@ class Device(_messages.Message):
     serialNumber: Serial Number of device. Example: HT82V1A01076.
     wifiMacAddresses: WiFi MAC addresses of device.
   """
+
+  class ClientTypesValueListEntryValuesEnum(_messages.Enum):
+    r"""ClientTypesValueListEntryValuesEnum enum type.
+
+    Values:
+      CLIENT_TYPE_UNSPECIFIED: Default value
+      DRIVE_FS: Managed by DriveFS
+      FUNDAMENTAL: Management type for every secure device
+      ENDPOINT_VERIFICATION: Managed by Endpoint Verification
+      WINDOWS_ADVANCED: Managed by Windows
+      GOOGLE_CREDENTIALS_PROVIDER_FOR_WINDOWS: Managed by Google credential
+        provider for windows
+    """
+    CLIENT_TYPE_UNSPECIFIED = 0
+    DRIVE_FS = 1
+    FUNDAMENTAL = 2
+    ENDPOINT_VERIFICATION = 3
+    WINDOWS_ADVANCED = 4
+    GOOGLE_CREDENTIALS_PROVIDER_FOR_WINDOWS = 5
 
   class CompromisedStateValueValuesEnum(_messages.Enum):
     r"""Output only. Represents whether the Device is compromised.
@@ -1399,30 +1822,32 @@ class Device(_messages.Message):
   bootloaderVersion = _messages.StringField(4)
   brand = _messages.StringField(5)
   buildNumber = _messages.StringField(6)
-  compromisedState = _messages.EnumField('CompromisedStateValueValuesEnum', 7)
-  createTime = _messages.StringField(8)
-  deviceId = _messages.StringField(9)
-  deviceType = _messages.EnumField('DeviceTypeValueValuesEnum', 10)
-  enabledDeveloperOptions = _messages.BooleanField(11)
-  enabledUsbDebugging = _messages.BooleanField(12)
-  encryptionState = _messages.EnumField('EncryptionStateValueValuesEnum', 13)
-  endpointVerificationSpecificAttributes = _messages.MessageField('EndpointVerificationSpecificAttributes', 14)
-  imei = _messages.StringField(15)
-  kernelVersion = _messages.StringField(16)
-  lastSyncTime = _messages.StringField(17)
-  managementState = _messages.EnumField('ManagementStateValueValuesEnum', 18)
-  manufacturer = _messages.StringField(19)
-  meid = _messages.StringField(20)
-  model = _messages.StringField(21)
-  name = _messages.StringField(22)
-  networkOperator = _messages.StringField(23)
-  osVersion = _messages.StringField(24)
-  otherAccounts = _messages.StringField(25, repeated=True)
-  ownerType = _messages.EnumField('OwnerTypeValueValuesEnum', 26)
-  releaseVersion = _messages.StringField(27)
-  securityPatchTime = _messages.StringField(28)
-  serialNumber = _messages.StringField(29)
-  wifiMacAddresses = _messages.StringField(30, repeated=True)
+  clientTypes = _messages.EnumField('ClientTypesValueListEntryValuesEnum', 7, repeated=True)
+  compromisedState = _messages.EnumField('CompromisedStateValueValuesEnum', 8)
+  createTime = _messages.StringField(9)
+  deviceId = _messages.StringField(10)
+  deviceType = _messages.EnumField('DeviceTypeValueValuesEnum', 11)
+  enabledDeveloperOptions = _messages.BooleanField(12)
+  enabledUsbDebugging = _messages.BooleanField(13)
+  encryptionState = _messages.EnumField('EncryptionStateValueValuesEnum', 14)
+  endpointVerificationSpecificAttributes = _messages.MessageField('EndpointVerificationSpecificAttributes', 15)
+  hostname = _messages.StringField(16)
+  imei = _messages.StringField(17)
+  kernelVersion = _messages.StringField(18)
+  lastSyncTime = _messages.StringField(19)
+  managementState = _messages.EnumField('ManagementStateValueValuesEnum', 20)
+  manufacturer = _messages.StringField(21)
+  meid = _messages.StringField(22)
+  model = _messages.StringField(23)
+  name = _messages.StringField(24)
+  networkOperator = _messages.StringField(25)
+  osVersion = _messages.StringField(26)
+  otherAccounts = _messages.StringField(27, repeated=True)
+  ownerType = _messages.EnumField('OwnerTypeValueValuesEnum', 28)
+  releaseVersion = _messages.StringField(29)
+  securityPatchTime = _messages.StringField(30)
+  serialNumber = _messages.StringField(31)
+  wifiMacAddresses = _messages.StringField(32, repeated=True)
 
 
 class DeviceUser(_messages.Message):
@@ -1511,6 +1936,16 @@ class DeviceUser(_messages.Message):
   passwordState = _messages.EnumField('PasswordStateValueValuesEnum', 8)
   userAgent = _messages.StringField(9)
   userEmail = _messages.StringField(10)
+
+
+class DsaPublicKeyInfo(_messages.Message):
+  r"""Information of a DSA public key.
+
+  Fields:
+    keySize: Key size in bits (size of parameter P).
+  """
+
+  keySize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
 
 class DynamicGroupMetadata(_messages.Message):
@@ -2268,6 +2703,8 @@ class Group(_messages.Message):
       an empty value.
 
   Fields:
+    additionalGroupKeys: Output only. Additional group keys associated with
+      the Group.
     createTime: Output only. The time when the `Group` was created.
     description: An extended description to help users determine the purpose
       of a `Group`. Must not be longer than 4,096 characters.
@@ -2291,9 +2728,11 @@ class Group(_messages.Message):
       `Group`. Shall be of the form `groups/{group_id}`.
     parent: Required. Immutable. The resource name of the entity under which
       this `Group` resides in the Cloud Identity resource hierarchy. Must be
-      of the form `identitysources/{identity_source_id}` for external-
-      identity-mapped groups or `customers/{customer_id}` for Google Groups.
-      The `customer_id` must begin with "C" (for example, 'C046psxkn').
+      of the form `identitysources/{identity_source}` for external [identity-
+      mapped groups](https://support.google.com/a/answer/9039510) or
+      `customers/{customer_id}` for Google Groups. The `customer_id` must
+      begin with "C" (for example, 'C046psxkn'). [Find your customer ID.]
+      (https://support.google.com/cloudidentity/answer/10070793)
     posixGroups: Optional. The POSIX groups associated with the `Group`.
     updateTime: Output only. The time when the `Group` was last updated.
   """
@@ -2332,16 +2771,17 @@ class Group(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  createTime = _messages.StringField(1)
-  description = _messages.StringField(2)
-  displayName = _messages.StringField(3)
-  dynamicGroupMetadata = _messages.MessageField('DynamicGroupMetadata', 4)
-  groupKey = _messages.MessageField('EntityKey', 5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  name = _messages.StringField(7)
-  parent = _messages.StringField(8)
-  posixGroups = _messages.MessageField('PosixGroup', 9, repeated=True)
-  updateTime = _messages.StringField(10)
+  additionalGroupKeys = _messages.MessageField('EntityKey', 1, repeated=True)
+  createTime = _messages.StringField(2)
+  description = _messages.StringField(3)
+  displayName = _messages.StringField(4)
+  dynamicGroupMetadata = _messages.MessageField('DynamicGroupMetadata', 5)
+  groupKey = _messages.MessageField('EntityKey', 6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  parent = _messages.StringField(9)
+  posixGroups = _messages.MessageField('PosixGroup', 10, repeated=True)
+  updateTime = _messages.StringField(11)
 
 
 class GroupRelation(_messages.Message):
@@ -2413,6 +2853,102 @@ class GroupRelation(_messages.Message):
   roles = _messages.MessageField('TransitiveMembershipRole', 6, repeated=True)
 
 
+class IdpCredential(_messages.Message):
+  r"""Credential for verifying signatures produced by the Identity Provider.
+
+  Fields:
+    dsaKeyInfo: Output only. Information of a DSA public key.
+    name: Output only. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      credential.
+    rsaKeyInfo: Output only. Information of a RSA public key.
+    updateTime: Output only. Time when the `IdpCredential` was last updated.
+  """
+
+  dsaKeyInfo = _messages.MessageField('DsaPublicKeyInfo', 1)
+  name = _messages.StringField(2)
+  rsaKeyInfo = _messages.MessageField('RsaPublicKeyInfo', 3)
+  updateTime = _messages.StringField(4)
+
+
+class InboundSamlSsoProfile(_messages.Message):
+  r"""A [SAML 2.0](https://www.oasis-open.org/standards#samlv2.0) federation
+  between a Google enterprise customer and a SAML identity provider.
+
+  Fields:
+    customer: Immutable. The customer. For example: `customers/C0123abc`.
+    displayName: Human-readable name of the SAML SSO profile.
+    idpConfig: SAML identity provider configuration.
+    name: Output only. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the SAML
+      SSO profile.
+    spConfig: SAML service provider configuration for this SAML SSO profile.
+      These are the service provider details provided by Google that should be
+      configured on the corresponding identity provider.
+  """
+
+  customer = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  idpConfig = _messages.MessageField('SamlIdpConfig', 3)
+  name = _messages.StringField(4)
+  spConfig = _messages.MessageField('SamlSpConfig', 5)
+
+
+class InboundSsoAssignment(_messages.Message):
+  r"""Targets with "set" SSO assignments and their respective assignments.
+
+  Enums:
+    SsoModeValueValuesEnum: Inbound SSO behavior.
+
+  Fields:
+    customer: Immutable. The customer. For example: `customers/C0123abc`.
+    name: Output only. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      Inbound SSO Assignment.
+    rank: Must be zero (which is the default value so it can be omitted) for
+      assignments with `target_org_unit` set and must be greater-than-or-
+      equal-to one for assignments with `target_group` set.
+    samlSsoInfo: SAML SSO details. Must be set if and only if `sso_mode` is
+      set to `SAML_SSO`.
+    signInBehavior: Assertions about users assigned to an IdP will always be
+      accepted from that IdP. This controls whether/when Google should
+      redirect a user to the IdP. Unset (defaults) is the recommended
+      configuration.
+    ssoMode: Inbound SSO behavior.
+    targetGroup: Immutable. Must be of the form `groups/{group}`.
+    targetOrgUnit: Immutable. Must be of the form `orgUnits/{org_unit}`.
+  """
+
+  class SsoModeValueValuesEnum(_messages.Enum):
+    r"""Inbound SSO behavior.
+
+    Values:
+      SSO_MODE_UNSPECIFIED: Not allowed.
+      SSO_OFF: Disable SSO for the targeted users.
+      SAML_SSO: Use an external SAML Identity Provider for SSO for the
+        targeted users.
+      DOMAIN_WIDE_SAML_IF_ENABLED: Use the domain-wide SAML Identity Provider
+        for the targeted users if one is configured; otherwise, this is
+        equivalent to `SSO_OFF`. Note that this will also be equivalent to
+        `SSO_OFF` if/when support for domain-wide SAML is removed. Google may
+        disallow this mode at that point and existing assignments with this
+        mode may be automatically changed to `SSO_OFF`.
+    """
+    SSO_MODE_UNSPECIFIED = 0
+    SSO_OFF = 1
+    SAML_SSO = 2
+    DOMAIN_WIDE_SAML_IF_ENABLED = 3
+
+  customer = _messages.StringField(1)
+  name = _messages.StringField(2)
+  rank = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  samlSsoInfo = _messages.MessageField('SamlSsoInfo', 4)
+  signInBehavior = _messages.MessageField('SignInBehavior', 5)
+  ssoMode = _messages.EnumField('SsoModeValueValuesEnum', 6)
+  targetGroup = _messages.StringField(7)
+  targetOrgUnit = _messages.StringField(8)
+
+
 class IsInvitableUserResponse(_messages.Message):
   r"""Response for IsInvitableUser RPC.
 
@@ -2473,6 +3009,48 @@ class ListGroupsResponse(_messages.Message):
   """
 
   groups = _messages.MessageField('Group', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListIdpCredentialsResponse(_messages.Message):
+  r"""Response of the InboundSamlSsoProfilesService.ListIdpCredentials method.
+
+  Fields:
+    idpCredentials: The IdpCredentials from the specified
+      InboundSamlSsoProfile.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  idpCredentials = _messages.MessageField('IdpCredential', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListInboundSamlSsoProfilesResponse(_messages.Message):
+  r"""Response of the InboundSamlSsoProfilesService.ListInboundSamlSsoProfiles
+  method.
+
+  Fields:
+    inboundSamlSsoProfiles: List of InboundSamlSsoProfiles.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  inboundSamlSsoProfiles = _messages.MessageField('InboundSamlSsoProfile', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListInboundSsoAssignmentsResponse(_messages.Message):
+  r"""Response of the InboundSsoAssignmentsService.ListInboundSsoAssignments
+  method.
+
+  Fields:
+    inboundSsoAssignments: The assignments.
+    nextPageToken: A token, which can be sent as `page_token` to retrieve the
+      next page. If this field is omitted, there are no subsequent pages.
+  """
+
+  inboundSsoAssignments = _messages.MessageField('InboundSsoAssignment', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -2548,8 +3126,8 @@ class LookupSelfDeviceUsersResponse(_messages.Message):
   the caller's credentials.
 
   Fields:
-    customer: The obfuscated customer Id that may be passed back to other
-      Devices API methods such as List, Get, etc.
+    customer: The customer Id that may be passed back to other Devices API
+      methods such as List, Get, etc.
     names: [Resource
       names](https://cloud.google.com/apis/design/resource_names) of the
       DeviceUsers in the format:
@@ -2695,6 +3273,64 @@ class MembershipAdjacencyList(_messages.Message):
 
   edges = _messages.MessageField('Membership', 1, repeated=True)
   group = _messages.StringField(2)
+
+
+class MembershipRelation(_messages.Message):
+  r"""Message containing membership relation.
+
+  Messages:
+    LabelsValue: One or more label entries that apply to the Group. Currently
+      supported labels contain a key with an empty value.
+
+  Fields:
+    description: An extended description to help users determine the purpose
+      of a `Group`.
+    displayName: The display name of the `Group`.
+    group: The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Group`. Shall be of the form `groups/{group_id}`.
+    groupKey: The `EntityKey` of the `Group`.
+    labels: One or more label entries that apply to the Group. Currently
+      supported labels contain a key with an empty value.
+    membership: The [resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      `Membership`. Shall be of the form
+      `groups/{group_id}/memberships/{membership_id}`.
+    roles: The `MembershipRole`s that apply to the `Membership`.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""One or more label entries that apply to the Group. Currently supported
+    labels contain a key with an empty value.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  description = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  group = _messages.StringField(3)
+  groupKey = _messages.MessageField('EntityKey', 4)
+  labels = _messages.MessageField('LabelsValue', 5)
+  membership = _messages.StringField(6)
+  roles = _messages.MessageField('MembershipRole', 7, repeated=True)
 
 
 class MembershipRole(_messages.Message):
@@ -3019,6 +3655,81 @@ class RestrictionEvaluations(_messages.Message):
   memberRestrictionEvaluation = _messages.MessageField('MembershipRoleRestrictionEvaluation', 1)
 
 
+class RsaPublicKeyInfo(_messages.Message):
+  r"""Information of a RSA public key.
+
+  Fields:
+    keySize: Key size in bits (size of the modulus).
+  """
+
+  keySize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class SamlIdpConfig(_messages.Message):
+  r"""SAML IDP (identity provider) configuration.
+
+  Fields:
+    changePasswordUri: The **Change Password URL** of the identity provider.
+      Users will be sent to this URL when changing their passwords at
+      `myaccount.google.com`. This takes precedence over the change password
+      URL configured at customer-level. Must use `HTTPS`.
+    entityId: Required. The SAML **Entity ID** of the identity provider.
+    logoutRedirectUri: The **Logout Redirect URL** (sign-out page URL) of the
+      identity provider. When a user clicks the sign-out link on a Google
+      page, they will be redirected to this URL. This is a pure redirect with
+      no attached SAML `LogoutRequest` i.e. SAML single logout is not
+      supported. Must use `HTTPS`.
+    singleSignOnServiceUri: Required. The `SingleSignOnService` endpoint
+      location (sign-in page URL) of the identity provider. This is the URL
+      where the `AuthnRequest` will be sent. Must use `HTTPS`. Assumed to
+      accept the `HTTP-Redirect` binding.
+  """
+
+  changePasswordUri = _messages.StringField(1)
+  entityId = _messages.StringField(2)
+  logoutRedirectUri = _messages.StringField(3)
+  singleSignOnServiceUri = _messages.StringField(4)
+
+
+class SamlSpConfig(_messages.Message):
+  r"""SAML SP (service provider) configuration.
+
+  Fields:
+    assertionConsumerServiceUri: Output only. The SAML **Assertion Consumer
+      Service (ACS) URL** to be used for the IDP-initiated login. Assumed to
+      accept response messages via the `HTTP-POST` binding.
+    entityId: Output only. The SAML **Entity ID** for this service provider.
+  """
+
+  assertionConsumerServiceUri = _messages.StringField(1)
+  entityId = _messages.StringField(2)
+
+
+class SamlSsoInfo(_messages.Message):
+  r"""Details that are applicable when `sso_mode` == `SAML_SSO`.
+
+  Fields:
+    inboundSamlSsoProfile: Required. Name of the `InboundSamlSsoProfile` to
+      use. Must be of the form
+      `inboundSamlSsoProfiles/{inbound_saml_sso_profile}`.
+  """
+
+  inboundSamlSsoProfile = _messages.StringField(1)
+
+
+class SearchDirectGroupsResponse(_messages.Message):
+  r"""The response message for MembershipsService.SearchDirectGroups.
+
+  Fields:
+    memberships: List of direct groups satisfying the query.
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results available for listing.
+  """
+
+  memberships = _messages.MessageField('MembershipRelation', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class SearchGroupsResponse(_messages.Message):
   r"""The response message for GroupsService.SearchGroups.
 
@@ -3076,6 +3787,33 @@ class SendUserInvitationRequest(_messages.Message):
   UserInvitation.
   """
 
+
+
+class SignInBehavior(_messages.Message):
+  r"""Controls sign-in behavior.
+
+  Enums:
+    RedirectConditionValueValuesEnum: When to redirect sign-ins to the IdP.
+
+  Fields:
+    redirectCondition: When to redirect sign-ins to the IdP.
+  """
+
+  class RedirectConditionValueValuesEnum(_messages.Enum):
+    r"""When to redirect sign-ins to the IdP.
+
+    Values:
+      REDIRECT_CONDITION_UNSPECIFIED: Default and means "always"
+      NEVER: Sign-in flows where the user is prompted for their identity will
+        not redirect to the IdP (so the user will most likely be prompted by
+        Google for a password), but special flows like IdP-initiated SAML and
+        sign-in following automatic redirection to the IdP by domain-specific
+        service URLs will accept the IdP's assertion of the user's identity.
+    """
+    REDIRECT_CONDITION_UNSPECIFIED = 0
+    NEVER = 1
+
+  redirectCondition = _messages.EnumField('RedirectConditionValueValuesEnum', 1)
 
 
 class StandardQueryParameters(_messages.Message):
@@ -3203,6 +3941,20 @@ class TransitiveMembershipRole(_messages.Message):
   role = _messages.StringField(1)
 
 
+class UpdateInboundSamlSsoProfileOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSamlSsoProfilesService.UpdateInboundSamlSsoProfile.
+  """
+
+
+
+class UpdateInboundSsoAssignmentOperationMetadata(_messages.Message):
+  r"""LRO response metadata for
+  InboundSsoAssignmentsService.UpdateInboundSsoAssignment.
+  """
+
+
+
 class UpdateMembershipRolesParams(_messages.Message):
   r"""The details of an update to a `MembershipRole`.
 
@@ -3266,6 +4018,12 @@ class WipeDeviceRequest(_messages.Message):
   r"""Request message for wiping all data on the device.
 
   Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
     removeResetLock: Optional. Specifies if a user is able to factory reset a
       device after a Device Wipe. On iOS, this is called "Activation Lock",
       while on Android, this is known as "Factory Reset Protection". If true,
@@ -3274,7 +4032,8 @@ class WipeDeviceRequest(_messages.Message):
       device.
   """
 
-  removeResetLock = _messages.BooleanField(1)
+  customer = _messages.StringField(1)
+  removeResetLock = _messages.BooleanField(2)
 
 
 class WipeDeviceResponse(_messages.Message):
@@ -3289,7 +4048,18 @@ class WipeDeviceResponse(_messages.Message):
 
 
 class WipeDeviceUserRequest(_messages.Message):
-  r"""Request message for starting an account wipe on device."""
+  r"""Request message for starting an account wipe on device.
+
+  Fields:
+    customer: Optional. [Resource
+      name](https://cloud.google.com/apis/design/resource_names) of the
+      customer. If you're using this API for your own organization, use
+      `customers/my_customer` If you're using this API to manage another
+      organization, use `customers/{customer_id}`, where customer_id is the
+      customer to whom the device belongs.
+  """
+
+  customer = _messages.StringField(1)
 
 
 class WipeDeviceUserResponse(_messages.Message):

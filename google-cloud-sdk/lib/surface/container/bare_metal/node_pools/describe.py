@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.gkeonprem import bare_metal_node_pools as apis
 from googlecloudsdk.calliope import base
-from googlecloudsdk.command_lib.container.bare_metal import flags
+from googlecloudsdk.command_lib.container.bare_metal import node_pool_flags as flags
 
 _EXAMPLES = """
 To describe a node pool named ``my-node-pool'' in a cluster named
@@ -30,7 +30,6 @@ $ {command} my-node-pool --cluster=my-cluster --location=us-west1
 """
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Describe(base.DescribeCommand):
   """Describe a node pool in an Anthos cluster on bare metal."""

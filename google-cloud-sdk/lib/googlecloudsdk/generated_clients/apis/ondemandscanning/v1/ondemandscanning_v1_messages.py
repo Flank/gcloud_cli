@@ -1545,10 +1545,10 @@ class PackageData(_messages.Message):
     hashDigest: HashDigest stores the SHA512 hash digest of the jar file if
       the package is of type Maven. This field will be unset for non Maven
       packages.
-    os: The OS affected by a vulnerability This field is deprecated and the
-      information is in cpe_uri
-    osVersion: The version of the OS This field is deprecated and the
-      information is in cpe_uri
+    os: The OS affected by a vulnerability Used to generate the cpe_uri for OS
+      packages
+    osVersion: The version of the OS Used to generate the cpe_uri for OS
+      packages
     package: The package being analysed for vulnerabilities
     packageType: The type of package: os, maven, go, etc.
     patchedCve: CVEs that this package is no longer vulnerable to go/drydock-
@@ -1566,12 +1566,16 @@ class PackageData(_messages.Message):
       MAVEN: Java packages from Maven.
       GO: Go third-party packages.
       GO_STDLIB: Go toolchain + standard library packages.
+      PYPI: Python packages.
+      NPM: NPM packages.
     """
     PACKAGE_TYPE_UNSPECIFIED = 0
     OS = 1
     MAVEN = 2
     GO = 3
     GO_STDLIB = 4
+    PYPI = 5
+    NPM = 6
 
   cpeUri = _messages.StringField(1)
   dependencyChain = _messages.MessageField('LanguagePackageDependency', 2, repeated=True)
@@ -2485,6 +2489,7 @@ class VulnerabilityOccurrence(_messages.Message):
     cvssScore: Output only. The CVSS score of this vulnerability. CVSS score
       is on a scale of 0 - 10 where 0 indicates low severity and 10 indicates
       high severity.
+    cvssV2: The cvss v2 score for the vulnerability.
     cvssVersion: Output only. CVSS version used to populate cvss_score and
       severity.
     cvssv3: The cvss v3 score for the vulnerability.
@@ -2570,16 +2575,17 @@ class VulnerabilityOccurrence(_messages.Message):
     CRITICAL = 5
 
   cvssScore = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  cvssVersion = _messages.EnumField('CvssVersionValueValuesEnum', 2)
-  cvssv3 = _messages.MessageField('CVSS', 3)
-  effectiveSeverity = _messages.EnumField('EffectiveSeverityValueValuesEnum', 4)
-  fixAvailable = _messages.BooleanField(5)
-  longDescription = _messages.StringField(6)
-  packageIssue = _messages.MessageField('PackageIssue', 7, repeated=True)
-  relatedUrls = _messages.MessageField('RelatedUrl', 8, repeated=True)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 9)
-  shortDescription = _messages.StringField(10)
-  type = _messages.StringField(11)
+  cvssV2 = _messages.MessageField('CVSS', 2)
+  cvssVersion = _messages.EnumField('CvssVersionValueValuesEnum', 3)
+  cvssv3 = _messages.MessageField('CVSS', 4)
+  effectiveSeverity = _messages.EnumField('EffectiveSeverityValueValuesEnum', 5)
+  fixAvailable = _messages.BooleanField(6)
+  longDescription = _messages.StringField(7)
+  packageIssue = _messages.MessageField('PackageIssue', 8, repeated=True)
+  relatedUrls = _messages.MessageField('RelatedUrl', 9, repeated=True)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 10)
+  shortDescription = _messages.StringField(11)
+  type = _messages.StringField(12)
 
 
 class WindowsUpdate(_messages.Message):

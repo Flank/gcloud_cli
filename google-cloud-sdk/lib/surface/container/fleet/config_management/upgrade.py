@@ -22,7 +22,6 @@ from googlecloudsdk.api_lib.container.fleet import util
 from googlecloudsdk.command_lib.container.fleet import resources
 from googlecloudsdk.command_lib.container.fleet.config_management import utils
 from googlecloudsdk.command_lib.container.fleet.features import base
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
 
@@ -44,14 +43,7 @@ class Upgrade(base.UpdateCommand):
 
   @classmethod
   def Args(cls, parser):
-    if resources.UseRegionalMemberships(cls.ReleaseTrack()):
-      resources.AddMembershipResourceArg(parser)
-    else:
-      parser.add_argument(
-          '--membership',
-          type=str,
-          help='The Membership name provided during registration.',
-      )
+    resources.AddMembershipResourceArg(parser)
     parser.add_argument(
         '--version',
         type=str,
@@ -59,16 +51,13 @@ class Upgrade(base.UpdateCommand):
         required=True)
 
   def Run(self, args):
+    utils.enable_poco_api_if_disabled(self.Project())
+
     f = self.GetFeature()
     new_version = args.version
-    if resources.UseRegionalMemberships(self.ReleaseTrack()):
-      membership = base.ParseMembership(
-          args, prompt=True, autoselect=True, search=True)
-      _, cluster_v = utils.versions_for_member(f, membership)
-    else:
-      membership = _get_or_prompt_membership(args.membership)
-      _, cluster_v = utils.versions_for_member(
-          f, self.MembershipResourceName(membership))
+    membership = base.ParseMembership(
+        args, prompt=True, autoselect=True, search=True)
+    _, cluster_v = utils.versions_for_member(f, membership)
 
     if not self._validate_versions(membership, cluster_v, new_version):
       return
@@ -81,24 +70,15 @@ class Upgrade(base.UpdateCommand):
 
     patch = self.messages.MembershipFeatureSpec()
     # If there's an existing spec, copy it to leave the other fields intact.
-    if resources.UseRegionalMemberships(self.ReleaseTrack()):
-      for full_name, spec in self.hubclient.ToPyDict(f.membershipSpecs).items():
-        if util.MembershipPartialName(full_name) == util.MembershipPartialName(
-            membership) and spec is not None:
-          patch = spec
-    else:
-      for full_name, spec in self.hubclient.ToPyDict(f.membershipSpecs).items():
-        if util.MembershipShortname(
-            full_name) == membership and spec is not None:
-          patch = spec
+    for full_name, spec in self.hubclient.ToPyDict(f.membershipSpecs).items():
+      if util.MembershipPartialName(full_name) == util.MembershipPartialName(
+          membership) and spec is not None:
+        patch = spec
     if patch.configmanagement is None:
       patch.configmanagement = self.messages.ConfigManagementMembershipSpec()
     patch.configmanagement.version = new_version
 
-    if resources.UseRegionalMemberships(self.ReleaseTrack()):
-      membership_key = membership
-    else:
-      membership_key = self.MembershipResourceName(membership)
+    membership_key = membership
     f = self.messages.Feature(
         membershipSpecs=self.hubclient.ToMembershipSpecs(
             {membership_key: patch}))
@@ -112,28 +92,3 @@ class Upgrade(base.UpdateCommand):
       return False
 
     return True
-
-
-def _get_or_prompt_membership(membership):
-  """Retrieve the membership name from args or user prompt choice.
-
-  Args:
-    membership: The default membership, if any.
-
-  Returns:
-    membership: A final membership name
-  Raises: Error, if specified membership could not be found
-  """
-  memberships = base.ListMemberships()
-  if not memberships:
-    raise exceptions.Error('No Memberships available in the fleet.')
-  # User should choose an existing membership if this arg wasn't provided
-  if not membership:
-    index = console_io.PromptChoice(
-        options=memberships,
-        message='Please specify a membership to upgrade:\n')
-    membership = memberships[index]
-  elif membership not in memberships:
-    raise exceptions.Error(
-        'Membership {} is not in the fleet.'.format(membership))
-  return membership

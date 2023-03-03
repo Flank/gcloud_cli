@@ -1,11 +1,1421 @@
 # Google Cloud CLI - Release Notes
 
-Copyright 2014-2022 Google Inc. All rights reserved.
+Copyright 2014-2023 Google Inc. All rights reserved.
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
 
-## 407.0.0 (2022-08-25)
+## 420.0.0 (2023-02-28)
+
+### Breaking Changes
+
+*   **(Cloud Firestore)** Switched `firestore beta database create` to use Firestore API.
+*   **(Cloud Firestore)** Added `--type`, `--location` and `--database` to `gcloud beta firestore database create`.
+*   **(Cloud Firestore)** Removed `--region` in `gcloud beta firestore database create`. Use `--location` instead.
+
+
+### App Engine
+
+* Added support for App Engine go runtime versions 116, 117, 118, 119, 120.
+
+### BigQuery
+
+* Updated messaging for the `use_legacy_sql` flag.
+* Added stack trace logging for errors when the `apilog` flag is used.
+* Removed unnecessary fetches for data transfer commands.
+
+### Certificate Authority Service
+
+* Added name constraints arguments to `gcloud privateca roots create` to allow
+configuring certificate authorities with name constraints.
+* Added name constraints arguments to `gcloud privateca subordinates create` to
+allow configuring certificate authorities with name constraints.
+* Added name constraints arguments to `gcloud privateca certificates create` to
+allow configuring certificate authorities with name constraints.
+
+### Cloud Composer
+
+* Update warning message when running commands that use the default Cloud
+ Composer version, which was changed recently from 1 to 2.
+
+### Cloud Functions
+
+*   Fixed issue where `gcloud functions deploy` would crash on updating an
+    existing function with VPC Connector when `--egress-settings` flag was
+    specified.
+* Added warning and prompting to `gcloud functions add-iam-policy-binding` about
+  needing to bind the `roles/run.invoker` role for 2nd gen functions.
+
+### Cloud Key Management Service
+
+*   Added `gcloud beta kms inventory` which allows viewing and tracking of
+    keys across cloud resources.
+
+### Cloud Logging
+
+* Promoted `buckets create --enable-analytics` to GA.
+* Added `buckets update --enable-analytics` to GA track.
+* Removed deprecated `buckets update --enable-loglink` from ALPHA track.
+* Added `--async` option to the `buckets create` and `buckets update` commands.
+* Added `links` command group implementation.
+
+### Compute Engine
+
+*   Promoted `--queue-count` flag in `--network-interface` of `gcloud compute instances create` to beta.
+*   Promoted `--stack-type` flag of `gcloud compute instances bulk create` to GA.
+* Promoted `gcloud compute disks update` to GA.
+* Promoted `--provisioned-iops` flag of `gcloud compute disks update` to GA.
+
+### GKE Hub
+
+* Added `gcloud container fleet scopes|namespaces` which allows users to manage Fleet Tenancy.
+
+### Identity and Access Management
+
+* Workforce identity federation now supports browser-based sign-in when authenticating with the Google Cloud CLI via `gcloud auth login`. To learn more, see [Obtain short-lived tokens for workforce identity federation](cloud.google.com/iam/docs/workforce-obtaining-short-lived-credentials) or the [Azure AD](/iam/docs/workforce-sign-in-azure-ad) or [Okta](/iam/docs/workforce-sign-in-okta)-specific `gcloud` CLI sign-in instructions.
+
+### Pubsub Emulator
+
+*   Added support for updating schemas.
+*   Fixed the inability to create topics, subscriptions, and schemas when using
+    the `gcloud` CLI.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 419.0.0 (2023-02-22)
+
+### App Engine
+
+* Updated the Java SDK to version 2.0.11 build from the open source project
+<https://github.com/GoogleCloudPlatform/appengine-java-standard/releases/tag/v2.0.11>.
+
+### Artifact Registry
+
+*  Fix issue where `artifacts repositories create` failed unconditionally.
+
+### Cloud Datastream
+
+* Added new `--full-hierarchy` and `--hierarchy-depth` flags for connection-profiles discover.
+* Deprecated `--recursive` and `--recursive-depth` flags for connection-profiles-discover.
+
+### Cloud Functions
+
+* Added support for Docker package format
+`{location}-docker.pkg.dev/{project}/{repository}` to `--docker-repository` flag
+of `gcloud functions deploy`.
+* Fixed issue where `gcloud functions deploy` fails if the user doesn't have
+  the permission `serviceusage.services.get`.
+
+### Cloud Logging
+
+* Promote `--logging-optional` and `--logging-optional-fields` flags of `gcloud compute backend-services create` and `gcloud compute backend-services update` to GA.
+
+### Cloud Run
+
+* Promoted `gcloud beta run jobs executions logs read` to beta, which reads logs from a selected resource.
+* Promoted `gcloud beta run jobs executions logs tail` to beta, which tail logs from a selected resource.
+
+### Cloud Storage
+
+* `gcloud storage cp` will now silently ignore the Content-MD5 header for parallel composite uploads.
+* `gcloud storage hash` has been promoted to GA.
+
+### Firebase Test Lab
+
+* Promoted `--client-details` flag of `gcloud firebase test [android|ios] run`
+  to GA. This flag can be used to provide additional details to attach to the
+  test matrix, including a `matrixLabel` to help you identify and locate your
+  test in the Firebase console.
+
+### Recaptcha
+
+* Support creating Fastly enabled site keys using `recaptcha keys create --waf-service=fastly`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 418.0.0 (2023-02-14)
+
+### Breaking Changes
+
+*   **(Cloud Dataproc)** Modified `--job-id` and `--yarn_application_id` flags to `--job-ids` and
+  `--yarn-application-ids` respectively in `gcloud dataproc clusters diagnose`
+  command. These flags can now accept a comma separated list of job ids and yarn
+  app ids instead of a single value.
+
+
+### Google Cloud CLI
+
+* Defined "quota_project" in `gcloud auth application-default set-quota-project` command documentation.
+* Launched the enterprise-certificate-proxy component. See more at `$ gcloud topic client-certificate`.
+
+### AI
+
+* Added `gcloud ai models copy` which copies a model.
+
+### AlloyDB
+
+* Added `--clear-continuous-backup-encryption-key` flag to `gcloud beta alloydb clusters update` to support clearing a custom encryption configuration for Continuous Backups.
+* Added following flags of `gcloud alloydb instances create` and
+  `gcloud alloydb instances update` to alpha, beta and GA:
+   * `--insights-config-query-string-length`
+   * `--insights-config-query-plans-per-minute`
+   * `--insights-config-record-application-tags`
+   * `--insights-config-record-client-address`
+
+### Artifact Registry
+
+* Adding new command `gcloud artifacts vpcsc-config allow --project=my-proj --location=us-west1`.
+* Adding new command `gcloud artifacts vpcsc-config deny --project=my-proj --location=us-west1`.
+* Adding new command `gcloud artifacts vpcsc-config describe --project=my-proj --location=us-west1`.
+* Adding new command `gcloud artifacts repositories create my-repo --project=my-project --repository-format=maven --location=us-east1  --description="My test repo" --mode=virtual-repository --upstream-policy-file=policy.json`.
+* Adding new command `gcloud artifacts repositories create my-repo --project=my-project --repository-format=python --location=us-east1  --description="My python repo" --mode=remote-repository --remote-repo-config-desc="test python remote repo" --remote-python-repo=PYPI`.
+* Adding new command `gcloud artifacts repositories create my-repo --project=my-project --repository-format=npm --location=us-east1  --description="My npm repo" --mode=remote-repository --remote-repo-config-desc="test npm remote repo" --remote-npm-repo=NPMJS`.
+* Adding new command `gcloud artifacts repositories create my-repo --project=my-project --repository-format=maven --location=us-east1  --description="My test repo" --mode=remote-repository --remote-repo-config-desc="test maven remote repo" --remote-mvn-repo=MAVEN-CENTRAL`.
+* Adding new command `gcloud artifacts repositories create my-repo --project=my-project --repository-format=docker --location=us-east1 --description="no CRM permission" --mode=remote-repository --remote-repo-config-desc="test docker remote repo" --remote-docker-repo=DOCKER-HUB`.
+
+### BigQuery
+
+* Added SPARK reservation assignment.
+* Added main class option for Spark procedures.
+* Added support for bi-engine reservation paths.
+
+### Cloud DNS
+
+* Fixed issue with `gcloud dns response-policies` being unable to update `gkeclusters` flag in GA.
+* Updated `gcloud dns record-sets create` and `gcloud dns record-sets update`
+  to allow referencing forwarding rules by their full resource path.
+
+### Cloud Datastream
+
+* Modified Create/Update Stream flags that use a JSON/YAML file to use camelCase field naming instead of snake_case, to match the REST API.
+Old snake_case configuration files will still be supported.
+
+### Cloud Filestore
+
+*   Added `--location` flag to `gcloud filestore instances snapshots create`, which
+    accepts either a zone or region and allows clients to create Enterprise and HighScale snapshots.
+*   Added `--location` flag to `gcloud filestore instances snapshots delete`, which
+    accepts either a zone or region and allows clients to delete Enterprise and HighScale snapshots.
+*   Added `--location` flag to `gcloud filestore instances snapshots list`, which
+    accepts either a zone or region and allows clients to list Enterprise and HighScale snapshots.
+*   Added `--location` flag to `gcloud filestore instances snapshots update`, which
+    accepts either a zone or region and allows clients to update Enterprise and HighScale snapshots.
+*   Added `--location` flag to `gcloud filestore instances snapshots describe`, which
+    accepts either a zone or region and allows clients to describe Enterprise and HighScale snapshots.
+
+### Cloud Firestore
+
+* Added `--api-scope` and `--query-scope` support for Firestore Index Create.
+
+### Cloud Key Management Service
+
+* Set `--location` and `--keyring` as required flags for commands
+  `set-primary-version`, `set-rotation-schedule`, `get-rotation-schedule`,
+  `set-iam-policy`, `get-iam-policy`.
+
+### Cloud Logging
+
+* Allow for protocols `TCP`, `UDP` and `UNSPECIFIED` in `gcloud compute backend-services create` and `gcloud compute backend-services update`.
+* Added `--logging-optional` and `--logging-optional-fields` flags of `gcloud compute backend-services create` and `gcloud compute backend-services update` in beta to specify the optional fields to be added to the reported logs.
+
+### Cloud Run
+
+* Fixed an issue where `gcloud run` delete commands report error sometimes even
+though the deletion succeeded.
+
+### Cloud Storage
+
+* Updated gsutil component to 5.20.
+* All `gcloud storage` commands that accept JSON files now also support YAML.
+
+### Compute Engine
+
+* Promoted `--resource-policies` flag for `glcloud compute reservations create`to to GA.
+
+### Distributed Cloud Edge
+
+*  Introduced the GDCE version for cluster, machine, and node-pool as output during list and describe operations.
+* Added `gcloud edge-cloud networking` which allows users to configure the
+  networking configurations on the ToRs to support customer workloads which are
+  running in Google Distributed Cloud Edge Clusters.
+
+### Stackdriver Debugger
+
+*   Deprecated `gcloud deploy`.  Cloud Debugger is deprecated and will be shut
+    down May 31, 2023.  For more information, see
+    <https://cloud.google.com/debugger/docs/deprecations>.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 417.0.1 (2023-02-08)
+
+### App Engine Flexible Environment
+
+* Fixing issue where App Engine Flex users cannot deploy their PHP, Java or Python applications via gcloud 417.0.0.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 417.0.0 (2023-02-07)
+
+### Breaking Changes
+
+*   **(Cloud IoT)** Added `--device-field-mask` flag to `gcloud iot devices list`
+  to have override possibility for device fieldMask. In case the API response
+  does not include the `blocked` field for any of the devices, the `BLOCKED`
+  column will disappear from the results table.
+
+
+### Google Cloud CLI
+
+* Defined "quota_project" in `gcloud auth application-default set-quota-project` command documentation.
+
+### Anthos Multi-Cloud
+
+* Modified `gcloud container azure clients create` to wait for the returned
+  long-running operation. Use `--async` flag to get the old behavior.
+* Modified `gcloud container azure clients delete` to wait for the returned
+  long-running operation. Use `--async` flag to get the old behavior.
+
+### Cloud Composer
+
+* Added warning message when running commands that use the default Cloud
+ Composer version, which will be changed soon.
+
+### Cloud Logging
+
+*  Updated `gcloud logging buckets list` command to include CMEK enabled or disabled setting.
+
+### Cloud Run
+
+* Promoted `gcloud run jobs deploy` to beta, which allows creating
+or updating a Cloud Run job from a container image or source to build.
+
+### Compute Engine
+
+* Added `REGION` column to default output of `gcloud compute target-https-proxies list`.
+* Promoted `gcloud compute network-attachments` to GA.
+
+### Distributed Cloud Edge
+
+* Promoted `--vpc-project` to `gcloud edge-cloud container vpn-connections create`
+  to create resources in a different GCP project than the GDCE cluster project.
+
+### Firebase Test Lab
+
+* Promoted `gcloud firebase test [android|ios] list-device-capacities` to GA.
+  This feature can inform your test decisions by letting you view the inventory
+  level of device types in the Test Lab catalog. To access this information, run
+  `gcloud firebase test [android|ios] list-device-capacities`, or
+  `gcloud firebase test [android|ios] models describe [MODEL_ID]`.
+
+### Identity and Access Management
+
+* Added `gcloud iam workforce-pools` commands for Workforce Identity Federation management.
+
+### Notebooks
+
+* Deprecate alpha and beta notebooks.
+
+### Security Command Center
+
+* Updated `gcloud scc custom-modules sha` command group to allow custom modules feature.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 416.0.0 (2023-01-31)
+
+### Breaking Changes
+
+*   **(Cloud Datalab)** Removed `gcloud datalab` component (Originally removed in release 413.0.0).
+
+
+### AI
+
+* Fixed an issue in `gcloud ai hp-tuning-jobs` that the values of `--max-trial-count`
+  and `--max-parallel-trial-count` are not passed in the config.yaml file.
+
+### AlloyDB
+
+*   Updated `gcloud beta alloydb clusters create` and `gcloud beta alloydb clusters update` to support enabling continuous backups via new `--enable-continuous-backup` and `--continuous-backup-recovery-window-days` and `--continuous-backup-encryption-key` flags.
+
+### Anthos Identity Service
+
+* Added `--fleet-default-member-config` flag to the following commands:
+  * `gcloud beta container fleet identity-service enable`
+  * `gcloud beta container fleet identity-service delete`
+
+      These will make it possible to configure and delete fleet
+      default membership configurations.
+
+### App Engine
+
+*   Added the `--tunnel-through-iap` flag to `gcloud beta app instances scp`.
+    Using this flag lets you use an Identity-Aware Proxy (IAP) tunnel when
+    attempting to SCP to/from an App Engine flexible environment instance
+    without an external IP address.
+
+### Cloud Run
+
+* Promotes `gcloud beta run jobs logs read` to beta, which reads logs from a selected resource.
+* Promotes `gcloud beta run jobs logs tail` to beta, which tail logs from a selected resource.
+
+### Cloud SQL
+
+*   Promoted `gcloud sql users describe` command to GA.
+
+### Cloud Storage
+
+* Updated gsutil component to 5.19.
+  * Fixed an issue causing parallel transfer commands to require elevated permissions.
+
+### Compute Engine
+
+* Modified `gcloud compute instance-groups managed update` to support relative path for regional health check.
+* Added `--allow-psc-global-access` flag of `gcloud compute forwarding-rules <create|update>` to beta.
+* Promoted `gcloud compute resource-policies update snapshot-schedule` to beta.
+
+### Config Controller
+
+*   Fixed issue where `--full-management` flag doesn't take effect.
+
+### Immersive Stream
+
+* Promoted `gcloud immersive-stream xr` to GA.
+
+### Kubernetes Engine
+
+* Updates default kubectl from 1.24.9 to 1.24.10.
+* Additional kubectl versions:
+  * kubectl.1.21 (1.21.14)
+  * kubectl.1.22 (1.22.17)
+  * kubectl.1.23 (1.23.16)
+  * kubectl.1.24 (1.24.10)
+  * kubectl.1.25 (1.25.6)
+  * kubectl.1.26 (1.26.1)
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 415.0.0 (2023-01-24)
+
+### Google Cloud CLI
+
+* Global `--format` flag now respects the `core/default_format` property when
+   `--format=default`. If `core/default_format` is not set, then `default` format
+   is `yaml`.
+
+### AI
+
+* Modified `--region` flag of `gcloud ai endpoints` to include new online
+  prediction regions.
+* Modified `--region` flag of `gcloud ai models` to include new online
+  prediction regions.
+* Added `--enable-dashboard-access` flag to `gcloud ai custom-jobs create` and
+  `gcloud ai hp-tuning-jobs create` to allow the access to the dashboard specified in
+  custom container.
+
+### BigQuery
+
+* Added support for using the `auth/impersonate_service_account` property in
+`bq` commands.
+
+### Cloud Build
+
+* Added command groups for managing connections and repositories: `gcloud beta builds connections` and `gcloud beta builds repositories`.
+
+### Cloud Dataproc
+
+* Added `gcloud dataproc node-groups` group with commands: `describe` and `resize`.
+* Added `--driver-pool-${X}` flags to `gcloud dataproc clusters create`.
+
+### Cloud Firestore
+
+* Added `--database` flag to `gcloud firestore operations` to add database
+    support for Firestore operations.
+
+### Cloud On Demand Scanning
+
+*   Fixed issue with extracting packages from Go binaries built with newer
+    versions of to the Go toolchain.
+
+### Cloud Org Policy
+
+* Added `--update-mask` to `gcloud org-policies set-policy` to specify the fields to be overwritten in the policy.
+
+### Cloud Pub/Sub
+
+*   Added `gcloud pubsub schemas commit` to commit a revision for a Pub/Sub schema.
+*   Added `gcloud pubsub schemas rollback` to roll back a revision for a Pub/Sub schema.
+*   Added `gcloud pubsub schemas delete-revision` to delete a revision for a Pub/Sub schema.
+*   Added `gcloud pubsub schemas list-revisions` to list all revisions for a Pub/Sub schema.
+*   Added `--first-revision-id` and `--last-revision-id` flags to `gcloud pubsub topics create` to create schema settings for Pub/Sub topics.
+*   Added `--clear-schema-settings`, `--schema`, `--message-encoding`, `--first-revision-id` and `--last-revision-id` flags to `gcloud pubsub topics update` to update schema settings for a Pub/Sub topic.
+
+### Cloud SQL
+
+*   Promoted `gcloud sql users describe` command to beta.
+
+### Compute Engine
+
+* Added `--update-policy-<type|max-unavailable|max-surge|minimal-action|most-disrtuptive-action|replacement-method>` flags of `gcloud compute instance-groups managed <create|update>` to GA.
+* Added `--update-policy-min-ready` flag of `gcloud compute instance-groups managed <create|update>` to beta.
+*  Added `--enforce-on-key-configs` flag to `gcloud beta compute security-policies rules create` and `gcloud beta compute security-policies rules update`.
+
+### Dataproc Metastore
+
+* Promoted `gcloud metastore services import` flag `--dump-type` to GA.
+* Promoted `gcloud metastore services export` flag `--dump-type` to GA.
+
+### Declarative Workflows
+
+*  Make `--storage-path`,  `--resource-types`  and `--resource-types-file`
+   mutually exclusive in `gcloud beta resource-config bulk-export`.
+
+### Kpt
+
+* Updated kpt from v1.0.0-beta.19 to v1.0.0-beta.24. See <https://github.com/GoogleContainerTools/kpt/releases/tag/v1.0.0-beta.24> and previous release notes for more details.
+
+### Recommender
+
+*   Added support for `gcloud recommender recommendations mark-dismissed`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 414.0.0 (2023-01-18)
+
+### Anthos Multi-Cloud
+
+*   Added `--azure-tenant-id` and `--azure-application-id` flags to
+    `gcloud container azure clusters create` and
+    `gcloud container azure clusters update` to set authentication configuration
+    for management of Azure resources. These flags replace `--client` flag.
+
+### Apigee
+
+* Fixed issue where `gcloud apigee apis describe` would demand a non-existent
+  `--revision` argument.
+
+### Cloud API Gateway
+
+*   Fixed issue where `sort-by` arguments in list commands produced type
+    validation errors.
+
+### Cloud Build
+
+* Added `--peered-network-ip-range` flag to `gcloud builds worker-pools create`.
+
+### Cloud Firestore
+
+* Added database support for Firestore import/export.
+* Added namespace_ids support for Firestore import/export.
+* Added databaseId support for Firestore TTL.
+* Added databaseId support for Firestore SFI.
+
+### Cloud Storage
+
+* Add IAM and ACL-related flags.
+* Updated gsutil component to 5.18.
+
+### Compute Engine
+
+* Promoted `--external-ipv6-address` flag of `gcloud compute instances network-interfaces update` to GA.
+* Promoted `--external-ipv6-prefix-length` flag of `gcloud compute instances network-interfaces update` to GA.
+* Added keyword `network-attachment` for `--network-interface` in `gcloud compute instance-templates create`.
+* Promoted `--external-ipv6-address` flag of `gcloud compute instances create` to GA.
+* Promoted `--external-ipv6-prefix-length` flag of `gcloud compute instances create` to GA.
+* Promoted `--source-instance-template` flag of `gcloud compute reservations create` to GA.
+
+### Database Migration
+
+* Added `gcloud database-migration conversion-workspaces seed` which seeds from a connection profile for a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces delete` which deletes a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces convert` which converts source entities to draft entities in a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces apply` which applies a database-migration conversion workspace onto the destination database.
+* Added `gcloud database-migration conversion-workspaces list-background-jobs` which lists the background jobs in a database-migration conversion workspaces.
+* Added `gcloud database-migration conversion-workspaces describe-entities` which describes the database entities in a database-migration conversion workspaces.
+
+### Dataproc Metastore
+
+* Promoted `gcloud metastore services` flag `--database-type` to GA.
+
+### Kubernetes Engine
+
+* Updates default kubectl from 1.23.15 to 1.24.9.
+* Additional kubectl versions:
+  * kubectl.1.21 (1.21.14)
+  * kubectl.1.22 (1.22.17)
+  * kubectl.1.23 (1.23.15)
+  * kubectl.1.24 (1.24.9)
+  * kubectl.1.25 (1.25.5)
+  * kubectl.1.26 (1.26.0)
+
+### Network Management
+
+* Added `appEngineVersion` and `cloudRunRevision` arguments for source in
+ `gcloud network-management connectivity-tests`. This allows the user to run
+ tests using App Engine version and Cloud Run revision endpoint types as source.
+
+### Security Command Center
+
+* Fixed `gcloud scc findings create` to require flag `event-time`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 413.0.0 (2023-01-10)
+
+### Breaking Changes
+
+*   **(Cloud Storage)** Added `--fetch-encrypted-object-hashes` flag to `ls` and `objects list` commands. API requests to the LIST endpoint do not fetch the hashes for encrypted objects by default. If this flag is set, a GET request is sent for each encrypted object in order to fetch hashes. This can significantly increase the cost of the commands.
+  * Previously, the fallback to GET was implemented for CSEK-encrypted objects as the default behavior. With this flag, both CSEK and CMEK are handled, and `gcloud` CLI checks if it has the necessary CSEK key before sending a GET request.
+*   **(Kubernetes Engine)** This change starts using the Client-Go Credential Plugin `gke-gcloud-auth-plugin` as noted in [Client-go Credential Plugin changes](https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke).
+
+
+### Google Cloud CLI
+
+* Fixed a crash during reauth when Enterprise Certificate is used.
+* Fixed issue where the `gcloud` CLI would crash when invoked in PowerShell 7.3.
+  This issue was reported at:
+  <https://issuetracker.google.com/issues/259295558>.
+* Added `core/default_format` and `core/format` properties to config in order
+  enable setting a default print format. Print format is first determined by
+  global flag `--format`. If `--format` flag is not defined, then CLI defaults
+  to `core/format` value. If `core/format` is not defined, then CLI defaults to
+  command specific output. If command specific output is undefined, then format
+  is determined by `core/default_format`. `core/default_format` defaults to yaml
+  format.
+
+### AI
+
+* Modified `--region` flag of `gcloud ai model-monitoring-jobs` to include new
+model monitoring jobs regions.
+* Modified `--explanation-metadata-file` flag of `gcloud ai models upload` from required to optional.
+* Added optional `output-image-uri` field to `--worker-pool-spec` flag of `gcloud ai custom-jobs create` to name and store the custom image built with autopackaging in the specified Google Container Registry or Artifact Registry.
+
+### Anthos Multi-Cloud
+
+*   Updated `gcloud container aws operations list` to show the underlying action
+    (create, update, delete, etc) associated with AWS long-running operations.
+*   Updated `gcloud container azure operations list` to show the underlying
+    action (create, update, delete, etc) associated with Azure long-running
+    operations.
+*   Added `gcloud container azure operations cancel` to cancel an ongoing
+    LRO operation on Azure resources.
+*   Added `gcloud container aws operations cancel` to cancel an ongoing
+    LRO operation on AWS resources.
+*   Added `--tags` flag to `gcloud container aws node-pools update` to
+    update the tags assigned to AWS node pool resources.
+*   Added `--clear-tags` flag to `gcloud container aws node-pools update`
+    to clear the tags assigned to AWS node pool resources.
+*   Added `--autoscaling-metrics-granularity` flag to
+    `gcloud container aws node-pools create` to set granularity when enabling
+    CloudWatch metrics collection of the autoscaling group of AWS node pools.
+*   Added `--autoscaling-metrics` flag to
+    `gcloud container aws node-pools create` to enable collection of specific
+    CloudWatch metrics of the autoscaling group of AWS node pools.
+*   Added `--autoscaling-metrics-granularity` flag to
+    `gcloud container aws node-pools update` to update the granularity of
+    CloudWatch metrics collection for the autoscaling group of AWS node
+    pools.
+*   Added `--autoscaling-metrics` flag to
+    `gcloud container aws node-pools update` to update the collection of
+    specific CloudWatch metrics for the autoscaling group of AWS node pools.
+*   Added `--clear-autoscaling-metrics` flag to
+    `gcloud container aws node-pools update` to clear the CloudWatch metrics
+    collection associated with the autoscaling group of AWS node pools.
+*   Added `gcloud container attached operations list` to show the underlying
+    action (create, update, delete, etc) associated with Attached clusters
+    long-running operations.
+*   Added `gcloud container attached operations describe` to show detailed
+    status of a provided Attached clusters long-running operation.
+*   Added `gcloud container attached operations wait` to wait for completion of
+    a provided Attached clusters long-running operation.
+
+### BigQuery
+
+* Fixed issue with timestamp normalization in Windows.
+* Extended the insert flags to include a `insert_id` flag that's appended to the
+  row number of the data to be inserted as the `insertId` field that's used for
+  deduping newly inserted rows. This can be used to ensure repeat executions
+  don't add unintended data.
+
+### Cloud Access Context Manager
+
+* Promoted `gcloud access-context-manager authorized-orgs` to GA.
+
+### Cloud Build
+
+* Removed `--subscription-filter` flag of `gcloud builds triggers create manual`.
+
+### Cloud Composer
+
+* Added `--enable-cloud-data-lineage-integration` to `gcloud composer
+  environments create/update` to enable Cloud Data Lineage integration.
+* Added `--disable-cloud-data-lineage-integration` to `gcloud composer
+  environments update` to disable Cloud Data Lineage integration.
+* Enabled `db clean` and `db check` Airflow commands executable via `gcloud
+ composer environments run` for environments with Airflow 2.3 or newer.
+
+### Cloud Datalab
+
+* Removed `gcloud datalab` component.
+
+### Cloud Run
+
+* Added `--env-vars-file` to `gcloud beta run jobs create` to add environment
+  variables to the job from a YAML file.
+* Removed the call to action from `gcloud beta run integrations describe` for
+  Redis integrations that are not ready for use.
+
+### Cloud SQL
+
+*   Added `--striped` and `--stripe_count` flags to `gcloud sql import bak`
+    and added `--striped` flag to `gcloud sql export bak` to enable the striped
+    import/export feature for SQL Server.
+*   Promoted `--restore-database-name` flag for `gcloud sql instance clone --point-in-time`
+    to support single database PITR restore for SQL Server to beta and GA.
+*   Added `gcloud sql users describe` command, which describes a Cloud SQL user in an instance in alpha.
+
+### Cloud Services
+
+*  Promoted `gcloud services api-keys list` in beta.
+ *  Promoted `gcloud services api-keys describe` in beta.
+ *  Promoted `gcloud services api-keys get-key-string` in beta.
+ *  Promoted `gcloud services api-keys create` in beta.
+ *  Promoted `gcloud services api-keys update` in beta.
+
+### Cloud Storage
+
+* Added `gcloud storage buckets create --placement` flag.
+* Promoted `gcloud storage objects update` retention flags to GA.
+  * `--event-based-hold`
+  * `--temporary-hold`
+* Removed `gcloud storage buckets update --no-lock-retention-period` flag.
+
+### Cloud Workstations
+
+* Added `gcloud beta workstations clusters create` which creates a cluster under a specified region.
+* Added `gcloud beta workstations configs create` which creates a workstation configuration under a specified cluster.
+* Added `gcloud beta workstations create` which creates a workstation under a specified config.
+* Added `gcloud beta workstations delete` which deletes the given workstation.
+* Added `gcloud beta workstations configs delete` which deletes the given config.
+* Added `gcloud beta workstations clusters delete` which deletes the given cluster.
+* Added `gcloud beta workstations describe` which displays all fields for a given workstation.
+* Added `gcloud beta workstations configs describe` which displays all fields for a given config.
+* Added `gcloud beta workstations clusters describe` which displays all fields for a given cluster.
+* Added `gcloud beta workstations start` which starts a specified workstation.
+* Added `gcloud beta workstations stop` which stops a specified workstation.
+
+### Compute Engine
+
+* Added <get|set>-iam-policy` and `<add|remove>-iam-policy-bindings` to `gcloud beta compute backend-buckets`.
+* Promoted `--endpoint-type` flag of `gcloud compute addresses create` to GA.
+* Promoted `gcloud compute sole-tenancy node-groups simulate-maintenance-event` to beta.
+* Added `--all-instances-config-effective` flag of `gcloud compute instance-groups managed wait-until` to beta.
+* Modified `gcloud compute forwarding-rules create` to allow specifying `--address` and `--ip-version` at the same time.
+
+### Compute Firewall Policies
+
+* Fixed `gcloud compute network-firewall-policies rules update` not sending an
+  empty list to the API if a field is specified as empty.
+
+### Database Migration
+
+* Added `gcloud database-migration private-connections create` which creates a database-migration private connection.
+* Added `gcloud database-migration private-connections list` which lists the database-migration private connections.
+* Added `gcloud database-migration private-connections describe` which describes a database-migration private connection.
+* Added `gcloud database-migration private-connections delete` which deletes a database-migration private connection.
+* Updated `gcloud database-migration connection-profiles create` to support creating Oracle connection profiles.
+* Updated `gcloud database-migration connection-profiles create` to support connectivity in creating Postgresql connection profiles.
+* Added `gcloud database-migrate conversion-workspaces create` which creates a database-migration conversion workspace.
+* Added `gcloud database-migrate conversion-workspaces update` which updates a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces list` which lists the database-migration conversion workspaces.
+* Added `gcloud database-migration conversion-workspaces describe` which describes a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces commit` which commits a database-migration conversion workspace.
+* Added `gcloud database-migration conversion-workspaces rollback` which rollbacks a database-migration conversion workspace.
+
+### Kubernetes Engine
+
+* Updates default kubectl from 1.23.14 to 1.23.15.
+* Removes kubectl.1.20, since it is no longer needed.
+* Additional kubectl versions:
+  * kubectl.1.21 (1.21.14)
+  * kubectl.1.22 (1.22.17)
+  * kubectl.1.23 (1.23.15)
+  * kubectl.1.24 (1.24.9)
+  * kubectl.1.25 (1.25.5)
+
+### Pubsub Emulator
+
+*   Added support for Exactly-once Delivery.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 412.0.0 (2022-12-13)
+
+### Breaking Changes
+
+*   **(Compute Engine)** Modified concurrent operation quota errors to show additional information to user instead of just error message.
+
+
+### Google Cloud CLI
+
+* Added property `core/parse_error_details`. If set, `gcloud` CLI will parse
+  and display errors in a more human readable format, where available.
+
+### AI
+
+* Modified `--region` flag of `gcloud ai endpoints` to include new online
+  prediction regions.
+* Modified `--region` flag of `gcloud ai models` to include new online
+  prediction regions.
+* Modified `--region` flag of `gcloud ai custom-jobs` to include new online
+  training regions.
+* Modified `--region` flag of `gcloud ai hp-tuning-jobs` to include new online
+  training regions.
+
+### AlloyDB
+
+* Introduced `gcloud alloydb` track.
+
+### Anthos Multi-Cloud
+
+* Promoted `gcloud container attached` to GA.
+
+### App Engine
+
+*   Updated `gcloud beta app instances ssh` to use an IAP tunnel when attempting
+    to SSH to an instance without an external IP.
+
+### Cloud Build
+
+* Modified one of `gcloud builds triggers run --branch`, `gcloud builds triggers run --tag`, and `gcloud builds triggers run --sha` flag to be required.
+* Make `--region` flag visible in `builds triggers create ` command group.
+Set `--dockerfile` flag as required for `builds triggers create` command group.
+* Ungroup `--build-config` flag and `--inline-config` flag for `builds triggers create`  command group.
+* Promoted `gcloud builds triggers` to GA.
+
+### Cloud Composer
+
+* Added `gcloud composer environments snapshots load` - to load a snapshot into
+  the environment.
+* Added `gcloud composer environments snapshots save` - save a snapshot of the
+  environment.
+* Added `--enable-scheduled-snapshot-creation` to `gcloud composer
+  environments create/update` to enable snapshots of the environment creation
+  according to a schedule. Can be specified for Composer 2.0.32 or greater.
+* Added `--snapshot-creation-schedule` to `gcloud composer environments
+  create/update` to specify cron expression when snapshots of the environment
+  should be created.
+* Added `--snapshot-location` to `gcloud composer environments
+  create/update` to specify the Cloud Storage location for storing
+  automatically created snapshots.
+* Added `--snapshot-schedule-timezone` to `gcloud composer environments
+  create/update` to specify Timezone that sets the context to interpret
+  snapshot_creation_schedule.
+* Added `--disable-scheduled-snapshot-creation` to `gcloud composer
+  environments update` to disable the automatic snapshots creation.
+
+### Cloud Datastream
+
+* Fixed issue where `gcloud datastream create` failed for Postgresql source config.
+
+### Cloud Functions
+
+* Added `--cpu` flag to `gcloud beta functions deploy` for 2nd Gen functions to alpha and beta.
+* Added `--concurrency` flag to `gcloud beta functions deploy` for 2nd Gen functions to alpha and beta.
+
+### Cloud Pub/Sub
+
+*   Added `--event-time` and `--publish-time` flags to
+    `gcloud pubsub lite-subscriptions create` to create Pub/Sub Lite
+    subscriptions from a nominated timestamp.
+*   Added `--export-pubsub-topic`, `--export-dead-letter-topic` and
+    `--export-desired-state` flags to `gcloud pubsub lite-subscriptions create`
+    to create Pub/Sub Lite export subscriptions.
+*   Added `--export-pubsub-topic`, `--export-dead-letter-topic` and
+    `--export-desired-state` flags to `gcloud pubsub lite-subscriptions update`
+    to update Pub/Sub Lite export subscriptions.
+
+### Cloud SQL
+
+*   Added `--enable-google-private-path` flag to `gcloud sql instances create`
+    and `gcloud sql instances patch` commands in Alpha, Beta, and GA.
+    This field specifies whether the instance is accessible
+    to internal Google Cloud services such as BigQuery.
+    This is applicable only to MySQL and PostgreSQL instances that don't
+    use public IP. Currently, SQL Server isn't supported.
+
+### Cloud Services
+
+*   Promoted `gcloud services api-keys delete` to beta.
+*   Promoted `gcloud services api-keys undelete` to beta.
+
+### Cloud Workstations
+
+* Added `gcloud beta workstations configs list` which lists workstation configs under a specified cluster.
+
+### Config Controller
+
+*   Added `--full-management` flag to `gcloud anthos config controller create`
+    to allow creating Config Controller on GKE Autopilot instances.
+
+### Database Migration
+
+*   Updated `gcloud database-migration connection-profiles create` to support
+    creating AlloyDB connection profiles.
+
+### Firebase Test Lab
+
+*   Added `--robo-script` flag to `gcloud firebase test ios run` to customize an
+    iOS Robo crawl with a Robo script.
+
+### Identity and Access Management
+
+* Added `--executable-interactive-timeout-millis` flag to
+  `gcloud iam workforce pools create-cred-config`. This enables using
+  executable-sourced credentials with user interactivity with
+  `gcloud auth login --cred-file=/path/to/interactive/executable/config.json`
+  when using Workforce Identity Federation.
+
+### Kubernetes Engine
+
+*   Added `--stack-type` and `--ipv6-access-type` arguments to
+`gcloud container clusters create` command to support dual stack GKE clusters.
+*   Added `--stack-type` argument to `gcloud container clusters update` command
+    to support changing stack type between IPv4 and dual stack GKE clusters.
+* Added `--ephemeral-storage-local-ssd` to `gcloud beta container clusters create`, `gcloud beta container node-pools create`, `gcloud container clusters create`, `gcloud container node-pools create`. This flag is used to configure nodes' ephemeral storage to be backed by local SSDs.
+* Added `--local-nvme-ssd-block` to `gcloud beta container clusters create`, `gcloud beta container node-pools create`, `gcloud container clusters create`, `gcloud container node-pools create`. This flag is used to initialize nodes in node-pool with raw-block local NVMe SSDs attached.
+
+### Notebooks
+
+* Added support for Shielded VM configuration to `gcloud notebooks instances create`.
+* Added support for reservation configuration to `gcloud notebooks instances create`.
+
+### Terraform
+
+*   Added zone and region option for `gcloud beta terraform vet`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 411.0.0 (2022-12-06)
+
+### Breaking Changes
+
+*   **(Compute Engine)** Added rhel-9 and rhel-9-byol options to `--os` flag for:
+  * `gcloud compute images import` in GA,
+  * `gcloud compute instances import` in GA
+  * `gcloud compute machine-images import` in GA
+
+
+### Google Cloud CLI
+
+* Added `gcloud topic` command group to alpha and beta.
+
+### App Engine
+
+* Add `--service-account` flag of `gcloud app create` to GA, which allows to create an app with a user-managed service account.
+* Add `--service-account` flag of `gcloud app update` to GA, which allows to update the app with a user-managed service account.
+
+### App Engine Flexible Environment
+
+* Add `--service-account` flag of `gcloud app create` to GA, which allows to create an app with a user-managed service account.
+* Add `--service-account` flag of `gcloud app update` to GA, which allows to update the app with a user-managed service account.
+
+### BigQuery
+
+* Expose enable_resumable_uploads flag in public bq.
+* Formatting fix for bigquery_client.py.
+* Changed "locking" Owned Test Accounts to "getting" to avoid overloading AccountProviderService.
+* Extended api logging to include URIs of requests.
+* Extends encodings supported during file upload.
+* Messages and fails early when the user tries to upload with an invalid schema.
+* Adds support for GOOGLE_CLOUD_QUOTA_PROJECT environment variable.
+* Adds configuration for external accounts using token_uri.
+* Dataset name validation and feedback.
+
+### Cloud Bigtable
+
+*    Promoted `gcloud bigtable instances tables create` to beta and GA.
+*    Promoted `gcloud bigtable instances tables delete` to beta and GA.
+*    Promoted `gcloud bigtable instances tables update` to beta and GA.
+*    Added `include-stats` option to `cbt lookup` and `cbt read` commands.
+*    Added `cbt notices` command, which displays licenses covering all direct
+     and indirect dependencies.
+
+### Cloud Build
+
+* Bugfix to enforce limits to be applied after filters.
+* Added `--enterprise-config` flag to `builds triggers create github` to support creating GitHub Enterprise trigger.
+
+### Cloud Composer
+
+*   Added `--enable-scheduled-snapshot-creation` to `gcloud beta composer
+    environments create/update` to enable snapshots of the environment creation
+    according to a schedule. Can be specified for Composer 2.0.32 or greater.
+*   Added `--snapshot-creation-schedule` to `gcloud beta composer environments
+    create/update` to specify cron expression when snapshots of the environment
+    should be created.
+*   Added `--snapshot-location` to `gcloud beta composer environments
+    create/update` to specify the Cloud Storage location for storing
+    automatically created snapshots.
+*   Added `--snapshot-schedule-timezone` to `gcloud beta composer environments
+    create/update` to specify Timezone that sets the context to interpret
+    snapshot_creation_schedule.
+*   Added `--disable-scheduled-snapshot-creation` to `gcloud beta composer
+    environments update` to disable the automatic snapshots creation.
+
+### Cloud Firestore
+
+* Add apiScope output for Firestore index. ApiScope can be viewed in `gcloud firestore indexes composite list` and `gcloud firestore indexes composite describe`.
+* Added databaseId support for Firestore index.
+
+### Cloud IDS
+
+* Added `--threat_exceptions` flag to exclude certain threat types from being
+ reported.
+
+### Cloud Key Management Service
+
+*   Modified `gcloud kms import-jobs create` to accept new SHA256 import methods
+    `rsa-oaep-3072-sha256`, `rsa-oaep-3072-sha256-aes-256`,
+    `rsa-oaep-4096-sha256`, and `rsa-oaep-4096-sha256-aes-256`.
+
+### Cloud Pub/Sub
+
+*   Promoted `--enable-exactly-once-delivery` flag of `gcloud pubsub subscriptions create` to GA.
+*   Promoted `--enable-exactly-once-delivery` flag of `gcloud pubsub subscriptions update` to GA.
+
+### Cloud Run
+
+* Promoted `--execution-environment` of `gcloud run` from beta to GA.
+* Fixed issue where `gcloud beta run jobs execute` with `--wait` flag, and
+  other jobs commands to wait for an execution to complete, failed to wait more
+  than 30 minutes.
+* Fixed issue where `gcloud beta run integrations delete` failed when the
+  associated Cloud Run service is deleted.
+
+### Cloud SQL
+
+* Promoted `--timeout` flag for `gcloud sql instances create` to GA.
+* Added `--restore-database-name` flag to `gcloud sql instance clone --point-in-time` to support single database PITR restore for SQL Server.
+
+### Cloud Services
+
+*   Updated `gcloud services list` to retry 429 errors.
+*   Set the default page size for `gcloud services list` to 200.
+*   Promoted `gcloud services api-keys lookup` to beta.
+
+### Cloud Spanner
+
+*   Added `--skip-init` flag to `gcloud spanner samples run`.
+
+### Cloud Storage
+
+* Promoted `gcloud storage buckets update` retention flags to GA.
+  * `--default-event-based-hold`
+  * `--retention-period`
+  * `--clear-retention-period`
+  * `--lock-retention-period`
+* Promoted `gcloud storage buckets update --uniform-bucket-level-access` to GA.
+* Rebuilt `gcloud-crc32c` 1.0.0 on latest version of golang.
+* Updated gsutil component to 5.17.
+
+### Compute Engine
+
+* Added `--merge-source-commitment` to `gcloud compute commitments create` for beta and GA.
+* Fixed issue where `gcloud compute instance-groups unmanaged list-instances`
+  would fail to fall back to the `compute/zone` property when `--zone` was
+  missing.
+* Added customRequestHeaders and customResponseHeaders to modifiable fields list in `gcloud compute backend-services edit`.
+
+### Dataproc Metastore
+
+* Added support for querying and mutating Dataproc Metastore metadata. The following commands have been added to the alpha and beta release tracks:
+  * `metastore services queryMetadata`
+  * `metastore services alterLocation`
+  * `metastore services moveTableToDatabase`
+
+### Distributed Cloud Edge
+
+* Added warning to long running operation metadata of `gcloud edge-cloud container cluster create/update`
+when the cluster has a maintenance window configuration that overlaps with other
+clusters' in the same project.
+
+### Firebase Test Lab
+
+*   Added `--type=robo` flag to `gcloud firebase test ios run` to support running iOS Robo tests.
+
+### GKE Hub
+
+* Fixed bug in `gcloud container fleet` and `gcloud container hub` command groups where a membership with ambiguous location was not given default value `global`.
+
+### Kubernetes Engine
+
+*   Promoted `--cluster-dns-scope=cluster` flag of
+    `gcloud container clusters create` and `gcloud container clusters update` to
+    GA.
+*   Promoted `--binauthz-evaluation-mode=MONITORING`,
+    `binauthz-evaluation-mode=MONITORING_AND_PROJECT_SINGLETON_POLICY_ENFORCE`,
+    and `--binauthz-policy` flags of `gcloud container clusters create`, `gcloud
+    container clusters create-auto`, and `gcloud container clusters update` to
+    beta.
+*   Corrected outdated description help text of `gcloud container node-pools
+    delete`.
+*   Promoted `--placement-type` flag for `gcloud container clusters create`
+    command to GA.
+*   Promoted `--placement-type` flag for `gcloud container node-pools create`
+    command to GA.
+*   Added `--async` flag to `gcloud container node-pools create/update` to allow
+    the in-progress operation to be returned, instead of the node pool.
+*   Additionally, default formatting for `gcloud container node-pools
+    create/update/delete --async` has been added to provide a more
+    human-readable format of the operation; potentially impacting parsing of
+    output. It is recommended to use `--format` when parsing `gcloud` CLI
+    output.
+* Updates default kubectl from 1.22.14 to 1.23.14.
+* Additional kubectl versions:
+  * kubectl.1.20 (1.20.15)
+  * kubectl.1.21 (1.21.14)
+  * kubectl.1.22 (1.22.15)
+  * kubectl.1.23 (1.23.14)
+  * kubectl.1.24 (1.24.8)
+  * kubectl.1.25 (1.25.4)
+
+*   Added `--windows-os-version` flag to `gcloud container node-pools
+    create/update` to allow create Windows node pools using Windows
+    Server LTSC 2022 Containerd node image.
+
+### Media CDN
+
+* Added `gcloud edge-cache` command group to enable configuration of Media CDN.
+
+### Network Connectivity
+
+* Promoted `gcloud network-connectivity internal-ranges` command group to GA.
+
+### Network Security
+
+* Promoting networksecurity firewall API to v1beta1.
+* Promoted commands under `gcloud network-security org-address-groups` and
+  `gcloud network-security address-groups` to beta.
+
+### Recommender
+
+*   Added billing account scope support for `gcloud recommender recommender-config describe`.
+*   Added billing account scope support for `gcloud recommender recommender-config update`.
+*   Added billing account scope support for `gcloud recommender insight-type-config describe`.
+*   Added billing account scope support for `gcloud recommender insight-type-config update`.
+
+### Terraform
+
+*   Added support for environment variables `GOOGLE_PROJECT`,
+    `GOOGLE_CLOUD_PROJECT`, `GCLOUD_PROJECT` in `gcloud beta terraform vet`.
+*   Fixed an issue where `gcloud beta terraform vet` would fail while trying to
+    format and output pre-formatted error strings.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 410.0.0 (2022-11-15)
+
+### Google Cloud CLI
+
+* Added `gcloud topic endpoint-override` for details on overriding the default api URL.
+
+### AI
+
+* Added asia-southeast2, europe-central2, and us-south1 options to `--region` flag of `gcloud ai custom-jobs` and `gcloud ai hp-tuning-jobs`.
+
+### AlloyDB
+
+* Introduced the following commands: `gcloud beta alloydb clusters create-secondary`,
+`gcloud beta alloydb instances create-secondary`,
+`gcloud beta alloydb clusters promote`.
+
+### App Engine
+
+* Updated the Java SDK to version 2.0.10 build from the open source project
+<https://github.com/GoogleCloudPlatform/appengine-java-standard/releases/tag/v2.0.10>.
+
+### Artifact Registry
+
+* Update maven and gradle plugin versions to 2.2.0.
+
+### Assured Workloads
+
+*   Added `SOVEREIGN_CONTROLS_BY_T_SYSTEMS` as an option for `--partner` flag of
+    `gcloud assured workloads create` command (available for both beta and GA).
+
+### Cloud Asset Inventory
+
+* Promoted `gcloud asset query` command to GA.
+
+### Cloud Bigtable
+
+* Added `stats` option to `--view` flag for `bigtable instances tables describe`.
+
+### Cloud Composer
+
+* Added  `--enable-triggerer` to `gcloud beta composer environments create/update` to allow usage of deferrable operators in dags.
+* Added  `--triggerer-cpu` to `gcloud beta composer environments create/update` to specify CPU allocated to Airflow triggerer.
+* Added  `--triggerer-memory` to `gcloud beta composer environments create/update` to specify memory allocated to Airflow triggerer.
+* Added  `--disable-triggerer` to `gcloud beta composer environments update` to disable Airflow triggerer.
+
+### Cloud Dataproc
+
+*   Added `--async` flag to `gcloud dataproc jobs kill`.
+
+### Cloud Datastream
+
+* Added the `max_concurrent_cdc_tasks` support to `--mysql-source-config` and `--oracle-source-config` flags in `gcloud datastream streams`.
+* Fixed issue where `stream create` using a `mysql-source-config` or `oracle-source-config` with column level filtering fails to create.
+
+### Cloud Functions
+
+*   Fixed issue where `gcloud functions list` would crash when a 2nd Gen-only
+    region was specified using `--regions`.
+*   Updated `gcloud function describe` to look up both 1st Gen and 2nd Gen environments for the function. When `--gen2` flag is specified, only 2nd Gen functions will be looked up.
+
+### Cloud Run
+
+* Promoted `gcloud run services logs read` and `gcloud run revisions logs read`
+to beta, which reads logs from a selected resource.
+* Promoted `gcloud run services logs tail` and `gcloud run revisions logs tail`
+to beta, which tail logs from a selected resource.
+* Added `--execute-now` and `--wait` flags to `gcloud beta run job update` to
+immediately execute the job after update and wait for completion.
+* Promoted `gcloud beta run integrations` command group and all sub-commands to beta.
+
+### Compute Engine
+
+* Promoted `--list-managed-instances-results` flag for `gcloud compute instance-groups managed create` and `gcloud compute instance-groups managed update` to GA.
+* Fixed `--network-interface` to mark the public IP as `None` when `--no-address` is specified.
+
+### GKE Hub
+
+*   Fixed issue where `gcloud container fleet memberships` commands did not
+output memberships with missing cluster.
+* Fixed bug in `gcloud container fleet config-management version` where
+memberships were stuck with version "NA".
+
+### Identity and Access Management
+
+* Added support for retrieving the token introspection endpoint through external account credentials.
+
+### Kubernetes Engine
+
+* Added `--labels` flag to `gcloud container node-pools create/update` to allow creating and updating node pools with GCP labels.
+
+### VPC Access
+
+* Promoted `gcloud compute networks vpc-access connectors update` to beta.
+  * Enables updating of `min-instances`, `max-instances` and `machine-type` of
+  already existing vpc-access connectors.
+
+### Vmware Engine
+
+* Added commands for managing resources:
+  * Locations
+  * Operations
+  * VMwareEngine networks
+  * Network policies
+  * Node types
+  * Private clouds
+  * Clusters
+  * HCX activation keys
+  * NSX credentials
+  * VCenter credentials
+  * Subnets
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 409.0.0 (2022-11-08)
+
+### Breaking Changes
+
+*   **(Compute Engine)** Modified stockout errors to show entire error object to user in yaml format instead of just error message.
+*   **(Compute Engine)** Modified quota exceeded errors to show additional information to user instead of just error message.
+
+
+### Google Cloud CLI
+
+*   Modified `gcloud config list` to accept both a section name and `--all`
+    flag. The command will display all the set and unset properties when
+    specifying both.
+
+### Anthos Multi-Cloud
+
+*   Added `--allow-missing` flag to the following command groups:
+    `gcloud container aws clusters delete`,
+    `gcloud container aws node-pools delete`,
+    `gcloud container azure clients delete`,
+    `gcloud container azure clusters delete`,
+    `gcloud container azure node-pools delete`,
+    to allow the delete request to succeed, even if the cluster, node-pool
+    or client resource does not exist.
+
+### Cloud Composer
+
+* Added  `--skip-airflow-overrides-setting` to `gcloud beta composer snapshots load` to allow skipping setting Airflow overrides from the snapshot.
+* Added  `--skip-environment-variables-setting` to `gcloud beta composer snapshots load` to allow skipping setting environment variables from the snapshot.
+* Added  `--skip-gcs-data-copying` to `gcloud beta composer snapshots load` to allow skipping copying dags, plugins and data folders from the snapshot.
+
+### Cloud Datastream
+
+* Added the `max_concurrent_cdc_tasks` support to `--mysql-source-config` and `--oracle-source-config` flags in `gcloud datastream streams`.
+
+### Cloud Filestore
+
+*  Fixed issue where `--kms-key` was being ignored in `gcloud filestore backups create` command.
+
+### Cloud Firestore Emulator
+
+* Promoted `gcloud emulators firestore` to GA.
+*   Release Cloud Firestore emulator v1.15.1
+    *   feat: allow users to configure websocket port
+
+### Cloud Functions
+
+*   Fixed issue where `gcloud functions list` would crash when a 2nd Gen-only
+    region was specified using `--regions`.
+
+### Cloud Logging
+
+*   Updated `gcloud logging read` to accept multiple resources to query using a
+    new `--resource-names` flag.
+
+### Cloud SQL
+
+* Added the following flags to `gcloud sql instances create` in BETA:
+   * `--timeout`
+
+### Compute Engine
+
+* Added `--split-source-commitment` to `gcloud compute commitments create` for beta and GA.
+* Promoted `any-single-zone` value support for the flag
+  `--target-distribution-shape` of `gcloud compute instance-groups managed
+  create` / `update` to beta.
+* Added keyword `network-attachment` for `--network-interface` in `gcloud compute instances create`.
+* Promoted `--max-run-duration` flag of `gcloud compute instances create` to beta.
+  * Allows specifying the duration of time after which the instance will terminate.
+* Promoted `--termination-time` flag of `gcloud compute instances create` to beta.
+  * Allows specifying the timestamp that the instance will terminate.
+* Added 3 additional accepted values to `--enforce-on-key` for  `gcloud compute security-policies rules create|update` and promoted it to GA.
+* Promoted `gcloud compute network-edge-security-services` command group to GA.
+* Promoted `--region` and '--global' flags of `gcloud compute security-policies` to GA.
+* Promoted `--network-ddos-protection` flag of `gcloud compute security-policies update` to GA.
+
+### Distributed Cloud Edge
+
+*  Removed unsupported GPU_TYPE field from `gcloud edge-cloud container machines list`. This field will be restored once the API provides accurate GPU information.
+
+### GKE Hub
+
+* Fixed a bug where `gcloud container fleet memberships get-credentials` and `gcloud container hub memberships get-credentials` would not return an error when the membership argument was left empty.
+
+### Kubernetes Engine
+
+*   Corrected outdated description help text of `gcloud container node-pools delete`.
+*   Added `--private-endpoint-subnetwork` and `--enable-google-cloud-access` flags to `gcloud container clusters create` and `gcloud container clusters create-auto`.
+*   Added `--enable-google-cloud-access` and `--enable-private-endpoint` flags to `gcloud container clusters update`.
+*   Added `--enable-private-nodes` flag to `gcloud container node-pools create` and `gcloud container node-pools update`.
+
+### Notebooks
+
+* Added `gcloud notebooks instances diagnose` and `gcloud notebooks runtimes diagnose` commands to GA.
+  These commands provide access to the AI Platform Notebooks new Diagnose API.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+## 408.0.1 (2022-11-02)
+
+### BigQuery
+
+* Adds various fixes to PSC environments.
+* Adds support for random forest models as part of BQML.
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 408.0.0 (2022-11-01)
+
+### Breaking Changes
+
+*   **(Cloud Storage)** Lifecycle and CORS settings files now use camel case instead of snake case to match the API documentation. Example: <http://cloud/storage/docs/json_api/v1/buckets#lifecycle>.
+
+
+### AI
+
+* Added more available regions to `gcloud ai model-monitoring-jobs`.
+* Added `--version-description` flag to `gcloud ai models upload` to support setting model version description.
+
+### BigQuery
+
+* Add missing open source licenses.
+* Expose Iceberg for public preview.
+
+### Cloud Composer
+
+* Added `--connection-type` flag to `gcloud beta composer environments create` and `gcloud composer environments create` command to allow forcing the use of VPC peerings for internal communication.
+
+### Cloud Deploy
+
+* Added `initial-rollout-labels` and `initial-rollout-annotations` flags to `gcloud deploy releases create` command.
+
+### Cloud SQL
+
+* Promoted `--connector_enforcement` flag for `gcloud sql instances create` and
+  `gcloud sql instances patch` to GA.
+
+### Cloud Storage
+
+* Updated gsutil component to 5.16.
+
+### Compute Engine
+
+* Promoted `--discard-local-ssd` flag of `gcloud compute instances stop` to beta.
+* Promoted `--force-update-on-repair` flag of `gcloud compute instance-groups managed <create | update>` to beta.
+* Fixed missing ephemeral IP when neither `--address` nor `--no-address` keys are provided with `--network-interface` flag during instance template creation.
+
+### GKE Hub
+
+* Changed membership-related flags in `gcloud container fleet` and `gcloud container hub` command groups to resource arguments, adding `--location` flag and `LOCATION` column in list commands.
+
+### Kubernetes Engine
+
+*   Promoted `--enable-managed-prometheus` flag of `gcloud container clusters
+    create/update` to GA.
+*   Promoted `--disable-managed-prometheus` flag of `gcloud container clusters
+    update` to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 407.0.0 (2022-10-25)
 
 ### Breaking Changes
 
@@ -14,7 +1424,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 *   **(Cloud Run)** In `gcloud run deploy` and `gcloud run services update`, `--set-secrets`,
     `--remove-secrets`, and `--update-secrets` flags now support mounting
     multiple versions of the same secret in the same directory.
-*   **(Cloud Run)** 
+*   **(Cloud Run)**
     *   If multiple different secrets are requested to be mounted in the same
         directory, including for secrets already set on the service in the case
         of `--update-secrets`, the operation will now fail instead of silently

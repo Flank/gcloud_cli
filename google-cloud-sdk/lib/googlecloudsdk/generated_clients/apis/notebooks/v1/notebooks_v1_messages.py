@@ -17,8 +17,8 @@ package = 'notebooks'
 class AcceleratorConfig(_messages.Message):
   r"""Definition of a hardware accelerator. Note that not all combinations of
   `type` and `core_count` are valid. Check [GPUs on Compute
-  Engine](/compute/docs/gpus/#gpus-list) to find a valid combination. TPUs are
-  not supported.
+  Engine](https://cloud.google.com/compute/docs/gpus/#gpus-list) to find a
+  valid combination. TPUs are not supported.
 
   Enums:
     TypeValueValuesEnum: Type of this accelerator.
@@ -96,7 +96,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -113,9 +115,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -190,21 +190,21 @@ class DiagnosticConfig(_messages.Message):
   Fields:
     copyHomeFilesFlagEnabled: Optional. Enables flag to copy all
       `/home/jupyter` folder contents
-    gcsBucket: Required. User Cloud Storage bucket location (REQUIRED) ## Must
-      be formatted with path prefix (gs://$GCS_BUCKET) Permissions: User
+    gcsBucket: Required. User Cloud Storage bucket location (REQUIRED). Must
+      be formatted with path prefix (`gs://$GCS_BUCKET`). Permissions: User
       Managed Notebooks: - storage.buckets.writer: Must be given to the
       project's service account attached to VM. Google Managed Notebooks: -
       storage.buckets.writer: Must be given to the project's service account
-      or ## user credentials attached to VM depending on authentication mode.
+      or user credentials attached to VM depending on authentication mode.
       Cloud Storage bucket Log file will be written to
-      gs://$GCS_BUCKET/$RELATIVE_PATH/$VM_DATE_$TIME.tar.gz
+      `gs://$GCS_BUCKET/$RELATIVE_PATH/$VM_DATE_$TIME.tar.gz`
     packetCaptureFlagEnabled: Optional. Enables flag to capture packets from
       the instance for 30 seconds
     relativePath: Optional. Defines the relative storage path in the Cloud
       Storage bucket where the diagnostic logs will be written: Default path
       will be the root directory of the Cloud Storage bucket
-      (gs://$GCS_BUCKET/$DATE_$TIME.tar.gz) Example of full path where Log
-      file will be written: gs://$GCS_BUCKET/$RELATIVE_PATH/
+      (`gs://$GCS_BUCKET/$DATE_$TIME.tar.gz`) Example of full path where Log
+      file will be written: `gs://$GCS_BUCKET/$RELATIVE_PATH/`
     repairFlagEnabled: Optional. Enables flag to repair service for instance
   """
 
@@ -225,7 +225,7 @@ class Disk(_messages.Message):
     boot: Indicates that this is a boot disk. The virtual machine will use the
       first partition of the disk for its root filesystem.
     deviceName: Indicates a unique device name of your choice that is
-      reflected into the /dev/disk/by-id/google-* tree of a Linux operating
+      reflected into the `/dev/disk/by-id/google-*` tree of a Linux operating
       system running within the instance. This name can be used to reference
       the device for mounting, resizing, and so on, from within the instance.
       If not specified, the server chooses a default device name to apply to
@@ -244,19 +244,19 @@ class Disk(_messages.Message):
       always use SCSI and the request will fail if you attempt to attach a
       persistent disk in any other format than SCSI. Local SSDs can use either
       NVME or SCSI. For performance characteristics of SCSI over NVMe, see
-      Local SSD performance. Valid values: * NVME * SCSI
+      Local SSD performance. Valid values: * `NVME` * `SCSI`
     kind: Type of the resource. Always compute#attachedDisk for attached
       disks.
     licenses: A list of publicly visible licenses. Reserved for Google's use.
       A License represents billing and aggregate usage data for public and
       marketplace images.
-    mode: The mode in which to attach this disk, either READ_WRITE or
-      READ_ONLY. If not specified, the default is to attach the disk in
-      READ_WRITE mode. Valid values: * READ_ONLY * READ_WRITE
+    mode: The mode in which to attach this disk, either `READ_WRITE` or
+      `READ_ONLY`. If not specified, the default is to attach the disk in
+      `READ_WRITE` mode. Valid values: * `READ_ONLY` * `READ_WRITE`
     source: Indicates a valid partial or full URL to an existing Persistent
       Disk resource.
-    type: Indicates the type of the disk, either SCRATCH or PERSISTENT. Valid
-      values: * PERSISTENT * SCRATCH
+    type: Indicates the type of the disk, either `SCRATCH` or `PERSISTENT`.
+      Valid values: * `PERSISTENT` * `SCRATCH`
   """
 
   autoDelete = _messages.BooleanField(1)
@@ -728,8 +728,8 @@ class GuestOsFeature(_messages.Message):
   Fields:
     type: The ID of a supported feature. Read Enabling guest operating system
       features to see a list of available options. Valid values: *
-      FEATURE_TYPE_UNSPECIFIED * MULTI_IP_SUBNET * SECURE_BOOT *
-      UEFI_COMPATIBLE * VIRTIO_SCSI_MULTIQUEUE * WINDOWS
+      `FEATURE_TYPE_UNSPECIFIED` * `MULTI_IP_SUBNET` * `SECURE_BOOT` *
+      `UEFI_COMPATIBLE` * `VIRTIO_SCSI_MULTIQUEUE` * `WINDOWS`
   """
 
   type = _messages.StringField(1)
@@ -760,7 +760,7 @@ class Instance(_messages.Message):
     acceleratorConfig: The hardware accelerator used on this instance. If you
       use accelerators, make sure that your configuration has [enough vCPUs
       and memory to support the `machine_type` you have
-      selected](/compute/docs/gpus/#gpus-list).
+      selected](https://cloud.google.com/compute/docs/gpus/#gpus-list).
     bootDiskSizeGb: Input only. The size of the boot disk in GB attached to
       this instance, up to a maximum of 64000 GB (64 TB). The minimum
       recommended value is 100 GB. If not specified, this defaults to 100.
@@ -798,7 +798,8 @@ class Instance(_messages.Message):
     labels: Labels to apply to this instance. These can be later modified by
       the setLabels method.
     machineType: Required. The [Compute Engine machine
-      type](/compute/docs/machine-types) of this instance.
+      type](https://cloud.google.com/compute/docs/machine-types) of this
+      instance.
     metadata: Custom metadata to apply to this instance.
     name: Output only. The name of this notebook instance. Format:
       `projects/{project_id}/locations/{location}/instances/{instance_id}`
@@ -1100,8 +1101,8 @@ class ListInstancesResponse(_messages.Message):
     instances: A list of returned instances.
     nextPageToken: Page token that can be used to continue listing from the
       last result in the next list call.
-    unreachable: Locations that could not be reached. For example, ['us-
-      west1-a', 'us-central1-b']. A ListInstancesResponse will only contain
+    unreachable: Locations that could not be reached. For example, `['us-
+      west1-a', 'us-central1-b']`. A ListInstancesResponse will only contain
       either instances or unreachables,
   """
 
@@ -1143,8 +1144,8 @@ class ListRuntimesResponse(_messages.Message):
     nextPageToken: Page token that can be used to continue listing from the
       last result in the next list call.
     runtimes: A list of returned Runtimes.
-    unreachable: Locations that could not be reached. For example, ['us-
-      west1', 'us-central1']. A ListRuntimesResponse will only contain either
+    unreachable: Locations that could not be reached. For example, `['us-
+      west1', 'us-central1']`. A ListRuntimesResponse will only contain either
       runtimes or unreachables,
   """
 
@@ -1181,7 +1182,7 @@ class LocalDisk(_messages.Message):
       virtual machine will use the first partition of the disk for its root
       filesystem.
     deviceName: Optional. Output only. Specifies a unique device name of your
-      choice that is reflected into the /dev/disk/by-id/google-* tree of a
+      choice that is reflected into the `/dev/disk/by-id/google-*` tree of a
       Linux operating system running within the instance. This name can be
       used to reference the device for mounting, resizing, and so on, from
       within the instance. If not specified, the server chooses a default
@@ -1205,18 +1206,18 @@ class LocalDisk(_messages.Message):
       always use SCSI and the request will fail if you attempt to attach a
       persistent disk in any other format than SCSI. Local SSDs can use either
       NVME or SCSI. For performance characteristics of SCSI over NVMe, see
-      Local SSD performance. Valid values: * NVME * SCSI
+      Local SSD performance. Valid values: * `NVME` * `SCSI`
     kind: Output only. Type of the resource. Always compute#attachedDisk for
       attached disks.
     licenses: Output only. Any valid publicly visible licenses.
-    mode: The mode in which to attach this disk, either READ_WRITE or
-      READ_ONLY. If not specified, the default is to attach the disk in
-      READ_WRITE mode. Valid values: * READ_ONLY * READ_WRITE
+    mode: The mode in which to attach this disk, either `READ_WRITE` or
+      `READ_ONLY`. If not specified, the default is to attach the disk in
+      `READ_WRITE` mode. Valid values: * `READ_ONLY` * `READ_WRITE`
     source: Specifies a valid partial or full URL to an existing Persistent
       Disk resource.
-    type: Specifies the type of the disk, either SCRATCH or PERSISTENT. If not
-      specified, the default is PERSISTENT. Valid values: * PERSISTENT *
-      SCRATCH
+    type: Specifies the type of the disk, either `SCRATCH` or `PERSISTENT`. If
+      not specified, the default is `PERSISTENT`. Valid values: * `PERSISTENT`
+      * `SCRATCH`
   """
 
   autoDelete = _messages.BooleanField(1)
@@ -1494,7 +1495,8 @@ class NotebooksProjectsLocationsExecutionsListRequest(_messages.Message):
 
   Fields:
     filter: Filter applied to resulting executions. Currently only supports
-      filtering executions by a specified schedule_id. Format: `schedule_id=`
+      filtering executions by a specified `schedule_id`. Format:
+      `schedule_id=`
     orderBy: Sort by field.
     pageSize: Maximum return size of the list call.
     pageToken: A previous returned page token that can be used to continue
@@ -1672,6 +1674,20 @@ class NotebooksProjectsLocationsInstancesRegisterRequest(_messages.Message):
 
   parent = _messages.StringField(1, required=True)
   registerInstanceRequest = _messages.MessageField('RegisterInstanceRequest', 2)
+
+
+class NotebooksProjectsLocationsInstancesReportEventRequest(_messages.Message):
+  r"""A NotebooksProjectsLocationsInstancesReportEventRequest object.
+
+  Fields:
+    name: Required. Format:
+      `projects/{project_id}/locations/{location}/instances/{instance_id}`
+    reportInstanceEventRequest: A ReportInstanceEventRequest resource to be
+      passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  reportInstanceEventRequest = _messages.MessageField('ReportInstanceEventRequest', 2)
 
 
 class NotebooksProjectsLocationsInstancesReportRequest(_messages.Message):
@@ -2070,9 +2086,11 @@ class NotebooksProjectsLocationsRuntimesPatchRequest(_messages.Message):
       the new value, as follows: { "software_config":{ "kernels": [{
       'repository': 'gcr.io/deeplearning-platform-release/pytorch-gpu', 'tag':
       'latest' }], } } Currently, only the following fields can be updated: -
-      software_config.kernels - software_config.post_startup_script -
-      software_config.custom_gpu_driver_path - software_config.idle_shutdown -
-      software_config.idle_shutdown_timeout - software_config.disable_terminal
+      `software_config.kernels` - `software_config.post_startup_script` -
+      `software_config.custom_gpu_driver_path` -
+      `software_config.idle_shutdown` -
+      `software_config.idle_shutdown_timeout` -
+      `software_config.disable_terminal` - `labels`
   """
 
   name = _messages.StringField(1, required=True)
@@ -2196,6 +2214,20 @@ class NotebooksProjectsLocationsRuntimesTestIamPermissionsRequest(_messages.Mess
 
   resource = _messages.StringField(1, required=True)
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class NotebooksProjectsLocationsRuntimesUpgradeRequest(_messages.Message):
+  r"""A NotebooksProjectsLocationsRuntimesUpgradeRequest object.
+
+  Fields:
+    name: Required. Format:
+      `projects/{project_id}/locations/{location}/runtimes/{runtime_id}`
+    upgradeRuntimeRequest: A UpgradeRuntimeRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  upgradeRuntimeRequest = _messages.MessageField('UpgradeRuntimeRequest', 2)
 
 
 class NotebooksProjectsLocationsSchedulesCreateRequest(_messages.Message):
@@ -2517,6 +2549,20 @@ class RegisterInstanceRequest(_messages.Message):
   instanceId = _messages.StringField(1)
 
 
+class ReportInstanceEventRequest(_messages.Message):
+  r"""Request for reporting a Managed Notebook Event.
+
+  Fields:
+    event: Required. The Event to be reported.
+    vmId: Required. The VM hardware token for authenticating the VM.
+      https://cloud.google.com/compute/docs/instances/verifying-instance-
+      identity
+  """
+
+  event = _messages.MessageField('Event', 1)
+  vmId = _messages.StringField(2)
+
+
 class ReportInstanceInfoRequest(_messages.Message):
   r"""Request for notebook instances to report information to Notebooks API.
 
@@ -2627,7 +2673,7 @@ class RollbackInstanceRequest(_messages.Message):
 
   Fields:
     targetSnapshot: Required. The snapshot for rollback. Example:
-      "projects/test-project/global/snapshots/krwlzipynril".
+      `projects/test-project/global/snapshots/krwlzipynril`.
   """
 
   targetSnapshot = _messages.StringField(1)
@@ -2640,10 +2686,26 @@ class Runtime(_messages.Message):
     HealthStateValueValuesEnum: Output only. Runtime health_state.
     StateValueValuesEnum: Output only. Runtime state.
 
+  Messages:
+    LabelsValue: Optional. The labels to associate with this Managed Notebook
+      or Runtime. Label **keys** must contain 1 to 63 characters, and must
+      conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). Label
+      **values** may be empty, but, if present, must contain 1 to 63
+      characters, and must conform to [RFC
+      1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can
+      be associated with a cluster.
+
   Fields:
     accessConfig: The config settings for accessing runtime.
     createTime: Output only. Runtime creation time.
     healthState: Output only. Runtime health_state.
+    labels: Optional. The labels to associate with this Managed Notebook or
+      Runtime. Label **keys** must contain 1 to 63 characters, and must
+      conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). Label
+      **values** may be empty, but, if present, must contain 1 to 63
+      characters, and must conform to [RFC
+      1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can
+      be associated with a cluster.
     metrics: Output only. Contains Runtime daemon metrics such as Service
       status and JupyterLab stats.
     name: Output only. The resource name of the runtime. Format:
@@ -2702,15 +2764,45 @@ class Runtime(_messages.Message):
     UPGRADING = 7
     INITIALIZING = 8
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class LabelsValue(_messages.Message):
+    r"""Optional. The labels to associate with this Managed Notebook or
+    Runtime. Label **keys** must contain 1 to 63 characters, and must conform
+    to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). Label **values** may
+    be empty, but, if present, must contain 1 to 63 characters, and must
+    conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt). No more than
+    32 labels can be associated with a cluster.
+
+    Messages:
+      AdditionalProperty: An additional property for a LabelsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type LabelsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a LabelsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   accessConfig = _messages.MessageField('RuntimeAccessConfig', 1)
   createTime = _messages.StringField(2)
   healthState = _messages.EnumField('HealthStateValueValuesEnum', 3)
-  metrics = _messages.MessageField('RuntimeMetrics', 4)
-  name = _messages.StringField(5)
-  softwareConfig = _messages.MessageField('RuntimeSoftwareConfig', 6)
-  state = _messages.EnumField('StateValueValuesEnum', 7)
-  updateTime = _messages.StringField(8)
-  virtualMachine = _messages.MessageField('VirtualMachine', 9)
+  labels = _messages.MessageField('LabelsValue', 4)
+  metrics = _messages.MessageField('RuntimeMetrics', 5)
+  name = _messages.StringField(6)
+  softwareConfig = _messages.MessageField('RuntimeSoftwareConfig', 7)
+  state = _messages.EnumField('StateValueValuesEnum', 8)
+  updateTime = _messages.StringField(9)
+  virtualMachine = _messages.MessageField('VirtualMachine', 10)
 
 
 class RuntimeAcceleratorConfig(_messages.Message):
@@ -2734,8 +2826,7 @@ class RuntimeAcceleratorConfig(_messages.Message):
 
     Values:
       ACCELERATOR_TYPE_UNSPECIFIED: Accelerator type is not specified.
-      NVIDIA_TESLA_K80: b/241005111 K80 deprecation in Google Managed
-        Notebooks Accelerator type is Nvidia Tesla K80.
+      NVIDIA_TESLA_K80: Accelerator type is Nvidia Tesla K80.
       NVIDIA_TESLA_P100: Accelerator type is Nvidia Tesla P100.
       NVIDIA_TESLA_V100: Accelerator type is Nvidia Tesla V100.
       NVIDIA_TESLA_P4: Accelerator type is Nvidia Tesla P4.
@@ -2812,8 +2903,9 @@ class RuntimeGuestOsFeature(_messages.Message):
     type: The ID of a supported feature. Read [Enabling guest operating system
       features](https://cloud.google.com/compute/docs/images/create-delete-
       deprecate-private-images#guest-os-features) to see a list of available
-      options. Valid values: * FEATURE_TYPE_UNSPECIFIED * MULTI_IP_SUBNET *
-      SECURE_BOOT * UEFI_COMPATIBLE * VIRTIO_SCSI_MULTIQUEUE * WINDOWS
+      options. Valid values: * `FEATURE_TYPE_UNSPECIFIED` * `MULTI_IP_SUBNET`
+      * `SECURE_BOOT` * `UEFI_COMPATIBLE` * `VIRTIO_SCSI_MULTIQUEUE` *
+      `WINDOWS`
   """
 
   type = _messages.StringField(1)
@@ -2909,6 +3001,8 @@ class RuntimeSoftwareConfig(_messages.Message):
     installGpuDriver: Install Nvidia Driver automatically. Default: True
     kernels: Optional. Use a list of container images to use as Kernels in the
       notebook instance.
+    mixerDisabled: Bool indicating whether mixer client should be disabled.
+      Default: False
     notebookUpgradeSchedule: Cron expression in UTC timezone, used to schedule
       instance auto upgrade. Please follow the [cron
       format](https://en.wikipedia.org/wiki/Cron).
@@ -2918,6 +3012,8 @@ class RuntimeSoftwareConfig(_messages.Message):
     postStartupScriptBehavior: Behavior for the post startup script.
     upgradeable: Output only. Bool indicating whether an newer image is
       available in an image family.
+    version: Output only. version of boot image such as M100, from release
+      label of the image.
   """
 
   class PostStartupScriptBehaviorValueValuesEnum(_messages.Enum):
@@ -2942,10 +3038,12 @@ class RuntimeSoftwareConfig(_messages.Message):
   idleShutdownTimeout = _messages.IntegerField(5, variant=_messages.Variant.INT32)
   installGpuDriver = _messages.BooleanField(6)
   kernels = _messages.MessageField('ContainerImage', 7, repeated=True)
-  notebookUpgradeSchedule = _messages.StringField(8)
-  postStartupScript = _messages.StringField(9)
-  postStartupScriptBehavior = _messages.EnumField('PostStartupScriptBehaviorValueValuesEnum', 10)
-  upgradeable = _messages.BooleanField(11)
+  mixerDisabled = _messages.BooleanField(8)
+  notebookUpgradeSchedule = _messages.StringField(9)
+  postStartupScript = _messages.StringField(10)
+  postStartupScriptBehavior = _messages.EnumField('PostStartupScriptBehaviorValueValuesEnum', 11)
+  upgradeable = _messages.BooleanField(12)
+  version = _messages.StringField(13)
 
 
 class Schedule(_messages.Message):
@@ -2957,11 +3055,11 @@ class Schedule(_messages.Message):
   Fields:
     createTime: Output only. Time the schedule was created.
     cronSchedule: Cron-tab formatted schedule by which the job will execute.
-      Format: minute, hour, day of month, month, day of week, e.g. 0 0 * * WED
-      = every Wednesday More examples: https://crontab.guru/examples.html
+      Format: minute, hour, day of month, month, day of week, e.g. `0 0 * *
+      WED` = every Wednesday More examples: https://crontab.guru/examples.html
     description: A brief description of this environment.
     displayName: Output only. Display name used for UI purposes. Name can only
-      contain alphanumeric characters, hyphens '-', and underscores '_'.
+      contain alphanumeric characters, hyphens `-`, and underscores `_`.
     executionTemplate: Notebook Execution Template corresponding to this
       schedule.
     name: Output only. The name of this schedule. Format:
@@ -3176,7 +3274,9 @@ class SetInstanceMachineTypeRequest(_messages.Message):
 
 class ShieldedInstanceConfig(_messages.Message):
   r"""A set of Shielded Instance options. Check [Images using supported
-  Shielded VM features] Not all combinations are valid.
+  Shielded VM
+  features](https://cloud.google.com/compute/docs/instances/modifying-
+  shielded-vm). Not all combinations are valid.
 
   Fields:
     enableIntegrityMonitoring: Defines whether the instance has integrity
@@ -3492,8 +3592,8 @@ class UpgradeHistoryEntry(_messages.Message):
     snapshot: The snapshot of the boot disk of this notebook instance before
       upgrade.
     state: The state of this instance upgrade history entry.
-    targetImage: Target VM Image. Format: ainotebooks-vm/project/image-
-      name/name.
+    targetImage: Target VM Image. Format: `ainotebooks-vm/project/image-
+      name/name`.
     targetVersion: Target VM Version, like m63.
     version: The version of the notebook instance before this upgrade.
     vmImage: The VM image before this instance upgrade.
@@ -3607,31 +3707,43 @@ class UpgradeInstanceRequest(_messages.Message):
   type = _messages.EnumField('TypeValueValuesEnum', 1)
 
 
+class UpgradeRuntimeRequest(_messages.Message):
+  r"""Request for upgrading a Managed Notebook Runtime to the latest version.
+  option (google.api.message_visibility).restriction =
+  "TRUSTED_TESTER,SPECIAL_TESTER";
+
+  Fields:
+    requestId: Idempotent request UUID.
+  """
+
+  requestId = _messages.StringField(1)
+
+
 class VertexAIParameters(_messages.Message):
   r"""Parameters used in Vertex AI JobType executions.
 
   Messages:
     EnvValue: Environment variables. At most 100 environment variables can be
-      specified and unique. Example: GCP_BUCKET=gs://my-bucket/samples/
+      specified and unique. Example: `GCP_BUCKET=gs://my-bucket/samples/`
 
   Fields:
     env: Environment variables. At most 100 environment variables can be
-      specified and unique. Example: GCP_BUCKET=gs://my-bucket/samples/
+      specified and unique. Example: `GCP_BUCKET=gs://my-bucket/samples/`
     network: The full name of the Compute Engine
-      [network](/compute/docs/networks-and-firewalls#networks) to which the
-      Job should be peered. For example,
+      [network](https://cloud.google.com/compute/docs/networks-and-
+      firewalls#networks) to which the Job should be peered. For example,
       `projects/12345/global/networks/myVPC`. [Format](https://cloud.google.co
       m/compute/docs/reference/rest/v1/networks/insert) is of the form
-      `projects/{project}/global/networks/{network}`. Where {project} is a
-      project number, as in `12345`, and {network} is a network name. Private
-      services access must already be configured for the network. If left
-      unspecified, the job is not peered with any network.
+      `projects/{project}/global/networks/{network}`. Where `{project}` is a
+      project number, as in `12345`, and `{network}` is a network name.
+      Private services access must already be configured for the network. If
+      left unspecified, the job is not peered with any network.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class EnvValue(_messages.Message):
     r"""Environment variables. At most 100 environment variables can be
-    specified and unique. Example: GCP_BUCKET=gs://my-bucket/samples/
+    specified and unique. Example: `GCP_BUCKET=gs://my-bucket/samples/`
 
     Messages:
       AdditionalProperty: An additional property for a EnvValue object.

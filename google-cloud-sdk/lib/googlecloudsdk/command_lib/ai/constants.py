@@ -54,7 +54,89 @@ SUPPORTED_TRAINING_REGIONS = (
     'asia-northeast3',
     'asia-south1',
     'asia-southeast1',
+    'asia-southeast2',
     'australia-southeast1',
+    'europe-central2',
+    'europe-west1',
+    'europe-west2',
+    'europe-west3',
+    'europe-west4',
+    'europe-west6',
+    'europe-west9',
+    'me-west1',
+    'northamerica-northeast1',
+    'northamerica-northeast2',
+    'southamerica-east1',
+    'us-central1',
+    'us-east1',
+    'us-east4',
+    'us-south1',
+    'us-west1',
+    'us-west2',
+    'us-west3',
+    'us-west4',
+)
+
+# Available regions specifically for online prediction, including endpoints and
+# models
+SUPPORTED_OP_REGIONS = (
+    'asia-east1',
+    'asia-east2',
+    'asia-northeast1',
+    'asia-northeast2',
+    'asia-northeast3',
+    'asia-south1',
+    'asia-southeast1',
+    'asia-southeast2',
+    'australia-southeast1',
+    'australia-southeast2',
+    'europe-central2',
+    'europe-north1',
+    'europe-southwest1',
+    'europe-west1',
+    'europe-west2',
+    'europe-west3',
+    'europe-west4',
+    'europe-west6',
+    'europe-west8',
+    'europe-west9',
+    'me-west1',
+    'northamerica-northeast1',
+    'northamerica-northeast2',
+    'southamerica-east1',
+    'southamerica-west1',
+    'us-central1',
+    'us-east1',
+    'us-east4',
+    'us-south1',
+    'us-west1',
+    'us-west2',
+    'us-west3',
+    'us-west4',
+)
+
+# Available regions specifically for deployment resource pools
+SUPPORTED_DEPLOYMENT_RESOURCE_POOL_REGIONS = (
+    'us-central1',
+    'us-east1',
+    'us-east4',
+    'us-west1',
+    'europe-west1',
+    'asia-northeast1',
+    'asia-southeast1',
+)
+
+# Available regions specifically for model monitoring jobs
+SUPPORTED_MODEL_MONITORING_JOBS_REGIONS = (
+    'asia-east1',
+    'asia-east2',
+    'asia-northeast1',
+    'asia-northeast3',
+    'asia-south1',
+    'asia-southeast1',
+    'asia-southeast2',
+    'australia-southeast1',
+    'europe-central2',
     'europe-west1',
     'europe-west2',
     'europe-west3',
@@ -69,44 +151,8 @@ SUPPORTED_TRAINING_REGIONS = (
     'us-east4',
     'us-west1',
     'us-west2',
+    'us-west3',
     'us-west4',
-)
-
-# Available regions specifically for online prediction, including endpoints and
-# models
-SUPPORTED_OP_REGIONS = (
-    'asia-east1',
-    'asia-east2',
-    'asia-northeast1',
-    'asia-northeast3',
-    'asia-south1',
-    'asia-southeast1',
-    'australia-southeast1',
-    'europe-west1',
-    'europe-west2',
-    'europe-west3',
-    'europe-west4',
-    'europe-west6',
-    'northamerica-northeast1',
-    'northamerica-northeast2',
-    'southamerica-east1',
-    'us-central1',
-    'us-east1',
-    'us-east4',
-    'us-west1',
-    'us-west2',
-    'us-west4',
-)
-
-# Available regions specifically for deployment resource pools
-SUPPORTED_DEPLOYMENT_RESOURCE_POOL_REGIONS = (
-    'us-central1',
-    'us-east1',
-    'us-east4',
-    'us-west1',
-    'europe-west1',
-    'asia-northeast1',
-    'asia-southeast1',
 )
 
 OPERATION_CREATION_DISPLAY_MESSAGE = """\

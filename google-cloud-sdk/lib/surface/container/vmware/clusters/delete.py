@@ -32,7 +32,6 @@ $ {command} my-cluster --location=us-west1
 """
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class Delete(base.DeleteCommand):
   """Delete an Anthos cluster on VMware."""
@@ -45,6 +44,7 @@ class Delete(base.DeleteCommand):
     flags.AddValidationOnly(parser, hidden=True)
     flags.AddForceDeleteCluster(parser)
     flags.AddAllowMissingDeleteCluster(parser)
+    flags.AddIgnoreErrors(parser)
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):

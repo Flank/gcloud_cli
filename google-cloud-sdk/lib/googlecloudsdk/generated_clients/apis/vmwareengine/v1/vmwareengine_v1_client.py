@@ -46,11 +46,15 @@ class VmwareengineV1(base_api.BaseApiClient):
     self.projects_locations_networkPolicies = self.ProjectsLocationsNetworkPoliciesService(self)
     self.projects_locations_nodeTypes = self.ProjectsLocationsNodeTypesService(self)
     self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
+    self.projects_locations_privateClouds_clusters_nodes = self.ProjectsLocationsPrivateCloudsClustersNodesService(self)
     self.projects_locations_privateClouds_clusters = self.ProjectsLocationsPrivateCloudsClustersService(self)
     self.projects_locations_privateClouds_externalAddresses = self.ProjectsLocationsPrivateCloudsExternalAddressesService(self)
     self.projects_locations_privateClouds_hcxActivationKeys = self.ProjectsLocationsPrivateCloudsHcxActivationKeysService(self)
+    self.projects_locations_privateClouds_managementDnsZoneBindings = self.ProjectsLocationsPrivateCloudsManagementDnsZoneBindingsService(self)
     self.projects_locations_privateClouds_subnets = self.ProjectsLocationsPrivateCloudsSubnetsService(self)
     self.projects_locations_privateClouds = self.ProjectsLocationsPrivateCloudsService(self)
+    self.projects_locations_privateConnections_peeringRoutes = self.ProjectsLocationsPrivateConnectionsPeeringRoutesService(self)
+    self.projects_locations_privateConnections = self.ProjectsLocationsPrivateConnectionsService(self)
     self.projects_locations_vmwareEngineNetworks = self.ProjectsLocationsVmwareEngineNetworksService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
@@ -601,33 +605,6 @@ class VmwareengineV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
-    def GetIamPolicy(self, request, global_params=None):
-      r"""Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-
-      Args:
-        request: (VmwareengineProjectsLocationsNodeTypesGetIamPolicyRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Policy) The response message.
-      """
-      config = self.GetMethodConfig('GetIamPolicy')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1/projects/{projectsId}/locations/{locationsId}/nodeTypes/{nodeTypesId}:getIamPolicy',
-        http_method='GET',
-        method_id='vmwareengine.projects.locations.nodeTypes.getIamPolicy',
-        ordered_params=['resource'],
-        path_params=['resource'],
-        query_params=['options_requestedPolicyVersion'],
-        relative_path='v1/{+resource}:getIamPolicy',
-        request_field='',
-        request_type_name='VmwareengineProjectsLocationsNodeTypesGetIamPolicyRequest',
-        response_type_name='Policy',
-        supports_download=False,
-    )
-
     def List(self, request, global_params=None):
       r"""Lists node types.
 
@@ -652,60 +629,6 @@ class VmwareengineV1(base_api.BaseApiClient):
         request_field='',
         request_type_name='VmwareengineProjectsLocationsNodeTypesListRequest',
         response_type_name='ListNodeTypesResponse',
-        supports_download=False,
-    )
-
-    def SetIamPolicy(self, request, global_params=None):
-      r"""Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-
-      Args:
-        request: (VmwareengineProjectsLocationsNodeTypesSetIamPolicyRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Policy) The response message.
-      """
-      config = self.GetMethodConfig('SetIamPolicy')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1/projects/{projectsId}/locations/{locationsId}/nodeTypes/{nodeTypesId}:setIamPolicy',
-        http_method='POST',
-        method_id='vmwareengine.projects.locations.nodeTypes.setIamPolicy',
-        ordered_params=['resource'],
-        path_params=['resource'],
-        query_params=[],
-        relative_path='v1/{+resource}:setIamPolicy',
-        request_field='setIamPolicyRequest',
-        request_type_name='VmwareengineProjectsLocationsNodeTypesSetIamPolicyRequest',
-        response_type_name='Policy',
-        supports_download=False,
-    )
-
-    def TestIamPermissions(self, request, global_params=None):
-      r"""Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-
-      Args:
-        request: (VmwareengineProjectsLocationsNodeTypesTestIamPermissionsRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (TestIamPermissionsResponse) The response message.
-      """
-      config = self.GetMethodConfig('TestIamPermissions')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path='v1/projects/{projectsId}/locations/{locationsId}/nodeTypes/{nodeTypesId}:testIamPermissions',
-        http_method='POST',
-        method_id='vmwareengine.projects.locations.nodeTypes.testIamPermissions',
-        ordered_params=['resource'],
-        path_params=['resource'],
-        query_params=[],
-        relative_path='v1/{+resource}:testIamPermissions',
-        request_field='testIamPermissionsRequest',
-        request_type_name='VmwareengineProjectsLocationsNodeTypesTestIamPermissionsRequest',
-        response_type_name='TestIamPermissionsResponse',
         supports_download=False,
     )
 
@@ -797,6 +720,70 @@ class VmwareengineV1(base_api.BaseApiClient):
         request_field='',
         request_type_name='VmwareengineProjectsLocationsOperationsListRequest',
         response_type_name='ListOperationsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsPrivateCloudsClustersNodesService(base_api.BaseApiService):
+    """Service class for the projects_locations_privateClouds_clusters_nodes resource."""
+
+    _NAME = 'projects_locations_privateClouds_clusters_nodes'
+
+    def __init__(self, client):
+      super(VmwareengineV1.ProjectsLocationsPrivateCloudsClustersNodesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets details of a single node.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsClustersNodesGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Node) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/clusters/{clustersId}/nodes/{nodesId}',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateClouds.clusters.nodes.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsClustersNodesGetRequest',
+        response_type_name='Node',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists nodes in a given cluster.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsClustersNodesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListNodesResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/clusters/{clustersId}/nodes',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateClouds.clusters.nodes.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['pageSize', 'pageToken'],
+        relative_path='v1/{+parent}/nodes',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsClustersNodesListRequest',
+        response_type_name='ListNodesResponse',
         supports_download=False,
     )
 
@@ -946,7 +933,7 @@ class VmwareengineV1(base_api.BaseApiClient):
     )
 
     def Patch(self, request, global_params=None):
-      r"""Modifies a `Cluster` resource. Only the following fields can be updated: `nodeCount`. Only fields specified in `updateMask` are applied. During operation processing, the resource is temporarily in the `ACTIVE` state before the operation fully completes. For that period of time, you can't update the resource. Use the operation status to determine when the processing fully completes.
+      r"""Modifies a `Cluster` resource. Only the following fields can be updated: `node_type_configs.*.node_count`. Only fields specified in `updateMask` are applied. During operation processing, the resource is temporarily in the `ACTIVE` state before the operation fully completes. For that period of time, you can't update the resource. Use the operation status to determine when the processing fully completes.
 
       Args:
         request: (VmwareengineProjectsLocationsPrivateCloudsClustersPatchRequest) input message
@@ -1343,6 +1330,151 @@ class VmwareengineV1(base_api.BaseApiClient):
         supports_download=False,
     )
 
+  class ProjectsLocationsPrivateCloudsManagementDnsZoneBindingsService(base_api.BaseApiService):
+    """Service class for the projects_locations_privateClouds_managementDnsZoneBindings resource."""
+
+    _NAME = 'projects_locations_privateClouds_managementDnsZoneBindings'
+
+    def __init__(self, client):
+      super(VmwareengineV1.ProjectsLocationsPrivateCloudsManagementDnsZoneBindingsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Create(self, request, global_params=None):
+      r"""Creates a new `ManagementDnsZoneBinding` resource in a private cloud. This RPC creates the DNS binding and the resource that represents the DNS binding of the consumer VPC network to the management DNS zone. A management DNS zone is the Cloud DNS cross-project binding zone that VMware Engine creates for each private cloud. It contains FQDNs and corresponding IP addresses for the private cloud's ESXi hosts and management VM appliances like vCenter and NSX Manager.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/managementDnsZoneBindings',
+        http_method='POST',
+        method_id='vmwareengine.projects.locations.privateClouds.managementDnsZoneBindings.create',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['managementDnsZoneBindingId', 'requestId'],
+        relative_path='v1/{+parent}/managementDnsZoneBindings',
+        request_field='managementDnsZoneBinding',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsCreateRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a `ManagementDnsZoneBinding` resource. When a management DNS zone binding is deleted, the corresponding consumer VPC network is no longer bound to the management DNS zone.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/managementDnsZoneBindings/{managementDnsZoneBindingsId}',
+        http_method='DELETE',
+        method_id='vmwareengine.projects.locations.privateClouds.managementDnsZoneBindings.delete',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['requestId'],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsDeleteRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Retrieves a 'ManagementDnsZoneBinding' resource by its resource name.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ManagementDnsZoneBinding) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/managementDnsZoneBindings/{managementDnsZoneBindingsId}',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateClouds.managementDnsZoneBindings.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsGetRequest',
+        response_type_name='ManagementDnsZoneBinding',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists Consumer VPCs bound to Management DNS Zone of a given private cloud.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListManagementDnsZoneBindingsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/managementDnsZoneBindings',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateClouds.managementDnsZoneBindings.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['filter', 'orderBy', 'pageSize', 'pageToken'],
+        relative_path='v1/{+parent}/managementDnsZoneBindings',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsListRequest',
+        response_type_name='ListManagementDnsZoneBindingsResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Updates a `ManagementDnsZoneBinding` resource. Only fields specified in `update_mask` are applied.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/managementDnsZoneBindings/{managementDnsZoneBindingsId}',
+        http_method='PATCH',
+        method_id='vmwareengine.projects.locations.privateClouds.managementDnsZoneBindings.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['requestId', 'updateMask'],
+        relative_path='v1/{+name}',
+        request_field='managementDnsZoneBinding',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsManagementDnsZoneBindingsPatchRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
   class ProjectsLocationsPrivateCloudsSubnetsService(base_api.BaseApiService):
     """Service class for the projects_locations_privateClouds_subnets resource."""
 
@@ -1352,6 +1484,33 @@ class VmwareengineV1(base_api.BaseApiClient):
       super(VmwareengineV1.ProjectsLocationsPrivateCloudsSubnetsService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def Get(self, request, global_params=None):
+      r"""Gets details of a single subnet.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsSubnetsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Subnet) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/subnets/{subnetsId}',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateClouds.subnets.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsSubnetsGetRequest',
+        response_type_name='Subnet',
+        supports_download=False,
+    )
 
     def List(self, request, global_params=None):
       r"""Lists subnets in a given private cloud.
@@ -1377,6 +1536,33 @@ class VmwareengineV1(base_api.BaseApiClient):
         request_field='',
         request_type_name='VmwareengineProjectsLocationsPrivateCloudsSubnetsListRequest',
         response_type_name='ListSubnetsResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Updates the parameters of a single subnet. Only fields specified in `update_mask` are applied. *Note*: This API is synchronous and always returns a successful `google.longrunning.Operation` (LRO). The returned LRO will only have `done` and `response` fields.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateCloudsSubnetsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateClouds/{privateCloudsId}/subnets/{subnetsId}',
+        http_method='PATCH',
+        method_id='vmwareengine.projects.locations.privateClouds.subnets.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['updateMask'],
+        relative_path='v1/{+name}',
+        request_field='subnet',
+        request_type_name='VmwareengineProjectsLocationsPrivateCloudsSubnetsPatchRequest',
+        response_type_name='Operation',
         supports_download=False,
     )
 
@@ -1418,7 +1604,7 @@ class VmwareengineV1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      r"""Schedules a `PrivateCloud` resource for deletion. A `PrivateCloud` resource scheduled for deletion has `PrivateCloud.state` set to `DELETED` and `expireTime` set to the time when deletion is final and can no longer be reversed. When deletion is final, all private cloud resources are irreversibly removed and billing stops. During the final removal process, `PrivateCloud.state` is set to `PURGING`.
+      r"""Schedules a `PrivateCloud` resource for deletion. A `PrivateCloud` resource scheduled for deletion has `PrivateCloud.state` set to `DELETED` and `expireTime` set to the time when deletion is final and can no longer be reversed. The delete operation is marked as done as soon as the `PrivateCloud` is successfully scheduled for deletion (this also applies when `delayHours` is set to zero), and the operation is not kept in pending state until `PrivateCloud` is purged. `PrivateCloud` can be restored using `UndeletePrivateCloud` method before the `expireTime` elapses. When `expireTime` is reached, deletion is final and all private cloud resources are irreversibly removed and billing stops. During the final removal process, `PrivateCloud.state` is set to `PURGING`. `PrivateCloud` can be polled using standard `GET` method for the whole period of deletion and purging. It will not be returned only when it is completely purged.
 
       Args:
         request: (VmwareengineProjectsLocationsPrivateCloudsDeleteRequest) input message
@@ -1737,6 +1923,188 @@ class VmwareengineV1(base_api.BaseApiClient):
         relative_path='v1/{+name}:undelete',
         request_field='undeletePrivateCloudRequest',
         request_type_name='VmwareengineProjectsLocationsPrivateCloudsUndeleteRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsPrivateConnectionsPeeringRoutesService(base_api.BaseApiService):
+    """Service class for the projects_locations_privateConnections_peeringRoutes resource."""
+
+    _NAME = 'projects_locations_privateConnections_peeringRoutes'
+
+    def __init__(self, client):
+      super(VmwareengineV1.ProjectsLocationsPrivateConnectionsPeeringRoutesService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def List(self, request, global_params=None):
+      r"""Lists the private connection routes exchanged over a peering connection.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsPeeringRoutesListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListPrivateConnectionPeeringRoutesResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections/{privateConnectionsId}/peeringRoutes',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateConnections.peeringRoutes.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['pageSize', 'pageToken'],
+        relative_path='v1/{+parent}/peeringRoutes',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsPeeringRoutesListRequest',
+        response_type_name='ListPrivateConnectionPeeringRoutesResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsPrivateConnectionsService(base_api.BaseApiService):
+    """Service class for the projects_locations_privateConnections resource."""
+
+    _NAME = 'projects_locations_privateConnections'
+
+    def __init__(self, client):
+      super(VmwareengineV1.ProjectsLocationsPrivateConnectionsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Create(self, request, global_params=None):
+      r"""Creates a new private connection that can be used for accessing private Clouds.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsCreateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Create')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Create.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections',
+        http_method='POST',
+        method_id='vmwareengine.projects.locations.privateConnections.create',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['privateConnectionId', 'requestId'],
+        relative_path='v1/{+parent}/privateConnections',
+        request_field='privateConnection',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsCreateRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a `PrivateConnection` resource. When a private connection is deleted for a VMware Engine network, the connected network becomes inaccessible to that VMware Engine network.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections/{privateConnectionsId}',
+        http_method='DELETE',
+        method_id='vmwareengine.projects.locations.privateConnections.delete',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['requestId'],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsDeleteRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Retrieves a `PrivateConnection` resource by its resource name. The resource contains details of the private connection, such as connected network, routing mode and state.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (PrivateConnection) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections/{privateConnectionsId}',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateConnections.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1/{+name}',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsGetRequest',
+        response_type_name='PrivateConnection',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists `PrivateConnection` resources in a given project and location.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListPrivateConnectionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections',
+        http_method='GET',
+        method_id='vmwareengine.projects.locations.privateConnections.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['filter', 'orderBy', 'pageSize', 'pageToken'],
+        relative_path='v1/{+parent}/privateConnections',
+        request_field='',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsListRequest',
+        response_type_name='ListPrivateConnectionsResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Modifies a `PrivateConnection` resource. Only `description` and `routing_mode` fields can be updated. Only fields specified in `updateMask` are applied.
+
+      Args:
+        request: (VmwareengineProjectsLocationsPrivateConnectionsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1/projects/{projectsId}/locations/{locationsId}/privateConnections/{privateConnectionsId}',
+        http_method='PATCH',
+        method_id='vmwareengine.projects.locations.privateConnections.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['requestId', 'updateMask'],
+        relative_path='v1/{+name}',
+        request_field='privateConnection',
+        request_type_name='VmwareengineProjectsLocationsPrivateConnectionsPatchRequest',
         response_type_name='Operation',
         supports_download=False,
     )

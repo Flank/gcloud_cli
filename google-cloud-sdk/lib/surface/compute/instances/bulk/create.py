@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import filter_rewrite
+from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import scope as compute_scopes
@@ -78,28 +79,30 @@ def _GetResult(compute_client, request, operation_group_id):
 
   operations_response, errors = _GetOperations(compute_client, request.project,
                                                operation_group_id)
+  if errors:
+    utils.RaiseToolException(errors, error_message='Could not fetch resource:')
   result = {'operationGroupId': operation_group_id, 'instances': []}
-  if not errors:
-    successful = [
-        op for op in operations_response if op.operationType == 'insert' and
-        str(op.status) == 'DONE' and op.error is None
-    ]
-    num_successful = len(successful)
-    num_unsuccessful = request.bulkInsertInstanceResource.count - num_successful
 
-    def GetInstanceStatus(op):
-      return {
-          'id': op.targetId,
-          'name': op.targetLink.split('/')[-1],
-          'zone': op.zone,
-          'selfLink': op.targetLink
-      }
+  successful = [
+      op for op in operations_response if op.operationType == 'insert' and
+      str(op.status) == 'DONE' and op.error is None
+  ]
+  num_successful = len(successful)
+  num_unsuccessful = request.bulkInsertInstanceResource.count - num_successful
 
-    instances_status = [GetInstanceStatus(op) for op in successful]
+  def GetInstanceStatus(op):
+    return {
+        'id': op.targetId,
+        'name': op.targetLink.split('/')[-1],
+        'zone': op.zone,
+        'selfLink': op.targetLink
+    }
 
-    result['createdInstanceCount'] = num_successful
-    result['failedInstanceCount'] = num_unsuccessful
-    result['instances'] = instances_status
+  instances_status = [GetInstanceStatus(op) for op in successful]
+
+  result['createdInstanceCount'] = num_successful
+  result['failedInstanceCount'] = num_unsuccessful
+  result['instances'] = instances_status
 
   return result
 
@@ -130,6 +133,8 @@ class Create(base.Command):
   _support_enable_target_shape = True
   _support_confidential_compute_type = False
   _support_provisioned_throughput = False
+  _support_no_address_in_networking = False
+  _support_max_count_per_zone = False
 
   _log_async = False
 
@@ -149,9 +154,11 @@ class Create(base.Command):
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_enable_target_shape=cls._support_enable_target_shape,
-        support_confidential_compute_type=cls
-        ._support_confidential_compute_type,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_confidential_compute_type=cls._support_confidential_compute_type,
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_no_address_in_networking=cls._support_no_address_in_networking,
+        support_max_count_per_zone=cls._support_max_count_per_zone,
+    )
     cls.AddSourceInstanceTemplate(parser)
 
   # LINT.IfChange(instance_template)
@@ -160,6 +167,7 @@ class Create(base.Command):
     cls.SOURCE_INSTANCE_TEMPLATE = (
         bulk_flags.MakeBulkSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
+
   # LINT.ThenChange(../../queued_resources/create.py:instance_template)
 
   def Collection(self):
@@ -168,34 +176,60 @@ class Create(base.Command):
   def _CreateRequests(self, args, holder, compute_client, resource_parser,
                       project, location, scope):
     supported_features = bulk_util.SupportedFeatures(
-        self._support_nvdimm, self._support_public_dns, self._support_erase_vss,
-        self._support_min_node_cpu, self._support_source_snapshot_csek,
-        self._support_image_csek, self._support_confidential_compute,
+        self._support_nvdimm,
+        self._support_public_dns,
+        self._support_erase_vss,
+        self._support_min_node_cpu,
+        self._support_source_snapshot_csek,
+        self._support_image_csek,
+        self._support_confidential_compute,
         self._support_post_key_revocation_action_type,
-        self._support_rsa_encrypted, self._deprecate_maintenance_policy,
-        self._support_create_disk_snapshots, self._support_boot_snapshot_uri,
-        self._support_display_device, self._support_local_ssd_size,
-        self._support_secure_tags, self._support_host_error_timeout_seconds,
-        self._support_numa_node_count, self._support_visible_core_count,
-        self._support_max_run_duration, self._support_enable_target_shape,
+        self._support_rsa_encrypted,
+        self._deprecate_maintenance_policy,
+        self._support_create_disk_snapshots,
+        self._support_boot_snapshot_uri,
+        self._support_display_device,
+        self._support_local_ssd_size,
+        self._support_secure_tags,
+        self._support_host_error_timeout_seconds,
+        self._support_numa_node_count,
+        self._support_visible_core_count,
+        self._support_max_run_duration,
+        self._support_enable_target_shape,
         self._support_confidential_compute_type,
-        self._support_provisioned_throughput)
+        self._support_provisioned_throughput,
+        self._support_max_count_per_zone,
+    )
     bulk_instance_resource = bulk_util.CreateBulkInsertInstanceResource(
-        args, holder, compute_client, resource_parser, project, location, scope,
-        self.SOURCE_INSTANCE_TEMPLATE, supported_features)
+        args,
+        holder,
+        compute_client,
+        resource_parser,
+        project,
+        location,
+        scope,
+        self.SOURCE_INSTANCE_TEMPLATE,
+        supported_features,
+    )
 
     if scope == compute_scopes.ScopeEnum.ZONE:
       instance_service = compute_client.apitools_client.instances
-      request_message = compute_client.messages.ComputeInstancesBulkInsertRequest(
-          bulkInsertInstanceResource=bulk_instance_resource,
-          project=project,
-          zone=location)
+      request_message = (
+          compute_client.messages.ComputeInstancesBulkInsertRequest(
+              bulkInsertInstanceResource=bulk_instance_resource,
+              project=project,
+              zone=location,
+          )
+      )
     elif scope == compute_scopes.ScopeEnum.REGION:
       instance_service = compute_client.apitools_client.regionInstances
-      request_message = compute_client.messages.ComputeRegionInstancesBulkInsertRequest(
-          bulkInsertInstanceResource=bulk_instance_resource,
-          project=project,
-          region=location)
+      request_message = (
+          compute_client.messages.ComputeRegionInstancesBulkInsertRequest(
+              bulkInsertInstanceResource=bulk_instance_resource,
+              project=project,
+              region=location,
+          )
+      )
 
     return instance_service, request_message
 
@@ -214,7 +248,9 @@ class Create(base.Command):
         support_enable_target_shape=self._support_enable_target_shape,
         support_max_run_duration=self._support_max_run_duration,
         support_image_csek=self._support_image_csek,
-        support_source_snapshot_csek=self._support_source_snapshot_csek)
+        support_source_snapshot_csek=self._support_source_snapshot_csek,
+        support_max_count_per_zone=self._support_max_count_per_zone,
+    )
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     compute_client = holder.client
@@ -261,8 +297,8 @@ class Create(base.Command):
     if response:
       operation_group_id = response[0].operationGroupId
       result = _GetResult(compute_client, request, operation_group_id)
-      if result['createdInstanceCount'] is not None and result[
-          'failedInstanceCount'] is not None:
+      if (result.get('createdInstanceCount') is not None and
+          result.get('failedInstanceCount') is not None):
         self._status_message = 'VM instances created: {}, failed: {}.'.format(
             result['createdInstanceCount'], result['failedInstanceCount'])
       return result
@@ -292,9 +328,11 @@ class CreateBeta(Create):
   _support_host_error_timeout_seconds = True
   _support_numa_node_count = False
   _support_visible_core_count = True
-  _support_max_run_duration = False
+  _support_max_run_duration = True
   _support_enable_target_shape = True
   _support_provisioned_throughput = False
+  _support_no_address_in_networking = False
+  _support_max_count_per_zone = False
 
   @classmethod
   def Args(cls, parser):
@@ -312,7 +350,10 @@ class CreateBeta(Create):
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_enable_target_shape=cls._support_enable_target_shape,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_no_address_in_networking=cls._support_no_address_in_networking,
+        support_max_count_per_zone=cls._support_max_count_per_zone,
+    )
     cls.AddSourceInstanceTemplate(parser)
 
     # Flags specific to Beta release track
@@ -334,6 +375,8 @@ class CreateAlpha(Create):
   _support_enable_target_shape = True
   _support_confidential_compute_type = True
   _support_provisioned_throughput = True
+  _support_no_address_in_networking = True
+  _support_max_count_per_zone = True
 
   @classmethod
   def Args(cls, parser):
@@ -351,15 +394,18 @@ class CreateAlpha(Create):
         support_visible_core_count=cls._support_visible_core_count,
         support_max_run_duration=cls._support_max_run_duration,
         support_enable_target_shape=cls._support_enable_target_shape,
-        support_confidential_compute_type=cls
-        ._support_confidential_compute_type,
-        support_provisioned_throughput=cls._support_provisioned_throughput)
+        support_confidential_compute_type=cls._support_confidential_compute_type,
+        support_provisioned_throughput=cls._support_provisioned_throughput,
+        support_no_address_in_networking=cls._support_no_address_in_networking,
+        support_max_count_per_zone=cls._support_max_count_per_zone,
+    )
 
     cls.AddSourceInstanceTemplate(parser)
 
     # Flags specific to Alpha release track
     instances_flags.AddSecureTagsArgs(parser)
     instances_flags.AddHostErrorTimeoutSecondsArgs(parser)
+    instances_flags.AddMaintenanceInterval().AddToParser(parser)
   # LINT.ThenChange(../../queued_resources/create.py:alpha_spec)
 
 

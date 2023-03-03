@@ -258,6 +258,14 @@ class Collections(enum.Enum):
       ['project', 'zone', 'machineType'],
       True
   )
+  NETWORKATTACHMENTS = (
+      'networkAttachments',
+      'projects/{project}/regions/{region}/networkAttachments/'
+      '{networkAttachment}',
+      {},
+      ['project', 'region', 'networkAttachment'],
+      True
+  )
   NETWORKEDGESECURITYSERVICES = (
       'networkEdgeSecurityServices',
       'projects/{project}/regions/{region}/networkEdgeSecurityServices/'
@@ -409,6 +417,14 @@ class Collections(enum.Enum):
       'projects/{project}/regions/{region}/instanceGroups/{instanceGroup}',
       {},
       ['project', 'region', 'instanceGroup'],
+      True
+  )
+  REGIONINSTANCETEMPLATES = (
+      'regionInstanceTemplates',
+      'projects/{project}/regions/{region}/instanceTemplates/'
+      '{instanceTemplate}',
+      {},
+      ['project', 'region', 'instanceTemplate'],
       True
   )
   REGIONNETWORKENDPOINTGROUPS = (

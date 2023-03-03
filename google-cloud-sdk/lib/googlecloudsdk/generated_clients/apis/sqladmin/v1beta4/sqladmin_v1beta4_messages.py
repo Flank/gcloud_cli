@@ -31,6 +31,16 @@ class AclEntry(_messages.Message):
   value = _messages.StringField(4)
 
 
+class AdvancedMachineFeatures(_messages.Message):
+  r"""Specifies options for controlling advanced machine features.
+
+  Fields:
+    threadsPerCore: The number of threads per physical core.
+  """
+
+  threadsPerCore = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
 class ApiWarning(_messages.Message):
   r"""An Admin API warning message.
 
@@ -427,6 +437,10 @@ class ConnectSettings(_messages.Message):
         version is 29.
       MYSQL_8_0_30: The database major version is MySQL 8.0 and the minor
         version is 30.
+      MYSQL_8_0_31: The database major version is MySQL 8.0 and the minor
+        version is 31.
+      MYSQL_8_0_32: The database major version is MySQL 8.0 and the minor
+        version is 32.
       SQLSERVER_2019_STANDARD: The database version is SQL Server 2019
         Standard.
       SQLSERVER_2019_ENTERPRISE: The database version is SQL Server 2019
@@ -456,10 +470,12 @@ class ConnectSettings(_messages.Message):
     MYSQL_8_0_28 = 19
     MYSQL_8_0_29 = 20
     MYSQL_8_0_30 = 21
-    SQLSERVER_2019_STANDARD = 22
-    SQLSERVER_2019_ENTERPRISE = 23
-    SQLSERVER_2019_EXPRESS = 24
-    SQLSERVER_2019_WEB = 25
+    MYSQL_8_0_31 = 22
+    MYSQL_8_0_32 = 23
+    SQLSERVER_2019_STANDARD = 24
+    SQLSERVER_2019_ENTERPRISE = 25
+    SQLSERVER_2019_EXPRESS = 26
+    SQLSERVER_2019_WEB = 27
 
   backendType = _messages.EnumField('BackendTypeValueValuesEnum', 1)
   databaseVersion = _messages.EnumField('DatabaseVersionValueValuesEnum', 2)
@@ -561,6 +577,7 @@ class DatabaseInstance(_messages.Message):
     diskEncryptionConfiguration: Disk encryption configuration specific to an
       instance.
     diskEncryptionStatus: Disk encryption status specific to an instance.
+    dnsName: Output only. The dns name of the instance.
     etag: This field is deprecated and will be removed from a future version
       of the API. Use the `settings.settingsVersion` field instead.
     failoverReplica: The name and status of the failover replica.
@@ -588,6 +605,8 @@ class DatabaseInstance(_messages.Message):
       database wellness job
     project: The project ID of the project containing the Cloud SQL instance.
       The Google apps domain is prefixed if applicable.
+    pscServiceAttachmentLink: Output only. The link to service attachment of
+      PSC instance.
     region: The geographical region. Can be: * `us-central` (`FIRST_GEN`
       instances only) * `us-central1` (`SECOND_GEN` instances only) * `asia-
       east1` or `europe-west1`. Defaults to `us-central` or `us-central1`
@@ -669,6 +688,10 @@ class DatabaseInstance(_messages.Message):
         version is 29.
       MYSQL_8_0_30: The database major version is MySQL 8.0 and the minor
         version is 30.
+      MYSQL_8_0_31: The database major version is MySQL 8.0 and the minor
+        version is 31.
+      MYSQL_8_0_32: The database major version is MySQL 8.0 and the minor
+        version is 32.
       SQLSERVER_2019_STANDARD: The database version is SQL Server 2019
         Standard.
       SQLSERVER_2019_ENTERPRISE: The database version is SQL Server 2019
@@ -698,10 +721,12 @@ class DatabaseInstance(_messages.Message):
     MYSQL_8_0_28 = 19
     MYSQL_8_0_29 = 20
     MYSQL_8_0_30 = 21
-    SQLSERVER_2019_STANDARD = 22
-    SQLSERVER_2019_ENTERPRISE = 23
-    SQLSERVER_2019_EXPRESS = 24
-    SQLSERVER_2019_WEB = 25
+    MYSQL_8_0_31 = 22
+    MYSQL_8_0_32 = 23
+    SQLSERVER_2019_STANDARD = 24
+    SQLSERVER_2019_ENTERPRISE = 25
+    SQLSERVER_2019_EXPRESS = 26
+    SQLSERVER_2019_WEB = 27
 
   class InstalledVersionValueValuesEnum(_messages.Enum):
     r"""Stores the current database version including minor version such as
@@ -738,6 +763,10 @@ class DatabaseInstance(_messages.Message):
         version is 29.
       MYSQL_8_0_30: The database major version is MySQL 8.0 and the minor
         version is 30.
+      MYSQL_8_0_31: The database major version is MySQL 8.0 and the minor
+        version is 31.
+      MYSQL_8_0_32: The database major version is MySQL 8.0 and the minor
+        version is 32.
       SQLSERVER_2019_STANDARD: The database version is SQL Server 2019
         Standard.
       SQLSERVER_2019_ENTERPRISE: The database version is SQL Server 2019
@@ -767,10 +796,12 @@ class DatabaseInstance(_messages.Message):
     MYSQL_8_0_28 = 19
     MYSQL_8_0_29 = 20
     MYSQL_8_0_30 = 21
-    SQLSERVER_2019_STANDARD = 22
-    SQLSERVER_2019_ENTERPRISE = 23
-    SQLSERVER_2019_EXPRESS = 24
-    SQLSERVER_2019_WEB = 25
+    MYSQL_8_0_31 = 22
+    MYSQL_8_0_32 = 23
+    SQLSERVER_2019_STANDARD = 24
+    SQLSERVER_2019_ENTERPRISE = 25
+    SQLSERVER_2019_EXPRESS = 26
+    SQLSERVER_2019_WEB = 27
 
   class InstanceTypeValueValuesEnum(_messages.Enum):
     r"""The instance type.
@@ -858,34 +889,36 @@ class DatabaseInstance(_messages.Message):
   databaseVersion = _messages.EnumField('DatabaseVersionValueValuesEnum', 7)
   diskEncryptionConfiguration = _messages.MessageField('DiskEncryptionConfiguration', 8)
   diskEncryptionStatus = _messages.MessageField('DiskEncryptionStatus', 9)
-  etag = _messages.StringField(10)
-  failoverReplica = _messages.MessageField('FailoverReplicaValue', 11)
-  gceZone = _messages.StringField(12)
-  installedVersion = _messages.EnumField('InstalledVersionValueValuesEnum', 13)
-  instanceType = _messages.EnumField('InstanceTypeValueValuesEnum', 14)
-  ipAddresses = _messages.MessageField('IpMapping', 15, repeated=True)
-  ipv6Address = _messages.StringField(16)
-  kind = _messages.StringField(17)
-  maintenanceVersion = _messages.StringField(18)
-  masterInstanceName = _messages.StringField(19)
-  maxDiskSize = _messages.IntegerField(20)
-  name = _messages.StringField(21)
-  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 22)
-  outOfDiskReport = _messages.MessageField('SqlOutOfDiskReport', 23)
-  project = _messages.StringField(24)
-  region = _messages.StringField(25)
-  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 26)
-  replicaNames = _messages.StringField(27, repeated=True)
-  rootPassword = _messages.StringField(28)
-  satisfiesPzs = _messages.BooleanField(29)
-  scheduledMaintenance = _messages.MessageField('SqlScheduledMaintenance', 30)
-  secondaryGceZone = _messages.StringField(31)
-  selfLink = _messages.StringField(32)
-  serverCaCert = _messages.MessageField('SslCert', 33)
-  serviceAccountEmailAddress = _messages.StringField(34)
-  settings = _messages.MessageField('Settings', 35)
-  state = _messages.EnumField('StateValueValuesEnum', 36)
-  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 37, repeated=True)
+  dnsName = _messages.StringField(10)
+  etag = _messages.StringField(11)
+  failoverReplica = _messages.MessageField('FailoverReplicaValue', 12)
+  gceZone = _messages.StringField(13)
+  installedVersion = _messages.EnumField('InstalledVersionValueValuesEnum', 14)
+  instanceType = _messages.EnumField('InstanceTypeValueValuesEnum', 15)
+  ipAddresses = _messages.MessageField('IpMapping', 16, repeated=True)
+  ipv6Address = _messages.StringField(17)
+  kind = _messages.StringField(18)
+  maintenanceVersion = _messages.StringField(19)
+  masterInstanceName = _messages.StringField(20)
+  maxDiskSize = _messages.IntegerField(21)
+  name = _messages.StringField(22)
+  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 23)
+  outOfDiskReport = _messages.MessageField('SqlOutOfDiskReport', 24)
+  project = _messages.StringField(25)
+  pscServiceAttachmentLink = _messages.StringField(26)
+  region = _messages.StringField(27)
+  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 28)
+  replicaNames = _messages.StringField(29, repeated=True)
+  rootPassword = _messages.StringField(30)
+  satisfiesPzs = _messages.BooleanField(31)
+  scheduledMaintenance = _messages.MessageField('SqlScheduledMaintenance', 32)
+  secondaryGceZone = _messages.StringField(33)
+  selfLink = _messages.StringField(34)
+  serverCaCert = _messages.MessageField('SslCert', 35)
+  serviceAccountEmailAddress = _messages.StringField(36)
+  settings = _messages.MessageField('Settings', 37)
+  state = _messages.EnumField('StateValueValuesEnum', 38)
+  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 39, repeated=True)
 
 
 class DatabasesListResponse(_messages.Message):
@@ -1013,6 +1046,15 @@ class DiskEncryptionStatus(_messages.Message):
   kmsKeyVersionName = _messages.StringField(2)
 
 
+class Empty(_messages.Message):
+  r"""A generic empty message that you can re-use to avoid defining duplicated
+  empty messages in your APIs. A typical example is to use it as the request
+  or the response type of an API method. For instance: service Foo { rpc
+  Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
+  """
+
+
+
 class ExportContext(_messages.Message):
   r"""Database instance export context.
 
@@ -1020,13 +1062,13 @@ class ExportContext(_messages.Message):
     FileTypeValueValuesEnum: The file type for the specified uri.
 
   Messages:
-    BakExportOptionsValue: A BakExportOptionsValue object.
+    BakExportOptionsValue: Options for exporting BAK files (SQL Server-only)
     CsvExportOptionsValue: Options for exporting data as CSV. `MySQL` and
       `PostgreSQL` instances only.
     SqlExportOptionsValue: Options for exporting data as SQL statements.
 
   Fields:
-    bakExportOptions: A BakExportOptionsValue attribute.
+    bakExportOptions: Options for exporting BAK files (SQL Server-only)
     csvExportOptions: Options for exporting data as CSV. `MySQL` and
       `PostgreSQL` instances only.
     databases: Databases to be exported. `MySQL instances:` If `fileType` is
@@ -1065,11 +1107,13 @@ class ExportContext(_messages.Message):
     BAK = 3
 
   class BakExportOptionsValue(_messages.Message):
-    r"""A BakExportOptionsValue object.
+    r"""Options for exporting BAK files (SQL Server-only)
 
     Fields:
-      stripeCount: A integer attribute.
-      striped: A boolean attribute.
+      stripeCount: Option for specifying how many stripes to use for the
+        export. If blank, and the value of the striped field is true, the
+        number of stripes is automatically chosen.
+      striped: Whether or not the export should be striped.
     """
 
     stripeCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1224,6 +1268,10 @@ class Flag(_messages.Message):
         version is 29.
       MYSQL_8_0_30: The database major version is MySQL 8.0 and the minor
         version is 30.
+      MYSQL_8_0_31: The database major version is MySQL 8.0 and the minor
+        version is 31.
+      MYSQL_8_0_32: The database major version is MySQL 8.0 and the minor
+        version is 32.
       SQLSERVER_2019_STANDARD: The database version is SQL Server 2019
         Standard.
       SQLSERVER_2019_ENTERPRISE: The database version is SQL Server 2019
@@ -1253,10 +1301,12 @@ class Flag(_messages.Message):
     MYSQL_8_0_28 = 19
     MYSQL_8_0_29 = 20
     MYSQL_8_0_30 = 21
-    SQLSERVER_2019_STANDARD = 22
-    SQLSERVER_2019_ENTERPRISE = 23
-    SQLSERVER_2019_EXPRESS = 24
-    SQLSERVER_2019_WEB = 25
+    MYSQL_8_0_31 = 22
+    MYSQL_8_0_32 = 23
+    SQLSERVER_2019_STANDARD = 24
+    SQLSERVER_2019_ENTERPRISE = 25
+    SQLSERVER_2019_EXPRESS = 26
+    SQLSERVER_2019_WEB = 27
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""The type of the flag. Flags are typed to being `BOOLEAN`, `STRING`,
@@ -1390,7 +1440,8 @@ class ImportContext(_messages.Message):
 
     Fields:
       encryptionOptions: A EncryptionOptionsValue attribute.
-      striped: A boolean attribute.
+      striped: Whether or not the backup set being restored is striped.
+        Applies only to Cloud SQL for SQL Server.
     """
 
     class EncryptionOptionsValue(_messages.Message):
@@ -1622,6 +1673,7 @@ class IpConfiguration(_messages.Message):
       SQL instance is accessible for private IP. For example,
       `/projects/myProject/global/networks/default`. This setting can be
       updated, but it cannot be removed after it is set.
+    pscConfig: PSC settings for this instance.
     requireSsl: Whether SSL connections over IP are enforced or not.
     reservedIpRange: This field is deprecated and will be removed from a
       future version of the API.
@@ -1632,8 +1684,9 @@ class IpConfiguration(_messages.Message):
   enablePrivatePathForGoogleCloudServices = _messages.BooleanField(3)
   ipv4Enabled = _messages.BooleanField(4)
   privateNetwork = _messages.StringField(5)
-  requireSsl = _messages.BooleanField(6)
-  reservedIpRange = _messages.StringField(7)
+  pscConfig = _messages.MessageField('PscConfig', 6)
+  requireSsl = _messages.BooleanField(7)
+  reservedIpRange = _messages.StringField(8)
 
 
 class IpMapping(_messages.Message):
@@ -2027,6 +2080,32 @@ class OperationErrors(_messages.Message):
   kind = _messages.StringField(2)
 
 
+class OperationMetadata(_messages.Message):
+  r"""Represents the metadata of the long-running operation.
+
+  Fields:
+    apiVersion: Output only. API version used to start the operation.
+    cancelRequested: Output only. Identifies whether the user has requested
+      cancellation of the operation. Operations that have been cancelled
+      successfully have Operation.error value with a google.rpc.Status.code of
+      1, corresponding to `Code.CANCELLED`.
+    createTime: Output only. The time the operation was created.
+    endTime: Output only. The time the operation finished running.
+    statusDetail: Output only. Human-readable status of the operation, if any.
+    target: Output only. Server-defined resource path for the target of the
+      operation.
+    verb: Output only. Name of the verb executed by the operation.
+  """
+
+  apiVersion = _messages.StringField(1)
+  cancelRequested = _messages.BooleanField(2)
+  createTime = _messages.StringField(3)
+  endTime = _messages.StringField(4)
+  statusDetail = _messages.StringField(5)
+  target = _messages.StringField(6)
+  verb = _messages.StringField(7)
+
+
 class OperationsListResponse(_messages.Message):
   r"""Operations list response.
 
@@ -2067,7 +2146,7 @@ class PasswordValidationPolicy(_messages.Message):
     enablePasswordPolicy: Whether the password policy is enabled or not.
     minLength: Minimum number of characters allowed.
     passwordChangeInterval: Minimum interval after which the password can be
-      changed. This flag is only supported for PostgresSQL.
+      changed. This flag is only supported for PostgreSQL.
     reuseInterval: Number of previous passwords that cannot be reused.
   """
 
@@ -2088,6 +2167,32 @@ class PasswordValidationPolicy(_messages.Message):
   minLength = _messages.IntegerField(4, variant=_messages.Variant.INT32)
   passwordChangeInterval = _messages.StringField(5)
   reuseInterval = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+
+
+class PerformDiskShrinkContext(_messages.Message):
+  r"""Perform disk shrink context.
+
+  Fields:
+    targetSizeGb: The target disk shrink size in GigaBytes.
+  """
+
+  targetSizeGb = _messages.IntegerField(1)
+
+
+class PscConfig(_messages.Message):
+  r"""PSC settings for a Cloud SQL instance.
+
+  Fields:
+    allowedConsumerProjects: List of consumer projects that are allow-listed
+      for PSC connections to this instance. This instance can be connected to
+      with PSC from any network in these projects. Each consumer project in
+      this list may be represented by a project number (numeric) or by a
+      project id (alphanumeric).
+    pscEnabled: Whether PSC connectivity is enabled for this instance.
+  """
+
+  allowedConsumerProjects = _messages.StringField(1, repeated=True)
+  pscEnabled = _messages.BooleanField(2)
 
 
 class ReplicaConfiguration(_messages.Message):
@@ -2225,6 +2330,8 @@ class Settings(_messages.Message):
       not activated, even if a connection request arrives.
     activeDirectoryConfig: Active Directory configuration, relevant only for
       Cloud SQL for SQL Server.
+    advancedMachineFeatures: Specifies advance machine configuration for the
+      instance relevant only for SQL Server.
     authorizedGaeApplications: The App Engine app IDs that can access this
       instance. (Deprecated) Applied to First Generation instances only.
     availabilityType: Availability type. Potential values: * `ZONAL`: The
@@ -2446,36 +2553,37 @@ class Settings(_messages.Message):
 
   activationPolicy = _messages.EnumField('ActivationPolicyValueValuesEnum', 1)
   activeDirectoryConfig = _messages.MessageField('SqlActiveDirectoryConfig', 2)
-  authorizedGaeApplications = _messages.StringField(3, repeated=True)
-  availabilityType = _messages.EnumField('AvailabilityTypeValueValuesEnum', 4)
-  backupConfiguration = _messages.MessageField('BackupConfiguration', 5)
-  collation = _messages.StringField(6)
-  connectorEnforcement = _messages.EnumField('ConnectorEnforcementValueValuesEnum', 7)
-  crashSafeReplicationEnabled = _messages.BooleanField(8)
-  dataDiskSizeGb = _messages.IntegerField(9)
-  dataDiskType = _messages.EnumField('DataDiskTypeValueValuesEnum', 10)
-  databaseFlags = _messages.MessageField('DatabaseFlags', 11, repeated=True)
-  databaseReplicationEnabled = _messages.BooleanField(12)
-  deletionProtectionEnabled = _messages.BooleanField(13)
-  denyMaintenancePeriods = _messages.MessageField('DenyMaintenancePeriod', 14, repeated=True)
-  insightsConfig = _messages.MessageField('InsightsConfig', 15)
-  instanceVersion = _messages.StringField(16)
-  ipConfiguration = _messages.MessageField('IpConfiguration', 17)
-  kind = _messages.StringField(18)
-  locationPreference = _messages.MessageField('LocationPreference', 19)
-  maintenanceVersion = _messages.StringField(20)
-  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 21)
-  passwordValidationPolicy = _messages.MessageField('PasswordValidationPolicy', 22)
-  pricingPlan = _messages.EnumField('PricingPlanValueValuesEnum', 23)
-  replicationType = _messages.EnumField('ReplicationTypeValueValuesEnum', 24)
-  settingsVersion = _messages.IntegerField(25)
-  sqlServerAuditConfig = _messages.MessageField('SqlServerAuditConfig', 26)
-  storageAutoResize = _messages.BooleanField(27)
-  storageAutoResizeLimit = _messages.IntegerField(28)
-  tier = _messages.StringField(29)
-  timeZone = _messages.StringField(30)
-  userLabels = _messages.MessageField('UserLabelsValue', 31)
-  workloadTier = _messages.EnumField('WorkloadTierValueValuesEnum', 32)
+  advancedMachineFeatures = _messages.MessageField('AdvancedMachineFeatures', 3)
+  authorizedGaeApplications = _messages.StringField(4, repeated=True)
+  availabilityType = _messages.EnumField('AvailabilityTypeValueValuesEnum', 5)
+  backupConfiguration = _messages.MessageField('BackupConfiguration', 6)
+  collation = _messages.StringField(7)
+  connectorEnforcement = _messages.EnumField('ConnectorEnforcementValueValuesEnum', 8)
+  crashSafeReplicationEnabled = _messages.BooleanField(9)
+  dataDiskSizeGb = _messages.IntegerField(10)
+  dataDiskType = _messages.EnumField('DataDiskTypeValueValuesEnum', 11)
+  databaseFlags = _messages.MessageField('DatabaseFlags', 12, repeated=True)
+  databaseReplicationEnabled = _messages.BooleanField(13)
+  deletionProtectionEnabled = _messages.BooleanField(14)
+  denyMaintenancePeriods = _messages.MessageField('DenyMaintenancePeriod', 15, repeated=True)
+  insightsConfig = _messages.MessageField('InsightsConfig', 16)
+  instanceVersion = _messages.StringField(17)
+  ipConfiguration = _messages.MessageField('IpConfiguration', 18)
+  kind = _messages.StringField(19)
+  locationPreference = _messages.MessageField('LocationPreference', 20)
+  maintenanceVersion = _messages.StringField(21)
+  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 22)
+  passwordValidationPolicy = _messages.MessageField('PasswordValidationPolicy', 23)
+  pricingPlan = _messages.EnumField('PricingPlanValueValuesEnum', 24)
+  replicationType = _messages.EnumField('ReplicationTypeValueValuesEnum', 25)
+  settingsVersion = _messages.IntegerField(26)
+  sqlServerAuditConfig = _messages.MessageField('SqlServerAuditConfig', 27)
+  storageAutoResize = _messages.BooleanField(28)
+  storageAutoResizeLimit = _messages.IntegerField(29)
+  tier = _messages.StringField(30)
+  timeZone = _messages.StringField(31)
+  userLabels = _messages.MessageField('UserLabelsValue', 32)
+  workloadTier = _messages.EnumField('WorkloadTierValueValuesEnum', 33)
 
 
 class SqlActiveDirectoryConfig(_messages.Message):
@@ -2854,6 +2962,19 @@ class SqlInstancesFailoverRequest(_messages.Message):
   project = _messages.StringField(3, required=True)
 
 
+class SqlInstancesGetDiskShrinkConfigResponse(_messages.Message):
+  r"""Instance get disk shrink config response.
+
+  Fields:
+    kind: This is always `sql#getDiskShrinkConfig`.
+    minimalTargetSizeGb: The minimum size to which a disk can be shrunk in
+      GigaBytes.
+  """
+
+  kind = _messages.StringField(1)
+  minimalTargetSizeGb = _messages.IntegerField(2)
+
+
 class SqlInstancesGetRequest(_messages.Message):
   r"""A SqlInstancesGetRequest object.
 
@@ -2969,6 +3090,10 @@ class SqlInstancesRescheduleMaintenanceRequestBody(_messages.Message):
   """
 
   reschedule = _messages.MessageField('Reschedule', 1)
+
+
+class SqlInstancesResetReplicaSizeRequest(_messages.Message):
+  r"""Instance reset replica size request."""
 
 
 class SqlInstancesResetSslConfigRequest(_messages.Message):
@@ -3162,6 +3287,18 @@ class SqlInstancesVerifyExternalSyncSettingsResponse(_messages.Message):
   warnings = _messages.MessageField('SqlExternalSyncSettingError', 3, repeated=True)
 
 
+class SqlOperationsCancelRequest(_messages.Message):
+  r"""A SqlOperationsCancelRequest object.
+
+  Fields:
+    operation: Instance operation ID.
+    project: Project ID of the project that contains the instance.
+  """
+
+  operation = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+
+
 class SqlOperationsGetRequest(_messages.Message):
   r"""A SqlOperationsGetRequest object.
 
@@ -3230,6 +3367,33 @@ class SqlOutOfDiskReport(_messages.Message):
   sqlOutOfDiskState = _messages.EnumField('SqlOutOfDiskStateValueValuesEnum', 2)
 
 
+class SqlProjectsInstancesGetDiskShrinkConfigRequest(_messages.Message):
+  r"""A SqlProjectsInstancesGetDiskShrinkConfigRequest object.
+
+  Fields:
+    instance: Cloud SQL instance ID. This does not include the project ID.
+    project: Project ID of the project that contains the instance.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+
+
+class SqlProjectsInstancesPerformDiskShrinkRequest(_messages.Message):
+  r"""A SqlProjectsInstancesPerformDiskShrinkRequest object.
+
+  Fields:
+    instance: Cloud SQL instance ID. This does not include the project ID.
+    performDiskShrinkContext: A PerformDiskShrinkContext resource to be passed
+      as the request body.
+    project: Project ID of the project that contains the instance.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  performDiskShrinkContext = _messages.MessageField('PerformDiskShrinkContext', 2)
+  project = _messages.StringField(3, required=True)
+
+
 class SqlProjectsInstancesRescheduleMaintenanceRequest(_messages.Message):
   r"""A SqlProjectsInstancesRescheduleMaintenanceRequest object.
 
@@ -3244,6 +3408,21 @@ class SqlProjectsInstancesRescheduleMaintenanceRequest(_messages.Message):
   instance = _messages.StringField(1, required=True)
   project = _messages.StringField(2, required=True)
   sqlInstancesRescheduleMaintenanceRequestBody = _messages.MessageField('SqlInstancesRescheduleMaintenanceRequestBody', 3)
+
+
+class SqlProjectsInstancesResetReplicaSizeRequest(_messages.Message):
+  r"""A SqlProjectsInstancesResetReplicaSizeRequest object.
+
+  Fields:
+    instance: Cloud SQL read replica instance name.
+    project: ID of the project that contains the read replica.
+    sqlInstancesResetReplicaSizeRequest: A SqlInstancesResetReplicaSizeRequest
+      resource to be passed as the request body.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  sqlInstancesResetReplicaSizeRequest = _messages.MessageField('SqlInstancesResetReplicaSizeRequest', 3)
 
 
 class SqlProjectsInstancesStartExternalSyncRequest(_messages.Message):
@@ -3437,15 +3616,16 @@ class SqlUsersGetRequest(_messages.Message):
   r"""A SqlUsersGetRequest object.
 
   Fields:
+    host: Host of a user of the instance.
     instance: Database instance ID. This does not include the project ID.
-    name: User of the instance. If the database user has a host, this is
-      specified as {username}@{host} else as {username}.
+    name: User of the instance.
     project: Project ID of the project that contains the instance.
   """
 
-  instance = _messages.StringField(1, required=True)
-  name = _messages.StringField(2, required=True)
-  project = _messages.StringField(3, required=True)
+  host = _messages.StringField(1)
+  instance = _messages.StringField(2, required=True)
+  name = _messages.StringField(3, required=True)
+  project = _messages.StringField(4, required=True)
 
 
 class SqlUsersListRequest(_messages.Message):
@@ -3801,9 +3981,7 @@ class UsersListResponse(_messages.Message):
   Fields:
     items: List of user resources in the instance.
     kind: This is always *sql#usersList*.
-    nextPageToken: An identifier that uniquely identifies the operation. You
-      can use this identifier to retrieve the Operations resource that has
-      information about the operation.
+    nextPageToken: Unused.
   """
 
   items = _messages.MessageField('User', 1, repeated=True)

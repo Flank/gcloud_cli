@@ -4,7 +4,7 @@
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20221005",
+ "revision": "20230223",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -110,12 +110,12 @@
     "code": {
      "type": "string",
      "description": "[Output-only] High-level BI Engine reason for partial or disabled acceleration.",
-     "default": "$(reason.code)"
+     "default": ""
     },
     "message": {
      "type": "string",
      "description": "[Output-only] Free form human-readable reason for partial or disabled acceleration.",
-     "default": "$(reason.message)"
+     "default": ""
     }
    }
   },
@@ -123,10 +123,15 @@
    "id": "BiEngineStatistics",
    "type": "object",
    "properties": {
+    "accelerationMode": {
+     "type": "string",
+     "description": "[Output-only] Specifies which mode of BI Engine acceleration was performed (if any).",
+     "default": ""
+    },
     "biEngineMode": {
      "type": "string",
      "description": "[Output-only] Specifies which mode of BI Engine acceleration was performed (if any).",
-     "default": "$(stats.bi_engine_mode)"
+     "default": ""
     },
     "biEngineReasons": {
      "type": "array",
@@ -489,6 +494,10 @@
      "description": "[Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.",
      "format": "int64"
     },
+    "defaultRoundingMode": {
+     "type": "string",
+     "description": "[Output-only] The default rounding mode of the dataset."
+    },
     "defaultTableExpirationMs": {
      "type": "string",
      "description": "[Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.",
@@ -548,6 +557,10 @@
      "type": "string",
      "description": "[Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource."
     },
+    "storageBillingModel": {
+     "type": "string",
+     "description": "[Optional] Storage billing model to be used for all tables in the dataset. Can be set to PHYSICAL. Default is LOGICAL."
+    },
     "tags": {
      "type": "array",
      "description": "[Optional]The tags associated with this dataset. Tag keys are globally unique.",
@@ -581,11 +594,13 @@
       "type": "string",
       "enum": [
        "TARGET_TYPE_UNSPECIFIED",
-       "VIEWS"
+       "VIEWS",
+       "ROUTINES"
       ],
       "enumDescriptions": [
        "Do not use. You must set a target type explicitly.",
-       "This entry applies to views in the dataset."
+       "This entry applies to views in the dataset.",
+       "This entry applies to routines in the dataset."
       ]
      }
     }
@@ -977,6 +992,14 @@
      "type": "integer",
      "description": "[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.",
      "format": "int32"
+    },
+    "metadataCacheMode": {
+     "type": "string",
+     "description": "[Optional] Metadata Cache Mode for the table. Set this to enable caching of metadata from external data source."
+    },
+    "objectMetadata": {
+     "type": "string",
+     "description": "ObjectMetadata is used to create Object Tables. Object Tables contain a listing of objects (with their metadata) found at the source_uris. If ObjectMetadata is set, source_format should be omitted. Currently SIMPLE is the only supported Object Metadata type."
     },
     "parquetOptions": {
      "$ref": "ParquetOptions",
@@ -2127,6 +2150,10 @@
    "id": "MaterializedViewDefinition",
    "type": "object",
    "properties": {
+    "allow_non_incremental_definition": {
+     "type": "boolean",
+     "description": "[Optional] Allow non incremental materialized view definition. The default value is \"false\"."
+    },
     "enableRefresh": {
      "type": "boolean",
      "description": "[Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is \"true\"."
@@ -2828,6 +2855,10 @@
      "type": "string",
      "description": "[Output-only] The default collation of the table."
     },
+    "defaultRoundingMode": {
+     "type": "string",
+     "description": "[Output-only] The default rounding mode of the table."
+    },
     "description": {
      "type": "string",
      "description": "[Optional] A user-friendly description of this table."
@@ -3172,6 +3203,10 @@
      "description": "[Optional] Precision (maximum number of total digits in base 10) and scale (maximum number of digits in the fractional part in base 10) constraints for values of this field for NUMERIC or BIGNUMERIC. It is invalid to set precision or scale if type \u2260 \"NUMERIC\" and \u2260 \"BIGNUMERIC\". If precision and scale are not specified, no value range constraint is imposed on this field insofar as values are permitted by the type. Values of this NUMERIC or BIGNUMERIC field must be in this range when: - Precision (P) and scale (S) are specified: [-10P-S + 10-S, 10P-S - 10-S] - Precision (P) is specified but not scale (and thus scale is interpreted to be equal to zero): [-10P + 1, 10P - 1]. Acceptable values for precision and scale if both are specified: - If type = \"NUMERIC\": 1 \u2264 precision - scale \u2264 29 and 0 \u2264 scale \u2264 9. - If type = \"BIGNUMERIC\": 1 \u2264 precision - scale \u2264 38 and 0 \u2264 scale \u2264 38. Acceptable values for precision if only precision is specified but not scale (and thus scale is interpreted to be equal to zero): - If type = \"NUMERIC\": 1 \u2264 precision \u2264 29. - If type = \"BIGNUMERIC\": 1 \u2264 precision \u2264 38. If scale is specified but not precision, then it is invalid.",
      "format": "int64"
     },
+    "roundingMode": {
+     "type": "string",
+     "description": "Optional. Rounding Mode specification of the field. It only can be set on NUMERIC or BIGNUMERIC type fields."
+    },
     "scale": {
      "type": "string",
      "description": "[Optional] See documentation for precision.",
@@ -3483,7 +3518,9 @@
       "Wide-and-deep classifier model.",
       "Wide-and-deep regressor model.",
       "Autoencoder model.",
-      "New name for the ARIMA model."
+      "New name for the ARIMA model.",
+      "Random Forest regressor model.",
+      "Random Forest classifier model."
      ],
      "enum": [
       "MODEL_TYPE_UNSPECIFIED",
@@ -3503,7 +3540,9 @@
       "DNN_LINEAR_COMBINED_CLASSIFIER",
       "DNN_LINEAR_COMBINED_REGRESSOR",
       "AUTOENCODER",
-      "ARIMA_PLUS"
+      "ARIMA_PLUS",
+      "RANDOM_FOREST_REGRESSOR",
+      "RANDOM_FOREST_CLASSIFIER"
      ]
     },
     "trainingRuns": {
@@ -5539,7 +5578,7 @@
      "format": "int64"
     },
     "language": {
-     "description": "Optional. Defaults to \"SQL\".",
+     "description": "Optional. Defaults to \"SQL\" if remote_function_options field is absent, not set otherwise.",
      "type": "string",
      "enumDescriptions": [
       "",
@@ -5566,7 +5605,7 @@
      "$ref": "StandardSqlDataType"
     },
     "returnTableType": {
-     "description": "Optional. Can be set only if routine_type = \"TABLE_VALUED_FUNCTION\". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specificed in return table type, at query time.",
+     "description": "Optional. Can be set only if routine_type = \"TABLE_VALUED_FUNCTION\". If absent, the return table type is inferred from definition_body at query time in each query that references this routine. If present, then the columns in the evaluated table result will be cast to match the column types specified in return table type, at query time.",
      "$ref": "StandardSqlTableType"
     },
     "importedLibraries": {
@@ -5723,7 +5762,7 @@
      }
     },
     "mainFileUri": {
-     "description": "The main file URI of the Spark application. Exactly one of the definition_body field and the main_file_uri field must be set.",
+     "description": "The main file/jar URI of the Spark application. Exactly one of the definition_body field and the main_file_uri field must be set for Python. Exactly one of main_class and main_file_uri field should be set for Java/Scala language type.",
      "type": "string"
     },
     "pyFileUris": {
@@ -5761,7 +5800,7 @@
    "type": "object",
    "properties": {
     "routines": {
-     "description": "Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.",
+     "description": "Routines in the requested dataset. Unless read_mask is set in the request, only the following fields are populated: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, language, and remote_function_options.",
      "type": "array",
      "items": {
       "$ref": "Routine"
@@ -5880,7 +5919,7 @@
      "type": "string"
     },
     "members": {
-     "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+     "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
      "type": "array",
      "items": {
       "type": "string"

@@ -89,10 +89,14 @@ class AttachVolumeRequest(_messages.Message):
   be attached.
 
   Fields:
-    volume: Required. Name of the Volume to attach.
+    volume: Name of the Volume to attach.
+    volumes: Names of the multiple Volumes to attach. The volumes attaching
+      will be an additive operation and will have no effect on existing
+      attached volumes.
   """
 
   volume = _messages.StringField(1)
+  volumes = _messages.StringField(2, repeated=True)
 
 
 class BaremetalsolutionProjectsLocationsGetRequest(_messages.Message):
@@ -259,6 +263,20 @@ class BaremetalsolutionProjectsLocationsInstancesPatchRequest(_messages.Message)
   instance = _messages.MessageField('Instance', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class BaremetalsolutionProjectsLocationsInstancesRenameRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsInstancesRenameRequest object.
+
+  Fields:
+    name: Required. The `name` field is used to identify the instance. Format:
+      projects/{project}/locations/{location}/instances/{instance}
+    renameInstanceRequest: A RenameInstanceRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  renameInstanceRequest = _messages.MessageField('RenameInstanceRequest', 2)
 
 
 class BaremetalsolutionProjectsLocationsInstancesResetRequest(_messages.Message):
@@ -728,10 +746,27 @@ class BaremetalsolutionProjectsLocationsVolumesDeleteRequest(_messages.Message):
   r"""A BaremetalsolutionProjectsLocationsVolumesDeleteRequest object.
 
   Fields:
+    force: If true, will put into cooloff all volume's luns as well. Luns must
+      not be attached to any Instances. If false operation will fail if a
+      volume has active (not in cooloff) luns.
     name: Required. The name of the Volume to delete.
   """
 
-  name = _messages.StringField(1, required=True)
+  force = _messages.BooleanField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class BaremetalsolutionProjectsLocationsVolumesEvictRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsVolumesEvictRequest object.
+
+  Fields:
+    evictVolumeRequest: A EvictVolumeRequest resource to be passed as the
+      request body.
+    name: Required. The name of the Volume.
+  """
+
+  evictVolumeRequest = _messages.MessageField('EvictVolumeRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class BaremetalsolutionProjectsLocationsVolumesGetRequest(_messages.Message):
@@ -769,6 +804,19 @@ class BaremetalsolutionProjectsLocationsVolumesLunsDeleteRequest(_messages.Messa
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class BaremetalsolutionProjectsLocationsVolumesLunsEvictRequest(_messages.Message):
+  r"""A BaremetalsolutionProjectsLocationsVolumesLunsEvictRequest object.
+
+  Fields:
+    evictLunRequest: A EvictLunRequest resource to be passed as the request
+      body.
+    name: Required. The name of the lun.
+  """
+
+  evictLunRequest = _messages.MessageField('EvictLunRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class BaremetalsolutionProjectsLocationsVolumesLunsGetRequest(_messages.Message):
@@ -928,11 +976,14 @@ class DetachVolumeRequest(_messages.Message):
 
   Fields:
     skipReboot: If true, performs Volume unmapping without instance reboot.
-    volume: Required. Name of the Volume to detach.
+    volume: Name of the Volume to detach.
+    volumes: Names of the multiple Volumes to detach. The detaching of volumes
+      will have no effect on other existing attached volumes.
   """
 
   skipReboot = _messages.BooleanField(1)
   volume = _messages.StringField(2)
+  volumes = _messages.StringField(3, repeated=True)
 
 
 class DisableInteractiveSerialConsoleRequest(_messages.Message):
@@ -950,6 +1001,14 @@ class Empty(_messages.Message):
 
 class EnableInteractiveSerialConsoleRequest(_messages.Message):
   r"""Message for enabling the interactive serial console on an instance."""
+
+
+class EvictLunRequest(_messages.Message):
+  r"""Request for skip lun cooloff and delete it."""
+
+
+class EvictVolumeRequest(_messages.Message):
+  r"""Request for skip volume cooloff and delete it."""
 
 
 class FetchInstanceProvisioningSettingsResponse(_messages.Message):
@@ -1019,6 +1078,7 @@ class Instance(_messages.Message):
 
   Enums:
     StateValueValuesEnum: Output only. The state of the server.
+    WorkloadProfileValueValuesEnum: The workload profile for the instance.
 
   Messages:
     LabelsValue: Labels as key value pairs.
@@ -1062,6 +1122,7 @@ class Instance(_messages.Message):
     updateTime: Output only. Update a time stamp.
     volumes: Input only. List of Volumes to attach to this Instance on
       creation. This field won't be populated in Get/List responses.
+    workloadProfile: The workload profile for the instance.
   """
 
   class StateValueValuesEnum(_messages.Enum):
@@ -1085,6 +1146,19 @@ class Instance(_messages.Message):
     STARTING = 5
     STOPPING = 6
     SHUTDOWN = 7
+
+  class WorkloadProfileValueValuesEnum(_messages.Enum):
+    r"""The workload profile for the instance.
+
+    Values:
+      WORKLOAD_PROFILE_UNSPECIFIED: The workload profile is in an unknown
+        state.
+      WORKLOAD_PROFILE_GENERIC: The workload profile is generic.
+      WORKLOAD_PROFILE_HANA: The workload profile is hana.
+    """
+    WORKLOAD_PROFILE_UNSPECIFIED = 0
+    WORKLOAD_PROFILE_GENERIC = 1
+    WORKLOAD_PROFILE_HANA = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -1127,6 +1201,7 @@ class Instance(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 15)
   updateTime = _messages.StringField(16)
   volumes = _messages.MessageField('Volume', 17, repeated=True)
+  workloadProfile = _messages.EnumField('WorkloadProfileValueValuesEnum', 18)
 
 
 class InstanceConfig(_messages.Message):
@@ -1537,6 +1612,8 @@ class Lun(_messages.Message):
 
   Fields:
     bootLun: Display if this LUN is a boot LUN.
+    expireTime: Output only. Time after which LUN will be fully deleted. It is
+      filled only for LUNs in COOL_OFF state.
     id: An identifier for the LUN, generated by the backend.
     multiprotocolType: The LUN multiprotocol type ensures the characteristics
       of the LUN are optimized for each operating system.
@@ -1570,12 +1647,15 @@ class Lun(_messages.Message):
       UPDATING: The LUN is being updated.
       READY: The LUN is ready for use.
       DELETING: The LUN has been requested to be deleted.
+      COOL_OFF: The LUN is in cool off state. It will be deleted after
+        `expire_time`.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
     UPDATING = 2
     READY = 3
     DELETING = 4
+    COOL_OFF = 5
 
   class StorageTypeValueValuesEnum(_messages.Enum):
     r"""The storage type for this LUN.
@@ -1590,15 +1670,16 @@ class Lun(_messages.Message):
     HDD = 2
 
   bootLun = _messages.BooleanField(1)
-  id = _messages.StringField(2)
-  multiprotocolType = _messages.EnumField('MultiprotocolTypeValueValuesEnum', 3)
-  name = _messages.StringField(4)
-  shareable = _messages.BooleanField(5)
-  sizeGb = _messages.IntegerField(6)
-  state = _messages.EnumField('StateValueValuesEnum', 7)
-  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 8)
-  storageVolume = _messages.StringField(9)
-  wwid = _messages.StringField(10)
+  expireTime = _messages.StringField(2)
+  id = _messages.StringField(3)
+  multiprotocolType = _messages.EnumField('MultiprotocolTypeValueValuesEnum', 4)
+  name = _messages.StringField(5)
+  shareable = _messages.BooleanField(6)
+  sizeGb = _messages.IntegerField(7)
+  state = _messages.EnumField('StateValueValuesEnum', 8)
+  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 9)
+  storageVolume = _messages.StringField(10)
+  wwid = _messages.StringField(11)
 
 
 class LunRange(_messages.Message):
@@ -2137,33 +2218,6 @@ class Operation(_messages.Message):
   response = _messages.MessageField('ResponseValue', 5)
 
 
-class OperationMetadata(_messages.Message):
-  r"""Represents the metadata from a long-running operation.
-
-  Fields:
-    apiVersion: Output only. API version used with the operation.
-    createTime: Output only. The time the operation was created.
-    endTime: Output only. The time the operation finished running.
-    requestedCancellation: Output only. Identifies whether the user requested
-      the cancellation of the operation. Operations that have been
-      successfully cancelled have Operation.error value with a
-      google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
-    statusMessage: Output only. Human-readable status of the operation, if
-      any.
-    target: Output only. Server-defined resource path for the target of the
-      operation.
-    verb: Output only. Name of the action executed by the operation.
-  """
-
-  apiVersion = _messages.StringField(1)
-  createTime = _messages.StringField(2)
-  endTime = _messages.StringField(3)
-  requestedCancellation = _messages.BooleanField(4)
-  statusMessage = _messages.StringField(5)
-  target = _messages.StringField(6)
-  verb = _messages.StringField(7)
-
-
 class ProvisioningConfig(_messages.Message):
   r"""A provisioning configuration.
 
@@ -2287,6 +2341,16 @@ class QosPolicy(_messages.Message):
   """
 
   bandwidthGbps = _messages.FloatField(1)
+
+
+class RenameInstanceRequest(_messages.Message):
+  r"""Message requesting rename of a server.
+
+  Fields:
+    newName: Required. The new `name` of the instance. Format: {instancename}
+  """
+
+  newName = _messages.StringField(1)
 
 
 class ResetInstanceRequest(_messages.Message):
@@ -2668,6 +2732,7 @@ class Volume(_messages.Message):
       snapshot reserved space is full.
     StateValueValuesEnum: The state of this storage volume.
     StorageTypeValueValuesEnum: The storage type for this volume.
+    WorkloadProfileValueValuesEnum: The workload profile for the volume.
 
   Messages:
     LabelsValue: Labels as key value pairs.
@@ -2684,6 +2749,8 @@ class Volume(_messages.Message):
       or auto shrink.
     emergencySizeGib: Additional emergency size that was requested for this
       Volume, in GiB. current_size_gib includes this value.
+    expireTime: Output only. Time after which volume will be fully deleted. It
+      is filled only for volumes in COOLOFF state.
     id: An identifier for the `Volume`, generated by the backend.
     labels: Labels as key value pairs.
     maxSizeGib: Maximum size volume can be expanded to in case of evergency,
@@ -2710,7 +2777,11 @@ class Volume(_messages.Message):
     snapshotSchedulePolicy: The name of the snapshot schedule policy in use
       for this volume, if any.
     state: The state of this storage volume.
+    storageAggregatePool: Input only. Name of the storage aggregate pool to
+      allocate the volume in. Can be used only for
+      VOLUME_PERFORMANCE_TIER_ASSIGNED volumes.
     storageType: The storage type for this volume.
+    workloadProfile: The workload profile for the volume.
   """
 
   class PerformanceTierValueValuesEnum(_messages.Enum):
@@ -2764,12 +2835,15 @@ class Volume(_messages.Message):
       READY: The storage volume is ready for use.
       DELETING: The storage volume has been requested to be deleted.
       UPDATING: The storage volume is being updated.
+      COOL_OFF: The storage volume is in cool off state. It will be deleted
+        after `expire_time`.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
     READY = 2
     DELETING = 3
     UPDATING = 4
+    COOL_OFF = 5
 
   class StorageTypeValueValuesEnum(_messages.Enum):
     r"""The storage type for this volume.
@@ -2782,6 +2856,19 @@ class Volume(_messages.Message):
     STORAGE_TYPE_UNSPECIFIED = 0
     SSD = 1
     HDD = 2
+
+  class WorkloadProfileValueValuesEnum(_messages.Enum):
+    r"""The workload profile for the volume.
+
+    Values:
+      WORKLOAD_PROFILE_UNSPECIFIED: The workload profile is in an unknown
+        state.
+      GENERIC: The workload profile is generic.
+      HANA: The workload profile is hana.
+    """
+    WORKLOAD_PROFILE_UNSPECIFIED = 0
+    GENERIC = 1
+    HANA = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -2811,23 +2898,26 @@ class Volume(_messages.Message):
   bootVolume = _messages.BooleanField(2)
   currentSizeGib = _messages.IntegerField(3)
   emergencySizeGib = _messages.IntegerField(4)
-  id = _messages.StringField(5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  maxSizeGib = _messages.IntegerField(7)
-  name = _messages.StringField(8)
-  notes = _messages.StringField(9)
-  originallyRequestedSizeGib = _messages.IntegerField(10)
-  performanceTier = _messages.EnumField('PerformanceTierValueValuesEnum', 11)
-  pod = _messages.StringField(12)
-  protocol = _messages.EnumField('ProtocolValueValuesEnum', 13)
-  remainingSpaceGib = _messages.IntegerField(14)
-  requestedSizeGib = _messages.IntegerField(15)
-  snapshotAutoDeleteBehavior = _messages.EnumField('SnapshotAutoDeleteBehaviorValueValuesEnum', 16)
-  snapshotEnabled = _messages.BooleanField(17)
-  snapshotReservationDetail = _messages.MessageField('SnapshotReservationDetail', 18)
-  snapshotSchedulePolicy = _messages.StringField(19)
-  state = _messages.EnumField('StateValueValuesEnum', 20)
-  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 21)
+  expireTime = _messages.StringField(5)
+  id = _messages.StringField(6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  maxSizeGib = _messages.IntegerField(8)
+  name = _messages.StringField(9)
+  notes = _messages.StringField(10)
+  originallyRequestedSizeGib = _messages.IntegerField(11)
+  performanceTier = _messages.EnumField('PerformanceTierValueValuesEnum', 12)
+  pod = _messages.StringField(13)
+  protocol = _messages.EnumField('ProtocolValueValuesEnum', 14)
+  remainingSpaceGib = _messages.IntegerField(15)
+  requestedSizeGib = _messages.IntegerField(16)
+  snapshotAutoDeleteBehavior = _messages.EnumField('SnapshotAutoDeleteBehaviorValueValuesEnum', 17)
+  snapshotEnabled = _messages.BooleanField(18)
+  snapshotReservationDetail = _messages.MessageField('SnapshotReservationDetail', 19)
+  snapshotSchedulePolicy = _messages.StringField(20)
+  state = _messages.EnumField('StateValueValuesEnum', 21)
+  storageAggregatePool = _messages.StringField(22)
+  storageType = _messages.EnumField('StorageTypeValueValuesEnum', 23)
+  workloadProfile = _messages.EnumField('WorkloadProfileValueValuesEnum', 24)
 
 
 class VolumeConfig(_messages.Message):
@@ -2854,6 +2944,9 @@ class VolumeConfig(_messages.Message):
     protocol: Volume protocol.
     sizeGb: The requested size of this volume, in GB.
     snapshotsEnabled: Whether snapshots should be enabled.
+    storageAggregatePool: Input only. Name of the storage aggregate pool to
+      allocate the volume in. Can be used only for
+      VOLUME_PERFORMANCE_TIER_ASSIGNED volumes.
     type: The type of this Volume.
     userNote: User note field, it can be used by customers to add additional
       information for the BMS Ops team .
@@ -2907,8 +3000,9 @@ class VolumeConfig(_messages.Message):
   protocol = _messages.EnumField('ProtocolValueValuesEnum', 8)
   sizeGb = _messages.IntegerField(9, variant=_messages.Variant.INT32)
   snapshotsEnabled = _messages.BooleanField(10)
-  type = _messages.EnumField('TypeValueValuesEnum', 11)
-  userNote = _messages.StringField(12)
+  storageAggregatePool = _messages.StringField(11)
+  type = _messages.EnumField('TypeValueValuesEnum', 12)
+  userNote = _messages.StringField(13)
 
 
 class VolumeLunRange(_messages.Message):

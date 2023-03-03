@@ -613,8 +613,14 @@ def ApplyFailoverPolicyArgs(messages, args, backend_service, support_failover):
     backend_service.failoverPolicy = failover_policy
 
 
-def ApplyLogConfigArgs(messages, args, backend_service, support_logging,
-                       support_tcp_ssl_logging, support_net_lb_ilb_logging):
+def ApplyLogConfigArgs(
+    messages,
+    args,
+    backend_service,
+    support_logging,
+    support_tcp_ssl_logging,
+    cleared_fields=None,
+):
   """Applies the LogConfig arguments to the specified backend service.
 
   If there are no arguments related to LogConfig, the backend service
@@ -626,11 +632,15 @@ def ApplyLogConfigArgs(messages, args, backend_service, support_logging,
     backend_service: The backend service proto message object.
     support_logging: Support logging functionality.
     support_tcp_ssl_logging: Support logging for TCL and SSL protocols.
-    support_net_lb_ilb_logging: Support logging for External Net LB and ILB.
+    cleared_fields: Reference to list with fields that should be cleared. Valid
+      only for update command.
   """
-  logging_specified = (
-      support_logging and (args.IsSpecified('enable_logging') or
-                           args.IsSpecified('logging_sample_rate')))
+  logging_specified = support_logging and (
+      args.IsSpecified('enable_logging')
+      or args.IsSpecified('logging_sample_rate')
+      or args.IsSpecified('logging_optional')
+      or args.IsSpecified('logging_optional_fields')
+  )
   valid_protocols = [
       messages.BackendService.ProtocolValueValuesEnum.HTTP,
       messages.BackendService.ProtocolValueValuesEnum.HTTPS,
@@ -645,33 +655,28 @@ def ApplyLogConfigArgs(messages, args, backend_service, support_logging,
       messages.BackendService.ProtocolValueValuesEnum.UDP,
       messages.BackendService.ProtocolValueValuesEnum.UNSPECIFIED
   ]
-  if support_net_lb_ilb_logging and support_tcp_ssl_logging:
+  if support_tcp_ssl_logging:
     if (logging_specified and backend_service.protocol
         not in valid_protocols + tcp_ssl_protocols + net_lb_ilb_protocols):
       raise exceptions.InvalidArgumentException(
           '--protocol',
-          'can only specify --enable-logging or --logging-sample-rate if the '
-          'protocol is HTTP/HTTPS/HTTP2/TCP/SSL/UDP/UNSPECIFIED.')
-  elif support_net_lb_ilb_logging:
+          (
+              'can only specify --enable-logging, --logging-sample-rate,'
+              ' --logging-optional or --logging-optional-fields if the'
+              ' protocol is HTTP/HTTPS/HTTP2/TCP/SSL/UDP/UNSPECIFIED.'
+          ),
+      )
+  else:
     if (logging_specified and
         backend_service.protocol not in valid_protocols + net_lb_ilb_protocols):
       raise exceptions.InvalidArgumentException(
           '--protocol',
-          'can only specify --enable-logging or --logging-sample-rate if the '
-          'protocol is HTTP/HTTPS/HTTP2/TCP/UDP/UNSPECIFIED.')
-  elif support_tcp_ssl_logging:
-    if (logging_specified and
-        backend_service.protocol not in valid_protocols + tcp_ssl_protocols):
-      raise exceptions.InvalidArgumentException(
-          '--protocol',
-          'can only specify --enable-logging or --logging-sample-rate if the '
-          'protocol is HTTP/HTTPS/HTTP2/TCP/SSL.')
-  else:
-    if (logging_specified and backend_service.protocol not in valid_protocols):
-      raise exceptions.InvalidArgumentException(
-          '--protocol',
-          'can only specify --enable-logging or --logging-sample-rate if the '
-          'protocol is HTTP/HTTPS/HTTP2.')
+          (
+              'can only specify --enable-logging, --logging-sample-rate,'
+              ' --logging-optional or --logging-optional-fields if the'
+              ' protocol is HTTP/HTTPS/HTTP2/TCP/UDP/UNSPECIFIED.'
+          ),
+      )
 
   if logging_specified:
     if backend_service.logConfig:
@@ -682,6 +687,16 @@ def ApplyLogConfigArgs(messages, args, backend_service, support_logging,
       log_config.enable = args.enable_logging
     if args.logging_sample_rate is not None:
       log_config.sampleRate = args.logging_sample_rate
+    if args.logging_optional is not None:
+      log_config.optionalMode = (
+          messages.BackendServiceLogConfig.OptionalModeValueValuesEnum(
+              args.logging_optional
+          )
+      )
+    if args.logging_optional_fields is not None:
+      log_config.optionalFields = args.logging_optional_fields
+      if not args.logging_optional_fields and cleared_fields is not None:
+        cleared_fields.append('logConfig.optionalFields')
     backend_service.logConfig = log_config
 
 

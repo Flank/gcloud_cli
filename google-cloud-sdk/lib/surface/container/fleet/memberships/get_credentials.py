@@ -22,10 +22,12 @@ import textwrap
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.container import util as container_util
+from googlecloudsdk.api_lib.container.fleet import util as fleet_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.fleet import api_util as hubapi_util
 from googlecloudsdk.command_lib.container.fleet import connect_gateway_util as cg_util
 from googlecloudsdk.command_lib.container.fleet import gwkubeconfig_util as kconfig
+from googlecloudsdk.command_lib.container.fleet import resources
 from googlecloudsdk.command_lib.container.fleet.memberships import errors as memberships_errors
 from googlecloudsdk.command_lib.container.fleet.memberships import util
 from googlecloudsdk.command_lib.projects import util as project_util
@@ -46,48 +48,46 @@ class GetCredentials(base.Command):
 
   {command} updates the `kubeconfig` file with the appropriate credentials and
   endpoint information to send `kubectl` commands to a fleet-registered and
-  connected cluster through Connect Gateway Service.
+  -connected cluster through the Connect Gateway service.
 
   It takes a project, passed through by set defaults or flags. By default,
   credentials are written to `$HOME/.kube/config`. You can provide an alternate
   path by setting the `KUBECONFIG` environment variable. If `KUBECONFIG`
   contains multiple paths, the first one is used.
 
-  Upon success, this command will switch current context to the target cluster,
-  when working with multiple clusters.
+  Upon success, this command will switch the current context to the target
+  cluster if other contexts are already present in the `kubeconfig` file.
 
   ## EXAMPLES
 
-    Get gateway kubeconfig for a registered cluster:
+    Get the Gateway kubeconfig for a globally registered cluster:
 
       $ {command} my-cluster
+      $ {command} my-cluster --location=global
+
+    Get the Gateway kubeconfig for a cluster registered in us-central1:
+
+      $ {command} my-cluster --location=us-central1
   """
 
   @classmethod
   def Args(cls, parser):
-    parser.add_argument(
-        'MEMBERSHIP',
-        type=str,
-        help=textwrap.dedent("""\
-          The membership name used to locate a cluster in your project. """),
-    )
-    if cls.ReleaseTrack() is base.ReleaseTrack.ALPHA:
-      parser.add_argument(
-          '--location',
-          type=str,
-          hidden=True,
-          help=textwrap.dedent("""\
-              The location for the membership resource, e.g. `us-central1`.
-              If not specified, defaults to `global`.
-            """),
-      )
+    resources.AddMembershipResourceArg(
+        parser,
+        membership_help=textwrap.dedent("""\
+          The membership name that you choose to uniquely represent the cluster
+          being registered in the fleet.
+        """),
+        location_help=textwrap.dedent("""\
+          The location of the membership resource, e.g. `us-central1`.
+          If not specified, defaults to `global`.
+        """),
+        membership_required=True,
+        positional=True)
 
   def Run(self, args):
     container_util.CheckKubectlInstalled()
     project_id = properties.VALUES.core.project.GetOrFail()
-    location = getattr(args, 'location', 'global')
-    if location is None:
-      location = 'global'
 
     log.status.Print('Starting to build Gateway kubeconfig...')
     log.status.Print('Current project_id: ' + project_id)
@@ -101,8 +101,11 @@ class GetCredentials(base.Command):
         project_id,
         util.GetConnectGatewayServiceName(hub_endpoint_override, None))
 
+    membership_name = resources.ParseMembershipArg(args)
+    membership_id = fleet_util.MembershipShortname(membership_name)
+    location = fleet_util.MembershipLocation(membership_name)
     membership = self.ReadClusterMembership(project_id, location,
-                                            args.MEMBERSHIP)
+                                            membership_id)
 
     # Registered GKE clusters use a different URL scheme, having
     # `gkeMemberships/` rather than the standard `memberships/` resource type.
@@ -118,9 +121,9 @@ class GetCredentials(base.Command):
 
     self.GenerateKubeconfig(
         util.GetConnectGatewayServiceName(hub_endpoint_override, location),
-        project_id, location, resource_type, args.MEMBERSHIP)
+        project_id, location, resource_type, membership_id)
     msg = 'A new kubeconfig entry \"' + KUBECONTEXT_FORMAT.format(
-        project=project_id, location=location, membership=args.MEMBERSHIP
+        project=project_id, location=location, membership=membership_id
     ) + '\" has been generated and set as the current context.'
     log.status.Print(msg)
 

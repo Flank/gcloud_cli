@@ -18,10 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import base as calliope_base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class ServiceDirectory(base.Group):
+@calliope_base.ReleaseTracks(calliope_base.ReleaseTrack.ALPHA)
+class ServiceDirectory(calliope_base.Group):
   """Manage the Service Directory Feature."""
-  pass
+
+  category = calliope_base.COMPUTE_CATEGORY

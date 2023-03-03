@@ -70,38 +70,95 @@ SUBCOMMAND_DEPRECATION = {
 # support. {'cmd': ('1.10.14', '2.0.0')} - command `cmd` is supported for
 # Airflow versions greater or equal to 1.10.14, prior to 2.0.0 (exclusive).
 # None - means no boundary.
+# LINT.IfChange
+
+
+class SupportedAirflowVersion(collections.namedtuple(
+    'SupportedAirflowVersion',
+    'from_version to_version allowed_nested_subcommands')):
+
+  __slots__ = ()
+
+  def __new__(cls, from_version=None, to_version='3.0.0',
+              allowed_nested_subcommands=None):
+    return super(SupportedAirflowVersion, cls).__new__(
+        cls, from_version, to_version, allowed_nested_subcommands)
+
+
 SUBCOMMAND_ALLOWLIST = {
-    'backfill': (None, '2.0.0'),
-    'clear': (None, '2.0.0'),
-    'connections': (None, '3.0.0'),
-    'dag_state': (None, '2.0.0'),
-    'dags': ('1.10.14', '3.0.0'),
-    'delete_dag': ('1.10.1', '2.0.0'),
-    'kerberos': (None, '3.0.0'),
-    'kubernetes': ('2.1.4', '3.0.0'),
-    'list_dag_runs': ('1.10.2', '2.0.0'),
-    'list_dags': (None, '2.0.0'),
-    'list_tasks': (None, '2.0.0'),
-    'next_execution': ('1.10.2', '2.0.0'),
-    'pause': (None, '2.0.0'),
-    'pool': (None, '2.0.0'),
-    'pools': ('1.10.14', '3.0.0'),
-    'render': (None, '2.0.0'),
-    'roles': ('2.0.0', '3.0.0'),
-    'run': (None, '2.0.0'),
-    'sync-perm': ('1.10.14', '3.0.0'),
-    'sync_perm': ('1.10.2', '2.0.0'),
-    'task_failed_deps': (None, '2.0.0'),
-    'task_state': (None, '2.0.0'),
-    'tasks': ('1.10.14', '3.0.0'),
-    'test': (None, '2.0.0'),
-    'trigger_dag': (None, '2.0.0'),
-    'unpause': (None, '2.0.0'),
-    'upgrade_check': ('1.10.15', '2.0.0'),
-    'users': ('1.10.14', '3.0.0'),
-    'variables': (None, '3.0.0'),
-    'version': (None, '3.0.0'),
+    'backfill':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'clear':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'connections':
+        SupportedAirflowVersion(from_version=None, to_version='3.0.0'),
+    'db':
+        SupportedAirflowVersion(
+            from_version='2.3.0',
+            to_version='3.0.0',
+            allowed_nested_subcommands={
+                'check':
+                    SupportedAirflowVersion(
+                        from_version='2.3.0', to_version='3.0.0'),
+            }),
+    'dag_state':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'dags':
+        SupportedAirflowVersion(from_version='1.10.14', to_version='3.0.0'),
+    'delete_dag':
+        SupportedAirflowVersion(from_version='1.10.1', to_version='2.0.0'),
+    'kerberos':
+        SupportedAirflowVersion(from_version=None, to_version='3.0.0'),
+    'kubernetes':
+        SupportedAirflowVersion(from_version='2.1.4', to_version='3.0.0'),
+    'list_dag_runs':
+        SupportedAirflowVersion(from_version='1.10.2', to_version='2.0.0'),
+    'list_dags':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'list_tasks':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'next_execution':
+        SupportedAirflowVersion(from_version='1.10.2', to_version='2.0.0'),
+    'pause':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'pool':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'pools':
+        SupportedAirflowVersion(from_version='1.10.14', to_version='3.0.0'),
+    'render':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'roles':
+        SupportedAirflowVersion(from_version='2.0.0', to_version='3.0.0'),
+    'run':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'sync-perm':
+        SupportedAirflowVersion(from_version='1.10.14', to_version='3.0.0'),
+    'sync_perm':
+        SupportedAirflowVersion(from_version='1.10.2', to_version='2.0.0'),
+    'task_failed_deps':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'task_state':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'tasks':
+        SupportedAirflowVersion(from_version='1.10.14', to_version='3.0.0'),
+    'test':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'trigger_dag':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'unpause':
+        SupportedAirflowVersion(from_version=None, to_version='2.0.0'),
+    'upgrade_check':
+        SupportedAirflowVersion(from_version='1.10.15', to_version='2.0.0'),
+    'users':
+        SupportedAirflowVersion(from_version='1.10.14', to_version='3.0.0'),
+    'variables':
+        SupportedAirflowVersion(from_version=None, to_version='3.0.0'),
+    'version':
+        SupportedAirflowVersion(from_version=None, to_version='3.0.0'),
 }
+# Code paths are prohibited from being included in this file.
+# LINT.ThenChange()
+
 SUBCOMMAND_ALLOWLIST.update(SUBCOMMAND_DEPRECATION)
 
 DEFAULT_NAMESPACE = 'default'
@@ -365,13 +422,23 @@ def RunKubectlCommand(args, out_func=None, err_func=None, namespace=None):
         exec_args,
         no_exit=True,
         out_func=out_func,
-        err_func=err_func,
+        err_func=lambda err: HandleKubectlErrorStream(err_func, err),
         universal_newlines=True)
   except (execution_utils.PermissionError,
           execution_utils.InvalidCommandError) as e:
     raise KubectlError(six.text_type(e))
   if retval:
     raise KubectlError('kubectl returned non-zero status code.')
+
+
+def HandleKubectlErrorStream(err_func, err):
+  err_handler_func = err_func or log.status.Print
+  if 'Unable to connect to the server' in err:
+    err_handler_func(err)
+    err_handler_func(
+        '\nPlease, check if you have connectivity to GKE control plane.\n')
+  else:
+    err_handler_func(err)
 
 
 def ConvertImageVersionToNamespacePrefix(image_version):

@@ -90,11 +90,19 @@ class CreateHelper(object):
   HTTPS_HEALTH_CHECK_ARG = None
 
   @classmethod
-  def Args(cls, parser, support_failover, support_logging,
-           support_tcp_ssl_logging, support_net_lb_ilb_logging,
-           support_multinic, support_client_only, support_unspecified_protocol,
-           support_subsetting, support_subsetting_subset_size,
-           support_advanced_load_balancing, support_weighted_lb):
+  def Args(
+      cls,
+      parser,
+      support_failover,
+      support_logging,
+      support_multinic,
+      support_client_only,
+      support_unspecified_protocol,
+      support_subsetting,
+      support_subsetting_subset_size,
+      support_advanced_load_balancing,
+      support_weighted_lb,
+  ):
     """Add flags to create a backend service to the parser."""
 
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
@@ -144,24 +152,10 @@ class CreateHelper(object):
       flags.AddFailoverRatio(parser)
 
     if support_logging:
-      if support_net_lb_ilb_logging and support_tcp_ssl_logging:
-        flags.AddEnableLoggingProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, SSL, UDP, or UNSPECIFIED')
-        flags.AddLoggingSampleRateProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, SSL, UDP, or UNSPECIFIED')
-      elif support_net_lb_ilb_logging:
-        flags.AddEnableLoggingProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, UDP, or UNSPECIFIED')
-        flags.AddLoggingSampleRateProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, UDP, or UNSPECIFIED')
-      elif support_tcp_ssl_logging:
-        flags.AddEnableLoggingProtocols(parser,
-                                        'HTTP, HTTPS, HTTP2, TCP, or SSL')
-        flags.AddLoggingSampleRateProtocols(parser,
-                                            'HTTP, HTTPS, HTTP2, TCP, or SSL')
-      else:
-        flags.AddEnableLogging(parser)
-        flags.AddLoggingSampleRate(parser)
+      flags.AddEnableLogging(parser)
+      flags.AddLoggingSampleRate(parser)
+      flags.AddLoggingOptional(parser)
+      flags.AddLoggingOptionalFields(parser)
 
     if support_multinic:
       flags.AddNetwork(parser)
@@ -175,14 +169,20 @@ class CreateHelper(object):
 
     flags.AddCompressionMode(parser)
 
-  def __init__(self, support_failover, support_logging, support_tcp_ssl_logging,
-               support_net_lb_ilb_logging, support_multinic, support_subsetting,
-               support_subsetting_subset_size, support_advanced_load_balancing,
-               support_weighted_lb):
+  def __init__(
+      self,
+      support_failover,
+      support_logging,
+      support_tcp_ssl_logging,
+      support_multinic,
+      support_subsetting,
+      support_subsetting_subset_size,
+      support_advanced_load_balancing,
+      support_weighted_lb,
+  ):
     self._support_failover = support_failover
     self._support_logging = support_logging
     self._support_tcp_ssl_logging = support_tcp_ssl_logging
-    self._support_net_lb_ilb_logging = support_net_lb_ilb_logging
     self._support_multinic = support_multinic
     self._support_subsetting = support_subsetting
     self._support_subsetting_subset_size = support_subsetting_subset_size
@@ -272,7 +272,7 @@ class CreateHelper(object):
         backend_service,
         support_logging=self._support_logging,
         support_tcp_ssl_logging=self._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=self._support_net_lb_ilb_logging)
+    )
 
     request = client.messages.ComputeBackendServicesInsertRequest(
         backendService=backend_service, project=backend_services_ref.project)
@@ -317,9 +317,12 @@ class CreateHelper(object):
           policy_name=args.service_lb_policy)
 
     if args.service_bindings is not None:
-      raise exceptions.InvalidArgumentException(
-          '--service-bindings',
-          'Service bindings are allowed only for global backend services.')
+      region = backend_services_ref.region
+      backend_service.serviceBindings = [
+          reference_utils.BuildServiceBindingUrl(backend_services_ref.project,
+                                                 region, binding_name)
+          for binding_name in args.service_bindings
+      ]
 
     if self._support_subsetting:
       backend_services_utils.ApplySubsettingArgs(
@@ -353,7 +356,7 @@ class CreateHelper(object):
         backend_service,
         support_logging=self._support_logging,
         support_tcp_ssl_logging=self._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=self._support_net_lb_ilb_logging)
+    )
 
     request = client.messages.ComputeRegionBackendServicesInsertRequest(
         backendService=backend_service,
@@ -437,7 +440,6 @@ class CreateGA(base.CreateCommand):
   _support_failover = True
   _support_logging = True
   _support_tcp_ssl_logging = False
-  _support_net_lb_ilb_logging = False
   _support_multinic = True
   _support_client_only = True
   _support_unspecified_protocol = True
@@ -452,15 +454,14 @@ class CreateGA(base.CreateCommand):
         parser,
         support_failover=cls._support_failover,
         support_logging=cls._support_logging,
-        support_tcp_ssl_logging=cls._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=cls._support_net_lb_ilb_logging,
         support_multinic=cls._support_multinic,
         support_client_only=cls._support_client_only,
         support_unspecified_protocol=cls._support_unspecified_protocol,
         support_subsetting=cls._support_subsetting,
         support_subsetting_subset_size=cls._support_subsetting_subset_size,
         support_advanced_load_balancing=cls._support_advanced_load_balancing,
-        support_weighted_lb=cls._support_weighted_lb)
+        support_weighted_lb=cls._support_weighted_lb,
+    )
 
   def Run(self, args):
     """Issues request necessary to create Backend Service."""
@@ -470,12 +471,12 @@ class CreateGA(base.CreateCommand):
         support_failover=self._support_failover,
         support_logging=self._support_logging,
         support_tcp_ssl_logging=self._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=self._support_net_lb_ilb_logging,
         support_multinic=self._support_multinic,
         support_subsetting=self._support_subsetting,
         support_subsetting_subset_size=self._support_subsetting_subset_size,
         support_advanced_load_balancing=self._support_advanced_load_balancing,
-        support_weighted_lb=self._support_weighted_lb).Run(args, holder)
+        support_weighted_lb=self._support_weighted_lb,
+    ).Run(args, holder)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -504,7 +505,6 @@ class CreateBeta(CreateGA):
   _support_advanced_load_balancing = False
   _support_weighted_lb = True
   _support_tcp_ssl_logging = True
-  _support_net_lb_ilb_logging = True
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -532,4 +532,3 @@ class CreateAlpha(CreateBeta):
   _support_advanced_load_balancing = True
   _support_weighted_lb = True
   _support_tcp_ssl_logging = True
-  _support_net_lb_ilb_logging = True

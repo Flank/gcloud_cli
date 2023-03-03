@@ -415,11 +415,13 @@ class ApkManifest(_messages.Message):
     intentFilters: A IntentFilter attribute.
     maxSdkVersion: Maximum API level on which the application is designed to
       run.
+    metadata: Meta-data tags defined in the manifest.
     minSdkVersion: Minimum API level required for the application to run.
     packageName: Full Java-style package name for this application, e.g.
       "com.example.foo".
     targetSdkVersion: Specifies the API Level on which the application is
       designed to run.
+    usesFeature: Feature usage tags defined in the manifest.
     usesPermission: Permissions declared to be used by the application
     versionCode: Version number used internally by the app.
     versionName: Version number shown to users.
@@ -428,12 +430,14 @@ class ApkManifest(_messages.Message):
   applicationLabel = _messages.StringField(1)
   intentFilters = _messages.MessageField('IntentFilter', 2, repeated=True)
   maxSdkVersion = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  minSdkVersion = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  packageName = _messages.StringField(5)
-  targetSdkVersion = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  usesPermission = _messages.StringField(7, repeated=True)
-  versionCode = _messages.IntegerField(8)
-  versionName = _messages.StringField(9)
+  metadata = _messages.MessageField('Metadata', 4, repeated=True)
+  minSdkVersion = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  packageName = _messages.StringField(6)
+  targetSdkVersion = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  usesFeature = _messages.MessageField('UsesFeature', 8, repeated=True)
+  usesPermission = _messages.StringField(9, repeated=True)
+  versionCode = _messages.IntegerField(10)
+  versionName = _messages.StringField(11)
 
 
 class AppBundle(_messages.Message):
@@ -847,6 +851,24 @@ class IosModel(_messages.Message):
   tags = _messages.StringField(10, repeated=True)
 
 
+class IosRoboTest(_messages.Message):
+  r"""A test that explores an iOS application on an iOS device.
+
+  Fields:
+    appBundleId: The bundle ID for the app-under-test. This is determined by
+      examining the application's "Info.plist" file.
+    appIpa: Required. The ipa stored at this file should be used to run the
+      test.
+    roboScript: An optional Roboscript to customize the crawl. See
+      https://firebase.google.com/docs/test-lab/android/robo-scripts-reference
+      for more information about Roboscripts.
+  """
+
+  appBundleId = _messages.StringField(1)
+  appIpa = _messages.MessageField('FileReference', 2)
+  roboScript = _messages.MessageField('FileReference', 3)
+
+
 class IosRuntimeConfiguration(_messages.Message):
   r"""iOS configuration that can be selected at the time a test is run.
 
@@ -987,10 +1009,23 @@ class ManualSharding(_messages.Message):
       least one shard if this field is present. When you select one or more
       physical devices, the number of repeated test_targets_for_shard must be
       <= 50. When you select one or more ARM virtual devices, it must be <=
-      50. When you select only x86 virtual devices, it must be <= 500.
+      100. When you select only x86 virtual devices, it must be <= 500.
   """
 
   testTargetsForShard = _messages.MessageField('TestTargetsForShard', 1, repeated=True)
+
+
+class Metadata(_messages.Message):
+  r"""A tag within a manifest.
+  https://developer.android.com/guide/topics/manifest/meta-data-element.html
+
+  Fields:
+    name: The android:name value
+    value: The android:value value
+  """
+
+  name = _messages.StringField(1)
+  value = _messages.StringField(2)
 
 
 class NetworkConfiguration(_messages.Message):
@@ -1050,15 +1085,16 @@ class PerAndroidVersionInfo(_messages.Message):
   r"""A version-specific information of an Android model.
 
   Enums:
-    DeviceCapacityValueValuesEnum: A static capacity of an Android version.
+    DeviceCapacityValueValuesEnum: The number of online devices for an Android
+      version.
 
   Fields:
-    deviceCapacity: A static capacity of an Android version.
+    deviceCapacity: The number of online devices for an Android version.
     versionId: An Android version.
   """
 
   class DeviceCapacityValueValuesEnum(_messages.Enum):
-    r"""A static capacity of an Android version.
+    r"""The number of online devices for an Android version.
 
     Values:
       DEVICE_CAPACITY_UNSPECIFIED: The value of device capacity is unknown or
@@ -1101,15 +1137,16 @@ class PerIosVersionInfo(_messages.Message):
   r"""A version-specific information of an iOS model.
 
   Enums:
-    DeviceCapacityValueValuesEnum: A static capacity of an iOS version.
+    DeviceCapacityValueValuesEnum: The number of online devices for an iOS
+      version.
 
   Fields:
-    deviceCapacity: A static capacity of an iOS version.
+    deviceCapacity: The number of online devices for an iOS version.
     versionId: An iOS version.
   """
 
   class DeviceCapacityValueValuesEnum(_messages.Enum):
-    r"""A static capacity of an iOS version.
+    r"""The number of online devices for an iOS version.
 
     Values:
       DEVICE_CAPACITY_UNSPECIFIED: The value of device capacity is unknown or
@@ -1618,6 +1655,13 @@ class TestMatrix(_messages.Message):
       INVALID_APK_PREVIEW_SDK: APK is built for a preview SDK which is
         unsupported
       MATRIX_TOO_LARGE: The matrix expanded to contain too many executions.
+      TEST_QUOTA_EXCEEDED: Not enough test quota to run the executions in this
+        matrix.
+      SERVICE_NOT_ACTIVATED: A required cloud service api is not activated.
+        See: https://firebase.google.com/docs/test-
+        lab/android/continuous#requirements
+      UNKNOWN_PERMISSION_ERROR: There was an unknown permission issue running
+        this test.
     """
     INVALID_MATRIX_DETAILS_UNSPECIFIED = 0
     DETAILS_UNAVAILABLE = 1
@@ -1655,6 +1699,9 @@ class TestMatrix(_messages.Message):
     INVALID_INPUT_APK = 33
     INVALID_APK_PREVIEW_SDK = 34
     MATRIX_TOO_LARGE = 35
+    TEST_QUOTA_EXCEEDED = 36
+    SERVICE_NOT_ACTIVATED = 37
+    UNKNOWN_PERMISSION_ERROR = 38
 
   class OutcomeSummaryValueValuesEnum(_messages.Enum):
     r"""Output Only. The overall outcome of the test. Only set when the test
@@ -1792,6 +1839,7 @@ class TestSpecification(_messages.Message):
     disablePerformanceMetrics: Disables performance metrics recording. May
       reduce test latency.
     disableVideoRecording: Disables video recording. May reduce test latency.
+    iosRoboTest: An iOS Robo test.
     iosTestLoop: An iOS application with a test loop.
     iosTestSetup: Test setup requirements for iOS.
     iosXcTest: An iOS XCTest, via an .xctestrun file.
@@ -1806,11 +1854,12 @@ class TestSpecification(_messages.Message):
   androidTestLoop = _messages.MessageField('AndroidTestLoop', 3)
   disablePerformanceMetrics = _messages.BooleanField(4)
   disableVideoRecording = _messages.BooleanField(5)
-  iosTestLoop = _messages.MessageField('IosTestLoop', 6)
-  iosTestSetup = _messages.MessageField('IosTestSetup', 7)
-  iosXcTest = _messages.MessageField('IosXcTest', 8)
-  testSetup = _messages.MessageField('TestSetup', 9)
-  testTimeout = _messages.StringField(10)
+  iosRoboTest = _messages.MessageField('IosRoboTest', 6)
+  iosTestLoop = _messages.MessageField('IosTestLoop', 7)
+  iosTestSetup = _messages.MessageField('IosTestSetup', 8)
+  iosXcTest = _messages.MessageField('IosXcTest', 9)
+  testSetup = _messages.MessageField('TestSetup', 10)
+  testTimeout = _messages.StringField(11)
 
 
 class TestTargetsForShard(_messages.Message):
@@ -1982,11 +2031,25 @@ class UniformSharding(_messages.Message):
       always be a positive number that is no greater than the total number of
       test cases. When you select one or more physical devices, the number of
       shards must be <= 50. When you select one or more ARM virtual devices,
-      it must be <= 50. When you select only x86 virtual devices, it must be
+      it must be <= 100. When you select only x86 virtual devices, it must be
       <= 500.
   """
 
   numShards = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+
+
+class UsesFeature(_messages.Message):
+  r"""A tag within a manifest.
+  https://developer.android.com/guide/topics/manifest/uses-feature-
+  element.html
+
+  Fields:
+    isRequired: The android:required value
+    name: The android:name value
+  """
+
+  isRequired = _messages.BooleanField(1)
+  name = _messages.StringField(2)
 
 
 class XcodeVersion(_messages.Message):

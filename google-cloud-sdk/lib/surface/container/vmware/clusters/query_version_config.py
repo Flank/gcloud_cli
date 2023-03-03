@@ -23,29 +23,33 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.vmware import flags
 
 _EXAMPLES = """
-To query versions for creating a cluster with an admin cluster membership named `my-admin-cluster-membership`,
-run:
+To query all available versions in location `us-west1`, run:
 
-$ {command} --admin-cluster-membership=my-admin-cluster-membership
+$ {command} --location=us-west1
 
-To query versions for upgrading a user cluster named `my-user-cluster`,
-run:
+To query versions for creating a cluster with an admin cluster membership named
+`my-admin-cluster-membership` managed in project `my-admin-cluster-project` and
+location `us-west`, run:
 
-$ {command} --cluster=my-user-cluster
+$ {command} --location=us-west1 --admin-cluster-membership=my-admin-cluster-membership --admin-cluster-membership-project=my-admin-cluster-project
+
+To query versions for upgrading a user cluster named `my-user-cluster` in
+location `us-west1`, run:
+
+$ {command} --location=us-west1 --cluster=my-user-cluster
 """
 
 
-@base.Hidden
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class QueryVersionConfig(base.Command):
-  """Query Anthos on VMware version configuration."""
+  """Query versions for creating or upgrading an Anthos on VMware user cluster."""
 
   detailed_help = {'EXAMPLES': _EXAMPLES}
 
   @staticmethod
   def Args(parser):
     """Registers flags for this command."""
-    flags.AddLocationResourceArg(parser, 'to query version configuration')
+    flags.AddLocationResourceArg(parser, 'to query versions')
     flags.AddConfigType(parser)
 
   def Run(self, args):

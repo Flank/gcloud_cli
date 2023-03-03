@@ -56,23 +56,23 @@ def AddConcurrentControlGroupArgs(parent_group):
   `--concurrency-limit=55` sets to 55%.""")
 
 
-def AddCycleFrequencyArgs(parser, flag_suffix, start_time_help,
-                          cadence_help, supports_hourly=False,
+def AddCycleFrequencyArgs(parser,
+                          flag_suffix,
+                          start_time_help,
+                          cadence_help,
+                          supports_hourly=False,
                           has_restricted_start_times=False,
-                          supports_weekly=False, parent_group=None):
+                          supports_weekly=False,
+                          required=True):
   """Add Cycle Frequency args for Resource Policies."""
-  if parent_group:
-    freq_group = parent_group.add_argument_group(
-        'Cycle Frequency Group.', mutex=True)
-  else:
-    freq_group = parser.add_argument_group(
-        'Cycle Frequency Group.', required=True, mutex=True)
+  freq_group = parser.add_argument_group(
+      'Cycle Frequency Group.', required=required, mutex=True)
   if has_restricted_start_times:
     start_time_help += """\
         Valid choices are 00:00, 04:00, 08:00, 12:00,
         16:00 and 20:00 UTC. For example, `--start-time="08:00"`."""
   freq_flags_group = freq_group.add_group(
-      'From flags:' if supports_weekly else '')
+      'Using command flags:' if supports_weekly else '')
   freq_flags_group.add_argument(
       '--start-time', required=True,
       type=arg_parsers.Datetime.ParseUtcTime,
@@ -101,18 +101,21 @@ def AddCycleFrequencyArgs(parser, flag_suffix, start_time_help,
                  'saturday', 'sunday'],
         help_str='{} occurs weekly on WEEKLY_{} at START_TIME.'.format(
             cadence_help, flag_suffix.upper())).AddToParser(cadence_group)
-    freq_file_group = freq_group.add_group('From file:')
+    freq_file_group = freq_group.add_group('Using a file:')
     freq_file_group.add_argument(
         '--weekly-{}-from-file'.format(flag_suffix),
         dest='weekly_cycle_from_file',
         type=arg_parsers.FileContents(),
         help="""\
-        A JSON/YAML file which specifies a weekly schedule. It should be a
-        list of objects with the following fields:
+        A JSON/YAML file which specifies a weekly schedule. The file should
+        contain the following fields:
 
         day: Day of the week with the same choices as `--weekly-{}`.
-        startTime: Start time of the snapshot schedule with the same format
-            as --start-time.
+        startTime: Start time of the snapshot schedule with
+        the same format as --start-time.
+
+        For more information about using a file,
+        see https://cloud.google.com/compute/docs/disks/scheduled-snapshots#create_snapshot_schedule
         """.format(flag_suffix))
 
 
@@ -163,15 +166,22 @@ def AddSnapshotScheduleArgs(parser, messages):
       help='Maximum number of days snapshot can be retained.')
   GetOnSourceDiskDeleteFlagMapper(messages).choice_arg.AddToParser(parser)
   snapshot_properties_group = parser.add_group('Snapshot properties')
-  labels_util.GetCreateLabelsFlag(
-      extra_message='These will be added to the disk snapshots on creation.',
-      labels_name='snapshot-labels').AddToParser(snapshot_properties_group)
+  AddSnapshotLabelArgs(snapshot_properties_group)
   snapshot_properties_group.add_argument(
       '--guest-flush',
       action='store_true',
       help='Create an application consistent snapshot by informing the OS to '
            'prepare for the snapshot process.')
   compute_flags.AddStorageLocationFlag(snapshot_properties_group, 'snapshot')
+
+
+def AddSnapshotLabelArgs(parser):
+  labels_util.GetCreateLabelsFlag(
+      extra_message=(
+          'The label is added to each snapshot created by the schedule.'
+      ),
+      labels_name='snapshot-labels',
+  ).AddToParser(parser)
 
 
 def AddGroupPlacementArgs(parser, messages, track):
@@ -191,6 +201,15 @@ def AddGroupPlacementArgs(parser, messages, track):
   if track == base.ReleaseTrack.ALPHA:
     GetAvailabilityDomainScopeFlagMapper(messages).choice_arg.AddToParser(
         parser)
+    parser.add_argument(
+        '--tpu-topology',
+        type=str,
+        help='Specifies the shape of the TPU pod slice.')
+    parser.add_argument(
+        '--max-distance',
+        type=arg_parsers.BoundedInt(lower_bound=1, upper_bound=2),
+        help='Specifies the number of max logical switches.'
+    )
 
 
 def GetCollocationFlagMapper(messages, track):

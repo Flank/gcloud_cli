@@ -23,6 +23,7 @@ import json
 from google.oauth2 import utils as oauth2_utils
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import requests as core_requests
 
 from six.moves import http_client
@@ -140,8 +141,20 @@ def GetExternalAccountId(creds):
   client_authentication = oauth2_utils.ClientAuthentication(
       oauth2_utils.ClientAuthType.basic, config.CLOUDSDK_CLIENT_ID,
       config.CLOUDSDK_CLIENT_NOTSOSECRET)
+
+  # Check if the introspection endpoint has been overridden,
+  # otherwise use default endpoint. Prioritize property override first then
+  # credential config.
+  token_introspection_endpoint = _EXTERNAL_ACCT_TOKEN_INTROSPECT_ENDPOINT
+
+  endpoint_override = properties.VALUES.auth.token_introspection_endpoint.Get()
+  property_override = creds.token_info_url
+
+  if endpoint_override or property_override:
+    token_introspection_endpoint = endpoint_override or property_override
+
   oauth_introspection = IntrospectionClient(
-      token_introspect_endpoint=_EXTERNAL_ACCT_TOKEN_INTROSPECT_ENDPOINT,
+      token_introspect_endpoint=token_introspection_endpoint,
       client_authentication=client_authentication)
   request = core_requests.GoogleAuthRequest()
   if not creds.valid:

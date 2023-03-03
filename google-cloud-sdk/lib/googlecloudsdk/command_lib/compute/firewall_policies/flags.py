@@ -217,8 +217,7 @@ def AddSrcIpRanges(parser, required=False):
       type=arg_parsers.ArgList(),
       required=required,
       metavar='SRC_IP_RANGE',
-      help=('Source IP ranges to match for this rule. '
-            'Can only be specified if DIRECTION is ingress.'))
+      help='Source IP ranges to match for this rule.')
 
 
 def AddDestIpRanges(parser, required=False):
@@ -228,8 +227,7 @@ def AddDestIpRanges(parser, required=False):
       type=arg_parsers.ArgList(),
       required=required,
       metavar='DEST_IP_RANGE',
-      help=('Destination IP ranges to match for this rule. '
-            'Can only be specified if DIRECTION is egress.'))
+      help='Destination IP ranges to match for this rule.')
 
 
 def AddLayer4Configs(parser, required=False):
@@ -453,8 +451,11 @@ def AddSrcThreatIntelligence(parser):
       required=False,
       help=(
           'Source Threat Intelligence lists to match for this rule. '
-          'Can only be specified if DIRECTION is `ingress`.'
-      ))
+          'Can only be specified if DIRECTION is `ingress`. '
+          'The available lists can be found here: '
+          'https://cloud.google.com/vpc/docs/firewall-policies-rule-details#threat-intelligence-fw-policy.'
+      ),
+  )
 
 
 def AddDestThreatIntelligence(parser):
@@ -466,8 +467,11 @@ def AddDestThreatIntelligence(parser):
       required=False,
       help=(
           'Destination Threat Intelligence lists to match for this rule. '
-          'Can only be specified if DIRECTION is `egress`.'
-      ))
+          'Can only be specified if DIRECTION is `egress`. '
+          'The available lists can be found here: '
+          'https://cloud.google.com/vpc/docs/firewall-policies-rule-details#threat-intelligence-fw-policy.'
+      ),
+  )
 
 
 def AddSecurityProfileGroup(parser):
@@ -488,3 +492,18 @@ def AddSecurityProfileGroup(parser):
           'In order to set this property, '
           'please run the command \'gcloud config set api_endpoint_overrides/networkservices https://<namespace>/\''
       ))
+
+
+def AddTlsInspect(parser):
+  """Adds the option to turn on TLS decryption on the rule."""
+  parser.add_argument(
+      '--tls-inspect',
+      required=False,
+      hidden=True,
+      action=arg_parsers.StoreTrueFalseAction,
+      help=(
+          'Use this flag to indicate whether TLS traffic should be inspected '
+          'using the TLS inspection policy when the security profile group '
+          'is applied. Default: no TLS inspection.'
+      ),
+  )

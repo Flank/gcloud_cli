@@ -47,7 +47,7 @@ class BuildType(enum.Enum):
   BUILDPACKS = 'Buildpacks'
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Deploy(base.Command):
   """Create or update a Cloud Run job."""
 
@@ -82,8 +82,8 @@ class Deploy(base.Command):
     flags.AddTasksFlag(parser)
     flags.AddMaxRetriesFlag(parser)
     flags.AddTaskTimeoutFlags(parser)
-    flags.AddServiceAccountFlag(parser)
-    flags.AddSetEnvVarsFlag(parser)
+    flags.AddServiceAccountFlag(parser, managed_only=True)
+    flags.AddMutexEnvVarsFlags(parser)
     flags.AddSetCloudSQLFlag(parser)
     flags.AddVpcConnectorArg(parser)
     flags.AddEgressSettingsFlag(parser)
@@ -127,8 +127,12 @@ class Deploy(base.Command):
         include_build = True
       else:
         raise c_exceptions.RequiredArgumentException(
-            '--image', 'Requires a container image to deploy (e.g. '
-            '`us-docker.pkg.dev/cloudrun/container/job:latest`) if no build source is provided.'
+            '--image',
+            (
+                'Requires a container image to deploy (e.g.'
+                ' `us-docker.pkg.dev/cloudrun/container/job:latest`) if no'
+                ' build source is provided.'
+            ),
         )
 
     job_ref = args.CONCEPTS.job.Parse()
@@ -176,7 +180,7 @@ class Deploy(base.Command):
                            ' to').format(build_type=build_type.value)
       pretty_print.Info(
           messages_util.GetBuildEquivalentForSourceRunMessage(
-              job_ref.jobsId, pack, source))
+              job_ref.jobsId, pack, source, is_job=True))
 
     changes = flags.GetJobConfigurationChanges(args)
     changes.append(

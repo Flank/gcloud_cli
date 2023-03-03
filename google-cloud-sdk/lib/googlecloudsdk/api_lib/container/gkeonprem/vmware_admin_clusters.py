@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.container.gkeonprem import client
 from googlecloudsdk.api_lib.container.gkeonprem import update_mask
 from googlecloudsdk.command_lib.container.vmware import flags
@@ -30,24 +31,58 @@ class AdminClustersClient(client.ClientBase):
     super(AdminClustersClient, self).__init__(**kwargs)
     self._service = self._client.projects_locations_vmwareAdminClusters
 
-  def Enroll(self, args):
+  def Enroll(self,
+             args,
+             membership=None,
+             vmware_admin_cluster_id=None,
+             parent=None):
     """Enrolls an admin cluster to Anthos on VMware."""
     kwargs = {
-        'membership': self._admin_cluster_membership_name(args),
-        'vmwareAdminClusterId': self._admin_cluster_id(args),
+        'membership':
+            membership
+            if membership else self._admin_cluster_membership_name(args),
+        'vmwareAdminClusterId':
+            vmware_admin_cluster_id
+            if vmware_admin_cluster_id else self._admin_cluster_id(args),
     }
     req = self._messages.GkeonpremProjectsLocationsVmwareAdminClustersEnrollRequest(
-        parent=self._admin_cluster_parent(args),
+        parent=parent if parent else self._admin_cluster_parent(args),
         enrollVmwareAdminClusterRequest=self._messages
         .EnrollVmwareAdminClusterRequest(**kwargs),
     )
     return self._service.Enroll(req)
 
-  def Update(self, args):
+  def Unenroll(self, args):
+    """Unenrolls an Anthos on VMware admin cluster."""
+    kwargs = {
+        'name': self._admin_cluster_name(args),
+    }
+    req = (
+        self._messages
+        .GkeonpremProjectsLocationsVmwareAdminClustersUnenrollRequest(**kwargs))
+    return self._service.Unenroll(req)
+
+  def List(self, args):
+    """Lists Admin Clusters in the GKE On-Prem VMware API."""
+    list_req = (
+        self._messages.GkeonpremProjectsLocationsVmwareAdminClustersListRequest(
+            parent=self._location_name(args)))
+
+    return list_pager.YieldFromList(
+        self._service,
+        list_req,
+        field='vmwareAdminClusters',
+        batch_size=flags.Get(args, 'page_size'),
+        limit=flags.Get(args, 'limit'),
+        batch_size_attribute='pageSize',
+    )
+
+  def Update(self, args, cluster_ref=None):
     """Updates an admin cluster to Anthos on VMware."""
     kwargs = {
         'name':
-            self._admin_cluster_name(args),
+            cluster_ref.RelativeName()
+            if cluster_ref else self._admin_cluster_name(args),
         'updateMask':
             update_mask.get_update_mask(
                 args, update_mask.VMWARE_ADMIN_CLUSTER_ARGS_TO_UPDATE_MASKS),
@@ -69,8 +104,12 @@ class AdminClustersClient(client.ClientBase):
 
   def _platform_config(self, args):
     """Constructs proto message field platform_config."""
+    required_platform_version = flags.Get(args, 'required_platform_version')
+    if required_platform_version is None:
+      required_platform_version = flags.Get(args, 'version')
+
     kwargs = {
-        'requiredPlatformVersion': flags.Get(args, 'required_platform_version'),
+        'requiredPlatformVersion': required_platform_version,
     }
     if any(kwargs.values()):
       return self._messages.VmwarePlatformConfig(**kwargs)

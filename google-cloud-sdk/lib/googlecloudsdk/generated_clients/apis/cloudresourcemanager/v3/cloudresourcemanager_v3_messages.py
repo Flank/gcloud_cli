@@ -109,7 +109,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -126,9 +128,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -205,8 +205,10 @@ class CloudresourcemanagerFoldersListRequest(_messages.Message):
       unspecified, server picks an appropriate default.
     pageToken: Optional. A pagination token returned from a previous call to
       `ListFolders` that indicates where this listing should continue from.
-    parent: Required. The resource name of the organization or folder whose
-      folders are being listed. Must be of the form `folders/{folder_id}` or
+    parent: Required. The name of the parent resource whose folders are being
+      listed. Only children of this parent resource are listed; descendants
+      are not listed. If the parent is a folder, use the value
+      `folders/{folder_id}`. If the parent is an organization, use the value
       `organizations/{org_id}`. Access to this method is controlled by
       checking the `resourcemanager.folders.list` permission on the `parent`.
     showDeleted: Optional. Controls whether folders in the DELETE_REQUESTED
@@ -582,9 +584,11 @@ class CloudresourcemanagerProjectsListRequest(_messages.Message):
       unspecified, server picks an appropriate default.
     pageToken: Optional. A pagination token returned from a previous call to
       ListProjects that indicates from where listing should continue.
-    parent: Required. The name of the parent resource to list projects under.
-      For example, setting this field to 'folders/1234' would list all
-      projects directly under that folder.
+    parent: Required. The name of the parent resource whose projects are being
+      listed. Only children of this parent resource are listed; descendants
+      are not listed. If the parent is a folder, use the value
+      `folders/{folder_id}`. If the parent is an organization, use the value
+      `organizations/{org_id}`.
     showDeleted: Optional. Indicate that projects in the `DELETE_REQUESTED`
       state should also be returned. Normally only `ACTIVE` projects are
       returned.
@@ -950,8 +954,7 @@ class CloudresourcemanagerTagValuesListRequest(_messages.Message):
       unspecified, the server will use 100 as the default.
     pageToken: Optional. A pagination token returned from a previous call to
       `ListTagValues` that indicates where this listing should continue from.
-    parent: Required. Resource name for TagKey, parent of the TagValues to be
-      listed, in the format `tagKeys/123`.
+    parent: Required.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -1164,6 +1167,8 @@ class EffectiveTag(_messages.Message):
       formats will be supported when we add non-org parented tags.
     tagKey: The name of the TagKey, in the format `tagKeys/{id}`, such as
       `tagKeys/123`.
+    tagKeyParentName: The parent name of the tag key. Must be in the format
+      `organizations/{organization_id}`.
     tagValue: Resource name for TagValue in the format `tagValues/456`.
   """
 
@@ -1171,7 +1176,8 @@ class EffectiveTag(_messages.Message):
   namespacedTagKey = _messages.StringField(2)
   namespacedTagValue = _messages.StringField(3)
   tagKey = _messages.StringField(4)
-  tagValue = _messages.StringField(5)
+  tagKeyParentName = _messages.StringField(5)
+  tagValue = _messages.StringField(6)
 
 
 class Empty(_messages.Message):
@@ -1851,7 +1857,7 @@ class Project(_messages.Message):
       must be between 1 and 63 characters long and must conform to the
       following regular expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?. Label
       values must be between 0 and 63 characters long and must conform to the
-      regular expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 256
+      regular expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 64
       labels can be associated with a given resource. Clients should store
       labels in a representation such as JSON that does not depend on specific
       characters being disallowed. Example: `"myBusinessDimension" :
@@ -1872,7 +1878,7 @@ class Project(_messages.Message):
       be between 1 and 63 characters long and must conform to the following
       regular expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?. Label values must
       be between 0 and 63 characters long and must conform to the regular
-      expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 256 labels
+      expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 64 labels
       can be associated with a given resource. Clients should store labels in
       a representation such as JSON that does not depend on specific
       characters being disallowed. Example: `"myBusinessDimension" :
@@ -1911,7 +1917,7 @@ class Project(_messages.Message):
     between 1 and 63 characters long and must conform to the following regular
     expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?. Label values must be between
     0 and 63 characters long and must conform to the regular expression
-    (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 256 labels can be
+    (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. No more than 64 labels can be
     associated with a given resource. Clients should store labels in a
     representation such as JSON that does not depend on specific characters
     being disallowed. Example: `"myBusinessDimension" : "businessValue"`
@@ -2152,9 +2158,8 @@ class Status(_messages.Message):
 
 class TagBinding(_messages.Message):
   r"""A TagBinding represents a connection between a TagValue and a cloud
-  resource (currently project, folder, or organization). Once a TagBinding is
-  created, the TagValue is applied to all the descendants of the cloud
-  resource.
+  resource Once a TagBinding is created, the TagValue is applied to all the
+  descendants of the Google Cloud resource.
 
   Fields:
     name: Output only. The name of the TagBinding. This is a String of the
@@ -2261,9 +2266,13 @@ class TagKey(_messages.Message):
       PURPOSE_UNSPECIFIED: Unspecified purpose.
       GCE_FIREWALL: Purpose for Compute Engine firewalls. A corresponding
         purpose_data should be set for the network the tag is intended for.
-        The key should be 'network' and the value should be in the format of
-        the network url id string: https://compute.googleapis.com/v1/projects/
-        {project_number}/global/networks/{network_id}
+        The key should be 'network' and the value should be in either of these
+        two formats: -https://www.googleapis.com/compute/{compute_version}/pro
+        jects/{project_id}/global/networks/{network_id}
+        -{project_id}/{network_name} Examples:
+        -https://www.googleapis.com/compute/staging_v1/projects/fail-closed-
+        load-testing/global/networks/6992953698831725600 -fail-closed-load-
+        testing/load-testing-network
     """
     PURPOSE_UNSPECIFIED = 0
     GCE_FIREWALL = 1

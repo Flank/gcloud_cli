@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google LLC. All Rights Reserved.
+# Copyright 2023 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,11 +32,13 @@ from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.configurations import properties_file as prop_files_lib
 from googlecloudsdk.core.docker import constants as const_lib
 from googlecloudsdk.core.feature_flags import config as feature_flags_config
+from googlecloudsdk.core.resource import resource_printer_types as formats
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import http_proxy_types
 from googlecloudsdk.core.util import scaled_integer
 from googlecloudsdk.core.util import times
+from googlecloudsdk.generated_clients.apis import apis_map
 import six
 
 # Try to parse the command line flags at import time to see if someone provided
@@ -249,6 +251,24 @@ or it can be set temporarily by the environment variable [{env_var}]""".format(
     self.property = prop
 
 
+class UnknownFormatError(exceptions.Error):
+  """Unknown format name exception."""
+
+  def __init__(self, printer_name, supported_formats):
+    """Constructs a new exception.
+
+    Args:
+      printer_name: str, The unknown printer format.
+      supported_formats: [str], Supported printer formats.
+    """
+    super(UnknownFormatError, self).__init__("""\
+Format must be one of {0}; received [{1}].
+
+For information on output formats:
+  $ gcloud topic formats
+""".format(', '.join(supported_formats), printer_name))
+
+
 class PropertyValue(object):
   """Represents a value and source for a property.
 
@@ -373,6 +393,7 @@ class _Sections(object):
       SDK.
     lifesciences: Section, The section containing lifesciencs properties for the
       Cloud SDK.
+    looker: Section, The section containing looker properties for the Cloud SDK.
     media_asset: Section, the section containing mediaasset protperties for the
       Cloud SDK.
     memcache: Section, The section containing memcache properties for the Cloud
@@ -383,6 +404,7 @@ class _Sections(object):
       SDK.
     ml_engine: Section, The section containing ml_engine properties for the
       Cloud SDK.
+    netapp: Section, The section containing netapp properties for the Cloud SDK.
     notebooks: Section, The section containing notebook properties for the Cloud
       SDK.
     privateca: Section, The section containing privateca properties for the
@@ -392,6 +414,8 @@ class _Sections(object):
     recaptcha: Section, The section containing recaptcha properties for the
       Cloud SDK.
     redis: Section, The section containing redis properties for the Cloud SDK.
+    resource_policy: Section, The section containing resource policy
+      configurations for the Cloud SDK.
     run: Section, The section containing run properties for the Cloud SDK.
     runapps: Section, The section containing runapps properties for the Cloud
       SDK.
@@ -410,6 +434,8 @@ class _Sections(object):
     transcoder: Section, The section containing transcoder properties for the
       Cloud SDK.
     vmware: Section, The section containing vmware properties for the Cloud SDK.
+    web3: Section, the section containing web3 properties for the
+      Cloud SDK.
     workflows: Section, The section containing workflows properties for the
       Cloud SDK.
   """
@@ -472,17 +498,20 @@ class _Sections(object):
     self.interactive = _SectionInteractive()
     self.kuberun = _SectionKubeRun()
     self.lifesciences = _SectionLifeSciences()
+    self.looker = _SectionLooker()
     self.media_asset = _SectionMediaAsset()
     self.memcache = _SectionMemcache()
     self.metastore = _SectionMetastore()
     self.metrics = _SectionMetrics()
     self.ml_engine = _SectionMlEngine()
+    self.netapp = _SectionNetapp()
     self.notebooks = _SectionNotebooks()
     self.privateca = _SectionPrivateCa()
     self.proxy = _SectionProxy()
     self.pubsub = _SectionPubsub()
     self.recaptcha = _SectionRecaptcha()
     self.redis = _SectionRedis()
+    self.resource_policy = _SectionResourcePolicy()
     self.run = _SectionRun()
     self.runapps = _SectionRunApps()
     self.secrets = _SectionSecrets()
@@ -494,6 +523,7 @@ class _Sections(object):
     self.transport = _SectionTransport()
     self.transcoder = _SectionTranscoder()
     self.vmware = _SectionVmware()
+    self.web3 = _SectionWeb3()
     self.workflows = _SectionWorkflows()
 
     sections = [
@@ -546,17 +576,20 @@ class _Sections(object):
         self.interactive,
         self.kuberun,
         self.lifesciences,
+        self.looker,
         self.media_asset,
         self.memcache,
         self.metastore,
         self.metrics,
         self.ml_engine,
+        self.netapp,
         self.notebooks,
         self.pubsub,
         self.privateca,
         self.proxy,
         self.recaptcha,
         self.redis,
+        self.resource_policy,
         self.run,
         self.runapps,
         self.secrets,
@@ -567,6 +600,7 @@ class _Sections(object):
         self.transport,
         self.transcoder,
         self.vmware,
+        self.web3,
         self.workflows,
     ]
     self.__sections = {section.name: section for section in sections}
@@ -1099,6 +1133,7 @@ class _SectionApiEndpointOverrides(_Section):
         'assuredworkloads', command='gcloud assured')
     self.baremetalsolution = self._Add(
         'baremetalsolution', command='gcloud bms')
+    self.batch = self._Add('batch', command='gcloud batch', hidden=True)
     self.bigtableadmin = self._Add('bigtableadmin', command='gcloud bigtable')
     self.binaryauthorization = self._Add(
         'binaryauthorization', command='gcloud container binauthz', hidden=True)
@@ -1187,6 +1222,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.language = self._Add('language', command='gcloud ml language')
     self.lifesciences = self._Add('lifesciences', command='gcloud lifesciences')
     self.logging = self._Add('logging', command='gcloud logging')
+    self.looker = self._Add('looker', command='gcloud looker')
     self.managedidentities = self._Add(
         'managedidentities', command='gcloud active-directory')
     self.manager = self._Add('manager', hidden=True)
@@ -1195,6 +1231,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.metastore = self._Add('metastore', command='gcloud metastore')
     self.ml = self._Add('ml', hidden=True)
     self.monitoring = self._Add('monitoring', command='gcloud monitoring')
+    self.netapp = self._Add('netapp', command='gcloud netapp')
     self.networkconnectivity = self._Add(
         'networkconnectivity', command='gcloud network-connectivity')
     self.networkmanagement = self._Add(
@@ -1252,6 +1289,7 @@ class _SectionApiEndpointOverrides(_Section):
         command='gcloud storage insights',
         hidden=True)
     self.stream = self._Add('stream', hidden=True)
+    self.telcoautomation = self._Add('telcoautomation', hidden=True)
     self.testing = self._Add('testing', command='gcloud firebase test')
     self.toolresults = self._Add('toolresults', hidden=True)
     self.tpu = self._Add('tpu', hidden=True)
@@ -1266,6 +1304,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.securedlandingzone = self._Add(
         'securedlandingzone', hidden=True, command='gcloud scc slz-overwatch')
     self.securesourcemanager = self._Add('securesourcemanager', hidden=True)
+    self.workloadcertificate = self._Add('workloadcertificate', hidden=True)
 
   def EndpointValidator(self, value):
     """Checks to see if the endpoint override string is valid."""
@@ -1279,13 +1318,27 @@ class _SectionApiEndpointOverrides(_Section):
 
   def _Add(self, name, help_text=None, hidden=False, command=None):
     if not help_text and command:
-      help_text = 'Overrides API endpoint for `{}` command group.'.format(
-          command)
+      help_text = (
+          'Overrides API endpoint for `{}` command group.').format(command)
+
+    default_endpoint = self.GetDefaultEndpoint(name)
+    if command and default_endpoint:
+      help_text = ('{} Defaults to {}').format(help_text, default_endpoint)
+
     return super(_SectionApiEndpointOverrides, self)._Add(
         name,
         help_text=help_text,
         hidden=hidden,
         validator=self.EndpointValidator)
+
+  def GetDefaultEndpoint(self, api_name):
+    """Returns the BASE_URL for the repective api and version."""
+    api = apis_map.MAP.get(api_name)
+    if api:
+      for api_version in api:
+        api_def = api.get(api_version)
+        if api_def.default_version:
+          return api_def.apitools.base_url
 
 
 class _SectionApp(_Section):
@@ -1485,6 +1538,46 @@ class _SectionAuth(_Section):
         help_text='A switch to disable google-auth for a surface or a command '
         'group, in case there are some edge cases or google-auth '
         'does not work for some surface.')
+    self.token_introspection_endpoint = self._Add(
+        'token_introspection_endpoint',
+        hidden=True,
+        help_text='Overrides the endpoint used for token introspection with '
+        'Workload and Workforce Identity Federation. It can be used with '
+        'Private Service Connect.'
+    )
+    self.login_config_file = self._Add(
+        'login_config_file',
+        help_text='Sets the created login configuration file in '
+        'auth/login_config_file. Calling `gcloud auth login` will automatically '
+        'use this login configuration unless it is explicitly unset.')
+    self.service_account_use_self_signed_jwt = self._Add(
+        'service_account_use_self_signed_jwt',
+        default=False,
+        help_text=(
+            'If True, use self signed jwt flow to get service account'
+            ' credentials access token. This only applies to service account'
+            ' json file and not to the legacy .p12 file.'
+        ),
+        validator=functools.partial(
+            _BooleanValidator, 'service_account_use_self_signed_jwt'
+        ),
+        choices=('true', 'false'),
+        is_feature_flag=True,
+    )
+    self.service_account_disable_id_token_refresh = self._AddBool(
+        'service_account_disable_id_token_refresh',
+        default=False,
+        help_text='If True, disable ID token refresh for service account.',
+    )
+    self.reauth_use_google_auth = self._AddBool(
+        'reauth_use_google_auth',
+        hidden=True,
+        default=True,
+        help_text=(
+            'A switch to choose to use google-auth reauth or oauth2client'
+            ' reauth implementation. By default google-auth is used.'
+        ),
+    )
 
 
 class _SectionBatch(_Section):
@@ -1708,6 +1801,11 @@ class _SectionCompute(_Section):
         'iap_tunnel_use_new_websocket',
         default=False,
         help_text='Bool that indicates if we should use new websocket.',
+        hidden=True)
+    self.force_batch_request = self._AddBool(
+        'force_batch_request',
+        default=False,
+        help_text='Bool that force all requests are sent as batch request',
         hidden=True)
 
 
@@ -2019,6 +2117,46 @@ class _SectionCore(_Section):
         help_text='If True, use legacy format for flattened() and text().'
         'Please note that this option will not be supported indefinitely.')
 
+    # Only formats that accept empty projections can be used globally
+    supported_global_formats = sorted([
+        formats.CONFIG, formats.DEFAULT, formats.DISABLE, formats.FLATTENED,
+        formats.JSON, formats.LIST, formats.NONE, formats.OBJECT, formats.TEXT
+    ])
+
+    def FormatValidator(print_format):
+      if print_format and print_format not in supported_global_formats:
+        raise UnknownFormatError(print_format, supported_global_formats)
+
+    self.format = self._Add(
+        'format',
+        validator=FormatValidator,
+        help_text=textwrap.dedent("""\
+        Sets the format for printing all command resources. This overrides the
+        default command-specific human-friendly output format. Use
+        `--verbosity=debug` flag to view the command-specific format. If both
+        `core/default_format` and `core/format` are specified, `core/format`
+        takes precedence. If both `core/format` and `--format` are specified,
+        `--format` takes precedence. The supported formats are limited to:
+        `{0}`. For more details run $ gcloud topic formats. Run `$ gcloud config
+        set --help` to see more information about `core/format`""".format(
+            '`, `'.join(supported_global_formats))))
+
+    self.default_format = self._Add(
+        'default_format',
+        default='default',
+        validator=FormatValidator,
+        help_text=textwrap.dedent("""\
+        Sets the default format for printing command resources.
+        `core/default_format` overrides the default yaml format. If the command
+        contains a command-specific output format, it takes precedence over the
+        `core/default_format` value. Use `--verbosity=debug` flag to view the
+        command-specific format. Both `core/format` and `--format` also take
+        precedence over `core/default_format`. The supported formats are limited
+        to: `{0}`. For more details run $ gcloud topic formats. Run `$ gcloud
+        config set --help` to see more information about
+        `core/default_format`""".format(
+            '`, `'.join(supported_global_formats))))
+
     def ShowStructuredLogsValidator(show_structured_logs):
       if show_structured_logs is None:
         return
@@ -2067,6 +2205,13 @@ class _SectionCore(_Section):
         default=False,
         help_text='If True, `gcloud` will not store logs to a file. This may '
         'be useful if disk space is limited.')
+
+    self.parse_error_details = self._Add(
+        'parse_error_details',
+        help_text='If True, `gcloud` will attempt to parse and interpret '
+        'error details in API originating errors. If False, `gcloud` will '
+        ' write flush error details as is to stderr/log.',
+        default=False)
 
     self.custom_ca_certs_file = self._Add(
         'custom_ca_certs_file',
@@ -2651,6 +2796,18 @@ class _SectionLifeSciences(_Section):
         'command will fall back to this value.')
 
 
+class _SectionLooker(_Section):
+  """Contains the properties for the 'looker' section."""
+
+  def __init__(self):
+    super(_SectionLooker, self).__init__('looker')
+    self.region = self._Add(
+        'region',
+        help_text='Default region to use when working with Cloud '
+        'Looker resources. When a `region` is required but not '
+        'provided by a flag, the command will fall back to this value, if set.')
+
+
 class _SectionMediaAsset(_Section):
   """Contains the properties for the 'media_asset' section."""
 
@@ -2744,6 +2901,25 @@ class _SectionMlEngine(_Section):
                    'Cloud ML Engine local predict/train jobs. If not '
                    'specified, the default path is the one to the Python '
                    'interpreter found on system `PATH`.'))
+
+
+class _SectionNetapp(_Section):
+  """Contains the properties for the 'netapp' section."""
+
+  def __init__(self):
+    super(_SectionNetapp, self).__init__('netapp')
+
+    self.location = self._Add(
+        'location',
+        help_text='Default location to use when working with Cloud NetApp Files'
+                  ' resources. When a `location` value is required but not '
+                  'provided, the command will fall back to this value, if set.')
+
+    self.region = self._Add(
+        'region',
+        help_text='Default region to use when working with Cloud NetApp Files '
+        'regions. When a `--region` flag is required but not '
+        'provided, the command will fall back to this value, if set.')
 
 
 class _SectionNotebooks(_Section):
@@ -2852,6 +3028,25 @@ class _SectionRedis(_Section):
         help_text='Default region to use when working with Cloud '
         'Memorystore for Redis resources. When a `region` is required but not '
         'provided by a flag, the command will fall back to this value, if set.')
+
+
+class _SectionResourcePolicy(_Section):
+  """Contains the properties for the 'resource_policy' section."""
+
+  def __init__(self):
+    super(_SectionResourcePolicy, self).__init__('resource_policy', hidden=True)
+    self.org_restriction_header = self._Add(
+        'org_restriction_header',
+        default=None,
+        help_text='Default organization restriction header to use when '
+        'working with GCP resources. If set, the value '
+        'must be in JSON format and must contain a comma separated list '
+        'of authorized GCP organization IDs. The JSON must then be encoded '
+        'by following the RFC 4648, section 5, specifications. '
+        'See https://www.rfc-editor.org/rfc/rfc4648#section-5 '
+        'for more information about base 64 encoding. And visit '
+        'https://cloud.google.com/resource-manager/docs/organization-restrictions/overview '
+        'for more information about organization restrictions.')
 
 
 class _SectionRun(_Section):
@@ -3016,6 +3211,13 @@ class _SectionStorage(_Section):
 
   def __init__(self):
     super(_SectionStorage, self).__init__('storage')
+    self.additional_headers = self._Add(
+        'additional_headers',
+        help_text='Includes arbitrary headers in storage API calls.'
+        ' Accepts a comma separated list of key=value pairs, e.g.'
+        ' `header1=value1,header2=value2`.',
+    )
+
     self.run_by_gsutil_shim = self._AddBool(
         'run_by_gsutil_shim',
         help_text=(
@@ -3181,6 +3383,12 @@ class _SectionStorage(_Section):
         ' Otherwise, boto3 selects a default endpoint based on the AWS service'
         ' used.')
 
+    self.suggest_transfer = self._AddBool(
+        'suggest_transfer',
+        default=True,
+        help_text='If True, logs messages about when Storage Transfer Service'
+        ' might be a better tool than gcloud storage.')
+
     self.tracker_files_directory = self._Add(
         'tracker_files_directory',
         default=os.path.join(files.GetHomeDir(), '.config', 'gcloud',
@@ -3223,6 +3431,12 @@ class _SectionStorage(_Section):
         ' a thread. If False, creates duplicates of resources like API clients'
         ' on the same thread. Turning off can help with some bugs but will'
         ' hurt performance.')
+
+    self.use_grpc = self._AddBool(
+        'use_grpc',
+        default=False,
+        hidden=True,
+        help_text='Use GRPC API for GCS.')
 
 
 class _SectionSurvey(_Section):
@@ -3322,6 +3536,19 @@ class _SectionVmware(_Section):
         help_text='Node type to use when creating a new cluster.')
 
 
+class _SectionWeb3(_Section):
+  """Contains the properties for the 'web3' section."""
+
+  def __init__(self):
+    super(_SectionWeb3, self).__init__('web3', hidden=True)
+    self.location = self._Add(
+        'location',
+        default='us-central1',
+        help_text='The default region to use when working with Cloud '
+        'Web3 resources. When a `--location` flag is required '
+        'but not provided, the command will fall back to this value, if set.')
+
+
 class _SectionWorkflows(_Section):
   """Contains the properties for the 'workflows' section."""
 
@@ -3339,7 +3566,8 @@ class _Property(object):
   """An individual property that can be gotten from the properties file.
 
   Attributes:
-    section: str, The name of the section the property appears in in the file.
+    section: str, The name of the section the property appears in, within the
+      file.
     name: str, The name of the property.
     help_text: str, The man page help for what this property does.
     is_hidden: bool, True to hide this property from display for users that
@@ -3462,7 +3690,7 @@ class _Property(object):
   def GetOrFail(self):
     """Shortcut for Get(required=True).
 
-    Convinient as a callback function.
+    Convenient as a callback function.
 
     Returns:
       str, The value for this property.

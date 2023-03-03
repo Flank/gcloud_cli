@@ -69,11 +69,19 @@ class UpdateHelper(object):
   EDGE_SECURITY_POLICY_ARG = None
 
   @classmethod
-  def Args(cls, parser, support_failover, support_logging,
-           support_tcp_ssl_logging, support_net_lb_ilb_logging,
-           support_client_only, support_subsetting,
-           support_subsetting_subset_size, support_unspecified_protocol,
-           support_advanced_load_balancing, support_weighted_lb):
+  def Args(
+      cls,
+      parser,
+      support_failover,
+      support_logging,
+      support_client_only,
+      support_subsetting,
+      support_subsetting_subset_size,
+      support_unspecified_protocol,
+      support_advanced_load_balancing,
+      support_weighted_lb,
+      support_regional_security_policy,
+  ):
     """Add all arguments for updating a backend service."""
 
     flags.GLOBAL_REGIONAL_BACKEND_SERVICE_ARG.AddArgument(
@@ -88,9 +96,20 @@ class UpdateHelper(object):
     cls.HTTPS_HEALTH_CHECK_ARG.AddArgument(
         parser, cust_metavar='HTTPS_HEALTH_CHECK')
     flags.AddNoHealthChecks(parser)
-    cls.SECURITY_POLICY_ARG = (
-        security_policy_flags.SecurityPolicyArgumentForTargetResource(
-            resource='backend service'))
+    if support_regional_security_policy:
+      cls.SECURITY_POLICY_ARG = (
+          security_policy_flags
+          .SecurityPolicyMultiScopeArgumentForTargetResource(
+              resource='backend service',
+              region_hidden=True,
+              scope_flags_usage=compute_flags.ScopeFlagsUsage
+              .USE_EXISTING_SCOPE_FLAGS,
+              short_help_text=(
+                  'The security policy that will be set for this {0}.')))
+    else:
+      cls.SECURITY_POLICY_ARG = (
+          security_policy_flags.SecurityPolicyArgumentForTargetResource(
+              resource='backend service'))
     cls.SECURITY_POLICY_ARG.AddArgument(parser)
     cls.EDGE_SECURITY_POLICY_ARG = (
         security_policy_flags.EdgeSecurityPolicyArgumentForTargetResource(
@@ -125,24 +144,10 @@ class UpdateHelper(object):
       flags.AddFailoverRatio(parser)
 
     if support_logging:
-      if support_net_lb_ilb_logging and support_tcp_ssl_logging:
-        flags.AddEnableLoggingProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, SSL, UDP, or UNSPECIFIED')
-        flags.AddLoggingSampleRateProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, SSL, UDP, or UNSPECIFIED')
-      elif support_net_lb_ilb_logging:
-        flags.AddEnableLoggingProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, UDP, or UNSPECIFIED')
-        flags.AddLoggingSampleRateProtocols(
-            parser, 'HTTP, HTTPS, HTTP2, TCP, UDP, or UNSPECIFIED')
-      elif support_tcp_ssl_logging:
-        flags.AddEnableLoggingProtocols(parser,
-                                        'HTTP, HTTPS, HTTP2, TCP, or SSL')
-        flags.AddLoggingSampleRateProtocols(parser,
-                                            'HTTP, HTTPS, HTTP2, TCP, or SSL')
-      else:
-        flags.AddEnableLogging(parser)
-        flags.AddLoggingSampleRate(parser)
+      flags.AddEnableLogging(parser)
+      flags.AddLoggingSampleRate(parser)
+      flags.AddLoggingOptional(parser)
+      flags.AddLoggingOptionalFields(parser)
 
     AddIapFlag(parser)
     flags.AddCustomRequestHeaders(parser, remove_all_flag=True, default=None)
@@ -162,28 +167,33 @@ class UpdateHelper(object):
     if support_weighted_lb:
       flags.AddLocalityLbPolicy(parser)
 
-  def __init__(self,
-               support_failover,
-               support_logging,
-               support_tcp_ssl_logging,
-               support_net_lb_ilb_logging,
-               support_subsetting,
-               support_subsetting_subset_size,
-               support_advanced_load_balancing=False,
-               support_weighted_lb=False):
+  def __init__(
+      self,
+      support_failover,
+      support_logging,
+      support_tcp_ssl_logging,
+      support_subsetting,
+      support_subsetting_subset_size,
+      support_advanced_load_balancing=False,
+      support_weighted_lb=False,
+      support_regional_security_policy=False,
+  ):
     self._support_failover = support_failover
     self._support_logging = support_logging
     self._support_tcp_ssl_logging = support_tcp_ssl_logging
-    self._support_net_lb_ilb_logging = support_net_lb_ilb_logging
     self._support_subsetting = support_subsetting
     self._support_subsetting_subset_size = support_subsetting_subset_size
     self._support_advanced_load_balancing = support_advanced_load_balancing
     self._support_weighted_lb = support_weighted_lb
+    self._support_regional_security_policy = support_regional_security_policy
 
   def Modify(self, client, resources, args, existing, backend_service_ref):
     """Modify Backend Service."""
     replacement = encoding.CopyProtoMessage(existing)
     cleared_fields = []
+    location = (
+        backend_service_ref.region if backend_service_ref.Collection()
+        == 'compute.regionBackendServices' else 'global')
 
     if args.connection_draining_timeout is not None:
       replacement.connectionDraining = client.messages.ConnectionDraining(
@@ -226,7 +236,7 @@ class UpdateHelper(object):
     if args.enable_cdn is not None:
       replacement.enableCDN = args.enable_cdn
     elif not replacement.enableCDN and args.cache_mode:
-      # TODO (b/209812994): Replace implicit config change with
+      # TODO(b/209812994): Replace implicit config change with
       # warning that CDN is disabled and a prompt to enable it with
       # --enable-cdn
       log.warning(
@@ -286,13 +296,11 @@ class UpdateHelper(object):
         replacement,
         support_logging=self._support_logging,
         support_tcp_ssl_logging=self._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=self._support_net_lb_ilb_logging)
+        cleared_fields=cleared_fields,
+    )
 
     if self._support_advanced_load_balancing:
       if args.service_lb_policy is not None:
-        location = (
-            backend_service_ref.region if backend_service_ref.Collection()
-            == 'compute.regionBackendServices' else 'global')
         replacement.serviceLbPolicy = reference_utils.BuildServiceLbPolicyUrl(
             project_name=backend_service_ref.project,
             location=location,
@@ -304,7 +312,7 @@ class UpdateHelper(object):
     if args.service_bindings is not None:
       replacement.serviceBindings = [
           reference_utils.BuildServiceBindingUrl(backend_service_ref.project,
-                                                 'global', binding_name)
+                                                 location, binding_name)
           for binding_name in args.service_bindings
       ]
     if args.no_service_bindings is not None:
@@ -339,20 +347,31 @@ class UpdateHelper(object):
         args.IsSpecified('session_affinity'),
         args.IsSpecified('timeout'),
         args.IsSpecified('connection_drain_on_failover')
-        if self._support_failover else False,
+        if self._support_failover
+        else False,
         args.IsSpecified('drop_traffic_if_unhealthy')
-        if self._support_failover else False,
+        if self._support_failover
+        else False,
         args.IsSpecified('failover_ratio') if self._support_failover else False,
         args.IsSpecified('enable_logging') if self._support_logging else False,
         args.IsSpecified('logging_sample_rate')
-        if self._support_logging else False,
+        if self._support_logging
+        else False,
+        args.IsSpecified('logging_optional')
+        if self._support_logging
+        else False,
+        args.IsSpecified('logging_optional_fields')
+        if self._support_logging
+        else False,
         args.IsSpecified('health_checks'),
         args.IsSpecified('https_health_checks'),
         args.IsSpecified('no_health_checks'),
         args.IsSpecified('subsetting_policy')
-        if self._support_subsetting else False,
+        if self._support_subsetting
+        else False,
         args.IsSpecified('subsetting_subset_size')
-        if self._support_subsetting_subset_size else False,
+        if self._support_subsetting_subset_size
+        else False,
         args.IsSpecified('request_coalescing'),
         args.IsSpecified('cache_mode'),
         args.IsSpecified('client_ttl'),
@@ -376,13 +395,16 @@ class UpdateHelper(object):
         args.IsSpecified('enable_strong_affinity'),
         args.IsSpecified('compression_mode'),
         args.IsSpecified('service_lb_policy')
-        if self._support_advanced_load_balancing else False,
+        if self._support_advanced_load_balancing
+        else False,
         args.IsSpecified('no_service_lb_policy')
-        if self._support_advanced_load_balancing else False,
+        if self._support_advanced_load_balancing
+        else False,
         args.IsSpecified('service_bindings'),
         args.IsSpecified('no_service_bindings'),
         args.IsSpecified('locality_lb_policy')
-        if self._support_weighted_lb else False
+        if self._support_weighted_lb
+        else False,
     ]):
       raise compute_exceptions.UpdatePropertyError(
           'At least one property must be modified.')
@@ -422,7 +444,8 @@ class UpdateHelper(object):
     backend_service = backend_service_client.BackendService(
         backend_service_ref, compute_client=client)
     return backend_service.MakeSetSecurityPolicyRequestTuple(
-        security_policy=security_policy_ref)
+        security_policy=security_policy_ref,
+        support_regional_security_policy=self._support_regional_security_policy)
 
   def _GetSetEdgeSecurityPolicyRequest(self, client, backend_service_ref,
                                        security_policy_ref):
@@ -543,7 +566,6 @@ class UpdateGA(base.UpdateCommand):
 
   _support_logging = True
   _support_tcp_ssl_logging = False
-  _support_net_lb_ilb_logging = False
   _support_failover = True
   _support_client_only = True
   _support_unspecified_protocol = True
@@ -551,6 +573,7 @@ class UpdateGA(base.UpdateCommand):
   _support_subsetting_subset_size = False
   _support_advanced_load_balancing = False
   _support_weighted_lb = False
+  _support_regional_security_policy = False
 
   @classmethod
   def Args(cls, parser):
@@ -558,25 +581,28 @@ class UpdateGA(base.UpdateCommand):
         parser,
         support_failover=cls._support_failover,
         support_logging=cls._support_logging,
-        support_tcp_ssl_logging=cls._support_tcp_ssl_logging,
-        support_net_lb_ilb_logging=cls._support_net_lb_ilb_logging,
         support_client_only=cls._support_client_only,
         support_subsetting=cls._support_subsetting,
         support_subsetting_subset_size=cls._support_subsetting_subset_size,
         support_unspecified_protocol=cls._support_unspecified_protocol,
         support_advanced_load_balancing=cls._support_advanced_load_balancing,
-        support_weighted_lb=cls._support_weighted_lb)
+        support_weighted_lb=cls._support_weighted_lb,
+        support_regional_security_policy=cls._support_regional_security_policy,
+    )
 
   def Run(self, args):
     """Issues requests necessary to update the Backend Services."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return UpdateHelper(self._support_failover, self._support_logging,
-                        self._support_tcp_ssl_logging,
-                        self._support_net_lb_ilb_logging,
-                        self._support_subsetting,
-                        self._support_subsetting_subset_size,
-                        self._support_advanced_load_balancing,
-                        self._support_weighted_lb).Run(args, holder)
+    return UpdateHelper(
+        self._support_failover,
+        self._support_logging,
+        self._support_tcp_ssl_logging,
+        self._support_subsetting,
+        self._support_subsetting_subset_size,
+        self._support_advanced_load_balancing,
+        self._support_weighted_lb,
+        self._support_regional_security_policy,
+    ).Run(args, holder)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -593,7 +619,7 @@ class UpdateBeta(UpdateGA):
   _support_advanced_load_balancing = False
   _support_weighted_lb = True
   _support_tcp_ssl_logging = True
-  _support_net_lb_ilb_logging = True
+  _support_regional_security_policy = False
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -610,4 +636,4 @@ class UpdateAlpha(UpdateBeta):
   _support_advanced_load_balancing = True
   _support_weighted_lb = True
   _support_tcp_ssl_logging = True
-  _support_net_lb_ilb_logging = True
+  _support_regional_security_policy = True

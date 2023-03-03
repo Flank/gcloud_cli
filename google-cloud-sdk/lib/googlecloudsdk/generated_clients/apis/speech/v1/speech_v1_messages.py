@@ -14,6 +14,17 @@ from apitools.base.py import extra_types
 package = 'speech'
 
 
+class ABNFGrammar(_messages.Message):
+  r"""A ABNFGrammar object.
+
+  Fields:
+    abnfStrings: All declarations and rules of an ABNF grammar broken up into
+      multiple strings that will end up concatenated.
+  """
+
+  abnfStrings = _messages.StringField(1, repeated=True)
+
+
 class ClassItem(_messages.Message):
   r"""An item of the class.
 
@@ -174,6 +185,8 @@ class LongRunningRecognizeResponse(_messages.Message):
       specific only to the given request.
     results: Sequential list of transcription results corresponding to
       sequential portions of audio.
+    speechAdaptationInfo: Provides information on speech adaptation behavior
+      in response
     totalBilledTime: When available, billed audio seconds for the
       corresponding request.
   """
@@ -182,7 +195,8 @@ class LongRunningRecognizeResponse(_messages.Message):
   outputError = _messages.MessageField('Status', 2)
   requestId = _messages.IntegerField(3)
   results = _messages.MessageField('SpeechRecognitionResult', 4, repeated=True)
-  totalBilledTime = _messages.StringField(5)
+  speechAdaptationInfo = _messages.MessageField('SpeechAdaptationInfo', 5)
+  totalBilledTime = _messages.StringField(6)
 
 
 class Operation(_messages.Message):
@@ -314,8 +328,8 @@ class Phrase(_messages.Message):
   Speech-to-Text supports three locations: `global`, `us` (US North America),
   and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint,
   use the `global` location. To specify a region, use a [regional
-  endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu`
-  location value.
+  endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with
+  matching `us` or `eu` location value.
 
   Fields:
     boost: Hint Boost. Overrides the boost set at the phrase set level.
@@ -325,8 +339,8 @@ class Phrase(_messages.Message):
       boost will simply be ignored. Though `boost` can accept a wide range of
       positive values, most use cases are best served with values between 0
       and 20. We recommend using a binary search approach to finding the
-      optimal value for your use case. Speech recognition will skip PhraseSets
-      with a boost value of 0.
+      optimal value for your use case as well as adding phrases both with and
+      without boost to your requests.
     value: The phrase itself.
   """
 
@@ -347,8 +361,8 @@ class PhraseSet(_messages.Message):
       ignored. Though `boost` can accept a wide range of positive values, most
       use cases are best served with values between 0 (exclusive) and 20. We
       recommend using a binary search approach to finding the optimal value
-      for your use case. Speech recognition will skip PhraseSets with a boost
-      value of 0.
+      for your use case as well as adding phrases both with and without boost
+      to your requests.
     name: The resource name of the phrase set.
     phrases: A list of word and phrases.
   """
@@ -409,12 +423,12 @@ class RecognitionConfig(_messages.Message):
       supported for Voice Command and Voice Search use cases and performance
       may vary for other use cases (e.g., phone call transcription).
     audioChannelCount: The number of channels in the input audio data. ONLY
-      set this for MULTI-CHANNEL recognition. Valid values for LINEAR16 and
-      FLAC are `1`-`8`. Valid values for OGG_OPUS are '1'-'254'. Valid value
-      for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only `1`. If `0` or
-      omitted, defaults to one channel (mono). Note: We only recognize the
-      first channel by default. To perform independent recognition on each
-      channel set `enable_separate_recognition_per_channel` to 'true'.
+      set this for MULTI-CHANNEL recognition. Valid values for LINEAR16,
+      OGG_OPUS and FLAC are `1`-`8`. Valid value for MULAW, AMR, AMR_WB and
+      SPEEX_WITH_HEADER_BYTE is only `1`. If `0` or omitted, defaults to one
+      channel (mono). Note: We only recognize the first channel by default. To
+      perform independent recognition on each channel set
+      `enable_separate_recognition_per_channel` to 'true'.
     diarizationConfig: Config to enable speaker diarization and set additional
       parameters to make diarization better suited for your application. Note:
       When this is enabled, we send all the words from the beginning of the
@@ -727,13 +741,16 @@ class RecognizeResponse(_messages.Message):
       specific only to the given request.
     results: Sequential list of transcription results corresponding to
       sequential portions of audio.
+    speechAdaptationInfo: Provides information on adaptation behavior in
+      response
     totalBilledTime: When available, billed audio seconds for the
       corresponding request.
   """
 
   requestId = _messages.IntegerField(1)
   results = _messages.MessageField('SpeechRecognitionResult', 2, repeated=True)
-  totalBilledTime = _messages.StringField(3)
+  speechAdaptationInfo = _messages.MessageField('SpeechAdaptationInfo', 3)
+  totalBilledTime = _messages.StringField(4)
 
 
 class SpeakerDiarizationConfig(_messages.Message):
@@ -742,7 +759,7 @@ class SpeakerDiarizationConfig(_messages.Message):
   Fields:
     enableSpeakerDiarization: If 'true', enables speaker detection for each
       recognized word in the top alternative of the recognition result using a
-      speaker_tag provided in the WordInfo.
+      speaker_label provided in the WordInfo.
     maxSpeakerCount: Maximum number of speakers in the conversation. This
       range gives you more flexibility by allowing the system to automatically
       determine the correct number of speakers. If not set, the default value
@@ -764,6 +781,9 @@ class SpeechAdaptation(_messages.Message):
   r"""Speech adaptation configuration.
 
   Fields:
+    abnfGrammar: Augmented Backus-Naur form (ABNF) is a standardized grammar
+      notation comprised by a set of derivation rules. See specifications:
+      https://www.w3.org/TR/speech-grammar
     customClasses: A collection of custom classes. To specify the classes
       inline, leave the class' `name` blank and fill in the rest of its
       fields, giving it a unique `custom_class_id`. Refer to the inline
@@ -774,9 +794,25 @@ class SpeechAdaptation(_messages.Message):
       Any phrase set can use any custom class.
   """
 
-  customClasses = _messages.MessageField('CustomClass', 1, repeated=True)
-  phraseSetReferences = _messages.StringField(2, repeated=True)
-  phraseSets = _messages.MessageField('PhraseSet', 3, repeated=True)
+  abnfGrammar = _messages.MessageField('ABNFGrammar', 1)
+  customClasses = _messages.MessageField('CustomClass', 2, repeated=True)
+  phraseSetReferences = _messages.StringField(3, repeated=True)
+  phraseSets = _messages.MessageField('PhraseSet', 4, repeated=True)
+
+
+class SpeechAdaptationInfo(_messages.Message):
+  r"""Information on speech adaptation use in results
+
+  Fields:
+    adaptationTimeout: Whether there was a timeout when applying speech
+      adaptation. If true, adaptation had no effect in the response
+      transcript.
+    timeoutMessage: If set, returns a message specifying which part of the
+      speech adaptation request timed out.
+  """
+
+  adaptationTimeout = _messages.BooleanField(1)
+  timeoutMessage = _messages.StringField(2)
 
 
 class SpeechContext(_messages.Message):
@@ -1200,11 +1236,19 @@ class WordInfo(_messages.Message):
       corresponding to the end of the spoken word. This field is only set if
       `enable_word_time_offsets=true` and only in the top hypothesis. This is
       an experimental feature and the accuracy of the time offset can vary.
+    speakerLabel: Output only. A label value assigned for every unique speaker
+      within the audio. This field specifies which speaker was detected to
+      have spoken this word. For some models, like medical_conversation this
+      can be actual speaker role, for example "patient" or "provider", but
+      generally this would be a number identifying a speaker. This field is
+      only set if enable_speaker_diarization = 'true' and only for the top
+      alternative.
     speakerTag: Output only. A distinct integer value is assigned for every
       speaker within the audio. This field specifies which one of those
       speakers was detected to have spoken this word. Value ranges from '1' to
       diarization_speaker_count. speaker_tag is set if
-      enable_speaker_diarization = 'true' and only in the top alternative.
+      enable_speaker_diarization = 'true' and only for the top alternative.
+      Note: Use speaker_label instead.
     startTime: Time offset relative to the beginning of the audio, and
       corresponding to the start of the spoken word. This field is only set if
       `enable_word_time_offsets=true` and only in the top hypothesis. This is
@@ -1214,9 +1258,10 @@ class WordInfo(_messages.Message):
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
   endTime = _messages.StringField(2)
-  speakerTag = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(4)
-  word = _messages.StringField(5)
+  speakerLabel = _messages.StringField(3)
+  speakerTag = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  startTime = _messages.StringField(5)
+  word = _messages.StringField(6)
 
 
 encoding.AddCustomJsonFieldMapping(

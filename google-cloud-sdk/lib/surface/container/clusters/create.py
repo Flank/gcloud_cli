@@ -162,17 +162,6 @@ def MaybeLogCloudNatHelpText(args, is_autopilot, location, project_id):
         cloudNatTemplate.substitute(REGION=location, PROJECT_ID=project_id))
 
 
-def MaybeLogDataplaneV2ScaleWarning(args):
-  # TODO(b/177430844): Remove once scale limits are gone
-  if getattr(args, 'enable_dataplane_v2', False):
-    log.status.Print(
-        'Note: GKE Dataplane V2 has been certified to run up to 500 nodes per '
-        'cluster, including node autoscaling and surge upgrades. You '
-        'may request a cluster size of up to 1000 nodes by filing a '
-        'support ticket with GCP. For more information, please see '
-        'https://cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2')
-
-
 def ParseCreateOptionsBase(args, is_autopilot, get_default, location,
                            project_id):
   """Parses the flags provided with the cluster creation command."""
@@ -249,12 +238,14 @@ def ParseCreateOptionsBase(args, is_autopilot, get_default, location,
       enable_private_endpoint=get_default('enable_private_endpoint'),
       enable_gke_oidc=getattr(args, 'enable_gke_oidc', None),
       enable_identity_service=getattr(args, 'enable_identity_service', None),
+      ephemeral_storage_local_ssd=get_default('ephemeral_storage_local_ssd'),
       image_type=get_default('image_type'),
       image=get_default('image'),
       image_project=get_default('image_project'),
       image_family=get_default('image_family'),
       issue_client_certificate=get_default('issue_client_certificate'),
       labels=get_default('labels'),
+      local_nvme_ssd_block=get_default('local_nvme_ssd_block'),
       local_ssd_count=get_default('local_ssd_count'),
       maintenance_window=get_default('maintenance_window'),
       maintenance_window_start=get_default('maintenance_window_start'),
@@ -349,7 +340,9 @@ def ParseCreateOptionsBase(args, is_autopilot, get_default, location,
       gateway_api=get_default('gateway_api'),
       logging_variant=get_default('logging_variant'),
       enable_cost_allocation=get_default('enable_cost_allocation'),
-      enable_multi_networking=get_default('enable_multi_networking'))
+      enable_multi_networking=get_default('enable_multi_networking'),
+      placement_type=get_default('placement_type'),
+      enable_security_posture=get_default('enable_security_posture'))
 
 
 GA = 'ga'
@@ -435,7 +428,8 @@ flags_to_add = {
             _Args,
         'basicauth':
             flags.AddBasicAuthFlags,
-        'binauthz': (lambda p: flags.AddBinauthzFlags(p, api_version='v1')),
+        'binauthz': (lambda p: flags.AddBinauthzFlags(
+            p, release_track=base.ReleaseTrack.GA)),
         'bootdiskkms':
             flags.AddBootDiskKmsKeyFlag,
         'cloudlogging':
@@ -492,14 +486,16 @@ flags_to_add = {
             flags.AddLabelsFlag,
         'legacyauth':
             flags.AddEnableLegacyAuthorizationFlag,
-        'localssd':
-            flags.AddLocalSSDFlag,
+        'localssds':
+            flags.AddLocalSSDsGAFlags,
         'logging':
             flags.AddLoggingFlag,
         'machinetype':
             flags.AddMachineTypeFlag,
         'maintenancewindow':
             flags.AddMaintenanceWindowGroup,
+        'managedprometheus':
+            (lambda p: flags.AddManagedPrometheusFlags(p, for_create=True)),
         'masterauth':
             flags.AddMasterAuthorizedNetworksFlags,
         'masterglobalaccess':
@@ -534,6 +530,8 @@ flags_to_add = {
             flags.AddNotificationConfigFlag,
         'num_nodes':
             flags.AddNumNodes,
+        'placementtype':
+            flags.AddPlacementTypeFlag,
         'preemptible':
             flags.AddPreemptibleFlag,
         'privatecluster':
@@ -557,9 +555,9 @@ flags_to_add = {
         'stackdriver':
             flags.AddEnableStackdriverKubernetesFlag,
         'stacktype':
-            lambda p: flags.AddStackTypeFlag(p, hidden=True),
+            flags.AddStackTypeFlag,
         'ipv6accesstype':
-            lambda p: flags.AddIpv6AccessTypeFlag(p, hidden=True),
+            flags.AddIpv6AccessTypeFlag,
         'tags':
             flags.AddTagsCreate,
         'threads_per_core':
@@ -587,6 +585,8 @@ flags_to_add = {
             flags.AddLoggingVariantFlag,
         'enableMultiNetworking':
             flags.AddEnableMultiNetworkingFlag,
+        'enableSecurityPosture':
+            flags.AddSecurityPostureFlag,
     },
     BETA: {
         'accelerator': (lambda p: AddAcceleratorFlag(p, True, True, True)),
@@ -610,8 +610,8 @@ flags_to_add = {
             AddEnableAutoUpgradeWithDefault,
         'basicauth':
             flags.AddBasicAuthFlags,
-        'binauthz':
-            (lambda p: flags.AddBinauthzFlags(p, api_version='v1beta1')),
+        'binauthz': (lambda p: flags.AddBinauthzFlags(
+            p, release_track=base.ReleaseTrack.BETA)),
         'bootdiskkms':
             flags.AddBootDiskKmsKeyFlag,
         'cloudlogging':
@@ -798,6 +798,8 @@ flags_to_add = {
             flags.AddLoggingVariantFlag,
         'enableMultiNetworking':
             flags.AddEnableMultiNetworkingFlag,
+        'enableSecurityPosture':
+            flags.AddSecurityPostureFlag,
     },
     ALPHA: {
         'accelerator': (lambda p: AddAcceleratorFlag(p, True, True, True)),
@@ -825,8 +827,8 @@ flags_to_add = {
             flags.AddClusterVersionFlag,
         'autoupgrade':
             AddEnableAutoUpgradeWithDefault,
-        'binauthz':
-            (lambda p: flags.AddBinauthzFlags(p, api_version='v1alpha1')),
+        'binauthz': (lambda p: flags.AddBinauthzFlags(
+            p, release_track=base.ReleaseTrack.ALPHA)),
         'bootdiskkms':
             flags.AddBootDiskKmsKeyFlag,
         'cloudmonitoring':
@@ -1018,6 +1020,8 @@ flags_to_add = {
             flags.AddLoggingVariantFlag,
         'enableMultiNetworking':
             flags.AddEnableMultiNetworkingFlag,
+        'enableSecurityPosture':
+            flags.AddSecurityPostureFlag,
     },
 }
 
@@ -1136,14 +1140,11 @@ class Create(base.CreateCommand):
           'https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies'
       )
 
-    # TODO(b/201956384) Remove check that requires specifying scope, once
-    # cluster scope is also GA. This check is added to prevent enabling cluster
-    # scope(the default scope) by not specifying a scope value.
+    # TODO(b/201956384): Remove when cluster scope flag is released to GA.
     ga_track = (self.ReleaseTrack() == base.ReleaseTrack.GA)
     if ga_track and options.cluster_dns and options.cluster_dns.lower(
-    ) == 'clouddns' and not options.cluster_dns_scope:
-      raise util.Error(
-          'DNS Scope should be specified when using CloudDNS in GA.')
+    ) == 'clouddns' and options.cluster_dns_scope == 'cluster':
+      options.cluster_dns_scope = None
 
     if options.enable_kubernetes_alpha:
       console_io.PromptContinue(
@@ -1204,7 +1205,6 @@ class CreateBeta(Create):
     get_default = lambda key: AttrValue(args, key, self.default_flag_values)
     ops = ParseCreateOptionsBase(args, self.autopilot, get_default, location,
                                  project_id)
-    MaybeLogDataplaneV2ScaleWarning(args)
     flags.WarnForNodeVersionAutoUpgrade(args)
     flags.ValidateSurgeUpgradeSettings(args)
     ops.boot_disk_kms_key = get_default('boot_disk_kms_key')
@@ -1253,7 +1253,6 @@ class CreateBeta(Create):
     ops.enable_service_externalips = get_default('enable_service_externalips')
     ops.enable_managed_prometheus = get_default('enable_managed_prometheus')
     ops.spot = get_default('spot')
-    ops.placement_type = get_default('placement_type')
     ops.maintenance_interval = get_default('maintenance_interval')
     ops.disable_pod_cidr_overprovision = get_default(
         'disable_pod_cidr_overprovision')
@@ -1268,7 +1267,9 @@ class CreateBeta(Create):
     ops.enable_cost_allocation = get_default('enable_cost_allocation')
     ops.managed_config = get_default('managed_config')
     ops.fleet_project = get_default('fleet_project')
+    ops.enable_fleet = get_default('enable_fleet')
     ops.enable_multi_networking = get_default('enable_multi_networking')
+    ops.enable_security_posture = get_default('enable_security_posture')
     return ops
 
 
@@ -1345,7 +1346,6 @@ class CreateAlpha(Create):
     ops.enable_service_externalips = get_default('enable_service_externalips')
     ops.enable_managed_prometheus = get_default('enable_managed_prometheus')
     ops.spot = get_default('spot')
-    ops.placement_type = get_default('placement_type')
     ops.maintenance_interval = get_default('maintenance_interval')
     ops.disable_pod_cidr_overprovision = get_default(
         'disable_pod_cidr_overprovision')
@@ -1359,5 +1359,7 @@ class CreateAlpha(Create):
         'enable_workload_vulnerability_scanning')
     ops.managed_config = get_default('managed_config')
     ops.fleet_project = get_default('fleet_project')
+    ops.enable_fleet = get_default('enable_fleet')
     ops.enable_multi_networking = get_default('enable_multi_networking')
+    ops.enable_security_posture = get_default('enable_security_posture')
     return ops

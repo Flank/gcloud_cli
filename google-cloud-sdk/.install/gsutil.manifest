@@ -1,5 +1,6 @@
 bin/bootstrapping/gsutil.py
 data/cli/gsutil.json
+platform/gsutil.textproto
 platform/gsutil/CHANGES.md
 platform/gsutil/CHECKSUM
 platform/gsutil/CONTRIBUTING.md
@@ -2058,6 +2059,7 @@ platform/gsutil/third_party/google-auth-library-python/google/auth/_cloud_sdk.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_credentials_async.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_default.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_default_async.py
+platform/gsutil/third_party/google-auth-library-python/google/auth/_exponential_backoff.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_helpers.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_jwt_async.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_oauth2client.py
@@ -2079,6 +2081,7 @@ platform/gsutil/third_party/google-auth-library-python/google/auth/downscoped.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/environment_vars.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/exceptions.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/external_account.py
+platform/gsutil/third_party/google-auth-library-python/google/auth/external_account_authorized_user.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/iam.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/identity_pool.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/impersonated_credentials.py
@@ -2192,6 +2195,7 @@ platform/gsutil/third_party/google-auth-library-python/tests/data/es256_privatek
 platform/gsutil/third_party/google-auth-library-python/tests/data/es256_public_cert.pem
 platform/gsutil/third_party/google-auth-library-python/tests/data/es256_publickey.pem
 platform/gsutil/third_party/google-auth-library-python/tests/data/es256_service_account.json
+platform/gsutil/third_party/google-auth-library-python/tests/data/external_account_authorized_user.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/external_subject_token.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/external_subject_token.txt
 platform/gsutil/third_party/google-auth-library-python/tests/data/gdch_service_account.json
@@ -2218,6 +2222,7 @@ platform/gsutil/third_party/google-auth-library-python/tests/oauth2/test_sts.py
 platform/gsutil/third_party/google-auth-library-python/tests/oauth2/test_utils.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__cloud_sdk.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__default.py
+platform/gsutil/third_party/google-auth-library-python/tests/test__exponential_backoff.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__helpers.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__oauth2client.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__service_account_info.py
@@ -2225,7 +2230,9 @@ platform/gsutil/third_party/google-auth-library-python/tests/test_app_engine.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_aws.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_credentials.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_downscoped.py
+platform/gsutil/third_party/google-auth-library-python/tests/test_exceptions.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_external_account.py
+platform/gsutil/third_party/google-auth-library-python/tests/test_external_account_authorized_user.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_iam.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_identity_pool.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_impersonated_credentials.py

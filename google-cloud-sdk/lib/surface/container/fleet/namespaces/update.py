@@ -19,37 +19,54 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.fleet import client
+from googlecloudsdk.api_lib.container.fleet import util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.container.fleet import resources
 from googlecloudsdk.command_lib.util.apis import arg_utils
 
 
-@base.Hidden
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Update(base.UpdateCommand):
   """Update a fleet namespace.
 
   This command can fail for the following reasons:
   * The project specified does not exist.
   * The fleet namespace does not exist in the project.
-  * The caller does not have permission to access the namespace.
+  * The caller does not have permission to access the project or namespace.
 
   ## EXAMPLES
 
-  To update the namespace `my-ns` in the active project:
+  To update the namespace `NAMESPACE` in the active project:
 
-    $ {command} my-ns
+    $ {command} NAMESPACE
 
-  To update the namespace `my-ns` in project `foo-bar-1`:
+  To update the namespace `NAMESPACE` in project `PROJECT_ID`:
 
-    $ {command} my-ns --project=foo-bar-1
+    $ {command} NAMESPACE --project=PROJECT_ID
   """
 
-  @staticmethod
-  def Args(parser):
+  @classmethod
+  def Args(cls, parser):
     parser.add_argument(
         'NAME', type=str, help='Name of the namespace to be updated.')
+    resources.AddScopeResourceArg(
+        parser,
+        '--scope',
+        util.VERSION_MAP[cls.ReleaseTrack()],
+        scope_help='Name of the fleet scope to create the fleet namespace in.',
+    )
 
   def Run(self, args):
+    mask = []
+    for flag in ['scope']:
+      if args.IsKnownAndSpecified(flag):
+        mask.append(flag)
+    scope = None
+    scope_arg = args.CONCEPTS.scope.Parse()
+    if scope_arg is not None:
+      scope = scope_arg.RelativeName()
     project = arg_utils.GetFromNamespace(args, '--project', use_defaults=True)
-    fleetclient = client.FleetClient(release_track=base.ReleaseTrack.ALPHA)
-    return fleetclient.UpdateNamespace(args.NAME, project)
+    fleetclient = client.FleetClient(release_track=self.ReleaseTrack())
+    return fleetclient.UpdateNamespace(
+        args.NAME, scope, project, mask=','.join(mask)
+    )

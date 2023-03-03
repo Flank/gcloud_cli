@@ -30,10 +30,13 @@ from googlecloudsdk.core.console import console_io
 DETAILED_HELP = {
     'DESCRIPTION':
         """\
-        *{command}* deletes a node pool from a Google Kubernetes Engine cluster.
-        This command does not gracefully drain the nodes prior to deleting them.
-        Use "kubectl drain NODE_NAME" to drain each node to have containers
-        running on these nodes terminate gracefully.
+        *{command}* deletes a node pool from a Google Kubernetes Engine (GKE)
+        cluster. When you delete a node pool, GKE drains all the nodes in the
+        node pool. The draining process involves GKE evicting Pods on each node
+        in the node pool. Each node in a node pool is drained by evicting Pods
+        with an allotted graceful termination period of `MAX_POD`. `MAX_POD` is
+        the maximum `terminationGracePeriodSeconds` set on the Pods scheduled to
+        the node with a cap of one hour.
         """,
     'EXAMPLES':
         """\
@@ -98,11 +101,15 @@ class Delete(base.DeleteCommand):
       adapter.GetNodePool(pool_ref)
 
       op_ref = adapter.DeleteNodePool(pool_ref)
-      if not args.async_:
-        adapter.WaitForOperation(
-            op_ref,
-            'Deleting node pool {0}'.format(pool_ref.nodePoolId),
-            timeout_s=args.timeout)
+      if args.async_:
+        op = adapter.GetOperation(op_ref)
+        if not args.IsSpecified('format'):
+          args.format = util.OPERATIONS_FORMAT
+        return op
+      adapter.WaitForOperation(
+          op_ref,
+          'Deleting node pool {0}'.format(pool_ref.nodePoolId),
+          timeout_s=args.timeout)
     except apitools_exceptions.HttpError as error:
       raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
 

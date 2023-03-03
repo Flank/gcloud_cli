@@ -456,7 +456,9 @@ def CreateRecaptchaOptionsConfig(client, args,
   return recaptcha_options_config
 
 
-def CreateRateLimitOptions(client, args, support_fairshare):
+def CreateRateLimitOptions(
+    client, args, support_fairshare, support_multiple_rate_limit_keys
+):
   """Returns a SecurityPolicyRuleRateLimitOptions message."""
 
   messages = client.messages
@@ -495,10 +497,26 @@ def CreateRateLimitOptions(client, args, support_fairshare):
   if args.IsSpecified('enforce_on_key'):
     rate_limit_options.enforceOnKey = (
         messages.SecurityPolicyRuleRateLimitOptions.EnforceOnKeyValueValuesEnum(
-            _ConvertEnforceOnKey(args.enforce_on_key)))
+            ConvertEnforceOnKey(args.enforce_on_key)))
     is_updated = True
   if args.IsSpecified('enforce_on_key_name'):
     rate_limit_options.enforceOnKeyName = args.enforce_on_key_name
+    is_updated = True
+
+  if support_multiple_rate_limit_keys and args.IsSpecified(
+      'enforce_on_key_configs'
+  ):
+    enforce_on_key_configs = []
+    for k, v in args.enforce_on_key_configs.items():
+      enforce_on_key_configs.append(
+          messages.SecurityPolicyRuleRateLimitOptionsEnforceOnKeyConfig(
+              enforceOnKeyType=messages.SecurityPolicyRuleRateLimitOptionsEnforceOnKeyConfig.EnforceOnKeyTypeValueValuesEnum(
+                  ConvertEnforceOnKey(k)
+              ),
+              enforceOnKeyName=v if v else None,
+          )
+      )
+    rate_limit_options.enforceOnKeyConfigs = enforce_on_key_configs
     is_updated = True
 
   if (args.IsSpecified('ban_threshold_count') or
@@ -543,14 +561,17 @@ def _ConvertExceedAction(action):
   }.get(action, action)
 
 
-def _ConvertEnforceOnKey(enforce_on_key):
+def ConvertEnforceOnKey(enforce_on_key):
   return {
       'ip': 'IP',
       'all-ips': 'ALL_IPS',
       'all': 'ALL',
       'http-header': 'HTTP_HEADER',
       'xff-ip': 'XFF_IP',
-      'http-cookie': 'HTTP_COOKIE'
+      'http-cookie': 'HTTP_COOKIE',
+      'http-path': 'HTTP_PATH',
+      'sni': 'SNI',
+      'region-code': 'REGION_CODE'
   }.get(enforce_on_key, enforce_on_key)
 
 

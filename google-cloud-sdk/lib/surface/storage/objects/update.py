@@ -22,11 +22,11 @@ from googlecloudsdk.api_lib.storage import cloud_api
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.storage import encryption_util
+from googlecloudsdk.command_lib.storage import errors
 from googlecloudsdk.command_lib.storage import flags
+from googlecloudsdk.command_lib.storage import name_expansion
 from googlecloudsdk.command_lib.storage import stdin_iterator
-from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage import user_request_args_factory
-from googlecloudsdk.command_lib.storage import wildcard_iterator
 from googlecloudsdk.command_lib.storage.tasks import task_executor
 from googlecloudsdk.command_lib.storage.tasks import task_graph_executor
 from googlecloudsdk.command_lib.storage.tasks import task_status
@@ -34,28 +34,48 @@ from googlecloudsdk.command_lib.storage.tasks.objects import patch_object_task
 from googlecloudsdk.command_lib.storage.tasks.objects import rewrite_object_task
 
 
-def _get_task_iterator(args):
+def _get_task_iterator(urls, args):
   """Yields PatchObjectTask's or RewriteObjectTask's."""
-  if args.encryption_key or args.clear_encryption_key or args.storage_class:
-    fields_scope = cloud_api.FieldsScope.FULL
+  requires_rewrite = (
+      args.encryption_key or args.clear_encryption_key or args.storage_class)
+  if requires_rewrite:
     task_type = rewrite_object_task.RewriteObjectTask
   else:
-    fields_scope = cloud_api.FieldsScope.SHORT
     task_type = patch_object_task.PatchObjectTask
 
   user_request_args = (
       user_request_args_factory.get_user_request_args_from_command_args(
           args, metadata_type=user_request_args_factory.MetadataType.OBJECT))
-  urls = stdin_iterator.get_urls_iterable(args.url, args.read_paths_from_stdin)
-  for url in urls:
-    if args.recursive:
-      potentially_recursive_url = storage_url.storage_url_from_string(url).join(
-          '**').url_string
-    else:
-      potentially_recursive_url = url
-    for object_resource in wildcard_iterator.get_wildcard_iterator(
-        potentially_recursive_url, fields_scope=fields_scope):
-      yield task_type(object_resource, user_request_args=user_request_args)
+  adds_or_removes_acls = user_request_args_factory.adds_or_removes_acls(
+      user_request_args
+  )
+  if requires_rewrite or adds_or_removes_acls:
+    fields_scope = cloud_api.FieldsScope.FULL
+  else:
+    fields_scope = cloud_api.FieldsScope.SHORT
+
+  if args.all_versions and not (
+      args.predefined_acl or args.acl_file or adds_or_removes_acls
+  ):
+    # TODO(b/264282236) Stop raising error once we confirm that this flag
+    # works fine with all types of object update operations.
+    raise errors.Error(
+        '--all_versions flag is only allowed for ACL modifier flags.')
+
+  if args.recursive:
+    recursion_setting = name_expansion.RecursionSetting.YES
+  else:
+    recursion_setting = name_expansion.RecursionSetting.NO
+  for name_expansion_result in name_expansion.NameExpansionIterator(
+      urls,
+      all_versions=args.all_versions,
+      fields_scope=fields_scope,
+      include_buckets=name_expansion.BucketSetting.NO_WITH_ERROR,
+      recursion_requested=recursion_setting,
+  ):
+    yield task_type(
+        name_expansion_result.resource, user_request_args=user_request_args
+    )
 
 
 def _add_common_args(parser):
@@ -69,6 +89,21 @@ def _add_common_args(parser):
   """
   parser.add_argument(
       'url', nargs='*', help='Specifies URLs of objects to update.')
+
+  parser.add_argument(
+      '--all-versions',
+      action='store_true',
+      help='Perform the operation on all object versions.',
+  )
+
+  acl_flags_group = parser.add_group()
+  flags.add_acl_modifier_flags(acl_flags_group)
+  flags.add_preserve_acl_flag(acl_flags_group)
+
+  parser.add_argument(
+      '--event-based-hold',
+      action=arg_parsers.StoreTrueFalseAction,
+      help='Enables or disables an event-based hold on objects.')
   parser.add_argument(
       '--read-paths-from-stdin',
       '-I',
@@ -88,11 +123,15 @@ def _add_common_args(parser):
       '--storage-class',
       help='Specify the storage class of the object. Using this flag triggers'
       ' a rewrite of underlying object data.')
+  parser.add_argument(
+      '--temporary-hold',
+      action=arg_parsers.StoreTrueFalseAction,
+      help='Enables or disables a temporary hold on objects.')
 
+  flags.add_additional_headers_flag(parser)
   flags.add_continue_on_error_flag(parser)
   flags.add_encryption_flags(parser, allow_patch=True)
   flags.add_precondition_flags(parser)
-  flags.add_object_acl_setter_flags(parser)
   flags.add_object_metadata_flags(parser, allow_patch=True)
 
 
@@ -105,14 +144,7 @@ def _add_alpha_args(parser):
   Returns:
     objects update flag group
   """
-  parser.add_argument(
-      '--event-based-hold',
-      action=arg_parsers.StoreTrueFalseAction,
-      help='Enables or disables an event-based hold on objects.')
-  parser.add_argument(
-      '--temporary-hold',
-      action=arg_parsers.StoreTrueFalseAction,
-      help='Enables or disables a temporary hold on objects.')
+  del parser  # Unused.
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -151,7 +183,11 @@ class Update(base.Command):
     if not args.predefined_acl and args.preserve_acl is None:
       # Preserve ACLs by default if nothing set by user.
       args.preserve_acl = True
-    task_iterator = _get_task_iterator(args)
+
+    urls = stdin_iterator.get_urls_iterable(
+        args.url, args.read_paths_from_stdin
+    )
+    task_iterator = _get_task_iterator(urls, args)
 
     task_status_queue = task_graph_executor.multiprocessing_context.Queue()
     self.exit_code = task_executor.execute_tasks(

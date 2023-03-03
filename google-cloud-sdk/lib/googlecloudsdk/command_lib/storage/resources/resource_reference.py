@@ -73,6 +73,9 @@ class Resource(object):
         ]))
 
   def __repr__(self):
+    # Includes generation ("gs://b/o#some-generation"). Warning: Terminal may
+    # may think "#" is a comment and ignore it. Be careful using this like:
+    # `self.Run('describe {}'.format(resource))`.
     return self.storage_url.url_string
 
   def __eq__(self, other):
@@ -101,23 +104,6 @@ class CloudResource(Resource):
     # TODO(b/168690302): Stop using string scheme in storage_url.py.
     return self.storage_url.scheme
 
-  def get_full_metadata_string(self,
-                               formatter,
-                               show_acl=True,
-                               show_version_in_url=False):
-    """Returns a string representing the ls -L formatted output.
-
-    Args:
-      formatter (full_resource_formatter.FullResourceFormatter): A formatter
-        instance that defines how the Resource metadata should be formatted.
-      show_acl (bool): Include ACLs list in resource display.
-      show_version_in_url (bool): Display extended URL with versioning info.
-
-    Returns:
-      A formatted string representing the Resource metadata.
-    """
-    raise NotImplementedError
-
 
 class BucketResource(CloudResource):
   """Class representing a bucket.
@@ -131,9 +117,10 @@ class BucketResource(CloudResource):
     name (str): Name of bucket.
     scheme (storage_url.ProviderPrefix): Prefix indicating what cloud provider
       hosts the bucket.
-    acl (dict|str|None): ACLs dict or predefined-ACL string for the bucket.
-      If the API call to fetch the data failed, this can be an error string.
-    cors_config (dict|str|None): CORS configuration for the bucket.
+    acl (dict|CloudApiError|None): ACLs dict or predefined-ACL string for the
+      bucket. If the API call to fetch the data failed, this can be an error
+      string.
+    cors_config (dict|CloudApiError|None): CORS configuration for the bucket.
       If the API call to fetch the data failed, this can be an error string.
     creation_time (datetime|None): Bucket's creation time in UTC.
     default_event_based_hold (bool|None): Prevents objects in bucket from being
@@ -142,25 +129,28 @@ class BucketResource(CloudResource):
       bucket.
     etag (str|None): HTTP version identifier.
     labels (dict|None): Labels for the bucket.
-    lifecycle_config (dict|str|None): Lifecycle configuration for bucket.
-      If the API call to fetch the data failed, this can be an error string.
+    lifecycle_config (dict|CloudApiError|None): Lifecycle configuration for
+      bucket. If the API call to fetch the data failed, this can be an error
+      string.
     location (str|None): Represents region bucket was created in.
       If the API call to fetch the data failed, this can be an error string.
-    logging_config (dict|str|None): Logging configuration for bucket.
+    logging_config (dict|CloudApiError|None): Logging configuration for bucket.
       If the API call to fetch the data failed, this can be an error string.
     metadata (object|dict|None): Cloud-provider specific data type for holding
       bucket metadata.
     metageneration (int|None): The generation of the bucket's metadata.
-    requester_pays (bool|str|None): "Requester pays" status of bucket.
+    requester_pays (bool|CloudApiError|None): "Requester pays" status of bucket.
       If the API call to fetch the data failed, this can be an error string.
     retention_period (int|None): Default time to hold items in bucket before
       before deleting in seconds. Generated from retention_policy.
     retention_policy (dict|None): Info about object retention within bucket.
-      Currently GCS-only but needed for generic copy logic.
+    retention_policy_is_locked (bool|None): True if a retention policy is
+      locked.
     update_time (str|None): Bucket's update time.
-    versioning_enabled (bool|str|None): Whether past object versions are saved.
-      If the API call to fetch the data failed, this can be an error string.
-    website_config (dict|str|None): Website configuration for bucket.
+    versioning_enabled (bool|CloudApiError|None): Whether past object versions
+      are saved. If the API call to fetch the data failed, this can be an error
+      string.
+    website_config (dict|CloudApiError|None): Website configuration for bucket.
       If the API call to fetch the data failed, this can be an error string.
   """
   TYPE_STRING = 'cloud_bucket'
@@ -213,6 +203,11 @@ class BucketResource(CloudResource):
     # Provider-specific subclasses can override.
     return None
 
+  @property
+  def retention_policy_is_locked(self):
+    # Provider-specific subclasses can override.
+    return None
+
   def __eq__(self, other):
     return (super(BucketResource, self).__eq__(other) and
             self.acl == other.acl and self.cors_config == other.cors_config and
@@ -234,15 +229,6 @@ class BucketResource(CloudResource):
 
   def is_container(self):
     return True
-
-  def get_full_metadata_string(self,
-                               formatter,
-                               show_acl=True,
-                               show_version_in_url=False):
-    """See parent class."""
-    # TODO(b/249280177): Move this logic to caller.
-    del show_acl, show_version_in_url  # Unused.
-    return formatter.format_bucket(self.storage_url, self)
 
 
 class ObjectResource(CloudResource):
@@ -273,8 +259,9 @@ class ObjectResource(CloudResource):
       class because generic daisy chain logic uses the field.
     crc32c_hash (str|None): Base64-encoded digest of crc32c hash.
     creation_time (datetime|None): Time the object was created.
-    custom_metadata (dict|None): Custom key-value pairs set by users.
-    decryption_key_hash (str|None): Digest of a customer-supplied encryption key
+    custom_fields (dict|None): Custom key-value pairs set by users.
+    decryption_key_hash_sha256 (str|None): Digest of a customer-supplied
+      encryption key
     encryption_algorithm (str|None): Encryption algorithm used for encrypting
       the object if CSEK is used.
     etag (str|None): HTTP version identifier.
@@ -304,9 +291,9 @@ class ObjectResource(CloudResource):
                content_type=None,
                crc32c_hash=None,
                creation_time=None,
-               custom_metadata=None,
+               custom_fields=None,
                custom_time=None,
-               decryption_key_hash=None,
+               decryption_key_hash_sha256=None,
                encryption_algorithm=None,
                etag=None,
                event_based_hold=None,
@@ -331,9 +318,9 @@ class ObjectResource(CloudResource):
     self.content_type = content_type
     self.crc32c_hash = crc32c_hash
     self.creation_time = creation_time
-    self.custom_metadata = custom_metadata
+    self.custom_fields = custom_fields
     self.custom_time = custom_time
-    self.decryption_key_hash = decryption_key_hash
+    self.decryption_key_hash_sha256 = decryption_key_hash_sha256
     self.encryption_algorithm = encryption_algorithm
     self.etag = etag
     self.event_based_hold = event_based_hold
@@ -361,32 +348,31 @@ class ObjectResource(CloudResource):
     return self.storage_url.generation
 
   def __eq__(self, other):
-    return (super(ObjectResource, self).__eq__(other) and
-            self.acl == other.acl and
-            self.cache_control == other.cache_control and
-            self.component_count == other.component_count and
-            self.content_disposition == other.content_disposition and
-            self.content_encoding == other.content_encoding and
-            self.content_language == other.content_language and
-            self.content_type == other.content_type and
-            self.crc32c_hash == other.crc32c_hash and
-            self.creation_time == other.creation_time and
-            self.custom_metadata == other.custom_metadata and
-            self.custom_time == other.custom_time and
-            self.decryption_key_hash == other.decryption_key_hash and
-            self.encryption_algorithm == other.encryption_algorithm and
-            self.etag == other.etag and
-            self.event_based_hold == other.event_based_hold and
-            self.kms_key == other.kms_key and
-            self.md5_hash == other.md5_hash and
-            self.metadata == other.metadata and
-            self.metageneration == other.metageneration and
-            self.noncurrent_time == other.noncurrent_time and
-            self.retention_expiration == other.retention_expiration and
-            self.size == other.size and
-            self.storage_class == other.storage_class and
-            self.temporary_hold == other.temporary_hold and
-            self.update_time == other.update_time)
+    return (
+        super(ObjectResource, self).__eq__(other) and self.acl == other.acl and
+        self.cache_control == other.cache_control and
+        self.component_count == other.component_count and
+        self.content_disposition == other.content_disposition and
+        self.content_encoding == other.content_encoding and
+        self.content_language == other.content_language and
+        self.content_type == other.content_type and
+        self.crc32c_hash == other.crc32c_hash and
+        self.creation_time == other.creation_time and
+        self.custom_fields == other.custom_fields and
+        self.custom_time == other.custom_time and
+        self.decryption_key_hash_sha256 == other.decryption_key_hash_sha256 and
+        self.encryption_algorithm == other.encryption_algorithm and
+        self.etag == other.etag and
+        self.event_based_hold == other.event_based_hold and
+        self.kms_key == other.kms_key and self.md5_hash == other.md5_hash and
+        self.metadata == other.metadata and
+        self.metageneration == other.metageneration and
+        self.noncurrent_time == other.noncurrent_time and
+        self.retention_expiration == other.retention_expiration and
+        self.size == other.size and
+        self.storage_class == other.storage_class and
+        self.temporary_hold == other.temporary_hold and
+        self.update_time == other.update_time)
 
   def is_container(self):
     return False
@@ -397,18 +383,6 @@ class ObjectResource(CloudResource):
   def get_displayable_object_data(self):
     """To be overridden by child classes."""
     raise NotImplementedError
-
-  def get_full_metadata_string(self,
-                               formatter,
-                               show_acl=True,
-                               show_version_in_url=False):
-    """See parent class."""
-    # TODO(b/249280177): Move this logic to caller.
-    return formatter.format_object(
-        self.storage_url,
-        self,
-        show_acl=show_acl,
-        show_version_in_url=show_version_in_url)
 
 
 class PrefixResource(Resource):
@@ -744,3 +718,11 @@ class DisplayableObjectData(DisplayableResourceData):
 
   def __repr__(self):
     return debug_output.generic_repr(self)
+
+
+def is_container_or_has_container_url(resource):
+  """Returns if resource is a known or unverified container resource."""
+  if isinstance(resource, UnknownResource):
+    # May query for objects in bucket, skipping check if the bucket exists.
+    return resource.storage_url.is_bucket()
+  return resource.is_container()

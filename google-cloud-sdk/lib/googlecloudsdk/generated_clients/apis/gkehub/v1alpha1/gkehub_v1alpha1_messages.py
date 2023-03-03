@@ -81,187 +81,6 @@ class AnthosObservabilityMembershipSpec(_messages.Message):
   version = _messages.StringField(3)
 
 
-class AnthosVMFeatureSpec(_messages.Message):
-  r"""AnthosVMFeatureSpec contains the configuration for the AnthosVM feature
-
-  Messages:
-    MembershipSpecsValue: Map of Membership IDs to their individual
-      configuration. A map entry consists of a membershipID and the desired
-      anthosvm spec for that membership/cluster. The MembershipID needs to be
-      the full path to the membership eg:
-      projects/p1/locations/l1/memberships/m1
-
-  Fields:
-    membershipSpecs: Map of Membership IDs to their individual configuration.
-      A map entry consists of a membershipID and the desired anthosvm spec for
-      that membership/cluster. The MembershipID needs to be the full path to
-      the membership eg: projects/p1/locations/l1/memberships/m1
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class MembershipSpecsValue(_messages.Message):
-    r"""Map of Membership IDs to their individual configuration. A map entry
-    consists of a membershipID and the desired anthosvm spec for that
-    membership/cluster. The MembershipID needs to be the full path to the
-    membership eg: projects/p1/locations/l1/memberships/m1
-
-    Messages:
-      AdditionalProperty: An additional property for a MembershipSpecsValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type MembershipSpecsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a MembershipSpecsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A AnthosVMMembershipSpec attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('AnthosVMMembershipSpec', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  membershipSpecs = _messages.MessageField('MembershipSpecsValue', 1)
-
-
-class AnthosVMFeatureState(_messages.Message):
-  r"""AnthosVMFeatureState contains the state of the AnthosVM feature. It
-  represents the actual state in the cluster, while the AnthosVMMembershipSpec
-  represents the desired state.
-
-  Fields:
-    localControllerState: State of the local PE-controller in the cluster
-    subfeatureState: List of AnthosVM subfeature states
-  """
-
-  localControllerState = _messages.MessageField('LocalControllerState', 1)
-  subfeatureState = _messages.MessageField('AnthosVMSubFeatureState', 2, repeated=True)
-
-
-class AnthosVMMembershipSpec(_messages.Message):
-  r"""AnthosVMMembershipSpec contains the AnthosVM feature configuration for a
-  membership/cluster.
-
-  Fields:
-    subfeaturesSpec: List of configurations of the Anthos For VM subfeatures
-      that are to be enabled
-  """
-
-  subfeaturesSpec = _messages.MessageField('AnthosVMSubFeatureSpec', 1, repeated=True)
-
-
-class AnthosVMSubFeatureSpec(_messages.Message):
-  r"""AnthosVMSubFeatureSpec contains the subfeature configuration for a
-  membership/cluster.
-
-  Fields:
-    enabled: Indicates whether the subfeature should be enabled on the cluster
-      or not. If set to true, the subfeature's control plane and resources
-      will be installed in the cluster. If set to false, the oneof spec if
-      present will be ignored and nothing will be installed in the cluster.
-    migrateSpec: MigrateSpec repsents the configuration for Migrate
-      subfeature.
-    serviceMeshSpec: ServiceMeshSpec repsents the configuration for Service
-      Mesh subfeature.
-  """
-
-  enabled = _messages.BooleanField(1)
-  migrateSpec = _messages.MessageField('MigrateSpec', 2)
-  serviceMeshSpec = _messages.MessageField('ServiceMeshSpec', 3)
-
-
-class AnthosVMSubFeatureState(_messages.Message):
-  r"""AnthosVMSubFeatureState contains the state of the AnthosVM subfeatures.
-
-  Enums:
-    InstallationStateValueValuesEnum: InstallationState represents the state
-      of installation of the subfeature in the cluster.
-
-  Fields:
-    description: Description represents human readable description of the
-      subfeature state. If the deployment failed, this should also contain the
-      reason for the failure.
-    installationState: InstallationState represents the state of installation
-      of the subfeature in the cluster.
-    migrateState: MigrateState represents the state of the Migrate subfeature.
-    serviceMeshState: ServiceMeshState represents the state of the Service
-      Mesh subfeature.
-  """
-
-  class InstallationStateValueValuesEnum(_messages.Enum):
-    r"""InstallationState represents the state of installation of the
-    subfeature in the cluster.
-
-    Values:
-      INSTALLATION_STATE_UNSPECIFIED: state of installation is unknown
-      INSTALLATION_STATE_NOT_INSTALLED: component is not installed
-      INSTALLATION_STATE_INSTALLED: component is successfully installed
-      INSTALLATION_STATE_FAILED: installation failed
-    """
-    INSTALLATION_STATE_UNSPECIFIED = 0
-    INSTALLATION_STATE_NOT_INSTALLED = 1
-    INSTALLATION_STATE_INSTALLED = 2
-    INSTALLATION_STATE_FAILED = 3
-
-  description = _messages.StringField(1)
-  installationState = _messages.EnumField('InstallationStateValueValuesEnum', 2)
-  migrateState = _messages.MessageField('MigrateState', 3)
-  serviceMeshState = _messages.MessageField('ServiceMeshState', 4)
-
-
-class ApigeeFeatureSpec(_messages.Message):
-  r"""Feature spec for Apigee
-
-  Messages:
-    MembershipSpecsValue: Map of Hub-based Membership IDs to individual
-      membership spec. Membership IDs are in this format: `projects/[project-
-      number]/locations/global/memberships/[membership-name]`
-
-  Fields:
-    membershipSpecs: Map of Hub-based Membership IDs to individual membership
-      spec. Membership IDs are in this format: `projects/[project-
-      number]/locations/global/memberships/[membership-name]`
-  """
-
-  @encoding.MapUnrecognizedFields('additionalProperties')
-  class MembershipSpecsValue(_messages.Message):
-    r"""Map of Hub-based Membership IDs to individual membership spec.
-    Membership IDs are in this format: `projects/[project-
-    number]/locations/global/memberships/[membership-name]`
-
-    Messages:
-      AdditionalProperty: An additional property for a MembershipSpecsValue
-        object.
-
-    Fields:
-      additionalProperties: Additional properties of type MembershipSpecsValue
-    """
-
-    class AdditionalProperty(_messages.Message):
-      r"""An additional property for a MembershipSpecsValue object.
-
-      Fields:
-        key: Name of the additional property.
-        value: A MembershipSpec attribute.
-      """
-
-      key = _messages.StringField(1)
-      value = _messages.MessageField('MembershipSpec', 2)
-
-    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
-
-  membershipSpecs = _messages.MessageField('MembershipSpecsValue', 1)
-
-
-class ApigeeFeatureState(_messages.Message):
-  r"""An empty state for Apigee feature."""
-
-
 class AppDevExperienceFeatureSpec(_messages.Message):
   r"""Spec for App Dev Experience Feature."""
 
@@ -507,7 +326,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -524,9 +345,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -535,6 +354,35 @@ class Binding(_messages.Message):
   condition = _messages.MessageField('Expr', 2)
   members = _messages.StringField(3, repeated=True)
   role = _messages.StringField(4)
+
+
+class BundleInstallSpec(_messages.Message):
+  r"""BundleInstallSpec is the specification configuration for a single
+  managed bundle.
+
+  Enums:
+    ManagementValueValuesEnum: Management specifies how the bundle will be
+      managed by the controller.
+
+  Fields:
+    exemptedNamespaces: the set of namespaces to be exempted from the bundle
+    management: Management specifies how the bundle will be managed by the
+      controller.
+  """
+
+  class ManagementValueValuesEnum(_messages.Enum):
+    r"""Management specifies how the bundle will be managed by the controller.
+
+    Values:
+      MANAGEMENT_UNSPECIFIED: No Management strategy has been specified.
+      INSTALLED: The entity should be insistently reconciled by the Hub
+        controller.
+    """
+    MANAGEMENT_UNSPECIFIED = 0
+    INSTALLED = 1
+
+  exemptedNamespaces = _messages.StringField(1, repeated=True)
+  management = _messages.EnumField('ManagementValueValuesEnum', 2)
 
 
 class CancelOperationRequest(_messages.Message):
@@ -870,7 +718,7 @@ class ConfigSync(_messages.Message):
 
   Fields:
     allowVerticalScale: Set to true to allow the vertical scaling. Defaults to
-      false which disallows vertical scaling.
+      false which disallows vertical scaling. This field is deprecated.
     enabled: Enables the installation of ConfigSync. If set to true,
       ConfigSync resources will be created and the other ConfigSync fields
       will be applied if exist. If set to false, all other ConfigSync fields
@@ -1225,6 +1073,33 @@ class CounterOptions(_messages.Message):
   metric = _messages.StringField(3)
 
 
+class CreateReferenceRequest(_messages.Message):
+  r"""The CreateReferenceRequest request.
+
+  Fields:
+    parent: Required. The parent resource name (target_resource of this
+      reference). For example: `//targetservice.googleapis.com/projects/{my-
+      project}/locations/{location}/instances/{my-instance}`.
+    reference: Required. The reference to be created.
+    referenceId: The unique id of this resource. Must be unique within a scope
+      of a target resource, but does not have to be globally unique. Reference
+      ID is part of resource name of the reference. Resource name is generated
+      in the following way: {parent}/references/{reference_id}. Reference ID
+      field is currently required but id auto generation might be added in the
+      future. It can be any arbitrary string, either GUID or any other string,
+      however CLHs can use preprocess callbacks to perform a custom
+      validation.
+    requestId: Optional. Request ID is an idempotency ID of the request. It
+      must be a valid UUID. Zero UUID (00000000-0000-0000-0000-000000000000)
+      is not supported.
+  """
+
+  parent = _messages.StringField(1)
+  reference = _messages.MessageField('Reference', 2)
+  referenceId = _messages.StringField(3)
+  requestId = _messages.StringField(4)
+
+
 class CustomField(_messages.Message):
   r"""Custom fields. These can be used to create a counter with arbitrary
   field/value pairs. See: go/rpcsp-custom-fields.
@@ -1315,6 +1190,43 @@ class DataPlaneManagement(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 2)
 
 
+class DataplaneV2FeatureSpec(_messages.Message):
+  r"""Spec for multi-cluster dataplane-v2 feature. This is required since
+  Feature proto requires a spec.
+
+  Fields:
+    enableEncryption: Enable dataplane-v2 based encryption for the multiple
+      clusters.
+  """
+
+  enableEncryption = _messages.BooleanField(1)
+
+
+class DataplaneV2FeatureState(_messages.Message):
+  r"""An empty state for multi-cluster dataplane-v2 feature. This is required
+  since FeatureStateDetails requires a state.
+  """
+
+
+
+class DeleteReferenceRequest(_messages.Message):
+  r"""The DeleteReferenceRequest request.
+
+  Fields:
+    name: Required. Full resource name of the reference, in the following
+      format:
+      `//{targer_service}/{target_resource}/references/{reference_id}`. For
+      example: `//targetservice.googleapis.com/projects/{my-
+      project}/locations/{location}/instances/{my-instance}/references/{xyz}`.
+    requestId: Optional. Request ID is an idempotency ID of the request. It
+      must be a valid UUID. Zero UUID (00000000-0000-0000-0000-000000000000)
+      is not supported.
+  """
+
+  name = _messages.StringField(1)
+  requestId = _messages.StringField(2)
+
+
 class Empty(_messages.Message):
   r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
@@ -1385,8 +1297,6 @@ class Feature(_messages.Message):
   Fields:
     anthosobservabilityFeatureSpec: The specification for Anthos
       Observability.
-    anthosvmFeatureSpec: The specification for the Anthos For VM Feature.
-    apigeeFeatureSpec: The specification for Apigee.
     appdevexperienceFeatureSpec: The specification for App Dev Experience.
     authorizerFeatureSpec: The specification for the Authorizer Feature.
     cloudauditloggingFeatureSpec: The specification for Anthos Cloud Audit
@@ -1395,9 +1305,12 @@ class Feature(_messages.Message):
     configmanagementFeatureSpec: The specification for Anthos Config
       Management.
     createTime: Output only. When the Feature was created.
+    dataplanev2FeatureSpec: The specification for multi-cluster dataplane-v2.
     deleteTime: Output only. When the Feature was deleted.
     description: Description of the feature, limited to 63 characters.
     featureState: Output only. State of the Feature resource itself.
+    fleetDefaultMemberConfig: FleetDefaultMemberConfig describes the default
+      member configuration at the fleet level.
     fleetobservabilityFeatureSpec: The specification for FleetObservability
       feature.
     helloworldFeatureSpec: A Hello World feature for codelab examples and
@@ -1410,6 +1323,8 @@ class Feature(_messages.Message):
       Cluster Service Discovery.
     name: Output only. The full, unique name of this Feature resource in the
       format `projects/*/locations/global/features/*`.
+    namespaceactuationFeatureSpec: The specification for Fleet Namespace
+      Actuation.
     policycontrollerFeatureSpec: The specification for Policy Controller.
     rbacrolebindingactuationFeatureSpec: The specification for RBAC Role
       Binding Actuation.
@@ -1445,17 +1360,17 @@ class Feature(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   anthosobservabilityFeatureSpec = _messages.MessageField('AnthosObservabilityFeatureSpec', 1)
-  anthosvmFeatureSpec = _messages.MessageField('AnthosVMFeatureSpec', 2)
-  apigeeFeatureSpec = _messages.MessageField('ApigeeFeatureSpec', 3)
-  appdevexperienceFeatureSpec = _messages.MessageField('AppDevExperienceFeatureSpec', 4)
-  authorizerFeatureSpec = _messages.MessageField('AuthorizerFeatureSpec', 5)
-  cloudauditloggingFeatureSpec = _messages.MessageField('CloudAuditLoggingFeatureSpec', 6)
-  cloudbuildFeatureSpec = _messages.MessageField('CloudBuildFeatureSpec', 7)
-  configmanagementFeatureSpec = _messages.MessageField('ConfigManagementFeatureSpec', 8)
-  createTime = _messages.StringField(9)
-  deleteTime = _messages.StringField(10)
-  description = _messages.StringField(11)
-  featureState = _messages.MessageField('FeatureState', 12)
+  appdevexperienceFeatureSpec = _messages.MessageField('AppDevExperienceFeatureSpec', 2)
+  authorizerFeatureSpec = _messages.MessageField('AuthorizerFeatureSpec', 3)
+  cloudauditloggingFeatureSpec = _messages.MessageField('CloudAuditLoggingFeatureSpec', 4)
+  cloudbuildFeatureSpec = _messages.MessageField('CloudBuildFeatureSpec', 5)
+  configmanagementFeatureSpec = _messages.MessageField('ConfigManagementFeatureSpec', 6)
+  createTime = _messages.StringField(7)
+  dataplanev2FeatureSpec = _messages.MessageField('DataplaneV2FeatureSpec', 8)
+  deleteTime = _messages.StringField(9)
+  description = _messages.StringField(10)
+  featureState = _messages.MessageField('FeatureState', 11)
+  fleetDefaultMemberConfig = _messages.MessageField('FleetDefaultMemberConfig', 12)
   fleetobservabilityFeatureSpec = _messages.MessageField('FleetObservabilityFeatureSpec', 13)
   helloworldFeatureSpec = _messages.MessageField('HelloWorldFeatureSpec', 14)
   identityserviceFeatureSpec = _messages.MessageField('IdentityServiceFeatureSpec', 15)
@@ -1464,12 +1379,13 @@ class Feature(_messages.Message):
   multiclusteringressFeatureSpec = _messages.MessageField('MultiClusterIngressFeatureSpec', 18)
   multiclusterservicediscoveryFeatureSpec = _messages.MessageField('MultiClusterServiceDiscoveryFeatureSpec', 19)
   name = _messages.StringField(20)
-  policycontrollerFeatureSpec = _messages.MessageField('PolicyControllerFeatureSpec', 21)
-  rbacrolebindingactuationFeatureSpec = _messages.MessageField('RBACRoleBindingActuationFeatureSpec', 22)
-  servicedirectoryFeatureSpec = _messages.MessageField('ServiceDirectoryFeatureSpec', 23)
-  servicemeshFeatureSpec = _messages.MessageField('ServiceMeshFeatureSpec', 24)
-  updateTime = _messages.StringField(25)
-  workloadcertificateFeatureSpec = _messages.MessageField('WorkloadCertificateFeatureSpec', 26)
+  namespaceactuationFeatureSpec = _messages.MessageField('NamespaceActuationFeatureSpec', 21)
+  policycontrollerFeatureSpec = _messages.MessageField('PolicyControllerFeatureSpec', 22)
+  rbacrolebindingactuationFeatureSpec = _messages.MessageField('RBACRoleBindingActuationFeatureSpec', 23)
+  servicedirectoryFeatureSpec = _messages.MessageField('ServiceDirectoryFeatureSpec', 24)
+  servicemeshFeatureSpec = _messages.MessageField('ServiceMeshFeatureSpec', 25)
+  updateTime = _messages.StringField(26)
+  workloadcertificateFeatureSpec = _messages.MessageField('WorkloadCertificateFeatureSpec', 27)
 
 
 class FeatureState(_messages.Message):
@@ -1558,8 +1474,6 @@ class FeatureStateDetails(_messages.Message):
   Fields:
     anthosobservabilityFeatureState: State for the Anthos Observability
       Feature
-    anthosvmFeatureState: State for the Anthos For VM Feature.
-    apigeeFeatureState: State for the Apigee Feature.
     appdevexperienceFeatureState: State for the AppDevExperience Feature.
     authorizerFeatureState: State for the Authorizer Feature.
     cloudauditloggingFeatureState: The state of the Anthos Cloud Audit Logging
@@ -1569,6 +1483,7 @@ class FeatureStateDetails(_messages.Message):
       describing what actions (if any) need to be taken to return the Feature
       to `OK`.
     configmanagementFeatureState: State for the Config Management Feature.
+    dataplanev2FeatureState: State for multi-cluster dataplane-v2 feature.
     description: Human readable description of the issue.
     fleetobservabilityFeatureState: State for the FleetObservability Feature.
     helloworldFeatureState: State for the Hello World Feature.
@@ -1577,6 +1492,7 @@ class FeatureStateDetails(_messages.Message):
     multiclusteringressFeatureState: State for the Ingress for Anthos Feature.
     multiclusterservicediscoveryFeatureState: State for the Multi-cluster
       Service Discovery Feature.
+    namespaceactuationFeatureState: State for Fleet Namespace Actuation.
     policycontrollerFeatureState: State for the Policy Controller Feature.
     rbacrolebindingactuationFeatureState: State for RBAC Role Binding
       Actuation.
@@ -1609,20 +1525,20 @@ class FeatureStateDetails(_messages.Message):
     WARNING = 3
 
   anthosobservabilityFeatureState = _messages.MessageField('AnthosObservabilityFeatureState', 1)
-  anthosvmFeatureState = _messages.MessageField('AnthosVMFeatureState', 2)
-  apigeeFeatureState = _messages.MessageField('ApigeeFeatureState', 3)
-  appdevexperienceFeatureState = _messages.MessageField('AppDevExperienceFeatureState', 4)
-  authorizerFeatureState = _messages.MessageField('AuthorizerFeatureState', 5)
-  cloudauditloggingFeatureState = _messages.MessageField('CloudAuditLoggingFeatureState', 6)
-  code = _messages.EnumField('CodeValueValuesEnum', 7)
-  configmanagementFeatureState = _messages.MessageField('ConfigManagementFeatureState', 8)
-  description = _messages.StringField(9)
-  fleetobservabilityFeatureState = _messages.MessageField('FleetObservabilityFeatureState', 10)
-  helloworldFeatureState = _messages.MessageField('HelloWorldFeatureState', 11)
-  identityserviceFeatureState = _messages.MessageField('IdentityServiceFeatureState', 12)
-  meteringFeatureState = _messages.MessageField('MeteringFeatureState', 13)
-  multiclusteringressFeatureState = _messages.MessageField('MultiClusterIngressFeatureState', 14)
-  multiclusterservicediscoveryFeatureState = _messages.MessageField('MultiClusterServiceDiscoveryFeatureState', 15)
+  appdevexperienceFeatureState = _messages.MessageField('AppDevExperienceFeatureState', 2)
+  authorizerFeatureState = _messages.MessageField('AuthorizerFeatureState', 3)
+  cloudauditloggingFeatureState = _messages.MessageField('CloudAuditLoggingFeatureState', 4)
+  code = _messages.EnumField('CodeValueValuesEnum', 5)
+  configmanagementFeatureState = _messages.MessageField('ConfigManagementFeatureState', 6)
+  dataplanev2FeatureState = _messages.MessageField('DataplaneV2FeatureState', 7)
+  description = _messages.StringField(8)
+  fleetobservabilityFeatureState = _messages.MessageField('FleetObservabilityFeatureState', 9)
+  helloworldFeatureState = _messages.MessageField('HelloWorldFeatureState', 10)
+  identityserviceFeatureState = _messages.MessageField('IdentityServiceFeatureState', 11)
+  meteringFeatureState = _messages.MessageField('MeteringFeatureState', 12)
+  multiclusteringressFeatureState = _messages.MessageField('MultiClusterIngressFeatureState', 13)
+  multiclusterservicediscoveryFeatureState = _messages.MessageField('MultiClusterServiceDiscoveryFeatureState', 14)
+  namespaceactuationFeatureState = _messages.MessageField('NamespaceActuationFeatureState', 15)
   policycontrollerFeatureState = _messages.MessageField('PolicyControllerFeatureState', 16)
   rbacrolebindingactuationFeatureState = _messages.MessageField('RBACRoleBindingActuationFeatureState', 17)
   servicedirectoryFeatureState = _messages.MessageField('ServiceDirectoryFeatureState', 18)
@@ -1725,11 +1641,82 @@ class FeatureTest(_messages.Message):
   third = _messages.EnumField('ThirdValueValuesEnum', 9)
 
 
-class FleetObservabilityFeatureSpec(_messages.Message):
-  r"""An empty spec for FleetObservability feature. This is required since
-  Feature proto requires a spec.
+class FleetDefaultMemberConfig(_messages.Message):
+  r"""FleetDefaultMemberConfig contains default configuration information for
+  memberships of a fleet.
+
+  Messages:
+    OptedOutMembersValue: Contains Memberships which originally had the fleet
+      default member configuration applied but then the user performed an
+      override to remove the configuration for the member. By storing this
+      intent here, controllers are able to distinguish between new Memberships
+      and old ones which were previously overridden. Keys are of the following
+      structure: `projects/{p}/locations/{l}/memberships/{m}`
+
+  Fields:
+    identityService: Spec for IdentityService.
+    optedOutMembers: Contains Memberships which originally had the fleet
+      default member configuration applied but then the user performed an
+      override to remove the configuration for the member. By storing this
+      intent here, controllers are able to distinguish between new Memberships
+      and old ones which were previously overridden. Keys are of the following
+      structure: `projects/{p}/locations/{l}/memberships/{m}`
+    serviceMesh: Spec for ServiceMesh.
+    setTime: Timestamp for when the default member configuration was first
+      set. This timestamp is used in situations where a Fleet has existing
+      Memberships that were active before default member configuration was
+      set. Controllers can compare this timestamp to the Membership creation
+      timestamp in order to identify whether the Membership needs to be
+      processed.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class OptedOutMembersValue(_messages.Message):
+    r"""Contains Memberships which originally had the fleet default member
+    configuration applied but then the user performed an override to remove
+    the configuration for the member. By storing this intent here, controllers
+    are able to distinguish between new Memberships and old ones which were
+    previously overridden. Keys are of the following structure:
+    `projects/{p}/locations/{l}/memberships/{m}`
+
+    Messages:
+      AdditionalProperty: An additional property for a OptedOutMembersValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type OptedOutMembersValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a OptedOutMembersValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A boolean attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.BooleanField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  identityService = _messages.MessageField('MemberConfig', 1)
+  optedOutMembers = _messages.MessageField('OptedOutMembersValue', 2)
+  serviceMesh = _messages.MessageField('ServiceMeshMembershipSpec', 3)
+  setTime = _messages.StringField(4)
+
+
+class FleetObservabilityFeatureSpec(_messages.Message):
+  r"""Spec for FleetObservability feature. This is required since Feature
+  proto requires a spec.
+
+  Fields:
+    loggingConfig: Specified if fleet logging feature is enabled for the
+      entire fleet. If UNSPECIFIED, fleet logging feature is disabled for the
+      entire fleet.
+  """
+
+  loggingConfig = _messages.MessageField('LoggingConfig', 1)
 
 
 class FleetObservabilityFeatureState(_messages.Message):
@@ -1813,6 +1800,20 @@ class GatekeeperDeploymentState(_messages.Message):
   gatekeeperAudit = _messages.EnumField('GatekeeperAuditValueValuesEnum', 1)
   gatekeeperControllerManagerState = _messages.EnumField('GatekeeperControllerManagerStateValueValuesEnum', 2)
   gatekeeperMutation = _messages.EnumField('GatekeeperMutationValueValuesEnum', 3)
+
+
+class GetReferenceRequest(_messages.Message):
+  r"""The GetReferenceRequest request.
+
+  Fields:
+    name: Required. Full resource name of the reference, in the following
+      format:
+      `//{target_service}/{target_resource}/references/{reference_id}`. For
+      example: `//targetservice.googleapis.com/projects/{my-
+      project}/locations/{location}/instances/{my-instance}/references/{xyz}`.
+  """
+
+  name = _messages.StringField(1)
 
 
 class GitConfig(_messages.Message):
@@ -2380,38 +2381,37 @@ class ListOperationsResponse(_messages.Message):
   operations = _messages.MessageField('Operation', 2, repeated=True)
 
 
-class LocalControllerState(_messages.Message):
-  r"""LocalControllerState contains the state of the local controller deployed
-  in the cluster.
-
-  Enums:
-    InstallationStateValueValuesEnum: InstallationState represents the state
-      of deployment of the local PE controller in the cluster.
+class ListReferencesRequest(_messages.Message):
+  r"""The ListResourceMetadataRequest request.
 
   Fields:
-    description: Description represents the human readable description of the
-      current state of the local PE controller
-    installationState: InstallationState represents the state of deployment of
-      the local PE controller in the cluster.
+    pageSize: The maximum number of items to return. If unspecified, server
+      will pick an appropriate default. Server may return fewer items than
+      requested. A caller should only rely on response's next_page_token to
+      determine if there are more References left to be queried.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: Required. The parent resource name (target_resource of this
+      reference). For example: `//targetservice.googleapis.com/projects/{my-
+      project}/locations/{location}/instances/{my-instance}`.
   """
 
-  class InstallationStateValueValuesEnum(_messages.Enum):
-    r"""InstallationState represents the state of deployment of the local PE
-    controller in the cluster.
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3)
 
-    Values:
-      INSTALLATION_STATE_UNSPECIFIED: state of installation is unknown
-      INSTALLATION_STATE_NOT_INSTALLED: component is not installed
-      INSTALLATION_STATE_INSTALLED: component is successfully installed
-      INSTALLATION_STATE_FAILED: installation failed
-    """
-    INSTALLATION_STATE_UNSPECIFIED = 0
-    INSTALLATION_STATE_NOT_INSTALLED = 1
-    INSTALLATION_STATE_INSTALLED = 2
-    INSTALLATION_STATE_FAILED = 3
 
-  description = _messages.StringField(1)
-  installationState = _messages.EnumField('InstallationStateValueValuesEnum', 2)
+class ListReferencesResponse(_messages.Message):
+  r"""The ListReferencesResponse response.
+
+  Fields:
+    nextPageToken: Token to retrieve the next page of results, or empty if
+      there are no more results in the list.
+    references: The list of references.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  references = _messages.MessageField('Reference', 2, repeated=True)
 
 
 class Location(_messages.Message):
@@ -2508,6 +2508,20 @@ class LogConfig(_messages.Message):
   dataAccess = _messages.MessageField('DataAccessOptions', 3)
 
 
+class LoggingConfig(_messages.Message):
+  r"""LoggingConfig defines the configuration for different types of logs.
+
+  Fields:
+    defaultConfig: Specified if applying the default routing config to logs
+      not specified in other configs.
+    fleetScopeLogsConfig: Specified if applying the routing config to all logs
+      for all fleet scopes.
+  """
+
+  defaultConfig = _messages.MessageField('RoutingConfig', 1)
+  fleetScopeLogsConfig = _messages.MessageField('RoutingConfig', 2)
+
+
 class MemberConfig(_messages.Message):
   r"""The configuration for a member/cluster
 
@@ -2535,23 +2549,6 @@ class MembershipConfig(_messages.Message):
   hierarchyController = _messages.MessageField('HierarchyControllerConfig', 3)
   policyController = _messages.MessageField('PolicyController', 4)
   version = _messages.StringField(5)
-
-
-class MembershipSpec(_messages.Message):
-  r"""Membership information
-
-  Fields:
-    location: Location of the cluster. This is used by Apigee management plane
-      for making location-based routing decisions.
-    organizationProjects: In Apigee hybrid install, a project can contain
-      memberships that serve multiple Apigee org projects. This is the list of
-      Apigee org projects that the membership serves. E.g., In order to get
-      the memberships that serve a specific organization project, Consumers
-      can filter based on this field.
-  """
-
-  location = _messages.StringField(1)
-  organizationProjects = _messages.StringField(2, repeated=True)
 
 
 class MeshConnectivity(_messages.Message):
@@ -2617,17 +2614,6 @@ class MeteringFeatureState(_messages.Message):
   preciseLastMeasuredClusterVcpuCapacity = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
 
 
-class MigrateSpec(_messages.Message):
-  r"""MigrateSpec contains the migrate subfeature configuration. Other fields
-  to be added later
-  """
-
-
-
-class MigrateState(_messages.Message):
-  r"""MigrateState contains the state of Migrate subfeature"""
-
-
 class MultiClusterIngressFeatureSpec(_messages.Message):
   r"""MultiClusterIngressFeatureSpec contains the input for the
   MultiClusterIngress feature.
@@ -2682,6 +2668,14 @@ class MultiClusterServiceDiscoveryFeatureState(_messages.Message):
   required since FeatureStateDetails requires a state.
   """
 
+
+
+class NamespaceActuationFeatureSpec(_messages.Message):
+  r"""An empty spec for FNS actuation feature."""
+
+
+class NamespaceActuationFeatureState(_messages.Message):
+  r"""NamespaceActuation Feature State."""
 
 
 class OciConfig(_messages.Message):
@@ -2784,7 +2778,7 @@ class OnClusterState(_messages.Message):
         running on the cluster. The Hub Feature controller has a Membership,
         is aware of the version the cluster should be running in, but has not
         confirmed for itself that the PC is running with that version.
-      DECOMISSIONING: Policy Controller (PC) may have resources on the
+      DECOMMISSIONING: Policy Controller (PC) may have resources on the
         cluster, but the Hub Feature controller wishes to remove the
         Membership. The Membership still exists.
       CLUSTER_ERROR: Policy Controller (PC) is not operational, and the Hub
@@ -2810,7 +2804,7 @@ class OnClusterState(_messages.Message):
     INSTALLING = 2
     ACTIVE = 3
     UPDATING = 4
-    DECOMISSIONING = 5
+    DECOMMISSIONING = 5
     CLUSTER_ERROR = 6
     HUB_ERROR = 7
     SUSPENDED = 8
@@ -3070,6 +3064,50 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
+class PolicyContentSpec(_messages.Message):
+  r"""PolicyContentSpec defines the user's desired content configuration on
+  the cluster.
+
+  Messages:
+    BundlesValue: map of bundle name to BundleInstallSpec. The bundle name
+      maps to the `bundleName` key in the
+      `policycontroller.gke.io/constraintData` annotation on a constraint.
+
+  Fields:
+    bundles: map of bundle name to BundleInstallSpec. The bundle name maps to
+      the `bundleName` key in the `policycontroller.gke.io/constraintData`
+      annotation on a constraint.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class BundlesValue(_messages.Message):
+    r"""map of bundle name to BundleInstallSpec. The bundle name maps to the
+    `bundleName` key in the `policycontroller.gke.io/constraintData`
+    annotation on a constraint.
+
+    Messages:
+      AdditionalProperty: An additional property for a BundlesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type BundlesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a BundlesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A BundleInstallSpec attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('BundleInstallSpec', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  bundles = _messages.MessageField('BundlesValue', 1)
+
+
 class PolicyController(_messages.Message):
   r"""Configuration for Policy Controller
 
@@ -3100,6 +3138,22 @@ class PolicyController(_messages.Message):
   mutationEnabled = _messages.BooleanField(6)
   referentialRulesEnabled = _messages.BooleanField(7)
   templateLibraryInstalled = _messages.BooleanField(8)
+
+
+class PolicyControllerDeploymentConfig(_messages.Message):
+  r"""Deployment-specific configuration.
+
+  Fields:
+    containerResources: Container resource requirements.
+    podAntiAffinity: Pod anti-affinity enablement.
+    podTolerations: Pod tolerations of node taints.
+    replicaCount: Pod replica count.
+  """
+
+  containerResources = _messages.MessageField('ResourceRequirements', 1)
+  podAntiAffinity = _messages.BooleanField(2)
+  podTolerations = _messages.MessageField('Toleration', 3, repeated=True)
+  replicaCount = _messages.IntegerField(4)
 
 
 class PolicyControllerFeatureSpec(_messages.Message):
@@ -3150,12 +3204,15 @@ class PolicyControllerFeatureState(_messages.Message):
   Messages:
     ComponentStatesValue: On-cluster states of the components we would like to
       track. Currently these include (also serving as map keys): 1.
-      "admission" 2. "audit" 3. "mutation" 4. "constraint template library"
+      "admission" 2. "audit" 3. "mutation"
+    ContentStatesValue: The state of the template library and any specified
+      bundles
 
   Fields:
     componentStates: On-cluster states of the components we would like to
       track. Currently these include (also serving as map keys): 1.
-      "admission" 2. "audit" 3. "mutation" 4. "constraint template library"
+      "admission" 2. "audit" 3. "mutation"
+    contentStates: The state of the template library and any specified bundles
     state: The overall Policy Controller lifecycle state observed by the Hub
       Feature controller.
   """
@@ -3187,7 +3244,7 @@ class PolicyControllerFeatureState(_messages.Message):
         running on the cluster. The Hub Feature controller has a Membership,
         is aware of the version the cluster should be running in, but has not
         confirmed for itself that the PC is running with that version.
-      DECOMISSIONING: Policy Controller (PC) may have resources on the
+      DECOMMISSIONING: Policy Controller (PC) may have resources on the
         cluster, but the Hub Feature controller wishes to remove the
         Membership. The Membership still exists.
       CLUSTER_ERROR: Policy Controller (PC) is not operational, and the Hub
@@ -3213,7 +3270,7 @@ class PolicyControllerFeatureState(_messages.Message):
     INSTALLING = 2
     ACTIVE = 3
     UPDATING = 4
-    DECOMISSIONING = 5
+    DECOMMISSIONING = 5
     CLUSTER_ERROR = 6
     HUB_ERROR = 7
     SUSPENDED = 8
@@ -3222,7 +3279,7 @@ class PolicyControllerFeatureState(_messages.Message):
   class ComponentStatesValue(_messages.Message):
     r"""On-cluster states of the components we would like to track. Currently
     these include (also serving as map keys): 1. "admission" 2. "audit" 3.
-    "mutation" 4. "constraint template library"
+    "mutation"
 
     Messages:
       AdditionalProperty: An additional property for a ComponentStatesValue
@@ -3245,8 +3302,34 @@ class PolicyControllerFeatureState(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ContentStatesValue(_messages.Message):
+    r"""The state of the template library and any specified bundles
+
+    Messages:
+      AdditionalProperty: An additional property for a ContentStatesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type ContentStatesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ContentStatesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A OnClusterState attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('OnClusterState', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   componentStates = _messages.MessageField('ComponentStatesValue', 1)
-  state = _messages.EnumField('StateValueValuesEnum', 2)
+  contentStates = _messages.MessageField('ContentStatesValue', 2)
+  state = _messages.EnumField('StateValueValuesEnum', 3)
 
 
 class PolicyControllerHubConfig(_messages.Message):
@@ -3258,10 +3341,19 @@ class PolicyControllerHubConfig(_messages.Message):
       spec, not the lifecycle state of the feature observed by the Hub feature
       controller that is reported in the feature state.
 
+  Messages:
+    DeploymentConfigsValue: Map of deployment configs to deployments
+      ("admission", "audit", "mutation").
+
   Fields:
     auditIntervalSeconds: Sets the interval for Policy Controller Audit Scans
       (in seconds). When set to 0, this disables audit functionality
       altogether.
+    constraintViolationLimit: The maximum number of audit violations to be
+      stored in a constraint. If not set, the internal default (currently 20)
+      will be used.
+    deploymentConfigs: Map of deployment configs to deployments ("admission",
+      "audit", "mutation").
     exemptableNamespaces: The set of namespaces that are excluded from Policy
       Controller checks. Namespaces do not need to currently exist on the
       cluster.
@@ -3273,6 +3365,7 @@ class PolicyControllerHubConfig(_messages.Message):
     monitoring: Monitoring specifies the configuration of monitoring.
     mutationEnabled: Enables the ability to mutate resources using Policy
       Controller.
+    policyContent: Specifies the desired policy content on the cluster
     referentialRulesEnabled: Enables the ability to use Constraint Templates
       that reference to objects other than the object currently being
       evaluated.
@@ -3299,14 +3392,44 @@ class PolicyControllerHubConfig(_messages.Message):
     INSTALL_SPEC_ENABLED = 2
     INSTALL_SPEC_SUSPENDED = 3
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class DeploymentConfigsValue(_messages.Message):
+    r"""Map of deployment configs to deployments ("admission", "audit",
+    "mutation").
+
+    Messages:
+      AdditionalProperty: An additional property for a DeploymentConfigsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        DeploymentConfigsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a DeploymentConfigsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A PolicyControllerDeploymentConfig attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('PolicyControllerDeploymentConfig', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   auditIntervalSeconds = _messages.IntegerField(1)
-  exemptableNamespaces = _messages.StringField(2, repeated=True)
-  installSpec = _messages.EnumField('InstallSpecValueValuesEnum', 3)
-  logDeniesEnabled = _messages.BooleanField(4)
-  monitoring = _messages.MessageField('PolicyControllerMonitoringConfig', 5)
-  mutationEnabled = _messages.BooleanField(6)
-  referentialRulesEnabled = _messages.BooleanField(7)
-  templateLibraryConfig = _messages.MessageField('TemplateLibraryConfig', 8)
+  constraintViolationLimit = _messages.IntegerField(2)
+  deploymentConfigs = _messages.MessageField('DeploymentConfigsValue', 3)
+  exemptableNamespaces = _messages.StringField(4, repeated=True)
+  installSpec = _messages.EnumField('InstallSpecValueValuesEnum', 5)
+  logDeniesEnabled = _messages.BooleanField(6)
+  monitoring = _messages.MessageField('PolicyControllerMonitoringConfig', 7)
+  mutationEnabled = _messages.BooleanField(8)
+  policyContent = _messages.MessageField('PolicyContentSpec', 9)
+  referentialRulesEnabled = _messages.BooleanField(10)
+  templateLibraryConfig = _messages.MessageField('TemplateLibraryConfig', 11)
 
 
 class PolicyControllerMembershipSpec(_messages.Message):
@@ -3321,6 +3444,33 @@ class PolicyControllerMembershipSpec(_messages.Message):
 
   policyControllerHubConfig = _messages.MessageField('PolicyControllerHubConfig', 1)
   version = _messages.StringField(2)
+
+
+class PolicyControllerMigration(_messages.Message):
+  r"""State for the migration of PolicyController from ACM -> PoCo Hub.
+
+  Enums:
+    StageValueValuesEnum: Stage of the migration.
+
+  Fields:
+    stage: Stage of the migration.
+  """
+
+  class StageValueValuesEnum(_messages.Enum):
+    r"""Stage of the migration.
+
+    Values:
+      STAGE_UNSPECIFIED: Unknown state of migration.
+      ACM_MANAGED: ACM Hub/Operator manages policycontroller. No migration yet
+        completed.
+      POCO_MANAGED: All migrations steps complete; Poco Hub now manages
+        policycontroller.
+    """
+    STAGE_UNSPECIFIED = 0
+    ACM_MANAGED = 1
+    POCO_MANAGED = 2
+
+  stage = _messages.EnumField('StageValueValuesEnum', 1)
 
 
 class PolicyControllerMonitoring(_messages.Message):
@@ -3386,11 +3536,13 @@ class PolicyControllerState(_messages.Message):
 
   Fields:
     deploymentState: The state about the policy controller installation.
+    migration: Record state of ACM -> PoCo Hub migration for this feature.
     version: The version of Gatekeeper Policy Controller deployed.
   """
 
   deploymentState = _messages.MessageField('GatekeeperDeploymentState', 1)
-  version = _messages.MessageField('PolicyControllerVersion', 2)
+  migration = _messages.MessageField('PolicyControllerMigration', 2)
+  version = _messages.MessageField('PolicyControllerVersion', 3)
 
 
 class PolicyControllerVersion(_messages.Message):
@@ -3420,6 +3572,120 @@ class RBACRoleBindingActuationFeatureState(_messages.Message):
   wide Feature state.
   """
 
+
+
+class Reference(_messages.Message):
+  r"""Represents a reference to a resource.
+
+  Messages:
+    DetailsValueListEntry: A DetailsValueListEntry object.
+
+  Fields:
+    createTime: Output only. The creation time.
+    details: Details of the reference type with no implied semantics.
+      Cumulative size of the field must not be more than 1KiB. Note: For the
+      Arcus Reference API, you must add the proto you store in this field to
+      http://cs/symbol:cloud.cluster.reference.ReferencePayload
+    name: Output only. Relative resource name of the reference. Includes
+      target resource as a parent and reference uid
+      `{target_resource}/references/{reference_id}`. For example,
+      `projects/{my-project}/locations/{location}/instances/{my-
+      instance}/references/{xyz}`.
+    sourceResource: Required. Full resource name of the resource which refers
+      the target resource. For example:
+      //tpu.googleapis.com/projects/myproject/nodes/mynode
+    targetUniqueId: Output only. The unique_id of the target resource. Example
+      1: (For arcus resource) A-1-0-2-387420123-13-913517247483640811
+      unique_id format defined in go/m11n-unique-id-as-resource-id Example 2:
+      (For CCFE resource) 123e4567-e89b-12d3-a456-426614174000
+    type: Required. Type of the reference. A service might impose limits on
+      number of references of a specific type. Note: It's recommended to use
+      CAPITALS_WITH_UNDERSCORES style for a type name.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class DetailsValueListEntry(_messages.Message):
+    r"""A DetailsValueListEntry object.
+
+    Messages:
+      AdditionalProperty: An additional property for a DetailsValueListEntry
+        object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a DetailsValueListEntry object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  createTime = _messages.StringField(1)
+  details = _messages.MessageField('DetailsValueListEntry', 2, repeated=True)
+  name = _messages.StringField(3)
+  sourceResource = _messages.StringField(4)
+  targetUniqueId = _messages.StringField(5)
+  type = _messages.StringField(6)
+
+
+class ResourceList(_messages.Message):
+  r"""ResourceList contains container resource requirements.
+
+  Fields:
+    cpu: CPU requirement expressed in Kubernetes resource units.
+    memory: Memory requirement expressed in Kubernetes resource units.
+  """
+
+  cpu = _messages.StringField(1)
+  memory = _messages.StringField(2)
+
+
+class ResourceRequirements(_messages.Message):
+  r"""ResourceRequirements describes the compute resource requirements.
+
+  Fields:
+    limits: Limits describes the maximum amount of compute resources allowed
+      for use by the running container.
+    requests: Requests describes the amount of compute resources reserved for
+      the container by the kube-scheduler.
+  """
+
+  limits = _messages.MessageField('ResourceList', 1)
+  requests = _messages.MessageField('ResourceList', 2)
+
+
+class RoutingConfig(_messages.Message):
+  r"""RoutingConfig configures the behaviour of fleet logging feature.
+
+  Enums:
+    ModeValueValuesEnum: mode configures the logs routing mode.
+
+  Fields:
+    mode: mode configures the logs routing mode.
+  """
+
+  class ModeValueValuesEnum(_messages.Enum):
+    r"""mode configures the logs routing mode.
+
+    Values:
+      MODE_UNSPECIFIED: If UNSPECIFIED, fleet logging feature is disabled.
+      COPY: logs will be copied to the destination project.
+      MOVE: logs will be moved to the destination project.
+    """
+    MODE_UNSPECIFIED = 0
+    COPY = 1
+    MOVE = 2
+
+  mode = _messages.EnumField('ModeValueValuesEnum', 1)
 
 
 class Rule(_messages.Message):
@@ -3759,17 +4025,6 @@ class ServiceMeshMembershipSpec(_messages.Message):
   management = _messages.EnumField('ManagementValueValuesEnum', 4)
 
 
-class ServiceMeshSpec(_messages.Message):
-  r"""ServiceMeshSpec contains the serviceMesh subfeature configuration. Other
-  fields to be added later
-  """
-
-
-
-class ServiceMeshState(_messages.Message):
-  r"""ServiceMeshState contains the state of Service Mesh subfeature"""
-
-
 class SetIamPolicyRequest(_messages.Message):
   r"""Request message for `SetIamPolicy` method.
 
@@ -3996,6 +4251,22 @@ class TestIamPermissionsResponse(_messages.Message):
   """
 
   permissions = _messages.StringField(1, repeated=True)
+
+
+class Toleration(_messages.Message):
+  r"""Toleration of a node taint.
+
+  Fields:
+    effect: Matches a taint effect.
+    key: Matches a taint key (not necessarily unique).
+    operator: Matches a taint operator.
+    value: Matches a taint value.
+  """
+
+  effect = _messages.StringField(1)
+  key = _messages.StringField(2)
+  operator = _messages.StringField(3)
+  value = _messages.StringField(4)
 
 
 class Type(_messages.Message):

@@ -142,7 +142,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -159,9 +161,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -506,7 +506,23 @@ class GoogleCloudManagedidentitiesV1beta1OpMetadata(_messages.Message):
 
 
 class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message):
-  r"""A GoogleCloudSaasacceleratorManagementProvidersV1Instance object.
+  r"""Instance represents the interface for SLM services to actuate the state
+  of control plane resources. Example Instance in JSON, where consumer-
+  project-number=123456, producer-project-id=cloud-sql: ```json Instance: {
+  "name": "projects/123456/locations/us-east1/instances/prod-instance",
+  "create_time": { "seconds": 1526406431, }, "labels": { "env": "prod", "foo":
+  "bar" }, "state": READY, "software_versions": { "software_update": "cloud-
+  sql-09-28-2018", }, "maintenance_policy_names": { "UpdatePolicy":
+  "projects/123456/locations/us-east1/maintenancePolicies/prod-update-policy",
+  } "tenant_project_id": "cloud-sql-test-tenant", "producer_metadata": {
+  "cloud-sql-tier": "basic", "cloud-sql-instance-size": "1G", },
+  "provisioned_resources": [ { "resource-type": "compute-instance", "resource-
+  url": "https://www.googleapis.com/compute/v1/projects/cloud-sql/zones/us-
+  east1-b/instances/vm-1", } ], "maintenance_schedules": { "csa_rollout": {
+  "start_time": { "seconds": 1526406431, }, "end_time": { "seconds":
+  1535406431, }, }, "ncsa_rollout": { "start_time": { "seconds": 1526406431,
+  }, "end_time": { "seconds": 1535406431, }, } }, "consumer_defined_name":
+  "my-sql-instance1", } ``` LINT.IfChange
 
   Enums:
     StateValueValuesEnum: Output only. Current lifecycle state of the resource
@@ -516,11 +532,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     LabelsValue: Optional. Resource labels to represent user provided
       metadata. Each label is a key-value pair, where both the key and the
       value are arbitrary strings provided by the user.
-    MaintenancePolicyNamesValue: Optional. Deprecated. The MaintenancePolicies
-      that have been attached to the instance. The key must be of the type
-      name of the oneof policy name defined in MaintenancePolicy, and the
-      referenced policy must define the same policy type. For complete details
-      of MaintenancePolicy, please refer to go/cloud-saas-mw-ug.
+    MaintenancePolicyNamesValue: Optional. The MaintenancePolicies that have
+      been attached to the instance. The key must be of the type name of the
+      oneof policy name defined in MaintenancePolicy, and the referenced
+      policy must define the same policy type. For details, please refer to
+      go/cloud-saas-mw-ug. Should not be set if
+      maintenance_settings.maintenance_policies is set.
     MaintenanceSchedulesValue: The MaintenanceSchedule contains the scheduling
       information of published maintenance schedule with same key as
       software_versions.
@@ -535,11 +552,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
       instance. This can be mutated by rollout services.
 
   Fields:
-    consumerDefinedName: consumer_defined_name is the name that is set by the
-      consumer. On the other hand Name field represents system-assigned id of
-      an instance so consumers are not necessarily aware of it.
-      consumer_defined_name is used for notification/UI purposes for consumer
-      to recognize their instances.
+    consumerDefinedName: consumer_defined_name is the name of the instance set
+      by the service consumers. Generally this is different from the `name`
+      field which reperesents the system-assigned id of the instance which the
+      service consumers do not recognize. This is a required field for tenants
+      onboarding to Maintenance Window notifications (go/slm-rollout-
+      maintenance-policies#prerequisites).
     createTime: Output only. Timestamp when the resource was created.
     instanceType: Optional. The instance_type of this instance of format: proj
       ects/{project_number}/locations/{location_id}/instanceTypes/{instance_ty
@@ -550,11 +568,12 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
     labels: Optional. Resource labels to represent user provided metadata.
       Each label is a key-value pair, where both the key and the value are
       arbitrary strings provided by the user.
-    maintenancePolicyNames: Optional. Deprecated. The MaintenancePolicies that
-      have been attached to the instance. The key must be of the type name of
-      the oneof policy name defined in MaintenancePolicy, and the referenced
-      policy must define the same policy type. For complete details of
-      MaintenancePolicy, please refer to go/cloud-saas-mw-ug.
+    maintenancePolicyNames: Optional. The MaintenancePolicies that have been
+      attached to the instance. The key must be of the type name of the oneof
+      policy name defined in MaintenancePolicy, and the referenced policy must
+      define the same policy type. For details, please refer to go/cloud-saas-
+      mw-ug. Should not be set if maintenance_settings.maintenance_policies is
+      set.
     maintenanceSchedules: The MaintenanceSchedule contains the scheduling
       information of published maintenance schedule with same key as
       software_versions.
@@ -641,11 +660,11 @@ class GoogleCloudSaasacceleratorManagementProvidersV1Instance(_messages.Message)
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MaintenancePolicyNamesValue(_messages.Message):
-    r"""Optional. Deprecated. The MaintenancePolicies that have been attached
-    to the instance. The key must be of the type name of the oneof policy name
+    r"""Optional. The MaintenancePolicies that have been attached to the
+    instance. The key must be of the type name of the oneof policy name
     defined in MaintenancePolicy, and the referenced policy must define the
-    same policy type. For complete details of MaintenancePolicy, please refer
-    to go/cloud-saas-mw-ug.
+    same policy type. For details, please refer to go/cloud-saas-mw-ug. Should
+    not be set if maintenance_settings.maintenance_policies is set.
 
     Messages:
       AdditionalProperty: An additional property for a
@@ -838,9 +857,9 @@ class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings(_messag
     MaintenancePoliciesValue: Optional. The MaintenancePolicies that have been
       attached to the instance. The key must be of the type name of the oneof
       policy name defined in MaintenancePolicy, and the embedded policy must
-      define the same policy type. For complete details of MaintenancePolicy,
-      please refer to go/cloud-saas-mw-ug. If only the name is needed, then
-      only populate MaintenancePolicy.name.
+      define the same policy type. For details, please refer to go/cloud-saas-
+      mw-ug. Should not be set if maintenance_policy_names is set. If only the
+      name is needed, then only populate MaintenancePolicy.name.
 
   Fields:
     exclude: Optional. Exclude instance from maintenance. When true, rollout
@@ -851,9 +870,9 @@ class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings(_messag
     maintenancePolicies: Optional. The MaintenancePolicies that have been
       attached to the instance. The key must be of the type name of the oneof
       policy name defined in MaintenancePolicy, and the embedded policy must
-      define the same policy type. For complete details of MaintenancePolicy,
-      please refer to go/cloud-saas-mw-ug. If only the name is needed, then
-      only populate MaintenancePolicy.name.
+      define the same policy type. For details, please refer to go/cloud-saas-
+      mw-ug. Should not be set if maintenance_policy_names is set. If only the
+      name is needed, then only populate MaintenancePolicy.name.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -861,9 +880,9 @@ class GoogleCloudSaasacceleratorManagementProvidersV1MaintenanceSettings(_messag
     r"""Optional. The MaintenancePolicies that have been attached to the
     instance. The key must be of the type name of the oneof policy name
     defined in MaintenancePolicy, and the embedded policy must define the same
-    policy type. For complete details of MaintenancePolicy, please refer to
-    go/cloud-saas-mw-ug. If only the name is needed, then only populate
-    MaintenancePolicy.name.
+    policy type. For details, please refer to go/cloud-saas-mw-ug. Should not
+    be set if maintenance_policy_names is set. If only the name is needed,
+    then only populate MaintenancePolicy.name.
 
     Messages:
       AdditionalProperty: An additional property for a
@@ -1281,7 +1300,7 @@ class Location(_messages.Message):
 
 
 class MaintenancePolicy(_messages.Message):
-  r"""Defines policies to service maintenance events.
+  r"""LINT.IfChange Defines policies to service maintenance events.
 
   Enums:
     StateValueValuesEnum: Optional. The state of the policy.

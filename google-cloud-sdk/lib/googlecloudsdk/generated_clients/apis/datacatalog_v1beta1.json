@@ -158,7 +158,7 @@
           }
         },
         "includeGcpPublicDatasets": {
-          "description": "If `true`, include Google Cloud Platform (GCP) public datasets in the search results. Info on GCP public datasets is available at https:\/\/cloud.google.com\/public-datasets\/. By default, GCP public datasets are excluded.",
+          "description": "If `true`, include Google Cloud public datasets in the search results. Info on Google Cloud public datasets is available at https:\/\/cloud.google.com\/public-datasets\/. By default, Google Cloud public datasets are excluded.",
           "type": "boolean"
         },
         "restrictedLocations": {
@@ -631,7 +631,7 @@
     },
     "GoogleCloudDatacatalogV1beta1TagTemplate": {
       "id": "GoogleCloudDatacatalogV1beta1TagTemplate",
-      "description": "A tag template defines a tag, which can have one or more typed fields. The template is used to create and attach the tag to GCP resources. [Tag template roles](https:\/\/cloud.google.com\/iam\/docs\/understanding-roles#data-catalog-roles) provide permissions to create, edit, and use the template. See, for example, the [TagTemplate User](https:\/\/cloud.google.com\/data-catalog\/docs\/how-to\/template-user) role, which includes permission to use the tag template to tag resources.",
+      "description": "A tag template defines a tag, which can have one or more typed fields. The template is used to create and attach the tag to Google Cloud resources. [Tag template roles](https:\/\/cloud.google.com\/iam\/docs\/understanding-roles#data-catalog-roles) provide permissions to create, edit, and use the template. See, for example, the [TagTemplate User](https:\/\/cloud.google.com\/data-catalog\/docs\/how-to\/template-user) role, which includes permission to use the tag template to tag resources.",
       "type": "object",
       "properties": {
         "name": {
@@ -901,7 +901,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}\/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https:\/\/cloud.google.com\/kubernetes-engine\/docs\/how-to\/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace\/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1030,6 +1030,36 @@
               "FINE_GRAINED_ACCESS_CONTROL"
             ]
           }
+        },
+        "service": {
+          "description": "Output only. Identity of the service which owns the Taxonomy. This field is only populated when the taxonomy is created by a Google Cloud service. Currently only 'DATAPLEX' is supported.",
+          "readOnly": true,
+          "$ref": "GoogleCloudDatacatalogV1beta1TaxonomyService"
+        }
+      }
+    },
+    "GoogleCloudDatacatalogV1beta1TaxonomyService": {
+      "id": "GoogleCloudDatacatalogV1beta1TaxonomyService",
+      "description": "The source system of the Taxonomy.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The Google Cloud service name.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value",
+            "Dataplex.",
+            "Other"
+          ],
+          "enum": [
+            "MANAGING_SYSTEM_UNSPECIFIED",
+            "MANAGING_SYSTEM_DATAPLEX",
+            "MANAGING_SYSTEM_OTHER"
+          ]
+        },
+        "identity": {
+          "description": "P4SA Identity of the service.",
+          "type": "string"
         }
       }
     },
@@ -1214,6 +1244,134 @@
           "items": {
             "$ref": "GoogleCloudDatacatalogV1beta1SerializedTaxonomy"
           }
+        }
+      }
+    },
+    "GoogleCloudDatacatalogV1ReconcileTagsMetadata": {
+      "id": "GoogleCloudDatacatalogV1ReconcileTagsMetadata",
+      "description": "Long-running operation metadata message returned by the ReconcileTags.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "State of the reconciliation operation.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value. This value is unused.",
+            "The reconciliation has been queued and awaits for execution.",
+            "The reconciliation is in progress.",
+            "The reconciliation has been finished."
+          ],
+          "enum": [
+            "RECONCILIATION_STATE_UNSPECIFIED",
+            "RECONCILIATION_QUEUED",
+            "RECONCILIATION_IN_PROGRESS",
+            "RECONCILIATION_DONE"
+          ]
+        },
+        "errors": {
+          "description": "Maps the name of each tagged column (or empty string for a sole entry) to tagging operation status.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "Status"
+          }
+        }
+      }
+    },
+    "Status": {
+      "id": "Status",
+      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https:\/\/github.com\/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https:\/\/cloud.google.com\/apis\/design\/errors).",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
+          "type": "string"
+        },
+        "details": {
+          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object. Contains field @type with type URL."
+            }
+          }
+        }
+      }
+    },
+    "GoogleCloudDatacatalogV1ReconcileTagsResponse": {
+      "id": "GoogleCloudDatacatalogV1ReconcileTagsResponse",
+      "description": "Long-running operation response message returned by ReconcileTags.",
+      "type": "object",
+      "properties": {
+        "createdTagsCount": {
+          "description": "Number of tags created in the request.",
+          "type": "string",
+          "format": "int64"
+        },
+        "updatedTagsCount": {
+          "description": "Number of tags updated in the request.",
+          "type": "string",
+          "format": "int64"
+        },
+        "deletedTagsCount": {
+          "description": "Number of tags deleted in the request.",
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "GoogleCloudDatacatalogV1ImportEntriesMetadata": {
+      "id": "GoogleCloudDatacatalogV1ImportEntriesMetadata",
+      "description": "Metadata message for long-running operation returned by the ImportEntries.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "State of the import operation.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value. This value is unused.",
+            "The dump with entries has been queued for import.",
+            "The import of entries is in progress.",
+            "The import of entries has been finished.",
+            "The import of entries has been abandoned in favor of a newer request."
+          ],
+          "enum": [
+            "IMPORT_STATE_UNSPECIFIED",
+            "IMPORT_QUEUED",
+            "IMPORT_IN_PROGRESS",
+            "IMPORT_DONE",
+            "IMPORT_OBSOLETE"
+          ]
+        },
+        "errors": {
+          "description": "Partial errors that are encountered during the ImportEntries operation. There is no guarantee that all the encountered errors are reported. However, if no errors are reported, it means that no errors were encountered.",
+          "type": "array",
+          "items": {
+            "$ref": "Status"
+          }
+        }
+      }
+    },
+    "GoogleCloudDatacatalogV1ImportEntriesResponse": {
+      "id": "GoogleCloudDatacatalogV1ImportEntriesResponse",
+      "description": "Response message for long-running operation returned by the ImportEntries.",
+      "type": "object",
+      "properties": {
+        "upsertedEntriesCount": {
+          "description": "Cumulative number of entries created and entries updated as a result of import operation.",
+          "type": "string",
+          "format": "int64"
+        },
+        "deletedEntriesCount": {
+          "description": "Number of entries deleted as a result of import operation.",
+          "type": "string",
+          "format": "int64"
         }
       }
     }
@@ -2465,6 +2623,11 @@
                     },
                     "pageToken": {
                       "description": "The next_page_token value returned from a previous list request, if any. If not set, defaults to an empty string.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "filter": {
+                      "description": "Supported field for filter is 'service' and value is 'dataplex'. Eg: service=dataplex.",
                       "location": "query",
                       "type": "string"
                     }

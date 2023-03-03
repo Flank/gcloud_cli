@@ -108,7 +108,9 @@ class Binding(_messages.Message):
       to/kubernetes-service-accounts). For example, `my-
       project.svc.id.goog[my-namespace/my-kubernetes-sa]`. *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`. *
+      example, `admins@example.com`. * `domain:{domain}`: The G Suite domain
+      (primary) that represents all the users of that domain. For example,
+      `google.com` or `example.com`. *
       `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
       identifier) representing a user that has been recently deleted. For
       example, `alice@example.com?uid=123456789012345678901`. If the user is
@@ -125,9 +127,7 @@ class Binding(_messages.Message):
       has been recently deleted. For example,
       `admins@example.com?uid=123456789012345678901`. If the group is
       recovered, this value reverts to `group:{emailid}` and the recovered
-      group retains the role in the binding. * `domain:{domain}`: The G Suite
-      domain (primary) that represents all the users of that domain. For
-      example, `google.com` or `example.com`.
+      group retains the role in the binding.
     role: Role that is assigned to the list of `members`, or principals. For
       example, `roles/viewer`, `roles/editor`, or `roles/owner`.
   """
@@ -267,7 +267,10 @@ class Destination(_messages.Message):
   Fields:
     cloudFunction: The Cloud Function resource name. Only Cloud Functions V2
       is supported. Format:
-      `projects/{project}/locations/{location}/functions/{function}`
+      `projects/{project}/locations/{location}/functions/{function}` This is a
+      read-only field. Creating Cloud Functions V2 triggers is only supported
+      via the Cloud Functions product. An error will be returned if the user
+      sets this value.
     cloudRun: Cloud Run fully-managed resource that receives the events. The
       resource should be in the same project as the trigger.
     gke: A GKE service capable of receiving events. The service should be
@@ -1724,9 +1727,12 @@ class Trigger(_messages.Message):
     etag: Output only. This checksum is computed by the server based on the
       value of other fields, and might be sent only on create requests to
       ensure that the client has an up-to-date value before proceeding.
-    eventFilters: Required. null The list of filters that applies to event
-      attributes. Only events that match all the provided filters are sent to
-      the destination.
+    eventDataContentType: Optional. EventDataContentType specifies the type of
+      payload in MIME format that is expected from the CloudEvent data field.
+      This will be set to `application/json` if the value is not defined.
+    eventFilters: Required. Unordered list. The list of filters that applies
+      to event attributes. Only events that match all the provided filters are
+      sent to the destination.
     labels: Optional. User labels attached to the triggers that can be used to
       group resources.
     name: Required. The resource name of the trigger. Must be unique within
@@ -1744,10 +1750,10 @@ class Trigger(_messages.Message):
       account for information on how to invoke authenticated Cloud Run
       services. To create Audit Log triggers, the service account should also
       have the `roles/eventarc.eventReceiver` IAM role.
-    transport: Optional. To deliver messages, Eventarc might use other GCP
-      products as a transport intermediary. This field contains a reference to
-      that transport intermediary. This information can be used for debugging
-      purposes.
+    transport: Optional. To deliver messages, Eventarc might use other Google
+      Cloud products as a transport intermediary. This field contains a
+      reference to that transport intermediary. This information can be used
+      for debugging purposes.
     uid: Output only. Server-assigned unique identifier for the trigger. The
       value is a UUID4 string and guaranteed to remain unchanged until the
       resource is deleted.
@@ -1808,13 +1814,14 @@ class Trigger(_messages.Message):
   createTime = _messages.StringField(3)
   destination = _messages.MessageField('Destination', 4)
   etag = _messages.StringField(5)
-  eventFilters = _messages.MessageField('EventFilter', 6, repeated=True)
-  labels = _messages.MessageField('LabelsValue', 7)
-  name = _messages.StringField(8)
-  serviceAccount = _messages.StringField(9)
-  transport = _messages.MessageField('Transport', 10)
-  uid = _messages.StringField(11)
-  updateTime = _messages.StringField(12)
+  eventDataContentType = _messages.StringField(6)
+  eventFilters = _messages.MessageField('EventFilter', 7, repeated=True)
+  labels = _messages.MessageField('LabelsValue', 8)
+  name = _messages.StringField(9)
+  serviceAccount = _messages.StringField(10)
+  transport = _messages.MessageField('Transport', 11)
+  uid = _messages.StringField(12)
+  updateTime = _messages.StringField(13)
 
 
 encoding.AddCustomJsonFieldMapping(
