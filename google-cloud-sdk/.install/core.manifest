@@ -662,6 +662,7 @@ lib/googlecloudsdk/api_lib/monitoring/__init__.py
 lib/googlecloudsdk/api_lib/monitoring/channels.py
 lib/googlecloudsdk/api_lib/monitoring/metrics_scopes.py
 lib/googlecloudsdk/api_lib/monitoring/policies.py
+lib/googlecloudsdk/api_lib/monitoring/snoozes.py
 lib/googlecloudsdk/api_lib/netapp/__init__.py
 lib/googlecloudsdk/api_lib/netapp/active_directories/__init__.py
 lib/googlecloudsdk/api_lib/netapp/active_directories/client.py
@@ -1176,6 +1177,7 @@ lib/googlecloudsdk/command_lib/code/cloud/__init__.py
 lib/googlecloudsdk/command_lib/code/cloud/artifact_registry.py
 lib/googlecloudsdk/command_lib/code/cloud/cloud.py
 lib/googlecloudsdk/command_lib/code/cloud/cloud_files.py
+lib/googlecloudsdk/command_lib/code/cloud/cloudrun.py
 lib/googlecloudsdk/command_lib/code/common.py
 lib/googlecloudsdk/command_lib/code/cross_platform_temp_file.py
 lib/googlecloudsdk/command_lib/code/dataobject.py
@@ -1223,7 +1225,6 @@ lib/googlecloudsdk/command_lib/compute/completers.py
 lib/googlecloudsdk/command_lib/compute/diagnose/__init__.py
 lib/googlecloudsdk/command_lib/compute/diagnose/external_helper.py
 lib/googlecloudsdk/command_lib/compute/diagnose/internal_helpers.py
-lib/googlecloudsdk/command_lib/compute/diagnose/sosreport_helper.py
 lib/googlecloudsdk/command_lib/compute/disk_types/__init__.py
 lib/googlecloudsdk/command_lib/compute/disk_types/flags.py
 lib/googlecloudsdk/command_lib/compute/disks/__init__.py
@@ -2495,6 +2496,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/ls/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/objects/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/objects/patch_object_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/objects/rewrite_object_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/patch_file_posix_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/rm/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/rm/delete_object_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/rm/delete_task_iterator_factory.py
@@ -2527,6 +2529,9 @@ lib/googlecloudsdk/command_lib/tasks/resources.yaml
 lib/googlecloudsdk/command_lib/telco_automation/__init__.py
 lib/googlecloudsdk/command_lib/telco_automation/hooks.py
 lib/googlecloudsdk/command_lib/telco_automation/resources.yaml
+lib/googlecloudsdk/command_lib/terraform/__init__.py
+lib/googlecloudsdk/command_lib/terraform/env_vars.py
+lib/googlecloudsdk/command_lib/terraform/flags.py
 lib/googlecloudsdk/command_lib/transcoder/__init__.py
 lib/googlecloudsdk/command_lib/transcoder/flags.py
 lib/googlecloudsdk/command_lib/transcoder/resource_args.py
@@ -3913,7 +3918,12 @@ lib/googlecloudsdk/generated_clients/apis/netapp/v1alpha1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/netapp/v1alpha1/netapp_v1alpha1_client.py
 lib/googlecloudsdk/generated_clients/apis/netapp/v1alpha1/netapp_v1alpha1_messages.py
 lib/googlecloudsdk/generated_clients/apis/netapp/v1alpha1/resources.py
+lib/googlecloudsdk/generated_clients/apis/netapp/v1beta1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/netapp/v1beta1/netapp_v1beta1_client.py
+lib/googlecloudsdk/generated_clients/apis/netapp/v1beta1/netapp_v1beta1_messages.py
+lib/googlecloudsdk/generated_clients/apis/netapp/v1beta1/resources.py
 lib/googlecloudsdk/generated_clients/apis/netapp_v1alpha1.json
+lib/googlecloudsdk/generated_clients/apis/netapp_v1beta1.json
 lib/googlecloudsdk/generated_clients/apis/networkconnectivity/__init__.py
 lib/googlecloudsdk/generated_clients/apis/networkconnectivity/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/networkconnectivity/v1/networkconnectivity_v1_client.py
@@ -4111,12 +4121,16 @@ lib/googlecloudsdk/generated_clients/apis/privateca_v1.json
 lib/googlecloudsdk/generated_clients/apis/privateca_v1alpha1.json
 lib/googlecloudsdk/generated_clients/apis/privateca_v1beta1.json
 lib/googlecloudsdk/generated_clients/apis/publicca/__init__.py
+lib/googlecloudsdk/generated_clients/apis/publicca/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/publicca/v1/publicca_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/publicca/v1/publicca_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1alpha1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1alpha1/publicca_v1alpha1_client.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1alpha1/publicca_v1alpha1_messages.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1beta1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1beta1/publicca_v1beta1_client.py
 lib/googlecloudsdk/generated_clients/apis/publicca/v1beta1/publicca_v1beta1_messages.py
+lib/googlecloudsdk/generated_clients/apis/publicca_v1.json
 lib/googlecloudsdk/generated_clients/apis/publicca_v1alpha1.json
 lib/googlecloudsdk/generated_clients/apis/publicca_v1beta1.json
 lib/googlecloudsdk/generated_clients/apis/pubsub/__init__.py
@@ -5098,6 +5112,7 @@ lib/googlecloudsdk/schemas/networksecurity/v1alpha1/ServerTlsPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/Source.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/TlsCertificateFiles.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/TlsCertificatePaths.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1alpha1/TlsInspectionPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/UrlList.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/ValidationCA.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1beta1/AuthorizationPolicy.yaml
@@ -6487,7 +6502,6 @@ lib/surface/compute/copy_files.py
 lib/surface/compute/diagnose/__init__.py
 lib/surface/compute/diagnose/export_logs.py
 lib/surface/compute/diagnose/routes.py
-lib/surface/compute/diagnose/sosreport.py
 lib/surface/compute/disk_types/__init__.py
 lib/surface/compute/disk_types/describe.py
 lib/surface/compute/disk_types/list.py
@@ -9573,6 +9587,12 @@ lib/surface/monitoring/policies/delete.yaml
 lib/surface/monitoring/policies/describe.yaml
 lib/surface/monitoring/policies/list.yaml
 lib/surface/monitoring/policies/update.py
+lib/surface/monitoring/snoozes/__init__.py
+lib/surface/monitoring/snoozes/cancel.py
+lib/surface/monitoring/snoozes/create.py
+lib/surface/monitoring/snoozes/describe.py
+lib/surface/monitoring/snoozes/list.yaml
+lib/surface/monitoring/snoozes/update.py
 lib/surface/netapp/__init__.py
 lib/surface/netapp/active_directories/__init__.py
 lib/surface/netapp/active_directories/create.py
@@ -9742,6 +9762,11 @@ lib/surface/network_security/server_tls_policies/delete.yaml
 lib/surface/network_security/server_tls_policies/export.yaml
 lib/surface/network_security/server_tls_policies/import.yaml
 lib/surface/network_security/server_tls_policies/list.yaml
+lib/surface/network_security/tls_inspection_policies/__init__.py
+lib/surface/network_security/tls_inspection_policies/delete.yaml
+lib/surface/network_security/tls_inspection_policies/export.yaml
+lib/surface/network_security/tls_inspection_policies/import.yaml
+lib/surface/network_security/tls_inspection_policies/list.yaml
 lib/surface/network_security/url_lists/__init__.py
 lib/surface/network_security/url_lists/delete.yaml
 lib/surface/network_security/url_lists/export.yaml
@@ -10778,6 +10803,8 @@ lib/surface/telco_automation/orchestration_cluster/delete.yaml
 lib/surface/telco_automation/orchestration_cluster/describe.yaml
 lib/surface/telco_automation/orchestration_cluster/list.yaml
 lib/surface/terraform/__init__.py
+lib/surface/terraform/recommendations/__init__.py
+lib/surface/terraform/recommendations/list.py
 lib/surface/terraform/vet.py
 lib/surface/topic/__init__.py
 lib/surface/topic/accessibility.py

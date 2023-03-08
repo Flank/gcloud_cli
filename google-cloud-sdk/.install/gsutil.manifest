@@ -138,6 +138,7 @@ platform/gsutil/gslib/tests/test_data/test.json
 platform/gsutil/gslib/tests/test_data/test.mp3
 platform/gsutil/gslib/tests/test_data/test.p12
 platform/gsutil/gslib/tests/test_data/test.txt
+platform/gsutil/gslib/tests/test_data/test_external_account_authorized_user_credentials.json
 platform/gsutil/gslib/tests/test_data/test_external_account_credentials.json
 platform/gsutil/gslib/tests/test_defacl.py
 platform/gsutil/gslib/tests/test_defstorageclass.py
@@ -2064,6 +2065,7 @@ platform/gsutil/third_party/google-auth-library-python/google/auth/_helpers.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_jwt_async.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_oauth2client.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/_service_account_info.py
+platform/gsutil/third_party/google-auth-library-python/google/auth/api_key.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/app_engine.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/aws.py
 platform/gsutil/third_party/google-auth-library-python/google/auth/compute_engine/__init__.py
@@ -2226,6 +2228,7 @@ platform/gsutil/third_party/google-auth-library-python/tests/test__exponential_b
 platform/gsutil/third_party/google-auth-library-python/tests/test__helpers.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__oauth2client.py
 platform/gsutil/third_party/google-auth-library-python/tests/test__service_account_info.py
+platform/gsutil/third_party/google-auth-library-python/tests/test_api_key.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_app_engine.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_aws.py
 platform/gsutil/third_party/google-auth-library-python/tests/test_credentials.py
