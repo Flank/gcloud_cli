@@ -54,6 +54,7 @@ class NodePoolsClient(client.ClientBase):
         'etag': flags.Get(args, 'etag'),
         'name': self._node_pool_name(args),
         'validateOnly': flags.Get(args, 'validate_only'),
+        'ignoreErrors': flags.Get(args, 'ignore_errors'),
     }
     req = self._messages.GkeonpremProjectsLocationsVmwareClustersVmwareNodePoolsDeleteRequest(
         **kwargs)
@@ -90,6 +91,19 @@ class NodePoolsClient(client.ClientBase):
     req = self._messages.GkeonpremProjectsLocationsVmwareClustersVmwareNodePoolsPatchRequest(
         **kwargs)
     return self._service.Patch(req)
+
+  def Enroll(self, args):
+    """Enrolls an Anthos on VMware node pool API resource."""
+    enroll_vmware_node_pool_request = (
+        self._messages.EnrollVmwareNodePoolRequest(
+            vmwareNodepoolId=self._node_pool_id(args),
+        )
+    )
+    req = self._messages.GkeonpremProjectsLocationsVmwareClustersVmwareNodePoolsEnrollRequest(
+        enrollVmwareNodePoolRequest=enroll_vmware_node_pool_request,
+        parent=self._node_pool_parent(args),
+    )
+    return self._service.Enroll(req)
 
   def _vmware_node_pool(self, args):
     """Constructs proto message VmwareNodePool."""

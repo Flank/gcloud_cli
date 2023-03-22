@@ -28,6 +28,7 @@ from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.eventarc import flags as eventarc_flags
 from googlecloudsdk.command_lib.util import completers
+from googlecloudsdk.command_lib.util.apis import yaml_data
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import log
@@ -431,12 +432,20 @@ def AddRuntimeFlag(parser):
   )
 
 
+def GetVpcConnectorResourceSpec():
+  instance_data = yaml_data.ResourceYAMLData.FromPath(
+      'compute.networks.vpc_access.connector'
+  )
+  return concepts.ResourceSpec.FromYaml(instance_data.GetData())
+
+
 def AddVPCConnectorMutexGroup(parser):
   """Add flag for specifying VPC connector to the parser."""
   mutex_group = parser.add_group(mutex=True)
-  mutex_group.add_argument(
+  resource = presentation_specs.ResourcePresentationSpec(
       '--vpc-connector',
-      help="""\
+      GetVpcConnectorResourceSpec(),
+      """\
         The VPC Access connector that the function can connect to. It can be
         either the fully-qualified URI, or the short name of the VPC Access
         connector resource. If the short name is used, the connector must
@@ -445,7 +454,18 @@ def AddVPCConnectorMutexGroup(parser):
         or `${CONNECTOR}`, where `${CONNECTOR}` is the short name of the VPC
         Access connector.
       """,
+      group=mutex_group,
+      # This hides the region flag for the connector resource.
+      flag_name_overrides={'region': ''},
   )
+
+  concept_parsers.ConceptParser(
+      [resource],
+      # This configures the fallthrough from the vpc-connector's region to
+      # the primary flag for the function's region.
+      command_level_fallthroughs={'--vpc-connector.region': ['--region']},
+  ).AddToParser(parser)
+
   mutex_group.add_argument(
       '--clear-vpc-connector',
       action='store_true',
@@ -951,3 +971,46 @@ def AddConcurrencyFlag(parser, track):
             ' provided.'
         ),
     )
+
+
+def AddUpgradeFlags(parser):
+  """Adds upgrade related function flags."""
+  upgrade_group = parser.add_group(mutex=True)
+  upgrade_group.add_argument(
+      '--setup-config',
+      action='store_true',
+      help=(
+          'Sets up the function upgrade config by creating a 2nd gen copy of'
+          " the function's code and configuration. This is the default action."
+      ),
+  )
+  upgrade_group.add_argument(
+      '--redirect-traffic',
+      action='store_true',
+      help='Redirects production traffic to the 2nd gen copy of the function.',
+  )
+  upgrade_group.add_argument(
+      '--rollback-traffic',
+      action='store_true',
+      help=(
+          'Rolls back production traffic to the original 1st gen copy of the'
+          ' function. The 2nd gen copy will still be available for testing.'
+      ),
+  )
+  upgrade_group.add_argument(
+      '--commit',
+      action='store_true',
+      help=(
+          'Finishes the upgrade process and permanently deletes the original'
+          ' 1st gen copy of the function.'
+      ),
+  )
+  upgrade_group.add_argument(
+      '--abort',
+      action='store_true',
+      help=(
+          'Undoes all steps of the upgrade process done so far. All traffic'
+          ' will point to the original 1st gen function copy and the 2nd gen'
+          ' function copy will be deleted.'
+      ),
+  )

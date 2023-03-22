@@ -34,7 +34,6 @@ from googlecloudsdk.core.docker import constants as const_lib
 from googlecloudsdk.core.feature_flags import config as feature_flags_config
 from googlecloudsdk.core.resource import resource_printer_types as formats
 from googlecloudsdk.core.util import encoding
-from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import http_proxy_types
 from googlecloudsdk.core.util import scaled_integer
 from googlecloudsdk.core.util import times
@@ -404,6 +403,7 @@ class _Sections(object):
       SDK.
     ml_engine: Section, The section containing ml_engine properties for the
       Cloud SDK.
+    mps: Section, The section containing mps properties for the Cloud SDK.
     netapp: Section, The section containing netapp properties for the Cloud SDK.
     notebooks: Section, The section containing notebook properties for the Cloud
       SDK.
@@ -504,6 +504,7 @@ class _Sections(object):
     self.metastore = _SectionMetastore()
     self.metrics = _SectionMetrics()
     self.ml_engine = _SectionMlEngine()
+    self.mps = _SectionMps()
     self.netapp = _SectionNetapp()
     self.notebooks = _SectionNotebooks()
     self.privateca = _SectionPrivateCa()
@@ -582,6 +583,7 @@ class _Sections(object):
         self.metastore,
         self.metrics,
         self.ml_engine,
+        self.mps,
         self.netapp,
         self.notebooks,
         self.pubsub,
@@ -1134,6 +1136,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.baremetalsolution = self._Add(
         'baremetalsolution', command='gcloud bms')
     self.batch = self._Add('batch', command='gcloud batch', hidden=True)
+    self.bigquery = self._Add('bigquery', hidden=True)
     self.bigtableadmin = self._Add('bigtableadmin', command='gcloud bigtable')
     self.binaryauthorization = self._Add(
         'binaryauthorization', command='gcloud container binauthz', hidden=True)
@@ -1226,6 +1229,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.managedidentities = self._Add(
         'managedidentities', command='gcloud active-directory')
     self.manager = self._Add('manager', hidden=True)
+    self.marketplacesolutions = self._Add(
+        'marketplacesolutions', command='gcloud mps')
     self.mediaasset = self._Add('mediaasset', command='gcloud media')
     self.memcache = self._Add('memcache', command='gcloud memcache')
     self.metastore = self._Add('metastore', command='gcloud metastore')
@@ -2902,6 +2907,17 @@ class _SectionMlEngine(_Section):
                    'specified, the default path is the one to the Python '
                    'interpreter found on system `PATH`.'))
 
+class _SectionMps(_Section):
+  """Contains the properties for the 'mps' section."""
+
+  def __init__(self):
+    super(_SectionMps, self).__init__('mps')
+    self.vendor = self._Add(
+        'vendor',
+        default=None,
+        help_text='Id for Marketplace Solutions Vendor. '
+        )
+
 
 class _SectionNetapp(_Section):
   """Contains the properties for the 'netapp' section."""
@@ -3277,6 +3293,14 @@ class _SectionStorage(_Section):
         default=2,
         help_text='Used in exponential backoff for retrying operations.')
 
+    self.json_api_version = self._Add(
+        'json_api_version',
+        hidden=True,
+        help_text='The version "v1" is hardcoded in the generated client for'
+        ' upload operations, e.g. /resumable/upload/storage/v1/b/{bucket}/o.'
+        'Setting this property will replace "v1" in the above path with the'
+        'specified value.')
+
     self.key_store_path = self._Add(
         'key_store_path',
         help_text=textwrap.dedent("""\
@@ -3376,6 +3400,17 @@ class _SectionStorage(_Section):
         'Cloud Storage this limit is 32. This property has no effect if '
         'parallel_composite_upload_enabled is set to False.')
 
+    self.rsync_files_directory = self._Add(
+        'rsync_files_directory',
+        default=os.path.join(
+            config.Paths().global_config_dir,
+            'surface_data',
+            'storage',
+            'rsync_files',
+        ),
+        help_text='Directory path to intermediary files created by rsync.',
+    )
+
     self.s3_endpoint_url = self._Add(
         's3_endpoint_url',
         default=None,
@@ -3391,9 +3426,14 @@ class _SectionStorage(_Section):
 
     self.tracker_files_directory = self._Add(
         'tracker_files_directory',
-        default=os.path.join(files.GetHomeDir(), '.config', 'gcloud',
-                             'surface_data', 'storage', 'tracker_files'),
-        help_text='Directory path to tracker files for resumable operations.')
+        default=os.path.join(
+            config.Paths().global_config_dir,
+            'surface_data',
+            'storage',
+            'tracker_files',
+        ),
+        help_text='Directory path to tracker files for resumable operations.',
+    )
 
     self.use_gcloud_crc32c = self._AddBool(
         'use_gcloud_crc32c',

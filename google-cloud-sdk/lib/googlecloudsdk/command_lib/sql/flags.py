@@ -46,7 +46,8 @@ _IP_ADDRESS_PART = r'(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})'  # Match decimal 0-255
 _CIDR_PREFIX_PART = r'([0-9]|[1-2][0-9]|3[0-2])'  # Match decimal 0-32
 # Matches either IPv4 range in CIDR notation or a naked IPv4 address.
 _CIDR_REGEX = r'{addr_part}(\.{addr_part}){{3}}(\/{prefix_part})?$'.format(
-    addr_part=_IP_ADDRESS_PART, prefix_part=_CIDR_PREFIX_PART)
+    addr_part=_IP_ADDRESS_PART, prefix_part=_CIDR_PREFIX_PART
+)
 
 
 class DatabaseCompleter(completers.ListCommandCompleter):
@@ -732,6 +733,22 @@ def AddStorageSize(parser):
             'number of GB. The default is 10GB. Information on storage '
             'limits can be found here: '
             'https://cloud.google.com/sql/docs/quotas#storage_limits'))
+
+
+def AddStorageSizeForStorageShrink(parser):
+  parser.add_argument(
+      '--storage-size',
+      type=arg_parsers.BinarySize(
+          lower_bound='10GB',
+          upper_bound='65536GB',
+          suggested_binary_size_scales=['GB'],
+      ),
+      required=True,
+      help=(
+          'The target storage size must be an integer that represents the'
+          ' number of GB. For example, --storage-size=10GB'
+      ),
+  )
 
 
 def AddTier(parser, is_patch=False, is_alpha=False):
@@ -1492,3 +1509,17 @@ def AddClearAllowedPscProjects(parser):
       help=('This will clear the project allowlist of PSC, disallowing all '
             'projects from creating new PSC bindings to the instance.'),
       **kwargs)
+
+
+def AddRecreateReplicasOnPrimaryCrash(parser):
+  """Adds --recreate-replicas-on-primary-crash flag."""
+  parser.add_argument(
+      '--recreate-replicas-on-primary-crash',
+      hidden=True,
+      required=False,
+      help=('Enable/Disable replica recreation when a primary MySQL instance '
+            'operating in reduced durability mode with either or both of '
+            '`innodb_flush_log_at_trx_commit` and `sync_binlog` flags set to '
+            'non-default values. Not recreating the replicas might lead to '
+            'data inconsistencies between the primary and the replicas. '),
+      action=arg_parsers.StoreTrueFalseAction)

@@ -1,6 +1,5 @@
 bin/bootstrapping/gsutil.py
 data/cli/gsutil.json
-platform/gsutil.textproto
 platform/gsutil/CHANGES.md
 platform/gsutil/CHECKSUM
 platform/gsutil/CONTRIBUTING.md

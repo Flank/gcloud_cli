@@ -506,16 +506,27 @@ class EncryptionConfig(_messages.Message):
   kmsKeyName = _messages.StringField(1)
 
 
-class ExportInstanceRequest(_messages.Message):
-  r"""Requestion options for exporting data of an Instance
+class ExportEncryptionConfig(_messages.Message):
+  r"""Configuration for Encryption - e.g. CMEK
 
   Fields:
-    uri: Required. The path to the folder in Google Cloud Storage where the
-      export will be stored. The URI is in the form
-      `gs://bucketName/folderName`.
+    kmsKeyName: Name of the CMEK key in KMS.
   """
 
-  uri = _messages.StringField(1)
+  kmsKeyName = _messages.StringField(1)
+
+
+class ExportInstanceRequest(_messages.Message):
+  r"""Requestion options for exporting data of an Instance.
+
+  Fields:
+    encryptionConfig: Encryption configuration (CMEK).
+    gcsUri: The path to the folder in Google Cloud Storage where the export
+      will be stored. The URI is in the form `gs://bucketName/folderName`.
+  """
+
+  encryptionConfig = _messages.MessageField('ExportEncryptionConfig', 1)
+  gcsUri = _messages.StringField(2)
 
 
 class Expr(_messages.Message):
@@ -572,11 +583,11 @@ class ImportInstanceRequest(_messages.Message):
   r"""Requestion options for importing looker data to an Instance
 
   Fields:
-    uri: Required. Path to the import folder in Google Cloud Storage, in the
-      form `gs://bucketName/folderName`.
+    gcsUri: Path to the import folder in Google Cloud Storage, in the form
+      `gs://bucketName/folderName`.
   """
 
-  uri = _messages.StringField(1)
+  gcsUri = _messages.StringField(1)
 
 
 class Instance(_messages.Message):
@@ -655,6 +666,8 @@ class Instance(_messages.Message):
       DELETING: Instance delete is in progress.
       DELETED: Instance has been deleted.
       PURGING: Instance is being purged. (This is different from DELETING).
+      EXPORTING: Instance is being exported.
+      IMPORTING: Instance is importing data.
     """
     STATE_UNSPECIFIED = 0
     ACTIVE = 1
@@ -665,6 +678,8 @@ class Instance(_messages.Message):
     DELETING = 6
     DELETED = 7
     PURGING = 8
+    EXPORTING = 9
+    IMPORTING = 10
 
   adminSettings = _messages.MessageField('AdminSettings', 1)
   consumerNetwork = _messages.StringField(2)
@@ -771,28 +786,6 @@ class InstanceBackupInternal(_messages.Message):
   name = _messages.StringField(5)
   state = _messages.EnumField('StateValueValuesEnum', 6)
   tenantProjectId = _messages.StringField(7)
-
-
-class IssueRedirectTicketInternalRequest(_messages.Message):
-  r"""IssueRedirectTicketInternalRequest is the request to issue a redirect
-  ticket for an instance. For internal use only.
-
-  Fields:
-    redirectUri: Required. URI to be used in the redirect.
-  """
-
-  redirectUri = _messages.StringField(1)
-
-
-class IssueRedirectTicketInternalResponse(_messages.Message):
-  r"""IssueRedirectTicketInternalResponse is the response for issuing a
-  redirect ticket. For internal use only.
-
-  Fields:
-    ticketId: ID of the created redirect ticket.
-  """
-
-  ticketId = _messages.StringField(1)
 
 
 class ListInstanceBackupsResponse(_messages.Message):
@@ -1038,20 +1031,6 @@ class LookerProjectsLocationsInstancesBackupsListRequest(_messages.Message):
   parent = _messages.StringField(4, required=True)
 
 
-class LookerProjectsLocationsInstancesBackupsRestoreRequest(_messages.Message):
-  r"""A LookerProjectsLocationsInstancesBackupsRestoreRequest object.
-
-  Fields:
-    name: Required. Instance being restored Format: projects/{project}/locatio
-      ns/{location}/instances/{instance}/backups/{backup}
-    restoreInstanceBackupRequest: A RestoreInstanceBackupRequest resource to
-      be passed as the request body.
-  """
-
-  name = _messages.StringField(1, required=True)
-  restoreInstanceBackupRequest = _messages.MessageField('RestoreInstanceBackupRequest', 2)
-
-
 class LookerProjectsLocationsInstancesBackupsSetIamPolicyRequest(_messages.Message):
   r"""A LookerProjectsLocationsInstancesBackupsSetIamPolicyRequest object.
 
@@ -1177,20 +1156,6 @@ class LookerProjectsLocationsInstancesImportRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
 
 
-class LookerProjectsLocationsInstancesIssueRedirectTicketInternalRequest(_messages.Message):
-  r"""A LookerProjectsLocationsInstancesIssueRedirectTicketInternalRequest
-  object.
-
-  Fields:
-    instance: Required. The instance resource to issue a redirect ticket for.
-    issueRedirectTicketInternalRequest: A IssueRedirectTicketInternalRequest
-      resource to be passed as the request body.
-  """
-
-  instance = _messages.StringField(1, required=True)
-  issueRedirectTicketInternalRequest = _messages.MessageField('IssueRedirectTicketInternalRequest', 2)
-
-
 class LookerProjectsLocationsInstancesListRequest(_messages.Message):
   r"""A LookerProjectsLocationsInstancesListRequest object.
 
@@ -1238,6 +1203,20 @@ class LookerProjectsLocationsInstancesRestartRequest(_messages.Message):
 
   name = _messages.StringField(1, required=True)
   restartInstanceRequest = _messages.MessageField('RestartInstanceRequest', 2)
+
+
+class LookerProjectsLocationsInstancesRestoreRequest(_messages.Message):
+  r"""A LookerProjectsLocationsInstancesRestoreRequest object.
+
+  Fields:
+    name: Required. Instance being restored Format:
+      projects/{project}/locations/{location}/instances/{instance}
+    restoreInstanceRequest: A RestoreInstanceRequest resource to be passed as
+      the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  restoreInstanceRequest = _messages.MessageField('RestoreInstanceRequest', 2)
 
 
 class LookerProjectsLocationsInstancesSetIamPolicyRequest(_messages.Message):
@@ -1619,8 +1598,16 @@ class RestartInstanceRequest(_messages.Message):
   r"""Request options for restarting an instance."""
 
 
-class RestoreInstanceBackupRequest(_messages.Message):
-  r"""Request options for restoring an instance"""
+class RestoreInstanceRequest(_messages.Message):
+  r"""Request options for restoring an instance
+
+  Fields:
+    backupId: Required. Backup being used to restore the instance Format: proj
+      ects/{project}/locations/{location}/instances/{instance}/backups/{backup
+      }
+  """
+
+  backupId = _messages.StringField(1)
 
 
 class Rule(_messages.Message):

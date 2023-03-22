@@ -59,7 +59,7 @@ class Update(base.Command):
     messages = tags.TagMessages()
 
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
-      tag_key = tag_utils.GetResourceFromNamespacedName(
+      tag_key = tag_utils.GetResource(
           args.RESOURCE_NAME, 'tagKeys')
     else:
       tag_key = tag_utils.GetTagKeyFromNamespacedName(

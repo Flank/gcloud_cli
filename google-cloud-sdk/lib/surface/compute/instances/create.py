@@ -110,7 +110,8 @@ def _CommonArgs(parser,
                 support_max_run_duration=False,
                 support_provisioned_throughput=False,
                 support_network_attachments=False,
-                support_local_ssd_recovery_timeout=False):
+                support_local_ssd_recovery_timeout=False,
+                support_local_ssd_size=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
@@ -176,6 +177,8 @@ def _CommonArgs(parser,
   instances_flags.AddInstanceTerminationActionVmArgs(parser)
   instances_flags.AddIPv6AddressArgs(parser)
   instances_flags.AddIPv6PrefixLengthArgs(parser)
+  instances_flags.AddInternalIPv6AddressArgs(parser)
+  instances_flags.AddInternalIPv6PrefixLengthArgs(parser)
 
   instances_flags.AddReservationAffinityGroup(
       parser,
@@ -220,6 +223,11 @@ def _CommonArgs(parser,
   if support_max_run_duration:
     instances_flags.AddMaxRunDurationVmArgs(parser)
 
+  if support_local_ssd_size:
+    instances_flags.AddLocalSsdArgsWithSize(parser)
+  else:
+    instances_flags.AddLocalSsdArgs(parser)
+
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.CreateCommand):
@@ -247,13 +255,16 @@ class Create(base.CreateCommand):
   _support_host_error_timeout_seconds = False
   _support_numa_node_count = False
   _support_visible_core_count = True
-  _support_network_queue_count = False
+  _support_network_queue_count = True
   _support_instance_kms = False
   _support_max_run_duration = False
   _support_ipv6_assignment = False
   _support_confidential_compute_type = False
   _support_network_attachments = False
   _support_local_ssd_recovery_timeout = False
+  _support_internal_ipv6_reservation = True
+  _support_regional_instance_template = False
+  _support_local_ssd_size = True
 
   @classmethod
   def Args(cls, parser):
@@ -272,9 +283,12 @@ class Create(base.CreateCommand):
         support_provisioned_throughput=cls._support_provisioned_throughput,
         supports_erase_vss=cls._support_erase_vss,
         support_network_attachments=cls._support_network_attachments,
-        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout)
-    cls.SOURCE_INSTANCE_TEMPLATE = (
-        instances_flags.MakeSourceInstanceTemplateArg())
+        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout,
+        support_local_ssd_size=cls._support_local_ssd_size,
+        support_network_queue_count=cls._support_network_queue_count)
+    cls.SOURCE_INSTANCE_TEMPLATE = instances_flags.MakeSourceInstanceTemplateArg(
+        support_regional_instance_template=cls._support_regional_instance_template
+    )
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     cls.SOURCE_MACHINE_IMAGE = (instances_flags.AddMachineImageArg())
     cls.SOURCE_MACHINE_IMAGE.AddArgument(parser)
@@ -285,7 +299,6 @@ class Create(base.CreateCommand):
     instances_flags.AddConfidentialComputeArgs(parser)
     instances_flags.AddKeyRevocationActionTypeArgs(parser)
     instances_flags.AddVisibleCoreCountArgs(parser)
-    instances_flags.AddLocalSsdArgs(parser)
 
   def Collection(self):
     return 'compute.instances'
@@ -294,7 +307,9 @@ class Create(base.CreateCommand):
     """Get sourceInstanceTemplate value as required by API."""
     if not args.IsSpecified('source_instance_template'):
       return None
-    ref = self.SOURCE_INSTANCE_TEMPLATE.ResolveAsResource(args, resources)
+    ref = self.SOURCE_INSTANCE_TEMPLATE.ResolveAsResource(
+        args, resources, default_scope=flags.compute_scope.ScopeEnum.GLOBAL
+    )
     return ref.SelfLink()
 
   def GetSourceMachineImage(self, args, resources):
@@ -352,7 +367,9 @@ class Create(base.CreateCommand):
         scope=compute_scopes.ScopeEnum.ZONE,
         skip_defaults=skip_defaults,
         support_public_dns=self._support_public_dns,
-        support_ipv6_assignment=self._support_ipv6_assignment)
+        support_ipv6_assignment=self._support_ipv6_assignment,
+        support_internal_ipv6_reservation=self._support_internal_ipv6_reservation,
+    )
 
     confidential_vm = (
         args.IsSpecified('confidential_compute') and args.confidential_compute)
@@ -689,6 +706,8 @@ class CreateBeta(Create):
   _support_ipv6_assignment = False
   _support_network_attachments = False
   _support_local_ssd_recovery_timeout = False
+  _support_regional_instance_template = False
+  _support_local_ssd_size = True
 
   def GetSourceMachineImage(self, args, resources):
     """Retrieves the specified source machine image's selflink.
@@ -723,14 +742,15 @@ class CreateBeta(Create):
         support_provisioned_throughput=cls._support_provisioned_throughput,
         support_network_attachments=cls._support_network_attachments,
         support_network_queue_count=cls._support_network_queue_count,
-        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout)
-    cls.SOURCE_INSTANCE_TEMPLATE = (
-        instances_flags.MakeSourceInstanceTemplateArg())
+        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout,
+        support_local_ssd_size=cls._support_local_ssd_size)
+    cls.SOURCE_INSTANCE_TEMPLATE = instances_flags.MakeSourceInstanceTemplateArg(
+        support_regional_instance_template=cls._support_regional_instance_template
+    )
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     cls.SOURCE_MACHINE_IMAGE = (instances_flags.AddMachineImageArg())
     cls.SOURCE_MACHINE_IMAGE.AddArgument(parser)
     instances_flags.AddSourceMachineImageEncryptionKey(parser)
-    instances_flags.AddLocalSsdArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
     instances_flags.AddPrivateIpv6GoogleAccessArg(
         parser, utils.COMPUTE_BETA_API_VERSION)
@@ -773,6 +793,8 @@ class CreateAlpha(CreateBeta):
   _support_confidential_compute_type = True
   _support_network_attachments = True
   _support_local_ssd_recovery_timeout = True
+  _support_regional_instance_template = True
+  _support_local_ssd_size = True
 
   @classmethod
   def Args(cls, parser):
@@ -795,17 +817,18 @@ class CreateAlpha(CreateBeta):
         support_max_run_duration=cls._support_max_run_duration,
         support_provisioned_throughput=cls._support_provisioned_throughput,
         support_network_attachments=cls._support_network_attachments,
-        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout)
+        support_local_ssd_recovery_timeout=cls._support_local_ssd_recovery_timeout,
+        support_local_ssd_size=cls._support_local_ssd_size)
 
-    CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
-        instances_flags.MakeSourceInstanceTemplateArg())
+    CreateAlpha.SOURCE_INSTANCE_TEMPLATE = instances_flags.MakeSourceInstanceTemplateArg(
+        support_regional_instance_template=cls._support_regional_instance_template
+    )
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
     CreateAlpha.SOURCE_MACHINE_IMAGE = (instances_flags.AddMachineImageArg())
     CreateAlpha.SOURCE_MACHINE_IMAGE.AddArgument(parser)
     instances_flags.AddSourceMachineImageEncryptionKey(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
     instances_flags.AddPublicDnsArgs(parser, instance=True)
-    instances_flags.AddLocalSsdArgsWithSize(parser)
     instances_flags.AddLocalNvdimmArgs(parser)
     instances_flags.AddConfidentialComputeArgs(
         parser, support_confidential_compute_type=True)
@@ -818,8 +841,6 @@ class CreateAlpha(CreateBeta):
     instances_flags.AddKeyRevocationActionTypeArgs(parser)
     instances_flags.AddIPv6AddressAlphaArgs(parser)
     instances_flags.AddIPv6PrefixLengthAlphaArgs(parser)
-    instances_flags.AddInternalIPv6AddressArgs(parser)
-    instances_flags.AddInternalIPv6PrefixLengthArgs(parser)
 
 
 Create.detailed_help = DETAILED_HELP

@@ -342,7 +342,9 @@ def ParseCreateOptionsBase(args, is_autopilot, get_default, location,
       enable_cost_allocation=get_default('enable_cost_allocation'),
       enable_multi_networking=get_default('enable_multi_networking'),
       placement_type=get_default('placement_type'),
-      enable_security_posture=get_default('enable_security_posture'))
+      enable_security_posture=get_default('enable_security_posture'),
+      network_performance_config=get_default(
+          'network_performance_configs'))
 
 
 GA = 'ga'
@@ -587,6 +589,8 @@ flags_to_add = {
             flags.AddEnableMultiNetworkingFlag,
         'enableSecurityPosture':
             flags.AddSecurityPostureFlag,
+        'clusterNetworkPerformanceConfig':
+            flags.AddClusterNetworkPerformanceConfigFlags
     },
     BETA: {
         'accelerator': (lambda p: AddAcceleratorFlag(p, True, True, True)),
@@ -713,6 +717,8 @@ flags_to_add = {
             flags.AddMaintenanceIntervalFlag,
         'monitoring':
             flags.AddMonitoringFlag,
+        'nestedvirtualization':
+            lambda p: flags.AddEnableNestedVirtualizationFlag(p, hidden=True),
         'networkpolicy':
             flags.AddNetworkPolicyFlags,
         'nodetaints':
@@ -800,6 +806,8 @@ flags_to_add = {
             flags.AddEnableMultiNetworkingFlag,
         'enableSecurityPosture':
             flags.AddSecurityPostureFlag,
+        'clusterNetworkPerformanceConfig':
+            flags.AddClusterNetworkPerformanceConfigFlags
     },
     ALPHA: {
         'accelerator': (lambda p: AddAcceleratorFlag(p, True, True, True)),
@@ -905,6 +913,8 @@ flags_to_add = {
             AddKubernetesObjectsExportFlag,
         'npname':
             lambda p: flags.AddInitialNodePoolNameArg(p, hidden=False),
+        'nestedvirtualization':
+            lambda p: flags.AddEnableNestedVirtualizationFlag(p, hidden=True),
         'maxunavailable':
             (lambda p: flags.AddMaxUnavailableUpgradeFlag(p, is_create=True)),
         'masterglobalaccess':
@@ -1022,6 +1032,8 @@ flags_to_add = {
             flags.AddEnableMultiNetworkingFlag,
         'enableSecurityPosture':
             flags.AddSecurityPostureFlag,
+        'clusterNetworkPerformanceConfig':
+            flags.AddClusterNetworkPerformanceConfigFlags
     },
 }
 
@@ -1233,6 +1245,8 @@ class CreateBeta(Create):
     ops.enable_master_metrics = get_default('enable_master_metrics')
     ops.master_logs = get_default('master_logs')
     ops.enable_confidential_nodes = get_default('enable_confidential_nodes')
+    ops.enable_nested_virtualization = get_default(
+        'enable_nested_virtualization')
     ops.kubernetes_objects_changes_target = \
         getattr(args, 'kubernetes_objects_changes_target', None)
     ops.kubernetes_objects_snapshots_target = \
@@ -1327,6 +1341,8 @@ class CreateAlpha(Create):
     ops.enable_master_metrics = get_default('enable_master_metrics')
     ops.master_logs = get_default('master_logs')
     ops.enable_confidential_nodes = get_default('enable_confidential_nodes')
+    ops.enable_nested_virtualization = get_default(
+        'enable_nested_virtualization')
     ops.kubernetes_objects_changes_target = \
         getattr(args, 'kubernetes_objects_changes_target', None)
     ops.kubernetes_objects_snapshots_target = \

@@ -236,17 +236,47 @@ def InstanceArgumentForTargetPool(action, required=True):
       zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION)
 
 
-def MakeSourceInstanceTemplateArg():
-  return compute_flags.ResourceArgument(
-      name='--source-instance-template',
-      resource_name='instance template',
-      completer=compute_completers.InstanceTemplatesCompleter,
-      required=False,
-      global_collection='compute.instanceTemplates',
-      short_help=('The name of the instance template that the instance will '
-                  'be created from.\n\nUsers can also override machine '
-                  'type and labels. Values of other flags will be ignored and '
-                  '`--source-instance-template` will be used instead.'))
+def MakeSourceInstanceTemplateArg(support_regional_instance_template=False):
+  """MakeSourceInstanceTemplateArg.
+
+  Args:
+    support_regional_instance_template:
+
+  Returns:
+     compute_flags.ResourceArgument
+  """
+
+  if support_regional_instance_template:
+    return compute_flags.ResourceArgument(
+        name='--source-instance-template',
+        resource_name='instance template',
+        completer=compute_completers.InstanceTemplatesCompleter,
+        required=False,
+        scope_flags_usage=compute_flags.ScopeFlagsUsage.DONT_USE_SCOPE_FLAGS,
+        global_collection='compute.instanceTemplates',
+        regional_collection='compute.regionInstanceTemplates',
+        short_help=(
+            'The name of the instance template that the instance will '
+            'be created from. An instance template can be a '
+            'global/regional resource.\n\nUsers can also override machine '
+            'type and labels. Values of other flags will be ignored and'
+            ' `--source-instance-template` will be used instead.'
+        ),
+    )
+  else:
+    return compute_flags.ResourceArgument(
+        name='--source-instance-template',
+        resource_name='instance template',
+        completer=compute_completers.InstanceTemplatesCompleter,
+        required=False,
+        global_collection='compute.instanceTemplates',
+        short_help=(
+            'The name of the instance template that the instance will '
+            'be created from.\n\nUsers can also override machine '
+            'type and labels. Values of other flags will be ignored and'
+            ' `--source-instance-template` will be used instead.'
+        ),
+    )
 
 
 def AddMachineImageArg():
@@ -486,9 +516,6 @@ def AddLocalSsdArgsWithSize(parser):
       action='append',
       help="""\
       Attaches a local SSD to the instances.
-
-      This flag is currently in alpha and beta versions only and might change
-      without notice.
 
       *device-name*::: Optional. A name that indicates the disk name
       the guest operating system will see. Can only be specified if `interface`
@@ -3369,11 +3396,12 @@ def AddInternalIPv6AddressArgs(parser):
       '--internal-ipv6-address',
       type=NonEmptyString('--internal-ipv6-address'),
       help="""
-      Assigns the given internal IPv6 address or range to the instance
-        that is created. The address must be the first IP address in the range
-        or a /96 IP address range. This option can be used only when creating a single
-        instance.
-    """)
+      Assigns the given internal IPv6 address or range to the instance that is
+      created. The address must be the first IP address in the range or from a
+      /96 IP address range. This option can be used only when creating a single
+      instance.
+    """,
+  )
 
 
 def AddInternalIPv6PrefixLengthArgs(parser):
@@ -3382,11 +3410,12 @@ def AddInternalIPv6PrefixLengthArgs(parser):
       type=int,
       help="""
       Optional field that indicates the prefix length of the internal IPv6
-      address range, should be used together with --internal-ipv6-address. Only
-      /96 is supported and the default value is 96. If not set, the prefix
-      length from --internal-ipv6-address will be used or assigned a default
-      value of 96.
-    """)
+      address range. It should be used together with --internal-ipv6-address.
+      Only /96 IP address range is supported and the default value is 96. If
+      not set, either the prefix length from --internal-ipv6-address will be
+      used or the default value of 96 will be assigned.
+    """,
+  )
 
 
 def AddNetworkPerformanceConfigsArgs(parser):

@@ -210,6 +210,21 @@ def _get_encryption_headers(key):
   return {}
 
 
+def _update_api_version_for_uploads_if_needed(client):
+  api_version = properties.VALUES.storage.json_api_version.Get()
+  if api_version is None:
+    return
+
+  insert_config = client.objects._upload_configs.get('Insert')  # pylint: disable=protected-access
+  if insert_config is None:
+    return
+
+  insert_config.simple_path = insert_config.simple_path.replace(
+      'v1', api_version)
+  insert_config.resumable_path = insert_config.resumable_path.replace(
+      'v1', api_version)
+
+
 class GcsApi(cloud_api.CloudApi):
   """Client for Google Cloud Storage API."""
 
@@ -228,6 +243,9 @@ class GcsApi(cloud_api.CloudApi):
   def __init__(self):
     super(GcsApi, self).__init__()
     self.client = core_apis.GetClientInstance('storage', 'v1')
+
+    _update_api_version_for_uploads_if_needed(self.client)
+
     self.client.overwrite_transfer_urls_with_client_base = True
     self.client.additional_http_headers = (
         headers_util.get_additional_header_dict())
@@ -824,6 +842,11 @@ class GcsApi(cloud_api.CloudApi):
 
     projection = self._get_projection(fields_scope,
                                       self.messages.StorageObjectsGetRequest)
+    global_params = None
+    if fields_scope == cloud_api.FieldsScope.SHORT:
+      global_params = self.messages.StandardQueryParameters(
+          fields='bucket,name,size,generation'
+      )
 
     decryption_key = getattr(
         getattr(request_config, 'resource_args', None), 'decryption_key', None)
@@ -833,7 +856,10 @@ class GcsApi(cloud_api.CloudApi):
               bucket=bucket_name,
               object=object_name,
               generation=generation,
-              projection=projection))
+              projection=projection,
+          ),
+          global_params=global_params,
+      )
     return gcs_metadata_util.get_object_resource_from_metadata(object_metadata)
 
   def list_objects(self,

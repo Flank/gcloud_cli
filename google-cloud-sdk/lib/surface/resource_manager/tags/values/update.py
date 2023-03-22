@@ -61,7 +61,7 @@ class Update(base.Command):
     messages = tags.TagMessages()
 
     if args.RESOURCE_NAME.find('tagValues/') == 0:
-      tag_value = tag_utils.GetResourceFromNamespacedName(
+      tag_value = tag_utils.GetResource(
           args.RESOURCE_NAME, 'tagValues')
     else:
       tag_value = tag_utils.GetTagValueFromNamespacedName(

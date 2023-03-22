@@ -826,9 +826,9 @@ class ListHubsResponse(_messages.Message):
 
   Fields:
     hubs: The requested hubs.
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
+    nextPageToken: The token for the next page of the response. To see more
+      results, use this value as the page_token for your next request. If this
+      value is empty, there are no more results.
     unreachable: Locations that could not be reached.
   """
 
@@ -886,9 +886,9 @@ class ListRouteTablesResponse(_messages.Message):
   r"""Response for HubService.ListRouteTables method.
 
   Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
+    nextPageToken: The token for the next page of the response. To see more
+      results, use this value as the page_token for your next request. If this
+      value is empty, there are no more results.
     routeTables: The requested route tables.
     unreachable: Hubs that could not be reached.
   """
@@ -902,9 +902,9 @@ class ListRoutesResponse(_messages.Message):
   r"""Response for HubService.ListRoutes method.
 
   Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
+    nextPageToken: The token for the next page of the response. To see more
+      results, use this value as the page_token for your next request. If this
+      value is empty, there are no more results.
     routes: The requested routes.
     unreachable: RouteTables that could not be reached.
   """
@@ -918,9 +918,9 @@ class ListSpokesResponse(_messages.Message):
   r"""The response for HubService.ListSpokes.
 
   Fields:
-    nextPageToken: The next pagination token in the List response. It should
-      be used as page_token for the following request. An empty value means no
-      more result.
+    nextPageToken: The token for the next page of the response. To see more
+      results, use this value as the page_token for your next request. If this
+      value is empty, there are no more results.
     spokes: The requested spokes.
     unreachable: Locations that could not be reached.
   """
@@ -1138,7 +1138,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsListRequest(_messages.Messag
   r"""A NetworkconnectivityProjectsLocationsGlobalHubsListRequest object.
 
   Fields:
-    filter: An expression that filters the results listed in the response.
+    filter: An expression that filters the list of results.
     orderBy: Sort the results by a certain order.
     pageSize: The maximum number of results per page to return.
     pageToken: The page token.
@@ -1166,12 +1166,12 @@ class NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest(_messages.
     orderBy: Sort the results by name or create_time.
     pageSize: The maximum number of results to return per page.
     pageToken: The page token.
-    spokeLocations: A list of locations. Specify a single region (`us-
-      central1`), `global`, or a combination of values--for example, `[global,
-      us-central1, us-west1]`. If the spoke_locations field is populated, the
-      list of results includes only spokes in the specified location. If the
-      spoke_locations field is not populated, the list of results includes
-      spokes in all locations.
+    spokeLocations: A list of locations. Specify one of the following:
+      `[global]`, a single region (for example, `[us-central1]`), or a
+      combination of values (for example, `[global, us-central1, us-west1]`).
+      If the spoke_locations field is populated, the list of results includes
+      only spokes in the specified location. If the spoke_locations field is
+      not populated, the list of results includes spokes in all locations.
     view: The view of the spoke to return. The view you use determines which
       spoke fields are included in the response.
   """
@@ -1185,13 +1185,13 @@ class NetworkconnectivityProjectsLocationsGlobalHubsListSpokesRequest(_messages.
         view is unspecified, the API returns the same fields as the `BASIC`
         view.
       BASIC: Includes `name`, `create_time`, `hub`, `unique_id`, `state`,
-        `state_reason`, and `spoke_type`. This is the default value.
-      FULL: Include all spoke fields. You can use the `FULL` view only when
-        you set the `spoke_locations` field to `[global]`.
+        `reasons`, and `spoke_type`. This is the default value.
+      DETAILED: Include all spoke fields. You can use the `DETAILED` view only
+        when you set the `spoke_locations` field to `[global]`.
     """
     SPOKE_VIEW_UNSPECIFIED = 0
     BASIC = 1
-    FULL = 2
+    DETAILED = 2
 
   filter = _messages.StringField(1)
   name = _messages.StringField(2, required=True)
@@ -1251,7 +1251,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsRouteTablesListRequest(_mess
   object.
 
   Fields:
-    filter: An expression that filters the results listed in the response.
+    filter: An expression that filters the list of results.
     orderBy: Sort the results by a certain order.
     pageSize: The maximum number of results to return per page.
     pageToken: The page token.
@@ -1283,7 +1283,7 @@ class NetworkconnectivityProjectsLocationsGlobalHubsRouteTablesRoutesListRequest
   object.
 
   Fields:
-    filter: An expression that filters the results listed in the response.
+    filter: An expression that filters the list of results.
     orderBy: Sort the results by a certain order.
     pageSize: The maximum number of results to return per page.
     pageToken: The page token.
@@ -1976,7 +1976,7 @@ class NetworkconnectivityProjectsLocationsSpokesListRequest(_messages.Message):
   r"""A NetworkconnectivityProjectsLocationsSpokesListRequest object.
 
   Fields:
-    filter: An expression that filters the results listed in the response.
+    filter: An expression that filters the list of results.
     orderBy: Sort the results by a certain order.
     pageSize: The maximum number of results to return per page.
     pageToken: The page token.
@@ -2568,6 +2568,8 @@ class Spoke(_messages.Message):
   linked_router_appliance_instances
 
   Enums:
+    SpokeTypeValueValuesEnum: Output only. The type of resource associated
+      with the spoke.
     StateValueValuesEnum: Output only. The current lifecycle state of this
       spoke.
 
@@ -2594,6 +2596,7 @@ class Spoke(_messages.Message):
       use the following form:
       `projects/{project_number}/locations/{region}/spokes/{spoke_id}`
     reasons: The reasons for current state of the spoke.
+    spokeType: Output only. The type of resource associated with the spoke.
     state: Output only. The current lifecycle state of this spoke.
     uniqueId: Output only. The Google-generated UUID for the spoke. This value
       is unique across all spoke resources. If a spoke is deleted and another
@@ -2601,6 +2604,22 @@ class Spoke(_messages.Message):
       unique_id.
     updateTime: Output only. The time the spoke was last updated.
   """
+
+  class SpokeTypeValueValuesEnum(_messages.Enum):
+    r"""Output only. The type of resource associated with the spoke.
+
+    Values:
+      SPOKE_TYPE_UNSPECIFIED: Unspecified spoke type.
+      VPN_TUNNEL: Spokes associated with VPN tunnels.
+      INTERCONNECT_ATTACHMENT: Spokes associated with VLAN attachments.
+      ROUTER_APPLIANCE: Spokes associated with router appliance instances.
+      VPC_NETWORK: Spokes associated with VPC networks.
+    """
+    SPOKE_TYPE_UNSPECIFIED = 0
+    VPN_TUNNEL = 1
+    INTERCONNECT_ATTACHMENT = 2
+    ROUTER_APPLIANCE = 3
+    VPC_NETWORK = 4
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current lifecycle state of this spoke.
@@ -2667,9 +2686,10 @@ class Spoke(_messages.Message):
   linkedVpnTunnels = _messages.MessageField('LinkedVpnTunnels', 8)
   name = _messages.StringField(9)
   reasons = _messages.MessageField('StateReason', 10, repeated=True)
-  state = _messages.EnumField('StateValueValuesEnum', 11)
-  uniqueId = _messages.StringField(12)
-  updateTime = _messages.StringField(13)
+  spokeType = _messages.EnumField('SpokeTypeValueValuesEnum', 11)
+  state = _messages.EnumField('StateValueValuesEnum', 12)
+  uniqueId = _messages.StringField(13)
+  updateTime = _messages.StringField(14)
 
 
 class SpokeStateCount(_messages.Message):

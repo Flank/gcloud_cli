@@ -23,6 +23,8 @@ class AcceleratorConfig(_messages.Message):
       instance.
     acceleratorType: The accelerator type resource name. List of supported
       accelerators [here](https://cloud.google.com/compute/docs/gpus)
+    gpuDriverInstallationConfig: The configuration for auto installation of
+      GPU driver.
     gpuPartitionSize: Size of partitions to create on the GPU. Valid values
       are described in the NVIDIA [mig user
       guide](https://docs.nvidia.com/datacenter/tesla/mig-user-
@@ -32,8 +34,9 @@ class AcceleratorConfig(_messages.Message):
 
   acceleratorCount = _messages.IntegerField(1)
   acceleratorType = _messages.StringField(2)
-  gpuPartitionSize = _messages.StringField(3)
-  gpuSharingConfig = _messages.MessageField('GPUSharingConfig', 4)
+  gpuDriverInstallationConfig = _messages.MessageField('GPUDriverInstallationConfig', 3)
+  gpuPartitionSize = _messages.StringField(4)
+  gpuSharingConfig = _messages.MessageField('GPUSharingConfig', 5)
 
 
 class AdditionalNodeNetworkConfig(_messages.Message):
@@ -203,15 +206,18 @@ class AutopilotCompatibilityIssue(_messages.Message):
 
     Values:
       UNSPECIFIED: Default value, should not be used.
-      INCOMPATIBILITY: Indicates that the issue is referring to an
-        incompatibility between the cluster and Autopilot mode.
-      WARNING: Indicates the issue is not an incompatibility, but depending on
-        the workloads business logic, there is a potential that they won't
-        work on Autopilot.
+      INCOMPATIBILITY: Indicates that the issue is a known incompatibility
+        between the cluster and Autopilot mode.
+      ADDITIONAL_CONFIG_REQUIRED: Indicates the issue is an incompatibility if
+        customers take no further action to resolve.
+      PASSED_WITH_OPTIONAL_CONFIG: Indicates the issue is not an
+        incompatibility, but depending on the workloads business logic, there
+        is a potential that they won't work on Autopilot.
     """
     UNSPECIFIED = 0
     INCOMPATIBILITY = 1
-    WARNING = 2
+    ADDITIONAL_CONFIG_REQUIRED = 2
+    PASSED_WITH_OPTIONAL_CONFIG = 3
 
   description = _messages.StringField(1)
   documentationUrl = _messages.StringField(2)
@@ -2015,6 +2021,36 @@ class Fleet(_messages.Message):
   project = _messages.StringField(3)
 
 
+class GPUDriverInstallationConfig(_messages.Message):
+  r"""GPUDriverInstallationConfig specifies the version of GPU driver to be
+  auto installed.
+
+  Enums:
+    GpuDriverVersionValueValuesEnum: Mode for how the GPU driver is installed.
+
+  Fields:
+    gpuDriverVersion: Mode for how the GPU driver is installed.
+  """
+
+  class GpuDriverVersionValueValuesEnum(_messages.Enum):
+    r"""Mode for how the GPU driver is installed.
+
+    Values:
+      GPU_DRIVER_VERSION_UNSPECIFIED: Default value is to not install any GPU
+        driver.
+      INSTALLATION_DISABLED: Disable GPU driver auto installation and needs
+        manual installation
+      DEFAULT: "Default" GPU driver in COS and Ubuntu.
+      LATEST: "Latest" GPU driver in COS.
+    """
+    GPU_DRIVER_VERSION_UNSPECIFIED = 0
+    INSTALLATION_DISABLED = 1
+    DEFAULT = 2
+    LATEST = 3
+
+  gpuDriverVersion = _messages.EnumField('GpuDriverVersionValueValuesEnum', 1)
+
+
 class GPUSharingConfig(_messages.Message):
   r"""GPUSharingConfig represents the GPU sharing configuration for Hardware
   Accelerators.
@@ -2255,14 +2291,14 @@ class IPAllocationPolicy(_messages.Message):
       notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
       `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific
       range to use.
-    podCidrOverprovisionConfig: Pod CIDR size overprovisioning config for the
-      nodepool. Pod CIDR size per node depends on max_pods_per_node. By
-      default, the value of max_pods_per_node is doubled and then rounded off
-      to next power of 2 to get the size of pod CIDR block per node. Example:
-      max_pods_per_node of 30 would result in 64 IPs (/26). This config can
-      disable the doubling of IPs (we still round off to next power of 2)
-      Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
-      overprovisioning is disabled.
+    podCidrOverprovisionConfig: [PRIVATE FIELD] Pod CIDR size overprovisioning
+      config for the cluster. Pod CIDR size per node depends on
+      max_pods_per_node. By default, the value of max_pods_per_node is doubled
+      and then rounded off to next power of 2 to get the size of pod CIDR
+      block per node. Example: max_pods_per_node of 30 would result in 64 IPs
+      (/26). This config can disable the doubling of IPs (we still round off
+      to next power of 2) Example: max_pods_per_node of 30 will result in 32
+      IPs (/27) when overprovisioning is disabled.
     servicesIpv4Cidr: This field is deprecated, use services_ipv4_cidr_block.
     servicesIpv4CidrBlock: The IP address range of the services IPs in this
       cluster. If blank, a range will be automatically chosen with the default
@@ -3522,14 +3558,14 @@ class NodeNetworkConfig(_messages.Message):
       enable_private_nodes is not specified, then the value is derived from
       cluster.privateClusterConfig.enablePrivateNodes
     networkPerformanceConfig: Network bandwidth tier configuration.
-    podCidrOverprovisionConfig: Pod CIDR size overprovisioning config for the
-      nodepool. Pod CIDR size per node depends on max_pods_per_node. By
-      default, the value of max_pods_per_node is rounded off to next power of
-      2 and we then double that to get the size of pod CIDR block per node.
-      Example: max_pods_per_node of 30 would result in 64 IPs (/26). This
-      config can disable the doubling of IPs (we still round off to next power
-      of 2) Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
-      overprovisioning is disabled.
+    podCidrOverprovisionConfig: [PRIVATE FIELD] Pod CIDR size overprovisioning
+      config for the nodepool. Pod CIDR size per node depends on
+      max_pods_per_node. By default, the value of max_pods_per_node is rounded
+      off to next power of 2 and we then double that to get the size of pod
+      CIDR block per node. Example: max_pods_per_node of 30 would result in 64
+      IPs (/26). This config can disable the doubling of IPs (we still round
+      off to next power of 2) Example: max_pods_per_node of 30 will result in
+      32 IPs (/27) when overprovisioning is disabled.
     podIpv4CidrBlock: The IP address range for pod IPs in this node pool. Only
       applicable if `create_pod_range` is true. Set to blank to have a range
       chosen with the default size. Set to /netmask (e.g. `/14`) to have a
@@ -3986,7 +4022,7 @@ class PlacementPolicy(_messages.Message):
 
 
 class PodCIDROverprovisionConfig(_messages.Message):
-  r"""Config for pod CIDR size overprovisioning.
+  r"""[PRIVATE FIELD] Config for pod CIDR size overprovisioning.
 
   Fields:
     disable: Whether Pod CIDR overprovisioning is disabled. Note: Pod CIDR
@@ -5592,8 +5628,9 @@ class UsableSubnetworkSecondaryRange(_messages.Message):
       UNKNOWN: UNKNOWN is the zero value of the Status enum. It's not a valid
         status.
       UNUSED: UNUSED denotes that this range is unclaimed by any cluster.
-      IN_USE_SERVICE: IN_USE_SERVICE denotes that this range is claimed by a
-        cluster for services. It cannot be used for other clusters.
+      IN_USE_SERVICE: IN_USE_SERVICE denotes that this range is claimed by
+        cluster(s) for services. User-managed services range can be shared
+        between clusters within the same subnetwork.
       IN_USE_SHAREABLE_POD: IN_USE_SHAREABLE_POD denotes this range was
         created by the network admin and is currently claimed by a cluster for
         pods. It can only be used by other clusters as a pod range.

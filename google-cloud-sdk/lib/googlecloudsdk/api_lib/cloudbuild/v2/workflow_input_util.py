@@ -25,19 +25,12 @@ from googlecloudsdk.api_lib.cloudbuild.v2 import input_util
 
 def CloudBuildYamlDataToWorkflow(workflow):
   """Convert cloudbuild.yaml file into Workflow message."""
-  _VersionCheck(workflow)
   _WorkflowTransform(workflow)
 
   messages = client_util.GetMessagesModule()
   schema_message = encoding.DictToMessage(workflow, messages.Workflow)
   input_util.UnrecognizedFields(schema_message)
   return schema_message
-
-
-def _VersionCheck(data):
-  api_version = data.pop("api")
-  if api_version != "v2":
-    raise cloudbuild_exceptions.CloudBuildAPIVersionError()
 
 
 def _WorkflowTransform(workflow):
@@ -49,7 +42,8 @@ def _WorkflowTransform(workflow):
     workflow["workflowTriggers"] = workflow.pop("triggers")
 
   for workflow_trigger in workflow.get("workflowTriggers", []):
-    input_util.WorkflowTriggerTransform(workflow_trigger)
+    input_util.WorkflowTriggerTransform(
+        workflow_trigger, workflow.get("resources", {}))
 
   for param_spec in workflow.get("params", []):
     input_util.ParamSpecTransform(param_spec)
@@ -78,37 +72,22 @@ def _ResourcesTransform(workflow):
   """Transform resources message."""
 
   resources_map = {}
-  has_resources = False
+  types = ["repo", "url", "topic", "secretVersion"]
   for resource in workflow.get("resources", []):
-    has_resources = True
-    if "kind" not in resource:
+    if "name" not in resource:
       raise cloudbuild_exceptions.InvalidYamlError(
-          "Kind is required for resource.")
-
-    if "ref" in resource and "kind" in resource and resource[
-        "kind"] == "secretmanager.googleapis.com/SecretVersion":
-      resource.pop("kind")
-      resource["secret"] = {}
-      resource["secret"]["secretVersion"] = resource.pop("ref")
+          "Name is required for resource.")
+    if "secretVersion" in resource:
+      resource["secret"] = {"secretVersion": resource.pop("secretVersion")}
       resources_map[resource.pop("name")] = resource
-
-    if "ref" in resource and "kind" in resource and resource[
-        "kind"] == "cloudbuild.googleapis.com/Repository":
-      resource.pop("kind")
-      url_or_repo = resource.pop("ref")
-      if url_or_repo.startswith("projects/"):
-        resource["repo"] = url_or_repo
-      else:
-        resource["url"] = url_or_repo
+    elif any(t in resource for t in types):
       resources_map[resource.pop("name")] = resource
+    else:
+      raise cloudbuild_exceptions.InvalidYamlError(
+          ("Unknown resource. "
+           "Accepted types: {types}").format(types=",".join(types)))
 
-    if "ref" in resource  and "kind" in resource and resource[
-        "kind"] == "pubsub.googleapis.com/Topic":
-      resource.pop("kind")
-      resource["topic"] = resource.pop("ref")
-      resources_map[resource.pop("name")] = resource
-
-  if has_resources:
+  if resources_map:
     workflow["resources"] = resources_map
 
 
@@ -166,25 +145,11 @@ def _WorkspaceBindingTransform(workspace_binding):
   elif "volume" in workspace_binding:
     popped_volume = workspace_binding.pop("volume")
     # Volume Claim Template.
-    workspace_binding["volumeClaimTemplate"] = {"spec": {}}
-
-    if "accessMode" in popped_volume:
-      access_modes = []
-      for access_mode in popped_volume.pop("accessMode").split(" | "):
-        if access_mode == "read":
-          access_modes.append("READ_ONLY_MANY")
-        if access_mode == "read-write":
-          access_modes.append("READ_WRITE_ONCE")
-      workspace_binding["volumeClaimTemplate"]["spec"][
-          "accessModes"] = access_modes
+    workspace_binding["volumeClaim"] = {}
 
     if "storage" in popped_volume:
       storage = popped_volume.pop("storage")
-      workspace_binding["volumeClaimTemplate"]["spec"]["resources"] = {}
-      workspace_binding["volumeClaimTemplate"]["spec"]["resources"][
-          "requests"] = {
-              "storage": storage
-          }
+      workspace_binding["volumeClaim"]["storage"] = storage
 
   else:
     # Empty Workspace.

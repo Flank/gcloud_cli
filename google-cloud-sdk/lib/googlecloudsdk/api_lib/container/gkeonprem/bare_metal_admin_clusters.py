@@ -51,10 +51,10 @@ class _BareMetalAdminClusterClient(client.ClientBase):
     """Constructs proto message BareMetalAdminIslandModeCidrConfig."""
     kwargs = {
         'serviceAddressCidrBlocks': getattr(
-            args, 'island_mode_service_address_cidr_blocks', None
+            args, 'island_mode_service_address_cidr_blocks', []
         ),
         'podAddressCidrBlocks': getattr(
-            args, 'island_mode_pod_address_cidr_blocks', None
+            args, 'island_mode_pod_address_cidr_blocks', []
         ),
     }
 
@@ -519,19 +519,11 @@ class AdminClustersClient(_BareMetalAdminClusterClient):
   def QueryVersionConfig(self, args):
     """Query Anthos on bare metal admin version configuration."""
     kwargs = {
-        'createConfig_bootstrapClusterMembership': (
-            None if self._admin_cluster_name(args) else ''
-        ),
         'upgradeConfig_clusterName': self._admin_cluster_name(args),
         'parent': self._location_ref(args).RelativeName(),
     }
 
     # This is a workaround for the limitation in apitools with nested messages.
-    encoding.AddCustomJsonFieldMapping(
-        self._messages.GkeonpremProjectsLocationsBareMetalAdminClustersQueryVersionConfigRequest,
-        'createConfig_bootstrapClusterMembership',
-        'createConfig.bootstrapClusterMembership',
-    )
     encoding.AddCustomJsonFieldMapping(
         self._messages.GkeonpremProjectsLocationsBareMetalAdminClustersQueryVersionConfigRequest,
         'upgradeConfig_clusterName',

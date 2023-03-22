@@ -730,6 +730,10 @@
         "gpuSharingConfig": {
           "description": "The configuration for GPU sharing options.",
           "$ref": "GPUSharingConfig"
+        },
+        "gpuDriverInstallationConfig": {
+          "description": "The configuration for auto installation of GPU driver.",
+          "$ref": "GPUDriverInstallationConfig"
         }
       }
     },
@@ -755,6 +759,29 @@
             "GPU_SHARING_STRATEGY_UNSPECIFIED",
             "TIME_SHARING",
             "MPS"
+          ]
+        }
+      }
+    },
+    "GPUDriverInstallationConfig": {
+      "id": "GPUDriverInstallationConfig",
+      "description": "GPUDriverInstallationConfig specifies the version of GPU driver to be auto installed.",
+      "type": "object",
+      "properties": {
+        "gpuDriverVersion": {
+          "description": "Mode for how the GPU driver is installed.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value is to not install any GPU driver.",
+            "Disable GPU driver auto installation and needs manual installation",
+            "\"Default\" GPU driver in COS and Ubuntu.",
+            "\"Latest\" GPU driver in COS."
+          ],
+          "enum": [
+            "GPU_DRIVER_VERSION_UNSPECIFIED",
+            "INSTALLATION_DISABLED",
+            "DEFAULT",
+            "LATEST"
           ]
         }
       }
@@ -948,6 +975,10 @@
           "description": "Set the Pod PID limits. See https:\/\/kubernetes.io\/docs\/concepts\/policy\/pid-limiting\/#pod-pid-limits Controls the maximum number of processes allowed to run in a pod. The value must be greater than or equal to 1024 and less than 4194304.",
           "type": "string",
           "format": "int64"
+        },
+        "insecureKubeletReadonlyPortEnabled": {
+          "description": "Enable or disable Kubelet read only port.",
+          "type": "boolean"
         }
       }
     },
@@ -1214,6 +1245,10 @@
         "gkeBackupAgentConfig": {
           "description": "Configuration for the Backup for GKE agent addon.",
           "$ref": "GkeBackupAgentConfig"
+        },
+        "gcsFuseCsiDriverConfig": {
+          "description": "Configuration for the Cloud Storage Fuse CSI driver.",
+          "$ref": "GcsFuseCsiDriverConfig"
         }
       }
     },
@@ -1375,6 +1410,17 @@
         }
       }
     },
+    "GcsFuseCsiDriverConfig": {
+      "id": "GcsFuseCsiDriverConfig",
+      "description": "Configuration for the Cloud Storage Fuse CSI driver.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Whether the Cloud Storage Fuse CSI driver is enabled for this cluster.",
+          "type": "boolean"
+        }
+      }
+    },
     "NodePool": {
       "id": "NodePool",
       "description": "NodePool contains the name and configuration for a cluster's node pool. Node pools are a set of nodes (i.e. VM's), with a common configuration and specification, under the control of the cluster master. They may have a set of Kubernetes labels applied to them, which may be used to reference them during pod scheduling. They may also be resized up or down, to accommodate the workload. These upgrade settings control the level of parallelism and the level of disruption caused by an upgrade. maxUnavailable controls the number of nodes that can be simultaneously unavailable. maxSurge controls the number of additional nodes that can be added to the node pool temporarily for the time of the upgrade to increase the number of available nodes. (maxUnavailable + maxSurge) determines the level of parallelism (how many nodes are being upgraded at the same time). Note: upgrades inevitably introduce some disruption since workloads need to be moved from old nodes to new, upgraded ones. Even if maxUnavailable=0, this holds true. (Disruption stays within the limits of PodDisruptionBudget, if it is configured.) Consider a hypothetical node pool with 5 nodes having maxSurge=2, maxUnavailable=1. This means the upgrade process upgrades 3 nodes simultaneously. It creates 2 additional (upgraded) nodes, then it brings down 3 old (not yet upgraded) nodes at the same time. This ensures that there are always at least 4 nodes available.",
@@ -1526,7 +1572,7 @@
           "type": "string"
         },
         "podCidrOverprovisionConfig": {
-          "description": "Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is rounded off to next power of 2 and we then double that to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (\/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (\/27) when overprovisioning is disabled.",
+          "description": "[PRIVATE FIELD] Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is rounded off to next power of 2 and we then double that to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (\/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (\/27) when overprovisioning is disabled.",
           "$ref": "PodCIDROverprovisionConfig"
         },
         "additionalNodeNetworkConfigs": {
@@ -1578,7 +1624,7 @@
     },
     "PodCIDROverprovisionConfig": {
       "id": "PodCIDROverprovisionConfig",
-      "description": "Config for pod CIDR size overprovisioning.",
+      "description": "[PRIVATE FIELD] Config for pod CIDR size overprovisioning.",
       "type": "object",
       "properties": {
         "disable": {
@@ -2135,7 +2181,7 @@
           "type": "string"
         },
         "podCidrOverprovisionConfig": {
-          "description": "Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is doubled and then rounded off to next power of 2 to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (\/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (\/27) when overprovisioning is disabled.",
+          "description": "[PRIVATE FIELD] Pod CIDR size overprovisioning config for the cluster. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is doubled and then rounded off to next power of 2 to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (\/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (\/27) when overprovisioning is disabled.",
           "$ref": "PodCIDROverprovisionConfig"
         },
         "subnetIpv6CidrBlock": {
@@ -2471,6 +2517,10 @@
         "imageType": {
           "description": "The image type to use for NAP created node. Please see https:\/\/cloud.google.com\/kubernetes-engine\/docs\/concepts\/node-images for available image types.",
           "type": "string"
+        },
+        "insecureKubeletReadonlyPortEnabled": {
+          "description": "Enable or disable Kubelet read only port.",
+          "type": "boolean"
         }
       }
     },
@@ -3272,6 +3322,10 @@
         "managedPrometheusConfig": {
           "description": "Enable Google Cloud Managed Service for Prometheus in the cluster.",
           "$ref": "ManagedPrometheusConfig"
+        },
+        "advancedDatapathObservabilityConfig": {
+          "description": "Configuration of Advanced Datapath Observability features.",
+          "$ref": "AdvancedDatapathObservabilityConfig"
         }
       }
     },
@@ -3327,6 +3381,35 @@
         "enabled": {
           "description": "Enable Managed Collection.",
           "type": "boolean"
+        }
+      }
+    },
+    "AdvancedDatapathObservabilityConfig": {
+      "id": "AdvancedDatapathObservabilityConfig",
+      "description": "AdvancedDatapathObservabilityConfig specifies configuration of observability features of advanced datapath.",
+      "type": "object",
+      "properties": {
+        "enableMetrics": {
+          "description": "Expose flow metrics on nodes",
+          "type": "boolean"
+        },
+        "relayMode": {
+          "description": "Method used to make Relay available",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value. This shouldn't be used.",
+            "disabled",
+            "exposed via a Service object",
+            "exposed via internal load balancer",
+            "exposed via external load balancer"
+          ],
+          "enum": [
+            "RELAY_MODE_UNSPECIFIED",
+            "DISABLED",
+            "INTERNAL_CLUSTER_SERVICE",
+            "INTERNAL_VPC_LB",
+            "EXTERNAL_LB"
+          ]
         }
       }
     },
@@ -4119,6 +4202,10 @@
         "desiredEnableFqdnNetworkPolicy": {
           "description": "Enable\/Disable FQDN Network Policy for the cluster.",
           "type": "boolean"
+        },
+        "desiredAutopilotInsecureKubeletReadonlyPortEnabled": {
+          "description": "Enable\/disable kubelet readonly port for autopilot cluster",
+          "type": "boolean"
         }
       }
     },
@@ -4266,6 +4353,13 @@
         "windowsNodeConfig": {
           "description": "Parameters that can be configured on Windows nodes.",
           "$ref": "WindowsNodeConfig"
+        },
+        "accelerators": {
+          "description": "A list of hardware accelerators to be attached to each node. See https:\/\/cloud.google.com\/compute\/docs\/gpus for more information about support for GPUs.",
+          "type": "array",
+          "items": {
+            "$ref": "AcceleratorConfig"
+          }
         }
       }
     },
@@ -5291,13 +5385,15 @@
           "type": "string",
           "enumDescriptions": [
             "Default value, should not be used.",
-            "Indicates that the issue is referring to an incompatibility between the cluster and Autopilot mode.",
+            "Indicates that the issue is a known incompatibility between the cluster and Autopilot mode.",
+            "Indicates the issue is an incompatibility if customers take no further action to resolve.",
             "Indicates the issue is not an incompatibility, but depending on the workloads business logic, there is a potential that they won't work on Autopilot."
           ],
           "enum": [
             "UNSPECIFIED",
             "INCOMPATIBILITY",
-            "WARNING"
+            "ADDITIONAL_CONFIG_REQUIRED",
+            "PASSED_WITH_OPTIONAL_CONFIG"
           ]
         },
         "subjects": {

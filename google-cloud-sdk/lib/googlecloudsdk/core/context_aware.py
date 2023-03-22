@@ -152,7 +152,8 @@ def _GetCertificateConfigFile():
   file_path = properties.VALUES.context_aware.certificate_config_file_path.Get()
   if file_path is None:
     file_path = config.CertConfigDefaultFilePath()
-  if not file_path:
+
+  if not os.path.exists(file_path):
     return None
 
   # Make sure the config file is a valid JSON file.
@@ -184,7 +185,11 @@ def _GetCertificateConfigFile():
         ' (cert_config["libs"]["ecp"]) specified in enterprise certificate'
         ' config file was not found. Cannot use mTLS with ECP if the ECP binary'
         ' does not exist. Please check the ECP configuration. See `gcloud topic'
-        ' client-certificate` to learn more about ECP'
+        ' client-certificate` to learn more about ECP. \nIf this error is'
+        ' unexpected either delete {} or generate a new configuration with `$'
+        ' gcloud auth enterprise-certificate-config create --help` '.format(
+            file_path
+        )
     )
 
   return file_path
@@ -211,7 +216,7 @@ class _ConfigImpl(object):
       return None
 
     certificate_config_file_path = _GetCertificateConfigFile()
-    if certificate_config_file_path is not None:
+    if certificate_config_file_path:
       # The enterprise cert config file path will be used.
       log.debug('enterprise certificate is used for mTLS')
       return _EnterpriseCertConfigImpl(certificate_config_file_path)

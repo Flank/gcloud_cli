@@ -6,7 +6,7 @@
   "canonicalName": "SQL Admin",
   "version": "v1beta4",
   "revision": "0",
-  "title": "sqladmin API (prod)",
+  "title": "Cloud SQL Admin API",
   "description": "API for Cloud SQL database instance management",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -408,6 +408,28 @@
             "striped": {
               "description": "Whether or not the backup set being restored is striped. Applies only to Cloud SQL for SQL Server.",
               "type": "boolean"
+            },
+            "noRecovery": {
+              "description": "Whether or not the backup importing will restore database with NORECOVERY option Applies only to Cloud SQL for SQL Server.",
+              "type": "boolean"
+            },
+            "recoveryOnly": {
+              "description": "Whether or not the backup importing request will just bring database online without downloading Bak content only one of \"no_recovery\" and \"recovery_only\" can be true otherwise error will return. Applies only to Cloud SQL for SQL Server.",
+              "type": "boolean"
+            },
+            "bakType": {
+              "description": "Type of the bak content, FULL or DIFF.",
+              "type": "string",
+              "enumDescriptions": [
+                "default type to meet enum requirement, will be set to FULL if not set",
+                "Full backup.",
+                "Differential backup."
+              ],
+              "enum": [
+                "BAK_TYPE_UNSPECIFIED",
+                "FULL",
+                "DIFF"
+              ]
             }
           }
         }
@@ -1150,17 +1172,6 @@
         }
       }
     },
-    "SqlInstancesReencryptRequest": {
-      "id": "SqlInstancesReencryptRequest",
-      "description": "Instance reencrypt request.",
-      "type": "object",
-      "properties": {
-        "body": {
-          "description": "Reencrypt body that users request",
-          "$ref": "InstancesReencryptRequest"
-        }
-      }
-    },
     "InstancesReencryptRequest": {
       "id": "InstancesReencryptRequest",
       "description": "Database Instance reencrypt request.",
@@ -1793,6 +1804,10 @@
         "advancedMachineFeatures": {
           "description": "Specifies advance machine configuration for the instance relevant only for SQL Server.",
           "$ref": "AdvancedMachineFeatures"
+        },
+        "recreateReplicasOnPrimaryCrash": {
+          "description": "Specifies if replicas should automatically be recreated on a MySQL primary instance crashes when it is operating in low durability mode.",
+          "type": "boolean"
         }
       }
     },
@@ -2524,6 +2539,14 @@
         "restoreBackupContext": {
           "description": "Parameters required to perform the restore backup operation.",
           "$ref": "RestoreBackupContext"
+        },
+        "backup": {
+          "description": "The name of the backup to restore from in following format: projects\/{project-id}\/locations\/{location}\/backups\/{backup-uid} Only one of restore_backup_context or backup can be passed to the input.",
+          "type": "string"
+        },
+        "restoreInstanceSettings": {
+          "description": "Restore instance settings overrides the instance settings stored as part of the backup. Instance's major database version cannot be changed and the disk size can only be increased. This feature is only available for restores to new instances using the backup name.",
+          "$ref": "DatabaseInstance"
         }
       }
     },
@@ -2782,7 +2805,8 @@
             "The primary instance has unsupported binary log format.",
             "The primary instance's binary log retention setting.",
             "The primary instance has tables with unsupported storage engine.",
-            "Source has tables with limited support eg: PostgreSQL tables without primary keys"
+            "Source has tables with limited support eg: PostgreSQL tables without primary keys.",
+            "The replica instance contains existing data."
           ],
           "enum": [
             "SQL_EXTERNAL_SYNC_SETTING_ERROR_TYPE_UNSPECIFIED",
@@ -2812,7 +2836,8 @@
             "UNSUPPORTED_BINLOG_FORMAT",
             "BINLOG_RETENTION_SETTING",
             "UNSUPPORTED_STORAGE_ENGINE",
-            "LIMITED_SUPPORT_TABLES"
+            "LIMITED_SUPPORT_TABLES",
+            "EXISTING_DATA_IN_REPLICA"
           ]
         },
         "detail": {
@@ -4033,7 +4058,7 @@
             "instance"
           ],
           "request": {
-            "$ref": "SqlInstancesReencryptRequest"
+            "$ref": "InstancesReencryptRequest"
           },
           "response": {
             "$ref": "Operation"
