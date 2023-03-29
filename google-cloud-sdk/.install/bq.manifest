@@ -406,6 +406,7 @@ platform/bq/third_party/wcwidth/LICENSE
 platform/bq/third_party/wcwidth/__init__.py
 platform/bq/third_party/wcwidth/table_wide.py
 platform/bq/third_party/wcwidth/table_zero.py
+platform/bq/third_party/wcwidth/unicode_versions.py
 platform/bq/third_party/wcwidth/wcwidth.py
 platform/bq/third_party/yaml/LICENSE
 platform/bq/third_party/yaml/__init__.py
