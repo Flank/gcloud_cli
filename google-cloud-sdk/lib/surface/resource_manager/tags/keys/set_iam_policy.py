@@ -63,8 +63,9 @@ class SetIamPolicy(base.Command):
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = args.RESOURCE_NAME
     else:
-      tag_key = tag_utils.GetTagKeyFromNamespacedName(
-          args.RESOURCE_NAME).name
+      tag_key = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_KEYS
+      ).name
 
     policy = iam_util.ParsePolicyFile(args.POLICY_FILE, messages.Policy)
     policy.version = iam_util.MAX_LIBRARY_IAM_SUPPORTED_VERSION

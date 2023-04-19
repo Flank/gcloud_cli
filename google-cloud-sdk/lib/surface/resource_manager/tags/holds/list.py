@@ -33,11 +33,11 @@ class List(base.ListCommand):
 
   List TagHolds under a TagValue. The TagValue can be represented with its
   numeric id or its namespaced name of
-  {org_id}/{tag_key_short_name}/{tag_value_short_name}. Limited to TagHolds
-  stored in a single --location: if none is provided, the API will assume the
-  "global" location. Optional filters are --holder and --origin: if provided,
-  returned TagHolds' holder and origin fields must match the exact flag value.
-
+  {parent_namespace}/{tag_key_short_name}/{tag_value_short_name}. Limited to
+  TagHolds stored in a single --location: if none is provided, the API will
+  assume the "global" location. Optional filters are --holder and --origin: if
+  provided, returned TagHolds' holder and origin fields must match the exact
+  flag value.
   """
 
   detailed_help = {
@@ -62,7 +62,7 @@ class List(base.ListCommand):
         metavar="PARENT",
         help=("TagValue resource name or namespaced name to list TagHolds for. "
               "This field should be in the form tagValues/<id> or "
-              "<organization_id>/<tagkey_short_name>/<short_name>."))
+              "<parent_namespace>/<tagkey_short_name>/<short_name>."))
     arguments.AddLocationArgToParser(
         parser, ("Region where the matching TagHolds are stored. If not "
                  "provided, the API will attempt to retrieve matching TagHolds "
@@ -97,7 +97,9 @@ class List(base.ListCommand):
     if args.parent.find("tagValues/") == 0:
       parent = args.parent
     else:
-      parent = tag_utils.GetTagValueFromNamespacedName(args.parent).name
+      parent = tag_utils.GetNamespacedResource(
+          args.parent, tag_utils.TAG_VALUES
+      ).name
 
     with endpoints.CrmEndpointOverrides(location):
       service = tags.TagHoldsService()

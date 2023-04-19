@@ -75,7 +75,9 @@ class Create(base.Command):
     if args.parent.find("tagKeys/") == 0:
       tag_key = args.parent
     else:
-      tag_key = tag_utils.GetTagKeyFromNamespacedName(args.parent).name
+      tag_key = tag_utils.GetNamespacedResource(
+          args.parent, tag_utils.TAG_KEYS
+      ).name
 
     tag_value = messages.TagValue(
         shortName=short_name, description=description, parent=tag_key)

@@ -35,7 +35,8 @@ class AddIamPolicyBinding(base.Command):
 
      Adds the IAM policy binding for a TagValue resource given the binding
      and an identifier for the TagValue. The identifier can be the TagValue's
-     <organization_id>/<tagkey_short_name>/<tagvalue_short_name> or the
+     namespaced name in the form
+     <parent_namespace>/<tagkey_short_name>/<tagvalue_short_name> or the
      TagValue's ID in the form: tagValues/{numeric_id}.
   """
 
@@ -73,8 +74,9 @@ class AddIamPolicyBinding(base.Command):
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = args.RESOURCE_NAME
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(
-          args.RESOURCE_NAME).name
+      tag_value = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_VALUES
+      ).name
 
     get_iam_policy_req = (
         messages.CloudresourcemanagerTagValuesGetIamPolicyRequest(

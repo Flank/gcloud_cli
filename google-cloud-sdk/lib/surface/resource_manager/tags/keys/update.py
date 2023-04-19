@@ -60,10 +60,11 @@ class Update(base.Command):
 
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = tag_utils.GetResource(
-          args.RESOURCE_NAME, 'tagKeys')
+          args.RESOURCE_NAME, tag_utils.TAG_KEYS)
     else:
-      tag_key = tag_utils.GetTagKeyFromNamespacedName(
-          args.RESOURCE_NAME)
+      tag_key = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_KEYS
+      )
 
     tag_key.description = args.description
 

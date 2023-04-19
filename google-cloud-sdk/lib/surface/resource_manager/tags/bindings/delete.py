@@ -39,7 +39,8 @@ class Delete(base.Command):
     TagValue is attached to. The parent must be given as the full resource name.
     See: https://cloud.google.com/apis/design/resource_names#full_resource_name.
     The TagValue can be represented with its numeric id or
-    its namespaced name of {org_id}/{tag_key_short_name}.
+    its namespaced name of
+    {parent_namespace}/{tag_key_short_name}/{tag_value_short_name}.
   """
 
   detailed_help = {
@@ -79,7 +80,9 @@ class Delete(base.Command):
     if args.tag_value.find("tagValues/") == 0:
       tag_value = args.tag_value
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(args.tag_value).name
+      tag_value = tag_utils.GetNamespacedResource(
+          args.tag_value, tag_utils.TAG_VALUES
+      ).name
 
     messages = tags.TagMessages()
 
@@ -98,13 +101,16 @@ class Delete(base.Command):
         else:
           return operations.WaitForReturnOperation(
               op,
-              "Waiting for TagBinding for resource [{}] and tag value [{}] to be "
-              "deleted with [{}]".format(args.parent, args.tag_value, op.name))
+              "Waiting for TagBinding for resource [{}] and tag value [{}] to "
+              "be deleted with [{}]".format(
+                  args.parent, args.tag_value, op.name
+              ),
+          )
     except HttpBadRequestError:
       if args.parent.find(PROJECTS_PREFIX) != 0:
         raise
 
-    # Attempt to fetch and delete the binding for the given project id.
+      # Attempt to fetch and delete the binding for the given project id.
       binding_name = tag_utils.ProjectNameToBinding(resource_name, tag_value,
                                                     location)
       del_req = messages.CloudresourcemanagerTagBindingsDeleteRequest(

@@ -52,13 +52,17 @@ class List(base.ListCommand):
     if args.parent.find("tagKeys/") == 0:
       tag_key = args.parent
     else:
-      tag_key = tag_utils.GetTagKeyFromNamespacedName(args.parent).name
+      tag_key = tag_utils.GetNamespacedResource(
+          args.parent, tag_utils.TAG_KEYS
+      ).name
 
     list_request = messages.CloudresourcemanagerTagValuesListRequest(
-        parent=tag_key, pageSize=args.page_size)
+        parent=tag_key, pageSize=args.page_size
+    )
     return list_pager.YieldFromList(
         service,
         list_request,
         batch_size_attribute="pageSize",
         batch_size=args.page_size,
-        field="tagValues")
+        field="tagValues",
+    )

@@ -61,8 +61,9 @@ class Delete(base.Command):
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = args.RESOURCE_NAME
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(
-          args.RESOURCE_NAME).name
+      tag_value = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_VALUES
+      ).name
 
     delete_request = messages.CloudresourcemanagerTagValuesDeleteRequest(
         name=tag_value)

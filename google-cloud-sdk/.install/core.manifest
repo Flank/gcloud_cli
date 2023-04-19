@@ -851,6 +851,7 @@ lib/googlecloudsdk/api_lib/storage/gcs_grpc/__init__.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/client.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/grpc_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/metadata_util.py
+lib/googlecloudsdk/api_lib/storage/gcs_grpc/retry_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_iam_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_json/__init__.py
 lib/googlecloudsdk/api_lib/storage/gcs_json/client.py
@@ -907,6 +908,7 @@ lib/googlecloudsdk/api_lib/vmware/externalaccessrules.py
 lib/googlecloudsdk/api_lib/vmware/externaladdresses.py
 lib/googlecloudsdk/api_lib/vmware/hcxactivationkeys.py
 lib/googlecloudsdk/api_lib/vmware/locations.py
+lib/googlecloudsdk/api_lib/vmware/loggingservers.py
 lib/googlecloudsdk/api_lib/vmware/managementdnszonebinding.py
 lib/googlecloudsdk/api_lib/vmware/networkpeering.py
 lib/googlecloudsdk/api_lib/vmware/networkpeeringroutes.py
@@ -2062,6 +2064,7 @@ lib/googlecloudsdk/command_lib/logs/stream.py
 lib/googlecloudsdk/command_lib/looker/__init__.py
 lib/googlecloudsdk/command_lib/looker/flags.py
 lib/googlecloudsdk/command_lib/looker/instances_update_util.py
+lib/googlecloudsdk/command_lib/looker/operations_util.py
 lib/googlecloudsdk/command_lib/looker/resources.yaml
 lib/googlecloudsdk/command_lib/media/__init__.py
 lib/googlecloudsdk/command_lib/media/asset/__init__.py
@@ -2339,6 +2342,7 @@ lib/googlecloudsdk/command_lib/run/integrations/typekits/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/base.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/cloudsql_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/domain_routing_typekit.py
+lib/googlecloudsdk/command_lib/run/integrations/typekits/firebasehosting_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/redis_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits_util.py
 lib/googlecloudsdk/command_lib/run/integrations/types_describe_printer.py
@@ -4799,6 +4803,8 @@ lib/googlecloudsdk/schemas/gkebackup/v1/SubstitutionRules.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/AnnotationsValue.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/Authorization.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalApiServerArgument.yaml
+lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalBgpLbConfig.yaml
+lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalBgpPeerConfig.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalCluster.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalClusterOperationsConfig.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/BareMetalControlPlaneConfig.yaml
@@ -6029,6 +6035,7 @@ lib/surface/builds/connections/add_iam_policy_binding.yaml
 lib/surface/builds/connections/create/__init__.py
 lib/surface/builds/connections/create/github.yaml
 lib/surface/builds/connections/create/github_enterprise.yaml
+lib/surface/builds/connections/create/gitlab.yaml
 lib/surface/builds/connections/delete.yaml
 lib/surface/builds/connections/describe.yaml
 lib/surface/builds/connections/get_iam_policy.yaml
@@ -6037,6 +6044,7 @@ lib/surface/builds/connections/set_iam_policy.yaml
 lib/surface/builds/connections/update/__init__.py
 lib/surface/builds/connections/update/github.yaml
 lib/surface/builds/connections/update/github_enterprise.yaml
+lib/surface/builds/connections/update/gitlab.yaml
 lib/surface/builds/describe.py
 lib/surface/builds/enterprise_config/__init__.py
 lib/surface/builds/enterprise_config/bitbucketserver/__init__.py
@@ -9134,6 +9142,7 @@ lib/surface/logging/write.py
 lib/surface/looker/__init__.py
 lib/surface/looker/backups/__init__.py
 lib/surface/looker/backups/create.py
+lib/surface/looker/backups/delete.yaml
 lib/surface/looker/backups/describe.yaml
 lib/surface/looker/backups/list.yaml
 lib/surface/looker/instances/__init__.py
@@ -9142,8 +9151,10 @@ lib/surface/looker/instances/delete.yaml
 lib/surface/looker/instances/describe.yaml
 lib/surface/looker/instances/list.yaml
 lib/surface/looker/instances/restart.yaml
+lib/surface/looker/instances/restore.yaml
 lib/surface/looker/instances/update.yaml
 lib/surface/looker/operations/__init__.py
+lib/surface/looker/operations/cancel.yaml
 lib/surface/looker/operations/describe.yaml
 lib/surface/looker/operations/list.yaml
 lib/surface/media/__init__.py
@@ -9262,6 +9273,7 @@ lib/surface/metastore/operations/wait.yaml
 lib/surface/metastore/services/__init__.py
 lib/surface/metastore/services/add_iam_policy_binding.yaml
 lib/surface/metastore/services/alter_metadata_resource_location.yaml
+lib/surface/metastore/services/alter_table_properties.yaml
 lib/surface/metastore/services/backups/__init__.py
 lib/surface/metastore/services/backups/add_iam_policy_binding.yaml
 lib/surface/metastore/services/backups/create.yaml
@@ -9431,9 +9443,21 @@ lib/surface/monitoring/snoozes/describe.py
 lib/surface/monitoring/snoozes/list.yaml
 lib/surface/monitoring/snoozes/update.py
 lib/surface/mps/__init__.py
+lib/surface/mps/images/__init__.py
+lib/surface/mps/images/describe.py
+lib/surface/mps/images/list.py
 lib/surface/mps/instances/__init__.py
 lib/surface/mps/instances/describe.py
 lib/surface/mps/instances/list.py
+lib/surface/mps/networks/__init__.py
+lib/surface/mps/networks/describe.py
+lib/surface/mps/networks/list.py
+lib/surface/mps/ssh_keys/__init__.py
+lib/surface/mps/ssh_keys/describe.py
+lib/surface/mps/ssh_keys/list.py
+lib/surface/mps/volumes/__init__.py
+lib/surface/mps/volumes/describe.py
+lib/surface/mps/volumes/list.py
 lib/surface/netapp/__init__.py
 lib/surface/netapp/active_directories/__init__.py
 lib/surface/netapp/active_directories/create.py
@@ -9633,7 +9657,7 @@ lib/surface/network_security/security_profile_groups/update.yaml
 lib/surface/network_security/security_profiles/__init__.py
 lib/surface/network_security/security_profiles/threat_prevention/__init__.py
 lib/surface/network_security/security_profiles/threat_prevention/add_override.py
-lib/surface/network_security/security_profiles/threat_prevention/create.yaml
+lib/surface/network_security/security_profiles/threat_prevention/create.py
 lib/surface/network_security/security_profiles/threat_prevention/delete.yaml
 lib/surface/network_security/security_profiles/threat_prevention/delete_override.py
 lib/surface/network_security/security_profiles/threat_prevention/list.yaml
@@ -10817,6 +10841,12 @@ lib/surface/vmware/private_clouds/hcx/activationkeys/create.py
 lib/surface/vmware/private_clouds/hcx/activationkeys/describe.py
 lib/surface/vmware/private_clouds/hcx/activationkeys/list.py
 lib/surface/vmware/private_clouds/list.py
+lib/surface/vmware/private_clouds/logging_servers/__init__.py
+lib/surface/vmware/private_clouds/logging_servers/create.py
+lib/surface/vmware/private_clouds/logging_servers/delete.py
+lib/surface/vmware/private_clouds/logging_servers/describe.py
+lib/surface/vmware/private_clouds/logging_servers/list.py
+lib/surface/vmware/private_clouds/logging_servers/update.py
 lib/surface/vmware/private_clouds/management_dns_zone_bindings/__init__.py
 lib/surface/vmware/private_clouds/management_dns_zone_bindings/create.py
 lib/surface/vmware/private_clouds/management_dns_zone_bindings/delete.py

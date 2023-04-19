@@ -34,7 +34,8 @@ class Create(base.Command):
     Create a TagHold under a TagValue, indicating that the TagValue is being
     used by a holder (cloud resource) from an (optional) origin. The TagValue
     can be represented with its numeric id or its namespaced name of
-    {org_id}/{tag_key_short_name}/{tag_value_short_name}.
+    {parent_namespace}/{tag_key_short_name}/{tag_value_short_name}.
+
   """
 
   detailed_help = {
@@ -91,7 +92,9 @@ class Create(base.Command):
     if args.parent.find("tagValues/") == 0:
       parent = args.parent
     else:
-      parent = tag_utils.GetTagValueFromNamespacedName(args.parent).name
+      parent = tag_utils.GetNamespacedResource(
+          args.parent, tag_utils.TAG_VALUES
+      ).name
 
     holder = args.holder
     origin = args.origin if args.IsSpecified("origin") else None

@@ -34,8 +34,8 @@ class Create(base.Command):
     Creates a TagBinding given the TagValue and the parent cloud resource the
     TagValue will be attached to. The TagValue can be represented with its
     numeric id or its namespaced name of
-    organizations/{org_id}/{tag_key_short_name}. The parent resource should be
-    represented with its full resource name. See:
+    {parent_namespace}/{tag_key_short_name}/{tag_value_short_name}. The parent
+    resource should be represented with its full resource name. See:
     https://cloud.google.com/apis/design/resource_names#full_resource_name.
   """
 
@@ -70,16 +70,27 @@ class Create(base.Command):
   def Run(self, args):
     messages = tags.TagMessages()
 
+    tag_value = None
+    tag_value_namespaced_name = None
     if args.tag_value.find("tagValues/") == 0:
       tag_value = args.tag_value
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(args.tag_value).name
+      tag_value_namespaced_name = args.tag_value
 
     location = args.location if args.IsSpecified("location") else None
 
     resource_name = tag_utils.GetCanonicalResourceName(
         args.parent, location, base.ReleaseTrack.GA)
-    tag_binding = messages.TagBinding(parent=resource_name, tagValue=tag_value)
+    if tag_value is not None:
+      tag_binding = messages.TagBinding(
+          parent=resource_name,
+          tagValue=tag_value,
+      )
+    else:
+      tag_binding = messages.TagBinding(
+          parent=resource_name,
+          tagValueNamespacedName=tag_value_namespaced_name,
+      )
 
     create_req = messages.CloudresourcemanagerTagBindingsCreateRequest(
         tagBinding=tag_binding)

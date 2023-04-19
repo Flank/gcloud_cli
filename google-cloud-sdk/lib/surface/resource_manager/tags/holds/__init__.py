@@ -30,6 +30,6 @@ class TagHolds(base.Group):
     The Resource Manager Service gives you centralized and programmatic
     control over your organization's Tags. As the tag
     administrator, you will be able to create and configure restrictions across
-    the tags in the org, and you will be able to indicate the use of a TagValue
-    as a TagHold.
+    the tags in your organization or projects, and you will be able to indicate
+    the use of a TagValue as a TagHold.
   """

@@ -31,7 +31,7 @@ class Update(base.Command):
   """Updates the specified TagValue resource's description.
 
     Updates the TagValue's description given the TagValue's
-    <organization_id>/<tagkey_short_name>/<short_name>
+    namespaced name <parent_namespace>/<tagkey_short_name>/<short_name>
     or the TagValue's numeric id tagValues/<id>
   """
 
@@ -62,10 +62,11 @@ class Update(base.Command):
 
     if args.RESOURCE_NAME.find('tagValues/') == 0:
       tag_value = tag_utils.GetResource(
-          args.RESOURCE_NAME, 'tagValues')
+          args.RESOURCE_NAME, tag_utils.TAG_VALUES)
     else:
-      tag_value = tag_utils.GetTagValueFromNamespacedName(
-          args.RESOURCE_NAME)
+      tag_value = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_VALUES
+      )
 
     tag_value.description = args.description
 

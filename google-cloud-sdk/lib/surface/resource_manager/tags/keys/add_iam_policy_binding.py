@@ -73,8 +73,9 @@ class AddIamPolicyBinding(base.Command):
     if args.RESOURCE_NAME.find('tagKeys/') == 0:
       tag_key = args.RESOURCE_NAME
     else:
-      tag_key = tag_utils.GetTagKeyFromNamespacedName(
-          args.RESOURCE_NAME).name
+      tag_key = tag_utils.GetNamespacedResource(
+          args.RESOURCE_NAME, tag_utils.TAG_KEYS
+      ).name
 
     get_iam_policy_req = (
         messages.CloudresourcemanagerTagKeysGetIamPolicyRequest(
