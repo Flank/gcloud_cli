@@ -4071,6 +4071,7 @@ lib/third_party/urllib3/fields.py
 lib/third_party/urllib3/filepost.py
 lib/third_party/urllib3/packages/__init__.py
 lib/third_party/urllib3/packages/backports/__init__.py
+lib/third_party/urllib3/packages/backports/finalize.py
 lib/third_party/urllib3/packages/backports/makefile.py
 lib/third_party/urllib3/packages/six.py
 lib/third_party/urllib3/poolmanager.py

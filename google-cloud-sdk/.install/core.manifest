@@ -679,6 +679,8 @@ lib/googlecloudsdk/api_lib/netapp/storage_pools/client.py
 lib/googlecloudsdk/api_lib/netapp/util.py
 lib/googlecloudsdk/api_lib/netapp/volumes/__init__.py
 lib/googlecloudsdk/api_lib/netapp/volumes/client.py
+lib/googlecloudsdk/api_lib/netapp/volumes/replications/__init__.py
+lib/googlecloudsdk/api_lib/netapp/volumes/replications/client.py
 lib/googlecloudsdk/api_lib/netapp/volumes/snapshots/__init__.py
 lib/googlecloudsdk/api_lib/netapp/volumes/snapshots/client.py
 lib/googlecloudsdk/api_lib/network_connectivity/__init__.py
@@ -847,8 +849,10 @@ lib/googlecloudsdk/api_lib/storage/__init__.py
 lib/googlecloudsdk/api_lib/storage/api_factory.py
 lib/googlecloudsdk/api_lib/storage/cloud_api.py
 lib/googlecloudsdk/api_lib/storage/errors.py
+lib/googlecloudsdk/api_lib/storage/gcs_download.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/__init__.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/client.py
+lib/googlecloudsdk/api_lib/storage/gcs_grpc/download.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/grpc_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/metadata_util.py
 lib/googlecloudsdk/api_lib/storage/gcs_grpc/retry_util.py
@@ -914,6 +918,7 @@ lib/googlecloudsdk/api_lib/vmware/networkpeering.py
 lib/googlecloudsdk/api_lib/vmware/networkpeeringroutes.py
 lib/googlecloudsdk/api_lib/vmware/networkpolicies.py
 lib/googlecloudsdk/api_lib/vmware/networks.py
+lib/googlecloudsdk/api_lib/vmware/nodes.py
 lib/googlecloudsdk/api_lib/vmware/nodetypes.py
 lib/googlecloudsdk/api_lib/vmware/operations.py
 lib/googlecloudsdk/api_lib/vmware/private_clouds/__init__.py
@@ -2062,8 +2067,10 @@ lib/googlecloudsdk/command_lib/logs/__init__.py
 lib/googlecloudsdk/command_lib/logs/read.py
 lib/googlecloudsdk/command_lib/logs/stream.py
 lib/googlecloudsdk/command_lib/looker/__init__.py
+lib/googlecloudsdk/command_lib/looker/backups_util.py
 lib/googlecloudsdk/command_lib/looker/flags.py
 lib/googlecloudsdk/command_lib/looker/instances_update_util.py
+lib/googlecloudsdk/command_lib/looker/instances_util.py
 lib/googlecloudsdk/command_lib/looker/operations_util.py
 lib/googlecloudsdk/command_lib/looker/resources.yaml
 lib/googlecloudsdk/command_lib/media/__init__.py
@@ -2191,6 +2198,8 @@ lib/googlecloudsdk/command_lib/netapp/storage_pools/flags.py
 lib/googlecloudsdk/command_lib/netapp/util.py
 lib/googlecloudsdk/command_lib/netapp/volumes/__init__.py
 lib/googlecloudsdk/command_lib/netapp/volumes/flags.py
+lib/googlecloudsdk/command_lib/netapp/volumes/replications/__init__.py
+lib/googlecloudsdk/command_lib/netapp/volumes/replications/flags.py
 lib/googlecloudsdk/command_lib/netapp/volumes/snapshots/__init__.py
 lib/googlecloudsdk/command_lib/netapp/volumes/snapshots/flags.py
 lib/googlecloudsdk/command_lib/network_actions/__init__.py
@@ -2502,6 +2511,7 @@ lib/googlecloudsdk/command_lib/storage/rsync_command_util.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
 lib/googlecloudsdk/command_lib/storage/storage_parallel.py
 lib/googlecloudsdk/command_lib/storage/storage_url.py
+lib/googlecloudsdk/command_lib/storage/symlink_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/create_bucket_task.py
@@ -2571,6 +2581,8 @@ lib/googlecloudsdk/command_lib/tasks/resources.yaml
 lib/googlecloudsdk/command_lib/telco_automation/__init__.py
 lib/googlecloudsdk/command_lib/telco_automation/hooks.py
 lib/googlecloudsdk/command_lib/telco_automation/resources.yaml
+lib/googlecloudsdk/command_lib/telecomdatafabric/__init__.py
+lib/googlecloudsdk/command_lib/telecomdatafabric/resources.yaml
 lib/googlecloudsdk/command_lib/terraform/__init__.py
 lib/googlecloudsdk/command_lib/terraform/env_vars.py
 lib/googlecloudsdk/command_lib/terraform/flags.py
@@ -4094,6 +4106,10 @@ lib/googlecloudsdk/generated_clients/apis/serviceusage/v1beta1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/serviceusage/v1beta1/resources.py
 lib/googlecloudsdk/generated_clients/apis/serviceusage/v1beta1/serviceusage_v1beta1_client.py
 lib/googlecloudsdk/generated_clients/apis/serviceusage/v1beta1/serviceusage_v1beta1_messages.py
+lib/googlecloudsdk/generated_clients/apis/serviceusage/v2/__init__.py
+lib/googlecloudsdk/generated_clients/apis/serviceusage/v2/resources.py
+lib/googlecloudsdk/generated_clients/apis/serviceusage/v2/serviceusage_v2_client.py
+lib/googlecloudsdk/generated_clients/apis/serviceusage/v2/serviceusage_v2_messages.py
 lib/googlecloudsdk/generated_clients/apis/source/__init__.py
 lib/googlecloudsdk/generated_clients/apis/source/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/source/v1/resources.py
@@ -4356,11 +4372,13 @@ lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/__init__.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/v2/__init__.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/v2/async_client.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/v2/client.py
+lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/v2/resources.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/logging/v2/rest_client.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/__init__.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/v1/__init__.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/v1/async_client.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/v1/client.py
+lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/v1/resources.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/spanner/v1/rest_client.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/storage/__init__.py
 lib/googlecloudsdk/generated_clients/gapic_wrappers/storage/v2/__init__.py
@@ -4842,6 +4860,7 @@ lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareAutoRepairConfig.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareAutoResizeConfig.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareCluster.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareControlPlaneNodeConfig.yaml
+lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareControlPlaneV2Config.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareDataplaneV2Config.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareDhcpIpConfig.yaml
 lib/googlecloudsdk/schemas/gkeonprem/v1/VmwareF5BigIpConfig.yaml
@@ -4859,6 +4878,8 @@ lib/googlecloudsdk/schemas/networksecurity/v1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/CertificateProviderInstance.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ClientTlsPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/Destination.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/GatewaySecurityPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/GatewaySecurityPolicyRule.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1CertificateProvider.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/GoogleCloudNetworksecurityV1GrpcEndpoint.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/HttpHeaderMatch.yaml
@@ -4867,6 +4888,8 @@ lib/googlecloudsdk/schemas/networksecurity/v1/MTLSPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/Rule.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ServerTlsPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/Source.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/TlsInspectionPolicy.yaml
+lib/googlecloudsdk/schemas/networksecurity/v1/UrlList.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1/ValidationCA.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/AuthorizationPolicy.yaml
 lib/googlecloudsdk/schemas/networksecurity/v1alpha1/CertificateProvider.yaml
@@ -5471,6 +5494,11 @@ lib/surface/alloydb/operations/describe.py
 lib/surface/alloydb/operations/list.py
 lib/surface/alloydb/users/__init__.py
 lib/surface/alloydb/users/create.py
+lib/surface/alloydb/users/delete.py
+lib/surface/alloydb/users/list.py
+lib/surface/alloydb/users/set_password.py
+lib/surface/alloydb/users/set_roles.py
+lib/surface/alloydb/users/set_superuser.py
 lib/surface/anthos/__init__.py
 lib/surface/anthos/apply.py
 lib/surface/anthos/auth/__init__.py
@@ -5956,6 +5984,7 @@ lib/surface/bms/instances/describe.py
 lib/surface/bms/instances/disable_serial_console.yaml
 lib/surface/bms/instances/enable_serial_console.yaml
 lib/surface/bms/instances/list.py
+lib/surface/bms/instances/rename.py
 lib/surface/bms/instances/reset.yaml
 lib/surface/bms/instances/start.yaml
 lib/surface/bms/instances/stop.yaml
@@ -6100,6 +6129,7 @@ lib/surface/builds/triggers/list.py
 lib/surface/builds/triggers/run.py
 lib/surface/builds/triggers/update/__init__.py
 lib/surface/builds/triggers/update/bitbucketserver.py
+lib/surface/builds/triggers/update/cloud_source_repositories.py
 lib/surface/builds/triggers/update/github.py
 lib/surface/builds/triggers/update/gitlab_enterprise.py
 lib/surface/builds/worker_pools/__init__.py
@@ -7641,7 +7671,9 @@ lib/surface/database_migration/conversion_workspaces/convert.py
 lib/surface/database_migration/conversion_workspaces/create.py
 lib/surface/database_migration/conversion_workspaces/delete.py
 lib/surface/database_migration/conversion_workspaces/describe.yaml
+lib/surface/database_migration/conversion_workspaces/describe_ddls.py
 lib/surface/database_migration/conversion_workspaces/describe_entities.py
+lib/surface/database_migration/conversion_workspaces/describe_issues.py
 lib/surface/database_migration/conversion_workspaces/import_rules.py
 lib/surface/database_migration/conversion_workspaces/list.yaml
 lib/surface/database_migration/conversion_workspaces/list_background_jobs.yaml
@@ -9665,6 +9697,7 @@ lib/surface/network_security/security_profiles/threat_prevention/list_overrides.
 lib/surface/network_security/security_profiles/threat_prevention/update_override.py
 lib/surface/network_security/server_tls_policies/__init__.py
 lib/surface/network_security/server_tls_policies/delete.yaml
+lib/surface/network_security/server_tls_policies/describe.yaml
 lib/surface/network_security/server_tls_policies/export.yaml
 lib/surface/network_security/server_tls_policies/import.yaml
 lib/surface/network_security/server_tls_policies/list.yaml
@@ -10715,6 +10748,12 @@ lib/surface/telco_automation/orchestration_cluster/create.yaml
 lib/surface/telco_automation/orchestration_cluster/delete.yaml
 lib/surface/telco_automation/orchestration_cluster/describe.yaml
 lib/surface/telco_automation/orchestration_cluster/list.yaml
+lib/surface/telecomdatafabric/__init__.py
+lib/surface/telecomdatafabric/deployment/__init__.py
+lib/surface/telecomdatafabric/deployment/create.yaml
+lib/surface/telecomdatafabric/deployment/delete.yaml
+lib/surface/telecomdatafabric/deployment/describe.yaml
+lib/surface/telecomdatafabric/deployment/list.yaml
 lib/surface/terraform/__init__.py
 lib/surface/terraform/recommendations/__init__.py
 lib/surface/terraform/recommendations/list.py
@@ -10826,6 +10865,9 @@ lib/surface/vmware/private_clouds/clusters/create.py
 lib/surface/vmware/private_clouds/clusters/delete.py
 lib/surface/vmware/private_clouds/clusters/describe.py
 lib/surface/vmware/private_clouds/clusters/list.py
+lib/surface/vmware/private_clouds/clusters/nodes/__init__.py
+lib/surface/vmware/private_clouds/clusters/nodes/describe.py
+lib/surface/vmware/private_clouds/clusters/nodes/list.py
 lib/surface/vmware/private_clouds/clusters/update.py
 lib/surface/vmware/private_clouds/create.py
 lib/surface/vmware/private_clouds/delete.py
