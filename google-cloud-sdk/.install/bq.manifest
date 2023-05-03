@@ -348,7 +348,6 @@ platform/bq/third_party/rsa/pkcs1_v2.py
 platform/bq/third_party/rsa/prime.py
 platform/bq/third_party/rsa/randnum.py
 platform/bq/third_party/rsa/transform.py
-platform/bq/third_party/rsa/varblock.py
 platform/bq/third_party/six/LICENSE
 platform/bq/third_party/six/__init__.py
 platform/bq/third_party/socks/LICENSE
@@ -382,10 +381,9 @@ platform/bq/third_party/urllib3/fields.py
 platform/bq/third_party/urllib3/filepost.py
 platform/bq/third_party/urllib3/packages/__init__.py
 platform/bq/third_party/urllib3/packages/backports/__init__.py
+platform/bq/third_party/urllib3/packages/backports/finalize.py
 platform/bq/third_party/urllib3/packages/backports/makefile.py
 platform/bq/third_party/urllib3/packages/six.py
-platform/bq/third_party/urllib3/packages/ssl_match_hostname/__init__.py
-platform/bq/third_party/urllib3/packages/ssl_match_hostname/_implementation.py
 platform/bq/third_party/urllib3/poolmanager.py
 platform/bq/third_party/urllib3/request.py
 platform/bq/third_party/urllib3/response.py
