@@ -559,6 +559,7 @@ lib/googlecloudsdk/api_lib/firebase/test/tool_results.py
 lib/googlecloudsdk/api_lib/firebase/test/util.py
 lib/googlecloudsdk/api_lib/firestore/__init__.py
 lib/googlecloudsdk/api_lib/firestore/api_utils.py
+lib/googlecloudsdk/api_lib/firestore/backups.py
 lib/googlecloudsdk/api_lib/firestore/databases.py
 lib/googlecloudsdk/api_lib/firestore/importexport.py
 lib/googlecloudsdk/api_lib/firestore/indexes.py
@@ -637,6 +638,8 @@ lib/googlecloudsdk/api_lib/logging/tailing.py
 lib/googlecloudsdk/api_lib/logging/util.py
 lib/googlecloudsdk/api_lib/looker/__init__.py
 lib/googlecloudsdk/api_lib/looker/backups.py
+lib/googlecloudsdk/api_lib/looker/instances.py
+lib/googlecloudsdk/api_lib/looker/utils.py
 lib/googlecloudsdk/api_lib/memcache/__init__.py
 lib/googlecloudsdk/api_lib/meta/__init__.py
 lib/googlecloudsdk/api_lib/meta/help_html_data/__init__.py
@@ -817,6 +820,8 @@ lib/googlecloudsdk/api_lib/services/peering.py
 lib/googlecloudsdk/api_lib/services/scm.py
 lib/googlecloudsdk/api_lib/services/services_util.py
 lib/googlecloudsdk/api_lib/services/serviceusage.py
+lib/googlecloudsdk/api_lib/smart_guardrails/__init__.py
+lib/googlecloudsdk/api_lib/smart_guardrails/smart_guardrails.py
 lib/googlecloudsdk/api_lib/source/__init__.py
 lib/googlecloudsdk/api_lib/source/git.py
 lib/googlecloudsdk/api_lib/source/project_configs.py
@@ -1113,6 +1118,7 @@ lib/googlecloudsdk/command_lib/artifacts/sbom_util.py
 lib/googlecloudsdk/command_lib/artifacts/upgrade_util.py
 lib/googlecloudsdk/command_lib/artifacts/util.py
 lib/googlecloudsdk/command_lib/artifacts/version_util.py
+lib/googlecloudsdk/command_lib/artifacts/vex_util.py
 lib/googlecloudsdk/command_lib/asset/__init__.py
 lib/googlecloudsdk/command_lib/asset/asset_query_printer.py
 lib/googlecloudsdk/command_lib/asset/flags.py
@@ -2987,6 +2993,11 @@ lib/googlecloudsdk/generated_clients/apis/appengine/v1beta/__init__.py
 lib/googlecloudsdk/generated_clients/apis/appengine/v1beta/appengine_v1beta_client.py
 lib/googlecloudsdk/generated_clients/apis/appengine/v1beta/appengine_v1beta_messages.py
 lib/googlecloudsdk/generated_clients/apis/appengine/v1beta/resources.py
+lib/googlecloudsdk/generated_clients/apis/apphub/__init__.py
+lib/googlecloudsdk/generated_clients/apis/apphub/v1alpha/__init__.py
+lib/googlecloudsdk/generated_clients/apis/apphub/v1alpha/apphub_v1alpha_client.py
+lib/googlecloudsdk/generated_clients/apis/apphub/v1alpha/apphub_v1alpha_messages.py
+lib/googlecloudsdk/generated_clients/apis/apphub/v1alpha/resources.py
 lib/googlecloudsdk/generated_clients/apis/artifactregistry/__init__.py
 lib/googlecloudsdk/generated_clients/apis/artifactregistry/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/artifactregistry/v1/artifactregistry_v1_client.py
@@ -4604,6 +4615,7 @@ lib/googlecloudsdk/schemas/compute/beta/Metadata.yaml
 lib/googlecloudsdk/schemas/compute/beta/MetadataCredentialsFromPlugin.yaml
 lib/googlecloudsdk/schemas/compute/beta/MetadataFilter.yaml
 lib/googlecloudsdk/schemas/compute/beta/MetadataFilterLabelMatch.yaml
+lib/googlecloudsdk/schemas/compute/beta/MetadatasValue.yaml
 lib/googlecloudsdk/schemas/compute/beta/MutualTls.yaml
 lib/googlecloudsdk/schemas/compute/beta/NetworkInterface.yaml
 lib/googlecloudsdk/schemas/compute/beta/NetworkPerformanceConfig.yaml
@@ -4699,6 +4711,7 @@ lib/googlecloudsdk/schemas/compute/v1/LabelsValue.yaml
 lib/googlecloudsdk/schemas/compute/v1/Metadata.yaml
 lib/googlecloudsdk/schemas/compute/v1/MetadataFilter.yaml
 lib/googlecloudsdk/schemas/compute/v1/MetadataFilterLabelMatch.yaml
+lib/googlecloudsdk/schemas/compute/v1/MetadatasValue.yaml
 lib/googlecloudsdk/schemas/compute/v1/NetworkInterface.yaml
 lib/googlecloudsdk/schemas/compute/v1/NetworkPerformanceConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/OutlierDetection.yaml
@@ -5753,6 +5766,8 @@ lib/surface/artifacts/vpcsc_config/__init__.py
 lib/surface/artifacts/vpcsc_config/allow.yaml
 lib/surface/artifacts/vpcsc_config/deny.yaml
 lib/surface/artifacts/vpcsc_config/describe.yaml
+lib/surface/artifacts/vulnerabilities/__init__.py
+lib/surface/artifacts/vulnerabilities/load_vex.py
 lib/surface/artifacts/yum/__init__.py
 lib/surface/artifacts/yum/import.py
 lib/surface/artifacts/yum/upload.py
@@ -7510,10 +7525,13 @@ lib/surface/container/fleet/policycontroller/violations/__init__.py
 lib/surface/container/fleet/policycontroller/violations/describe.py
 lib/surface/container/fleet/policycontroller/violations/list.py
 lib/surface/container/fleet/scopes/__init__.py
+lib/surface/container/fleet/scopes/add_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/create.yaml
 lib/surface/container/fleet/scopes/delete.yaml
 lib/surface/container/fleet/scopes/describe.yaml
+lib/surface/container/fleet/scopes/get_iam_policy.yaml
 lib/surface/container/fleet/scopes/list.yaml
+lib/surface/container/fleet/scopes/remove_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/update.yaml
 lib/surface/container/fleet/service_directory/__init__.py
 lib/surface/container/fleet/service_directory/describe.py
@@ -7817,6 +7835,7 @@ lib/surface/dataplex/datascan/jobs/__init__.py
 lib/surface/dataplex/datascan/jobs/describe.yaml
 lib/surface/dataplex/datascan/jobs/list.yaml
 lib/surface/dataplex/datascan/list.yaml
+lib/surface/dataplex/datascan/run.yaml
 lib/surface/dataplex/environments/__init__.py
 lib/surface/dataplex/environments/add_iam_policy_binding.py
 lib/surface/dataplex/environments/create.py
@@ -7936,6 +7955,12 @@ lib/surface/dataproc/operations/describe.py
 lib/surface/dataproc/operations/get_iam_policy.py
 lib/surface/dataproc/operations/list.py
 lib/surface/dataproc/operations/set_iam_policy.py
+lib/surface/dataproc/session_templates/__init__.py
+lib/surface/dataproc/session_templates/delete.py
+lib/surface/dataproc/session_templates/describe.py
+lib/surface/dataproc/session_templates/export.py
+lib/surface/dataproc/session_templates/import.py
+lib/surface/dataproc/session_templates/list.py
 lib/surface/dataproc/sessions/__init__.py
 lib/surface/dataproc/sessions/create/__init__.py
 lib/surface/dataproc/sessions/create/spark.py
@@ -8537,6 +8562,10 @@ lib/surface/firebase/test/network_profiles/__init__.py
 lib/surface/firebase/test/network_profiles/describe.py
 lib/surface/firebase/test/network_profiles/list.py
 lib/surface/firestore/__init__.py
+lib/surface/firestore/backups/__init__.py
+lib/surface/firestore/backups/delete.py
+lib/surface/firestore/backups/describe.py
+lib/surface/firestore/backups/list.py
 lib/surface/firestore/databases/__init__.py
 lib/surface/firestore/databases/create.py
 lib/surface/firestore/databases/delete.py
@@ -9197,6 +9226,8 @@ lib/surface/looker/instances/__init__.py
 lib/surface/looker/instances/create.yaml
 lib/surface/looker/instances/delete.yaml
 lib/surface/looker/instances/describe.yaml
+lib/surface/looker/instances/export.py
+lib/surface/looker/instances/import.py
 lib/surface/looker/instances/list.yaml
 lib/surface/looker/instances/restart.yaml
 lib/surface/looker/instances/restore.yaml
@@ -9314,6 +9345,7 @@ lib/surface/metastore/locations/__init__.py
 lib/surface/metastore/locations/describe.yaml
 lib/surface/metastore/locations/list.yaml
 lib/surface/metastore/operations/__init__.py
+lib/surface/metastore/operations/cancel.py
 lib/surface/metastore/operations/delete.py
 lib/surface/metastore/operations/describe.yaml
 lib/surface/metastore/operations/list.yaml
@@ -9541,6 +9573,7 @@ lib/surface/netapp/volumes/list.py
 lib/surface/netapp/volumes/replications/__init__.py
 lib/surface/netapp/volumes/replications/resume.py
 lib/surface/netapp/volumes/replications/reverse.py
+lib/surface/netapp/volumes/replications/stop.py
 lib/surface/netapp/volumes/revert.py
 lib/surface/netapp/volumes/snapshots/__init__.py
 lib/surface/netapp/volumes/snapshots/create.py
@@ -10306,6 +10339,8 @@ lib/surface/scc/bqexports/list.yaml
 lib/surface/scc/bqexports/update.yaml
 lib/surface/scc/custom_modules/__init__.py
 lib/surface/scc/custom_modules/etd/__init__.py
+lib/surface/scc/custom_modules/etd/get.yaml
+lib/surface/scc/custom_modules/etd/get_effective.yaml
 lib/surface/scc/custom_modules/etd/list.yaml
 lib/surface/scc/custom_modules/etd/list_descendant.yaml
 lib/surface/scc/custom_modules/etd/list_effective.yaml
