@@ -231,6 +231,7 @@ lib/googlecloudsdk/api_lib/compute/filter_rewrite.py
 lib/googlecloudsdk/api_lib/compute/filter_scope_rewriter.py
 lib/googlecloudsdk/api_lib/compute/firewall_policies/__init__.py
 lib/googlecloudsdk/api_lib/compute/firewall_policies/client.py
+lib/googlecloudsdk/api_lib/compute/firewall_policy_association_utils.py
 lib/googlecloudsdk/api_lib/compute/firewall_policy_rule_utils.py
 lib/googlecloudsdk/api_lib/compute/firewalls_utils.py
 lib/googlecloudsdk/api_lib/compute/forwarding_rules_utils.py
@@ -559,6 +560,7 @@ lib/googlecloudsdk/api_lib/firebase/test/tool_results.py
 lib/googlecloudsdk/api_lib/firebase/test/util.py
 lib/googlecloudsdk/api_lib/firestore/__init__.py
 lib/googlecloudsdk/api_lib/firestore/api_utils.py
+lib/googlecloudsdk/api_lib/firestore/backup_schedules.py
 lib/googlecloudsdk/api_lib/firestore/backups.py
 lib/googlecloudsdk/api_lib/firestore/databases.py
 lib/googlecloudsdk/api_lib/firestore/importexport.py
@@ -1704,6 +1706,7 @@ lib/googlecloudsdk/command_lib/dataproc/clusters.py
 lib/googlecloudsdk/command_lib/dataproc/flags.py
 lib/googlecloudsdk/command_lib/dataproc/gke_clusters.py
 lib/googlecloudsdk/command_lib/dataproc/gke_workload_identity.py
+lib/googlecloudsdk/command_lib/dataproc/instances.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/__init__.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/base.py
 lib/googlecloudsdk/command_lib/dataproc/jobs/hadoop.py
@@ -3952,6 +3955,10 @@ lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3alpha/__init__.
 lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3alpha/policytroubleshooter_v3alpha_client.py
 lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3alpha/policytroubleshooter_v3alpha_messages.py
 lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3alpha/resources.py
+lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3beta/__init__.py
+lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3beta/policytroubleshooter_v3beta_client.py
+lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3beta/policytroubleshooter_v3beta_messages.py
+lib/googlecloudsdk/generated_clients/apis/policytroubleshooter/v3beta/resources.py
 lib/googlecloudsdk/generated_clients/apis/privateca/__init__.py
 lib/googlecloudsdk/generated_clients/apis/privateca/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/privateca/v1/privateca_v1_client.py
@@ -6160,6 +6167,7 @@ lib/surface/builds/triggers/update/bitbucketserver.py
 lib/surface/builds/triggers/update/cloud_source_repositories.py
 lib/surface/builds/triggers/update/github.py
 lib/surface/builds/triggers/update/gitlab_enterprise.py
+lib/surface/builds/triggers/update/manual.py
 lib/surface/builds/worker_pools/__init__.py
 lib/surface/builds/worker_pools/create.py
 lib/surface/builds/worker_pools/delete.py
@@ -7025,6 +7033,8 @@ lib/surface/compute/ssl_policies/list.py
 lib/surface/compute/ssl_policies/list_available_features.py
 lib/surface/compute/ssl_policies/update.py
 lib/surface/compute/start_iap_tunnel.py
+lib/surface/compute/storage_pools/__init__.py
+lib/surface/compute/storage_pools/describe.yaml
 lib/surface/compute/target_grpc_proxies/__init__.py
 lib/surface/compute/target_grpc_proxies/config/__init__.py
 lib/surface/compute/target_grpc_proxies/config/export.yaml
@@ -7926,6 +7936,10 @@ lib/surface/dataproc/clusters/set_iam_policy.py
 lib/surface/dataproc/clusters/start.py
 lib/surface/dataproc/clusters/stop.py
 lib/surface/dataproc/clusters/update.py
+lib/surface/dataproc/instances/__init__.py
+lib/surface/dataproc/instances/create.py
+lib/surface/dataproc/instances/delete.py
+lib/surface/dataproc/instances/describe.py
 lib/surface/dataproc/jobs/__init__.py
 lib/surface/dataproc/jobs/delete.py
 lib/surface/dataproc/jobs/describe.py
@@ -8566,11 +8580,18 @@ lib/surface/firestore/backups/__init__.py
 lib/surface/firestore/backups/delete.py
 lib/surface/firestore/backups/describe.py
 lib/surface/firestore/backups/list.py
+lib/surface/firestore/backups/schedules/__init__.py
+lib/surface/firestore/backups/schedules/create.py
+lib/surface/firestore/backups/schedules/delete.py
+lib/surface/firestore/backups/schedules/describe.py
+lib/surface/firestore/backups/schedules/list.py
+lib/surface/firestore/backups/schedules/update.py
 lib/surface/firestore/databases/__init__.py
 lib/surface/firestore/databases/create.py
 lib/surface/firestore/databases/delete.py
 lib/surface/firestore/databases/describe.yaml
 lib/surface/firestore/databases/list.py
+lib/surface/firestore/databases/restore.py
 lib/surface/firestore/databases/update.yaml
 lib/surface/firestore/export.py
 lib/surface/firestore/fields/__init__.py
@@ -9571,6 +9592,8 @@ lib/surface/netapp/volumes/delete.py
 lib/surface/netapp/volumes/describe.py
 lib/surface/netapp/volumes/list.py
 lib/surface/netapp/volumes/replications/__init__.py
+lib/surface/netapp/volumes/replications/describe.py
+lib/surface/netapp/volumes/replications/list.py
 lib/surface/netapp/volumes/replications/resume.py
 lib/surface/netapp/volumes/replications/reverse.py
 lib/surface/netapp/volumes/replications/stop.py
@@ -10339,6 +10362,8 @@ lib/surface/scc/bqexports/list.yaml
 lib/surface/scc/bqexports/update.yaml
 lib/surface/scc/custom_modules/__init__.py
 lib/surface/scc/custom_modules/etd/__init__.py
+lib/surface/scc/custom_modules/etd/create.yaml
+lib/surface/scc/custom_modules/etd/delete.yaml
 lib/surface/scc/custom_modules/etd/get.yaml
 lib/surface/scc/custom_modules/etd/get_effective.yaml
 lib/surface/scc/custom_modules/etd/list.yaml
@@ -10935,6 +10960,7 @@ lib/surface/vmware/private_clouds/external_addresses/create.py
 lib/surface/vmware/private_clouds/external_addresses/delete.py
 lib/surface/vmware/private_clouds/external_addresses/describe.py
 lib/surface/vmware/private_clouds/external_addresses/list.py
+lib/surface/vmware/private_clouds/external_addresses/update.py
 lib/surface/vmware/private_clouds/hcx/__init__.py
 lib/surface/vmware/private_clouds/hcx/activationkeys/__init__.py
 lib/surface/vmware/private_clouds/hcx/activationkeys/create.py
