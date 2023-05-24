@@ -2188,7 +2188,6 @@ platform/gsutil/third_party/google-auth-library-python/tests/data/authorized_use
 platform/gsutil/third_party/google-auth-library-python/tests/data/authorized_user_cloud_sdk_with_quota_project_id.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/authorized_user_with_rapt_token.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/client_secrets.json
-platform/gsutil/third_party/google-auth-library-python/tests/data/cloud_sdk_config.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/context_aware_metadata.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/enterprise_cert_invalid.json
 platform/gsutil/third_party/google-auth-library-python/tests/data/enterprise_cert_valid.json
