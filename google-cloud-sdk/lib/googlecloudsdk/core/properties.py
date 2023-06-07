@@ -1107,6 +1107,7 @@ class _SectionApiClientOverrides(_Section):
     self.storage = self._Add('storage')
     self.run = self._Add('run')
     self.scc = self._Add('securitycenter')
+    self.cloudresourcemanager = self._Add('cloudresourcemanager')
 
 
 class _SectionApiEndpointOverrides(_Section):
@@ -1445,6 +1446,13 @@ class _SectionArtifacts(_Section):
         'resources. When a `location` value is required but not provided, the '
         'command will fall back to this value, if set. If this value is unset, '
         'the default location is `global` when `location` value is optional.')
+
+    self.registry_endpoint_prefix = self._Add(
+        'registry_endpoint_prefix',
+        default='',
+        hidden=True,
+        help_text='Default prefix to use while interacting with Artifact '
+        'Registry resources.')
 
 
 class _SectionAuth(_Section):
@@ -3341,11 +3349,15 @@ class _SectionStorage(_Section):
 
     self.json_api_version = self._Add(
         'json_api_version',
+        default='v1',
         hidden=True,
-        help_text='The version "v1" is hardcoded in the generated client for'
-        ' upload operations, e.g. /resumable/upload/storage/v1/b/{bucket}/o.'
-        'Setting this property will replace "v1" in the above path with the'
-        'specified value.')
+        help_text=(
+            'The version "v1" is hardcoded in the generated client for upload'
+            ' operations, e.g.'
+            ' /resumable/upload/storage/v1/b/{bucket}/o. Setting this property'
+            ' will replace "v1" in the above path with the specified value.'
+        ),
+    )
 
     self.key_store_path = self._Add(
         'key_store_path',
@@ -4195,7 +4207,7 @@ def GetValueFromFeatureFlag(prop):
   ff_config = feature_flags_config.GetFeatureFlagsConfig(
       VALUES.core.account.Get(), VALUES.core.project.Get())
   if ff_config:
-    return ff_config.Get(prop)
+    return Stringize(ff_config.Get(prop))
   return None
 
 
@@ -4299,10 +4311,12 @@ def _GetBoolProperty(prop, properties_file, required, validate=False):
   property_value = _GetProperty(prop, properties_file, required)
   if validate:
     _BooleanValidator(prop.name, property_value)
-  if property_value is None or property_value.value is None or Stringize(
-      property_value.value).lower() == 'none':
+  if property_value is None or property_value.value is None:
     return None
-  return property_value.value.lower() in ['1', 'true', 'on', 'yes', 'y']
+  property_string_value = Stringize(property_value.value).lower()
+  if property_string_value == 'none':
+    return None
+  return property_string_value in ['1', 'true', 'on', 'yes', 'y']
 
 
 def _GetIntProperty(prop, properties_file, required):

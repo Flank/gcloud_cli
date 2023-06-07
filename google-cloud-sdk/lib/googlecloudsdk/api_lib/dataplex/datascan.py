@@ -20,8 +20,6 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dataplex import util as dataplex_api
 
-from googlecloudsdk.core import yaml
-
 
 def GenerateData(args):
   """Generate Data From Arguments."""
@@ -43,7 +41,7 @@ def GenerateDataQualitySpec(args):
   module = dataplex_api.GetMessageModule()
 
   if args.IsSpecified('data_quality_spec_file'):
-    dataqualityspec = yaml.load_path(args.data_quality_spec_file)
+    dataqualityspec = dataplex_api.ReadObject(args.data_quality_spec_file)
   else:
     dataqualityspec = module.GoogleCloudDataplexV1DataQualitySpec()
   return dataqualityspec
@@ -60,9 +58,7 @@ def GenerateTrigger(args):
   """Generate DataQualitySpec From Arguments."""
   module = dataplex_api.GetMessageModule()
   trigger = module.GoogleCloudDataplexV1Trigger()
-  if args.IsSpecified('disabled'):
-    trigger.disabled = args.disabled
-  elif args.IsSpecified('schedule'):
+  if args.IsSpecified('schedule'):
     trigger.schedule = GenerateSchedule(args)
   else:
     trigger.onDemand = module.GoogleCloudDataplexV1TriggerOnDemand()

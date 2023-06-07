@@ -187,6 +187,34 @@ def AddInstanceType(parser, required=True):
       help='Specifies instance type.')
 
 
+def AddFaultType(parser, required=True):
+  """Adds a --fault-type flag to parser.
+
+  Args:
+    parser: argparse.Parser: Parser object for command line inputs.
+    required: Whether or not --fault-type is required.
+  """
+  parser.add_argument(
+      '--fault-type',
+      type=str,
+      required=required,
+      choices={'stop-vm': 'stop-vm fault type supports stopping the VM.'},
+      help='Specifies fault type.',
+  )
+
+
+def GetInjectFaultTypeFlagMapper(alloydb_messages):
+  return arg_utils.ChoiceEnumMapper(
+      '--fault-type',
+      alloydb_messages.InjectFaultRequest.FaultTypeValueValuesEnum,
+      required=False,
+      custom_mappings={
+          'STOP_VM': 'stop-vm',
+      },
+      help_str='Type of fault to inject in an instance.',
+  )
+
+
 def AddOperation(parser):
   """Adds a positional operation argument to parser.
 
@@ -557,16 +585,15 @@ def AddEncryptionConfigFlags(parser, verb):
 
 
 def AddRestoreClusterSourceFlags(parser):
-  """Adds RestoreCluster PITR flags.
+  """Adds RestoreCluster flags.
 
   Args:
     parser: argparse.ArgumentParser: Parser object for command line inputs.
   """
-  group = parser.add_group(mutex=True, help='RestoreCluster source types.')
-  backup_source_group = group.add_group(
-      help='Restore a cluster using a specific backup as the source.')
-  backup_source_group.add_argument(
-      '--backup', required=True, type=str, help='AlloyDB backup ID')
+  group = parser.add_group(
+      mutex=True, required=True, help='RestoreCluster source types.'
+  )
+  group.add_argument('--backup', type=str, help='AlloyDB backup ID')
 
   continuous_backup_source_group = group.add_group(
       help='Restore a cluster from a source cluster at a given point in time.')
@@ -823,4 +850,49 @@ def AddUpdateMode(parser):
       },
       help='Specify the mode for updating the instance. If unspecified, '
       'the update would follow a least disruptive approach',
+  )
+
+
+def AddSSLMode(parser):
+  """Adds SSL Mode flag.
+
+  Args:
+    parser: argparse.Parser: Parser object for command line inputs.
+  """
+  parser.add_argument(
+      '--ssl-mode',
+      required=False,
+      hidden=True,
+      type=str,
+      # TODO(b/283520844): Set default to be ENCRYPTED_ONLY once we unhide this.
+      choices={
+          'ENCRYPTED_ONLY': (
+              'SSL connections are required. CA verification is not enforced.'
+          ),
+          'ALLOW_UNENCRYPTED_AND_ENCRYPTED': (
+              'SSL connections are optional. CA verification is not enforced.'
+          ),
+      },
+      help=(
+          'Specify the SSL mode to use when the instance connects to the '
+          'database.'
+      ),
+  )
+
+
+def AddRequireConnectors(parser):
+  """Adds Require Connectors flag.
+
+  Args:
+    parser: argparse.Parser: Parser object for command line inputs.
+  """
+  parser.add_argument(
+      '--require-connectors',
+      required=False,
+      hidden=True,
+      action=arg_parsers.StoreTrueFalseAction,
+      help=(
+          'Enable or disable enforcing connectors only (ex: AuthProxy)'
+          'connections to the database.'
+      ),
   )

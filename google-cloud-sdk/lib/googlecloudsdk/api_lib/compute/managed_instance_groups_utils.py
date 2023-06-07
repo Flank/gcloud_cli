@@ -99,12 +99,21 @@ def AddAutoscalerArgs(
   parser.add_argument(
       '--cool-down-period',
       type=arg_parsers.Duration(),
-      help=('The time period that the autoscaler should wait before it starts '
-            'collecting information from a new instance. This prevents the '
-            'autoscaler from collecting information when the instance is '
-            'initializing, during which the collected usage would not be '
-            'reliable. The default is 60s. See $ gcloud topic datetimes '
-            'for information on duration formats.'))
+      help=(
+          'The number of seconds that your application takes to initialize on a'
+          ' VM instance. This is referred to as the [initialization'
+          ' period](https://cloud.google.com/compute/docs/autoscaler#cool_down_period).'
+          ' Specifying an accurate initialization period improves autoscaler'
+          ' decisions. For example, when scaling out, the autoscaler ignores'
+          ' data from VMs that are still initializing because those VMs might'
+          ' not yet represent normal usage of your application. The default'
+          ' initialization period is 60 seconds. See $ gcloud topic datetimes'
+          ' for information on duration formats. Initialization periods might'
+          ' vary because of numerous factors. We recommend that you test how'
+          ' long your application may take to initialize. To do this, create a'
+          ' VM and time your application\'s startup process.'
+      ),
+  )
   parser.add_argument('--description', help='Notes about Autoscaler.')
   AddMinMaxControl(parser, max_required=not autoscaling_file_enabled)
   parser.add_argument('--scale-based-on-cpu',
@@ -458,7 +467,6 @@ def AddScheduledAutoscalingConfigurationArguments(arg_group):
         are other scaling schedules active with more required instances or if
         another signal (for example, scaling based on CPU) requires more
         instances to meet its target.
-
 
         This configuration does not change autoscaling minimum and maximum
         instance limits which are always in effect. Autoscaler does not create
@@ -1657,15 +1665,13 @@ def ListPerInstanceConfigs(client, igm_ref):
   return results[0].items
 
 
-def IsStateful(client, igm_info, igm_ref):
+def IsStateful(igm_info):
   """For a given IGM, returns if it is stateful."""
-  # TODO(b/129752312): use igm.is_stateful field when launched
-  pics = ListPerInstanceConfigs(client, igm_ref)
-  has_policy = (
-      hasattr(igm_info, 'statefulPolicy') and
-      igm_info.statefulPolicy is not None)
-
-  return has_policy or pics
+  return (
+      hasattr(igm_info.status, 'stateful')
+      and hasattr(igm_info.status.stateful, 'hasStatefulConfig')
+      and igm_info.status.stateful.hasStatefulConfig
+  )
 
 
 def ValidateIgmReadyForStatefulness(igm_resource, client):
@@ -1704,7 +1710,7 @@ def ValueOrNone(message):
   cases, it returns the message.
 
   Args:
-    message: An generated proto message object.
+    message: A generated proto message object.
 
   Returns:
     message if message is initialized or None

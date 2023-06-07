@@ -6,6 +6,164 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 Note: Support for Python 3.5-3.7 will be deprecated on August 8th, 2023.
 
+## 434.0.0 (2023-06-06)
+
+### AlloyDB
+
+* Promote Continuous Backups related commands to the GA track, which include changes to `gcloud alloydb clusters create`, `gcloud alloydb clusters update` and `gcloud alloydb clusters restore`.
+
+### Anthos On-Prem
+
+* Modified `gcloud container vmware admin-clusters list`. When specifying `--location=-`, or when both `--location` and gcloud configuration `container_vmware/location` are not specified, return admin clusters in all locations of the specified project.
+
+### Cloud Functions
+
+* Updated `gcloud functions logs read` to read function logs from both 1st gen
+  and 2nd gen functions when no function name is provided unless `--gen2` or
+  `--no-gen2` is set.
+
+### Cloud Key Management Service
+
+*   Promoted `gcloud kms inventory` which allows viewing and tracking of
+    keys across cloud resources.
+
+### Cloud Logging
+
+* Promoted `--custom-writer-identity` flag of `gcloud logging sinks create` to beta and GA.
+* Promoted `--custom-writer-identity` flag of `gcloud logging sinks update` to beta and GA.
+
+### Compute Engine
+
+* Updated the Interconnect attachment Bring Your Own IP (BYOIP) IPv6 fields to be unavailable.
+* Added  `--size` flag to `gcloud compute disks update` to support size update.
+* Added hyperdisk-balanced support to `gcloud compute disks create` and `gcloud compute instances create`.
+* Added `--per-instance-hostnames` flag to `gcloud compute instances bulk create` for alpha and beta.
+* Promoted `--http-keep-alive-timeout-sec` flag for `gcloud compute <target-http-proxies|target-https-proxies> <create|update>` and `--clear-http-keep-alive-timeout-sec` flag for `gcloud compute <target-http-proxies|target-https-proxies> update` to beta.
+
+### Dataproc Metastore
+
+* Promoted `--endpoint-protocol` flag to GA.
+
+### Kubernetes Engine
+
+* Added `--enable-fqdn-network-policy` flag to `gcloud beta container clusters create` and `gcloud beta container clusters update`.
+
+### Recommender
+
+* Added a `list` command for insights that lists all available insight types.
+* Added a `list` command for recommenders that lists all available recommenders.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Support for Python 3.5-3.7 will be deprecated on August 8th, 2023.
+
+## 433.0.1 (2023-06-1)
+
+### Google Cloud CLI
+
+* Disabled self-signed jwt usage for service accounts.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Support for Python 3.5-3.7 will be deprecated on August 8th, 2023.
+
+## 433.0.0 (2023-05-31)
+
+### Breaking Changes
+
+*   **(Cloud Run)** Added `--[no-]async` flags to `gcloud run jobs delete` and
+  `gcloud run jobs executions delete` with a default value of `--no-async`.
+  Changed these two commands to wait for delete operation by default.
+
+
+### Google Cloud CLI
+
+* Fixed issue where running the install script from within the root
+  `google-cloud-sdk` directory would crash with an unactionable error when new
+  versions of certain components were made available prior to installation.
+
+### AlloyDB
+
+* Promoted AlloyDB Cross Region Replication commands to GA track. Modified commands include: alloydb clusters create-secondary, alloydb clusters promote, alloydb instances create-secondary.
+
+### Anthos On-Prem
+
+* Modified `gcloud container bare-metal admin-clusters list`. When specifying `--location=-`, or when both `--location` and gcloud configuration `container_bare_metal/location` are not specified, return admin clusters in all locations of the specified project.
+
+### Artifact Registry
+
+* Updated the output of `gcloud artifacts docker images list` with flag `--show-occurrences` to include SBOM reference occurrences.
+
+### Certificate Authority Service
+
+* Added `--publishing-encoding-format` flag to `gcloud privateca pools
+  create` and `gcloud privateca pools update` to allow users to optionally
+  publish DER encoded CA certificates and CRLs to Google Cloud Storage buckets.
+
+### Cloud Build
+
+* Added flag to specify substitutions in `gcloud builds triggers run`.
+* Modified `--branch`, `--tag`, `--sha` flags to be optional in `gcloud builds triggers run` command.
+
+### Cloud Composer
+
+* Added `--enable-high-resilience` to `gcloud composer environments create` to create environments with high resilience mode.
+* Added `gcloud composer environments database-failover` to manually run a database failover for environments with high resilience enabled.
+* Added `gcloud composer environments fetch-database-properties` to fetch airflow database properties for Composer environments.
+
+### Cloud Logging
+
+* Added `logging_service_account_id` to `settings describe` response.
+
+### Cloud SQL
+
+*   Added `--no-recovery`, `--bak-type`  and `--recovery-only` flags to `gcloud sql import bak`
+    and added `--bak-type` and `--differential-base` flags to `gcloud sql export bak` to enable the differential
+    import/export feature for SQL Server.
+
+### Cloud Workstations
+
+* Added `--accelerator-type` and `--accelerator-count` flags to
+`gcloud beta workstations configs create`.
+
+### Compute Engine
+
+* Fixed bug in handling quota exceeded error with `gcloud compute commitments create` command.
+* Added `--region` flag to `gcloud beta compute security-policies rules` commands.
+* Deprecated `--no-client-ttl` and `--no-max-ttl` arguments of `gcloud compute [backend-services|backend-buckets] [create|update]`.
+
+### Kpt
+
+* Updated kpt in Google Cloud CLI from 1.0.0-beta.33 to 1.0.0-beta.34.
+
+### Kubernetes Engine
+
+* Added `--enable-best-effort-provision` and `--min-provision-nodes` to
+`gcloud container node-pools create` to turn on best effort provisioning for
+node pool creation.
+
+### Network Security
+
+* Added `network-security firewall-endpoint-associations` commands to manage Cloud Firewall Plus endpoint associations, and promoted them to beta.
+* Promoted commands under `gcloud network-security address-groups` to GA.
+* Promoted commands under `gcloud network-security org-address-groups` to GA.
+
+### Security Command Center
+
+* Added `gcloud topic datetimes` support for `gcloud scc` command group timestamp and duration flags.
+
+### Transfer
+
+*   Added `--docker-network` flag to `gcloud transfer agents install` to allow
+    configuration of the underlying Docker container's network.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+Note: Support for Python 3.5-3.7 will be deprecated on August 8th, 2023.
+
 ## 432.0.0 (2023-05-23)
 
 ### AI
