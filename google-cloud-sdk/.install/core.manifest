@@ -1563,6 +1563,9 @@ lib/googlecloudsdk/command_lib/config/config_validators.py
 lib/googlecloudsdk/command_lib/config/flags.py
 lib/googlecloudsdk/command_lib/config/virtualenv/__init__.py
 lib/googlecloudsdk/command_lib/config/virtualenv/util.py
+lib/googlecloudsdk/command_lib/config_manager/__init__.py
+lib/googlecloudsdk/command_lib/config_manager/deploy_util.py
+lib/googlecloudsdk/command_lib/config_manager/resources.yaml
 lib/googlecloudsdk/command_lib/container/__init__.py
 lib/googlecloudsdk/command_lib/container/attached/__init__.py
 lib/googlecloudsdk/command_lib/container/attached/flags.py
@@ -1644,6 +1647,7 @@ lib/googlecloudsdk/command_lib/container/gkemulticloud/errors.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/flags.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/kubeconfig.py
 lib/googlecloudsdk/command_lib/container/gkemulticloud/operations.py
+lib/googlecloudsdk/command_lib/container/gkemulticloud/versions.py
 lib/googlecloudsdk/command_lib/container/gkeonprem/__init__.py
 lib/googlecloudsdk/command_lib/container/gkeonprem/constants.py
 lib/googlecloudsdk/command_lib/container/gkeonprem/flags.py
@@ -2537,6 +2541,7 @@ lib/googlecloudsdk/command_lib/storage/resources/resources.yaml
 lib/googlecloudsdk/command_lib/storage/resources/s3_resource_reference.py
 lib/googlecloudsdk/command_lib/storage/resources/shim_format_util.py
 lib/googlecloudsdk/command_lib/storage/rsync_command_util.py
+lib/googlecloudsdk/command_lib/storage/sign_url_util.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
 lib/googlecloudsdk/command_lib/storage/storage_parallel.py
 lib/googlecloudsdk/command_lib/storage/storage_url.py
@@ -3338,6 +3343,10 @@ lib/googlecloudsdk/generated_clients/apis/config/v1alpha1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha1/config_v1alpha1_client.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha1/config_v1alpha1_messages.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha1/resources.py
+lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/__init__.py
+lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/config_v1alpha2_client.py
+lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/config_v1alpha2_messages.py
+lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/resources.py
 lib/googlecloudsdk/generated_clients/apis/container/__init__.py
 lib/googlecloudsdk/generated_clients/apis/container/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/container/v1/container_v1_client.py
@@ -3887,6 +3896,11 @@ lib/googlecloudsdk/generated_clients/apis/ondemandscanning/v1beta1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/ondemandscanning/v1beta1/ondemandscanning_v1beta1_client.py
 lib/googlecloudsdk/generated_clients/apis/ondemandscanning/v1beta1/ondemandscanning_v1beta1_messages.py
 lib/googlecloudsdk/generated_clients/apis/ondemandscanning/v1beta1/resources.py
+lib/googlecloudsdk/generated_clients/apis/orglifecycle/__init__.py
+lib/googlecloudsdk/generated_clients/apis/orglifecycle/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/orglifecycle/v1/orglifecycle_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/orglifecycle/v1/orglifecycle_v1_messages.py
+lib/googlecloudsdk/generated_clients/apis/orglifecycle/v1/resources.py
 lib/googlecloudsdk/generated_clients/apis/orgpolicy/__init__.py
 lib/googlecloudsdk/generated_clients/apis/orgpolicy/v2/__init__.py
 lib/googlecloudsdk/generated_clients/apis/orgpolicy/v2/orgpolicy_v2_client.py
@@ -4328,6 +4342,10 @@ lib/googlecloudsdk/generated_clients/apis/workloadcertificate/v1alpha1/resources
 lib/googlecloudsdk/generated_clients/apis/workloadcertificate/v1alpha1/workloadcertificate_v1alpha1_client.py
 lib/googlecloudsdk/generated_clients/apis/workloadcertificate/v1alpha1/workloadcertificate_v1alpha1_messages.py
 lib/googlecloudsdk/generated_clients/apis/workstations/__init__.py
+lib/googlecloudsdk/generated_clients/apis/workstations/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/workstations/v1/resources.py
+lib/googlecloudsdk/generated_clients/apis/workstations/v1/workstations_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/workstations/v1/workstations_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/workstations/v1beta/__init__.py
 lib/googlecloudsdk/generated_clients/apis/workstations/v1beta/resources.py
 lib/googlecloudsdk/generated_clients/apis/workstations/v1beta/workstations_v1beta_client.py
@@ -5444,6 +5462,11 @@ lib/surface/ai/models/list_version.py
 lib/surface/ai/models/upload.py
 lib/surface/ai/operations/__init__.py
 lib/surface/ai/operations/describe.py
+lib/surface/ai/persistent_resources/__init__.py
+lib/surface/ai/persistent_resources/create.py
+lib/surface/ai/persistent_resources/delete.py
+lib/surface/ai/persistent_resources/describe.py
+lib/surface/ai/persistent_resources/list.py
 lib/surface/ai/tensorboard_experiments/__init__.py
 lib/surface/ai/tensorboard_experiments/create.py
 lib/surface/ai/tensorboard_experiments/delete.py
@@ -6195,6 +6218,7 @@ lib/surface/builds/triggers/update/cloud_source_repositories.py
 lib/surface/builds/triggers/update/github.py
 lib/surface/builds/triggers/update/gitlab_enterprise.py
 lib/surface/builds/triggers/update/manual.py
+lib/surface/builds/triggers/update/webhook.py
 lib/surface/builds/worker_pools/__init__.py
 lib/surface/builds/worker_pools/create.py
 lib/surface/builds/worker_pools/delete.py
@@ -7266,6 +7290,13 @@ lib/surface/config/virtualenv/describe.py
 lib/surface/config/virtualenv/disable.py
 lib/surface/config/virtualenv/enable.py
 lib/surface/config/virtualenv/update.py
+lib/surface/config_manager/__init__.py
+lib/surface/config_manager/deployments/__init__.py
+lib/surface/config_manager/deployments/delete.yaml
+lib/surface/config_manager/deployments/describe.yaml
+lib/surface/config_manager/deployments/list.yaml
+lib/surface/config_manager/revisions/__init__.py
+lib/surface/config_manager/revisions/describe.yaml
 lib/surface/container/__init__.py
 lib/surface/container/attached/__init__.py
 lib/surface/container/attached/clusters/__init__.py
@@ -7541,6 +7572,7 @@ lib/surface/container/fleet/memberships/support_access/__init__.py
 lib/surface/container/fleet/memberships/support_access/describe.py
 lib/surface/container/fleet/memberships/support_access/disable.py
 lib/surface/container/fleet/memberships/support_access/enable.py
+lib/surface/container/fleet/memberships/support_access/get_yaml.py
 lib/surface/container/fleet/memberships/unregister.py
 lib/surface/container/fleet/memberships/update.yaml
 lib/surface/container/fleet/mesh/__init__.py
@@ -7815,6 +7847,7 @@ lib/surface/dataflow/jobs/list.py
 lib/surface/dataflow/jobs/resume_unsupported_sdk.py
 lib/surface/dataflow/jobs/run.py
 lib/surface/dataflow/jobs/show.py
+lib/surface/dataflow/jobs/update_options.py
 lib/surface/dataflow/logs/__init__.py
 lib/surface/dataflow/logs/list.py
 lib/surface/dataflow/metrics/__init__.py
@@ -8138,6 +8171,9 @@ lib/surface/deploy/automation_runs/__init__.py
 lib/surface/deploy/automation_runs/cancel.py
 lib/surface/deploy/automation_runs/describe.yaml
 lib/surface/deploy/automation_runs/list.yaml
+lib/surface/deploy/automations/__init__.py
+lib/surface/deploy/automations/describe.yaml
+lib/surface/deploy/automations/list.yaml
 lib/surface/deploy/delete.py
 lib/surface/deploy/delivery_pipelines/__init__.py
 lib/surface/deploy/delivery_pipelines/add_iam_policy_binding.yaml
@@ -8628,7 +8664,6 @@ lib/surface/firestore/databases/__init__.py
 lib/surface/firestore/databases/create.py
 lib/surface/firestore/databases/delete.py
 lib/surface/firestore/databases/describe.py
-lib/surface/firestore/databases/describe.yaml
 lib/surface/firestore/databases/list.py
 lib/surface/firestore/databases/restore.py
 lib/surface/firestore/databases/update.yaml
@@ -9653,6 +9688,9 @@ lib/surface/network_connectivity/hubs/create.yaml
 lib/surface/network_connectivity/hubs/delete.yaml
 lib/surface/network_connectivity/hubs/describe.yaml
 lib/surface/network_connectivity/hubs/get_iam_policy.yaml
+lib/surface/network_connectivity/hubs/groups/__init__.py
+lib/surface/network_connectivity/hubs/groups/describe.yaml
+lib/surface/network_connectivity/hubs/groups/list.yaml
 lib/surface/network_connectivity/hubs/list.yaml
 lib/surface/network_connectivity/hubs/list_spokes.py
 lib/surface/network_connectivity/hubs/remove_iam_policy_binding.yaml
