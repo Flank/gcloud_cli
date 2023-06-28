@@ -1,7 +1,7 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [BETA]
 
   help_text:
-    brief: Delete a BeyondCorp client connector service.
+    brief: Delete a BeyondCorp client connector service (Deprecated).
     description: Delete a BeyondCorp client connector service.
     examples: |
       To delete a client connector service with ID ``my-service-resource'' run:
@@ -13,8 +13,6 @@
 
   request:
     collection: beyondcorp.projects.locations.clientConnectorServices
-    ALPHA:
-      api_version: v1alpha
     BETA:
       api_version: v1
 

@@ -1,8 +1,8 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [BETA]
 
   help_text:
     brief: |
-      List BeyondCorp client connector operations.
+      List BeyondCorp client connector operations (Deprecated).
     description: |
       List all BeyondCorp client connector operations in the specified project.
 
@@ -21,8 +21,6 @@
 
   request:
     collection: beyondcorp.projects.locations.operations
-    ALPHA:
-      api_version: v1alpha
     BETA:
       api_version: v1
 

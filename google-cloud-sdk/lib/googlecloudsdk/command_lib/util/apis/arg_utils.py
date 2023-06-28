@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import collections
+import enum
 import re
 
 from apitools.base.protorpclite import messages
@@ -186,6 +187,51 @@ def _GetField(message, field_name):
     raise UnknownFieldError(field_name, message)
 
 
+class FieldType(enum.Enum):
+  MAP = 'map'
+  MESSAGE = 'message'
+  FIELD = 'field'
+
+
+ADDITIONAL_PROPS = 'additionalProperties'
+
+
+def _GetAdditionalPropsField(field):
+  if field.name == ADDITIONAL_PROPS:
+    return field
+  try:
+    return GetFieldFromMessage(field.type, ADDITIONAL_PROPS)
+  except UnknownFieldError:
+    return None
+
+
+def GetFieldType(field):
+  """Determines whether the apitools field is a map, message, or field.
+
+  Args:
+    field: messages.Field, apitools field instance
+
+  Returns:
+    FieldType based on the apitools field type and the type of fields
+      it contains.
+  """
+  if not isinstance(field, messages.MessageField):
+    return FieldType.FIELD
+
+  # Apitools does not distinguish MapFields. Rather, apitools creates a
+  # message field with an additionalProperties field that contains a list
+  # of key, value fields
+  additional_props_field = _GetAdditionalPropsField(field)
+
+  is_map = (additional_props_field and
+            isinstance(additional_props_field, messages.MessageField) and
+            additional_props_field.repeated)
+
+  if is_map:
+    return FieldType.MAP
+  return FieldType.MESSAGE
+
+
 DEFAULT_PARAMS = {'project': properties.VALUES.core.project.Get,
                   'projectId': properties.VALUES.core.project.Get,
                   'projectsId': properties.VALUES.core.project.Get,
@@ -226,11 +272,11 @@ class ArgObjectType(object):
   of the message.
   """
 
-  def GenerateType(self, message):
+  def GenerateType(self, field):
     """Generates an argparse type function to use to parse the argument.
 
     Args:
-      message: The apitools message class.
+      field: The apitools field instance.
     """
     pass
 
@@ -332,8 +378,8 @@ def GenerateFlagType(field, attributes, fix_bools=True):
           field.name,
           'Type {0} cannot be used with a custom action. Remove '
           'action {1} from spec.'.format(type(flag_type).__name__, action))
-    action = flag_type.Action(repeated)
-    flag_type = flag_type.GenerateType(field.type)
+    action = flag_type.Action(field)
+    flag_type = flag_type.GenerateType(field)
   elif repeated:
     if flag_type:
       is_repeatable_message = isinstance(flag_type, RepeatedMessageBindableType)

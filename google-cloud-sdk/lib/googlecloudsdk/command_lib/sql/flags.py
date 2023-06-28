@@ -408,6 +408,10 @@ def AddDatabaseVersion(
       'SQLSERVER_2019_WEB',
       'SQLSERVER_2019_STANDARD',
       'SQLSERVER_2019_ENTERPRISE',
+      'SQLSERVER_2022_EXPRESS',
+      'SQLSERVER_2022_WEB',
+      'SQLSERVER_2022_STANDARD',
+      'SQLSERVER_2022_ENTERPRISE',
   ]
   # End of engine-specific content.
 
@@ -609,6 +613,17 @@ def AddExternalMasterGroup(parser):
           'PEM encoded private key associated with the '
           'clientCertificate.'
       ),
+  )
+
+
+def AddFailoverFlag(parser, show_negated_in_help=True):
+  kwargs = _GetKwargsForBoolFlag(show_negated_in_help)
+  parser.add_argument(
+      '--failover',
+      required=False,
+      hidden=True,
+      help='Whether the promote operation is a failover.',
+      **kwargs
   )
 
 

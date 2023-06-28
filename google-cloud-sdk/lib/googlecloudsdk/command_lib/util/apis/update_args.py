@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import abc
 import enum
 
-from apitools.base.protorpclite import messages
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util.apis import arg_utils
@@ -63,10 +62,9 @@ class UpdateArgumentGenerator(six.with_metaclass(abc.ABCMeta, object)):
     flag_type, action = arg_utils.GenerateFlagType(field, arg_data)
 
     is_repeated = field.repeated
-    is_message = field.variant == messages.Variant.MESSAGE
-    is_map = is_repeated and is_message and field.name == 'additionalProperties'
+    field_type = arg_utils.GetFieldType(field)
 
-    if is_map:
+    if field_type == arg_utils.FieldType.MAP:
       gen_cls = UpdateMapArgumentGenerator
     elif is_repeated:
       gen_cls = UpdateListArgumentGenerator
@@ -114,22 +112,41 @@ class UpdateArgumentGenerator(six.with_metaclass(abc.ABCMeta, object)):
     """Set of flag types that need to be converted."""
     pass
 
+  def _CreateFlag(self, flag_type, flag_prefix, value_type, action):
+    """Creates a flag.
+
+    Args:
+      flag_type: FlagType, used to determine help text
+      flag_prefix: str | None, prefix for the flag name
+      value_type: func, type that flag is used to convert user input
+      action: str, flag action
+
+    Returns:
+      base.Argument with correct params
+    """
+    if flag_prefix is not None:
+      name = flag_prefix + '-' + self.arg_name
+    else:
+      name = self.arg_name
+    arg = base.Argument(
+        '--{}'.format(name),
+        action=action,
+        help=self._GetHelpText(flag_type))
+    if action != 'store_true':
+      arg.kwargs['type'] = value_type
+    return arg
+
   @property
   def set_arg(self):
     """Flag that sets field to specifed value."""
-    return base.Argument(
-        '--{}'.format(self.arg_name),
-        type=self.flag_type,
-        action=self.action,
-        help=self._GetHelpText(FlagType.SET))
+    return self._CreateFlag(
+        FlagType.SET, None, self.flag_type, self.action)
 
   @property
   def clear_arg(self):
     """Flag that clears field."""
-    return base.Argument(
-        '--clear-{}'.format(self.arg_name),
-        action='store_true',
-        help=self._GetHelpText(FlagType.CLEAR))
+    return self._CreateFlag(
+        FlagType.CLEAR, 'clear', None, 'store_true')
 
   @property
   def update_arg(self):
@@ -176,7 +193,7 @@ class UpdateArgumentGenerator(six.with_metaclass(abc.ABCMeta, object)):
 
     update_group = base.ArgumentGroup(required=False)
     if FlagType.UPDATE in self.flags_to_generate and self.update_arg:
-      base_group.AddArgument(self.update_arg)
+      update_group.AddArgument(self.update_arg)
 
     clear_group = base.ArgumentGroup(
         mutex=True, required=False)
@@ -341,19 +358,13 @@ class UpdateListArgumentGenerator(UpdateArgumentGenerator):
 
   @property
   def update_arg(self):
-    return base.Argument(
-        '--add-{}'.format(self.arg_name),
-        action=self.action,
-        type=self.flag_type,
-        help=self._GetHelpText(FlagType.UPDATE))
+    return self._CreateFlag(
+        FlagType.UPDATE, 'add', self.flag_type, self.action)
 
   @property
   def remove_arg(self):
-    return base.Argument(
-        '--remove-{}'.format(self.arg_name),
-        action=self.action,
-        type=self.flag_type,
-        help=self._GetHelpText(FlagType.REMOVE))
+    return self._CreateFlag(
+        FlagType.REMOVE, 'remove', self.flag_type, self.action)
 
   def _ApplyClearFlag(self, output, clear_flag):
     if clear_flag:
@@ -375,6 +386,10 @@ class UpdateMapArgumentGenerator(UpdateArgumentGenerator):
   """Update flag generator for key-value pairs ie proto map fields."""
 
   @property
+  def _is_list_field(self):
+    return self.field.name == arg_utils.ADDITIONAL_PROPS
+
+  @property
   def _help_text(self):
     return {
         FlagType.SET: self.help_text,
@@ -391,37 +406,74 @@ class UpdateMapArgumentGenerator(UpdateArgumentGenerator):
 
   @property
   def update_arg(self):
-    return base.Argument(
-        '--update-{}'.format(self.arg_name),
-        type=self.flag_type,
-        action=self.action,
-        help=self._GetHelpText(FlagType.UPDATE))
+    return self._CreateFlag(
+        FlagType.UPDATE, 'update', self.flag_type, self.action)
 
   @property
   def remove_arg(self):
-    key_field = arg_utils.GetFieldFromMessage(self.field.type, 'key')
+    if self._is_list_field:
+      field = self.field
+    else:
+      field = arg_utils.GetFieldFromMessage(
+          self.field.type, arg_utils.ADDITIONAL_PROPS)
+
+    key_field = arg_utils.GetFieldFromMessage(field.type, 'key')
     key_type = key_field.type or arg_utils.TYPES.get(key_field.variant)
     key_list = arg_parsers.ArgList(element_type=key_type)
 
-    return base.Argument(
-        '--remove-{}'.format(self.arg_name),
-        type=key_list,
-        action='store',
-        help=self._GetHelpText(FlagType.REMOVE))
+    return self._CreateFlag(
+        FlagType.REMOVE, 'remove', key_list, 'store')
+
+  def _WrapOutput(self, output_list):
+    """Wraps field AdditionalProperties in apitools message if needed.
+
+    Args:
+      output_list: list of apitools AdditionalProperties messages.
+
+    Returns:
+      apitools message instance.
+    """
+    if self._is_list_field:
+      return output_list
+    message = self.field.type()
+    arg_utils.SetFieldInMessage(
+        message, arg_utils.ADDITIONAL_PROPS, output_list)
+    return message
+
+  def _GetPropsFieldValue(self, field):
+    """Retrieves AdditionalProperties field value.
+
+    Args:
+      field: apitools instance that contains AdditionalProperties field
+
+    Returns:
+      list of apitools AdditionalProperties messages.
+    """
+    if not field:
+      return []
+    if self._is_list_field:
+      return field
+    return arg_utils.GetFieldValueFromMessage(
+        field, arg_utils.ADDITIONAL_PROPS)
 
   def _ApplyClearFlag(self, output, clear_flag):
     if clear_flag:
-      return []
+      return self._WrapOutput([])
     return output
 
   def _ApplyUpdateFlag(self, output, update_val):
     if update_val:
-      update_key_set = set([x.key for x in update_val])
-      return [x for x in output if x.key not in update_key_set] + update_val
+      output_list = self._GetPropsFieldValue(output)
+      update_val_list = self._GetPropsFieldValue(update_val)
+      update_key_set = set([x.key for x in update_val_list])
+      deduped_list = [x for x in output_list if x.key not in update_key_set]
+      return self._WrapOutput(deduped_list + update_val_list)
     return output
 
   def _ApplyRemoveFlag(self, output, remove_val):
     if remove_val:
+      output_list = self._GetPropsFieldValue(output)
       remove_val_set = set(remove_val)
-      return [x for x in output if x.key not in remove_val_set]
+      return self._WrapOutput(
+          [x for x in output_list if x.key not in remove_val_set])
     return output

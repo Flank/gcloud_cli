@@ -1,7 +1,7 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [BETA]
 
   help_text:
-    brief: Describe a single BeyondCorp client gateway.
+    brief: Describe a single BeyondCorp client gateway (Deprecated).
     description: Describe a single BeyondCorp client gateway.
     examples: |
       To describe a client gateway ``my-client-gateway'' run:
@@ -13,8 +13,6 @@
 
   request:
     collection: beyondcorp.projects.locations.clientGateways
-    ALPHA:
-      api_version: v1alpha
     BETA:
       api_version: v1
 

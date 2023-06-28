@@ -1,7 +1,7 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [BETA]
   help_text:
     brief: |
-      List BeyondCorp client connector service resources.
+      List BeyondCorp client connector service resources (Deprecated).
     description: |
       List BeyondCorp client connector service resources based on project and location.
 
@@ -16,8 +16,6 @@
 
   request:
     collection: beyondcorp.projects.locations.clientConnectorServices
-    ALPHA:
-      api_version: v1alpha
     BETA:
       api_version: v1
 

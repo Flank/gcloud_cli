@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands for creating and manipulating client connector operations."""
+"""Commands for creating and manipulating client connector operations (Deprecated)."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -22,6 +22,6 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class Operations(base.Group):
   """List and describe BeyondCorp client connector operations."""

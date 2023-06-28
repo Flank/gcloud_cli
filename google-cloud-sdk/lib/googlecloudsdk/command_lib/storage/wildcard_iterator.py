@@ -22,9 +22,8 @@ from __future__ import unicode_literals
 import abc
 import collections
 import fnmatch
-import glob
-import itertools
 import os
+import pathlib
 import re
 
 from googlecloudsdk.api_lib.storage import api_factory
@@ -36,13 +35,16 @@ from googlecloudsdk.command_lib.storage import storage_url
 from googlecloudsdk.command_lib.storage.resources import resource_reference
 from googlecloudsdk.core import log
 from googlecloudsdk.core.util import debug_output
-
 import six
 
 
 _FILES_ONLY_ERROR_FORMAT = 'Expected files but got stream: {}'
 COMPRESS_WILDCARDS_REGEX = re.compile(r'\*{3,}')
 WILDCARD_REGEX = re.compile(r'[*?\[\]]')
+
+
+def _is_hidden(path):
+  return path.rpartition(os.sep)[2].startswith('.')
 
 
 def contains_wildcard(url_string):
@@ -203,17 +205,9 @@ class FileWildcardIterator(WildcardIterator):
       )
     self._path = self._url.object_name
     self._recurse = '**' in self._path
-    self._include_hidden_files = self._recurse or force_include_hidden_files
-    # TODO(b/284493911): This can be removed with better hidden file handling.
-    if self._include_hidden_files and re.search(
-        r'{sep}\.[^{sep}]+'.format(sep=re.escape(os.sep)), self._path
-    ):
-      # Example matches: `\.hidden-file.txt` & `/.**hidden-dir/file.txt`
-      # Does not match: `/./`
-      log.warning(
-          'Wildcard input pattern may match hidden files, which could cause'
-          ' duplicate matches to the hidden files matched by other flags.'
-      )
+    self._include_hidden_files = (
+        self._recurse or force_include_hidden_files or _is_hidden(self._path)
+    )
 
   def __iter__(self):
     # Files named '-' will not be copied, as that string makes is_stdio true.
@@ -224,26 +218,26 @@ class FileWildcardIterator(WildcardIterator):
         )
       yield resource_reference.FileObjectResource(self._url)
 
-    normal_file_iterator = glob.iglob(self._path, recursive=self._recurse)
-    # TODO(b/284493911): Current hidden file handling misses some cases.
-    if self._include_hidden_files:
-      # Python 3.11 supports a hidden file kwarg, so if we drop all previous
-      # versions, we can stop this pattern nonsense.
-      if self._recurse:
-        # `**` requires `recursive=True` to work.
-        # Ex: /some/path -> some/path/**/.* (also matches `some/path/.*`)
-        hidden_file_glob_pattern = os.path.join(self._path, '**', '.*')
-      else:
-        # Should error in __init__ for non-compliant URLs.
-        # Ex: /some/path/** -> some/path/.*
-        hidden_file_glob_pattern = self._path.rstrip('*') + '.*'
-      hidden_file_iterator = glob.iglob(
-          hidden_file_glob_pattern, recursive=True
-      )
+    pathlib_path = pathlib.Path(self._path).expanduser()
+    if pathlib_path.root:
+      # It's a path that starts with a root. Create the glob pattern relative
+      # to the root dir. Ex: /usr/a/b/c => (usr, a, b, c)
+      path_components_relative_to_root = list(pathlib_path.parts[1:])
+      path_relative_to_root = os.path.join(*path_components_relative_to_root)
+      root = pathlib_path.anchor
     else:
-      hidden_file_iterator = []
-    for path in itertools.chain(normal_file_iterator, hidden_file_iterator):
-      if self._exclude_patterns and self._exclude_patterns.match(path):
+      root = '.'
+      path_relative_to_root = self._path
+    if path_relative_to_root.endswith('**'):
+      path_relative_to_root = os.path.join(path_relative_to_root, '*')
+    path_iterator = (
+        str(p) for p in pathlib.Path(root).glob(path_relative_to_root)
+    )
+
+    for path in path_iterator:
+      if (self._exclude_patterns and self._exclude_patterns.match(path)) or (
+          not self._include_hidden_files and _is_hidden(path)
+      ):
         continue
       if self._files_only and not os.path.isfile(path):
         if storage_url.is_named_pipe(path):
@@ -264,12 +258,9 @@ class FileWildcardIterator(WildcardIterator):
         log.warning('Skipping symlink {}'.format(path))
         continue
 
-      # For pattern like foo/bar/**, glob returns first path as 'foo/bar/'
-      # even when foo/bar does not exist. So we skip non-existing paths.
-      # Glob also returns intermediate directories if called with **. We skip
+      # Glob returns intermediate directories if called with **. We skip
       # them to be consistent with CloudWildcardIterator.
-      if self._path.endswith('**') and (not os.path.exists(path)
-                                        or os.path.isdir(path)):
+      if self._path.endswith('**') and os.path.isdir(path):
         continue
 
       file_url = storage_url.FileUrl(path)
@@ -359,14 +350,22 @@ class CloudWildcardIterator(WildcardIterator):
             yield obj_resource
 
   def _decrypt_resource_if_necessary(self, resource):
-    if (self._fetch_encrypted_object_hashes and
-        cloud_api.Capability.ENCRYPTION in self._client.capabilities and
-        self._fields_scope != cloud_api.FieldsScope.SHORT and
-        isinstance(resource, resource_reference.ObjectResource)):
+    if (
+        self._fetch_encrypted_object_hashes
+        and cloud_api.Capability.ENCRYPTION in self._client.capabilities
+        and self._fields_scope != cloud_api.FieldsScope.SHORT
+        and isinstance(resource, resource_reference.ObjectResource)
+        and not (resource.crc32c_hash or resource.md5_hash)
+    ):
       # LIST won't return GCS hash fields. Need to GET.
       if resource.kms_key:
         # Backend will reject if user does not have KMS encryption permissions.
-        return self._client.get_object_metadata(resource.bucket, resource.name)
+        return self._client.get_object_metadata(
+            resource.bucket,
+            resource.name,
+            generation=self._url.generation,
+            fields_scope=self._fields_scope,
+        )
       if resource.decryption_key_hash_sha256:
         request_config = request_config_factory.get_request_config(
             resource.storage_url,
@@ -374,8 +373,13 @@ class CloudWildcardIterator(WildcardIterator):
             error_on_missing_key=self._error_on_missing_key)
         if getattr(request_config.resource_args, 'decryption_key', None):
           # Don't GET unless we have a key that will decrypt object.
-          return self._client.get_object_metadata(resource.bucket,
-                                                  resource.name, request_config)
+          return self._client.get_object_metadata(
+              resource.bucket,
+              resource.name,
+              request_config,
+              generation=self._url.generation,
+              fields_scope=self._fields_scope,
+          )
     # No decryption necessary or don't have proper key.
     return resource
 
@@ -387,8 +391,9 @@ class CloudWildcardIterator(WildcardIterator):
           self._url.object_name,
           # TODO(b/197754758): add user request args from surface.
           request_config_factory.get_request_config(self._url),
-          self._url.generation,
-          self._fields_scope)
+          generation=self._url.generation,
+          fields_scope=self._fields_scope,
+      )
 
       return self._decrypt_resource_if_necessary(resource)
     except api_errors.NotFoundError:
