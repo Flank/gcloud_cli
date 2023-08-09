@@ -10,7 +10,6 @@ platform/bq/bq_auth_flags.py
 platform/bq/bq_flags.py
 platform/bq/bq_utils.py
 platform/bq/credential_loader.py
-platform/bq/discovery/httpswwwgoogleapiscom.bigquery.v2.rest.json
 platform/bq/discovery_documents/discovery_document_cache.py
 platform/bq/discovery_documents/discovery_document_loader.py
 platform/bq/discovery_next/bigquery.json
@@ -294,6 +293,7 @@ platform/bq/third_party/pyasn1_modules/rfc6402.py
 platform/bq/third_party/pycparser/LICENSE
 platform/bq/third_party/pyglib/__init__.py
 platform/bq/third_party/pyglib/appcommands.py
+platform/bq/third_party/pyglib/stringutil.py
 platform/bq/third_party/pyparsing/LICENSE
 platform/bq/third_party/pyparsing/__init__.py
 platform/bq/third_party/python_runtime/LICENSE
