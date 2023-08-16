@@ -163,8 +163,6 @@ lib/googlecloudsdk/api_lib/billing/billing_client.py
 lib/googlecloudsdk/api_lib/billing/utils.py
 lib/googlecloudsdk/api_lib/blockchainnodeengine/__init__.py
 lib/googlecloudsdk/api_lib/blockchainnodeengine/api_util.py
-lib/googlecloudsdk/api_lib/blueprints/__init__.py
-lib/googlecloudsdk/api_lib/blueprints/blueprints_util.py
 lib/googlecloudsdk/api_lib/bms/__init__.py
 lib/googlecloudsdk/api_lib/bms/bms_client.py
 lib/googlecloudsdk/api_lib/certificate_manager/__init__.py
@@ -703,6 +701,8 @@ lib/googlecloudsdk/api_lib/netapp/active_directories/client.py
 lib/googlecloudsdk/api_lib/netapp/backup_policies/__init__.py
 lib/googlecloudsdk/api_lib/netapp/backup_policies/client.py
 lib/googlecloudsdk/api_lib/netapp/backup_vaults/__init__.py
+lib/googlecloudsdk/api_lib/netapp/backup_vaults/backups/__init__.py
+lib/googlecloudsdk/api_lib/netapp/backup_vaults/backups/client.py
 lib/googlecloudsdk/api_lib/netapp/backup_vaults/client.py
 lib/googlecloudsdk/api_lib/netapp/constants.py
 lib/googlecloudsdk/api_lib/netapp/kms_configs/__init__.py
@@ -942,6 +942,8 @@ lib/googlecloudsdk/api_lib/transcoder/jobs.py
 lib/googlecloudsdk/api_lib/transcoder/templates.py
 lib/googlecloudsdk/api_lib/transfer/__init__.py
 lib/googlecloudsdk/api_lib/transfer/agent_pools_util.py
+lib/googlecloudsdk/api_lib/transfer/appliances/__init__.py
+lib/googlecloudsdk/api_lib/transfer/appliances/operations.py
 lib/googlecloudsdk/api_lib/transfer/jobs_util.py
 lib/googlecloudsdk/api_lib/transfer/operations_util.py
 lib/googlecloudsdk/api_lib/util/__init__.py
@@ -1222,15 +1224,6 @@ lib/googlecloudsdk/command_lib/billingbudgets/hooks.py
 lib/googlecloudsdk/command_lib/billingbudgets/resources.yaml
 lib/googlecloudsdk/command_lib/blockchain_node_engine/__init__.py
 lib/googlecloudsdk/command_lib/blockchain_node_engine/resources.yaml
-lib/googlecloudsdk/command_lib/blueprints/__init__.py
-lib/googlecloudsdk/command_lib/blueprints/deploy_util.py
-lib/googlecloudsdk/command_lib/blueprints/deterministic_snapshot.py
-lib/googlecloudsdk/command_lib/blueprints/error_handling.py
-lib/googlecloudsdk/command_lib/blueprints/flags.py
-lib/googlecloudsdk/command_lib/blueprints/git_blueprint_util.py
-lib/googlecloudsdk/command_lib/blueprints/resource_args.py
-lib/googlecloudsdk/command_lib/blueprints/resources.yaml
-lib/googlecloudsdk/command_lib/blueprints/staging_bucket_util.py
 lib/googlecloudsdk/command_lib/bms/__init__.py
 lib/googlecloudsdk/command_lib/bms/exceptions.py
 lib/googlecloudsdk/command_lib/bms/flags.py
@@ -1555,6 +1548,7 @@ lib/googlecloudsdk/command_lib/compute/tpus/flags.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/__init__.py
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/flags.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/resources.yaml
+lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/ssh.py
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/util.py
 lib/googlecloudsdk/command_lib/compute/tpus/resources.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/tpu_vm/__init__.py
@@ -1637,6 +1631,8 @@ lib/googlecloudsdk/command_lib/container/fleet/api_util.py
 lib/googlecloudsdk/command_lib/container/fleet/base.py
 lib/googlecloudsdk/command_lib/container/fleet/build/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/build/utils.py
+lib/googlecloudsdk/command_lib/container/fleet/clusterupgrade/__init__.py
+lib/googlecloudsdk/command_lib/container/fleet/clusterupgrade/flags.py
 lib/googlecloudsdk/command_lib/container/fleet/config_management/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/config_management/utils.py
 lib/googlecloudsdk/command_lib/container/fleet/connect_gateway_util.py
@@ -1657,6 +1653,7 @@ lib/googlecloudsdk/command_lib/container/fleet/mesh/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/mesh/utils.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/command.py
+lib/googlecloudsdk/command_lib/container/fleet/policycontroller/constants.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/deployment_configs.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/exceptions.py
 lib/googlecloudsdk/command_lib/container/fleet/policycontroller/flags.py
@@ -4817,6 +4814,7 @@ lib/googlecloudsdk/schemas/compute/beta/UrlMapTest.yaml
 lib/googlecloudsdk/schemas/compute/beta/UrlMapTestHeader.yaml
 lib/googlecloudsdk/schemas/compute/beta/UrlRewrite.yaml
 lib/googlecloudsdk/schemas/compute/beta/WeightedBackendService.yaml
+lib/googlecloudsdk/schemas/compute/v1/AWSV4Signature.yaml
 lib/googlecloudsdk/schemas/compute/v1/AcceleratorConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/AccessConfig.yaml
 lib/googlecloudsdk/schemas/compute/v1/AdvancedMachineFeatures.yaml
@@ -5994,6 +5992,7 @@ lib/surface/assured/workloads/__init__.py
 lib/surface/assured/workloads/create.py
 lib/surface/assured/workloads/delete.py
 lib/surface/assured/workloads/describe.py
+lib/surface/assured/workloads/enable_resource_monitoring.py
 lib/surface/assured/workloads/list.py
 lib/surface/assured/workloads/update.py
 lib/surface/assured/workloads/violations/__init__.py
@@ -6198,15 +6197,6 @@ lib/surface/blockchain_node_engine/nodes/list.yaml
 lib/surface/blockchain_node_engine/operations/__init__.py
 lib/surface/blockchain_node_engine/operations/describe.yaml
 lib/surface/blockchain_node_engine/operations/list.yaml
-lib/surface/blueprints/__init__.py
-lib/surface/blueprints/apply.py
-lib/surface/blueprints/delete.py
-lib/surface/blueprints/describe.py
-lib/surface/blueprints/list.yaml
-lib/surface/blueprints/preview.py
-lib/surface/blueprints/revisions/__init__.py
-lib/surface/blueprints/revisions/describe.py
-lib/surface/blueprints/revisions/list.yaml
 lib/surface/bms/__init__.py
 lib/surface/bms/instances/__init__.py
 lib/surface/bms/instances/describe.py
@@ -6351,7 +6341,6 @@ lib/surface/builds/triggers/create/bitbucketserver.py
 lib/surface/builds/triggers/create/cloud_source_repositories.py
 lib/surface/builds/triggers/create/github.py
 lib/surface/builds/triggers/create/gitlab.py
-lib/surface/builds/triggers/create/gitlab_enterprise.py
 lib/surface/builds/triggers/create/manual.py
 lib/surface/builds/triggers/create/pubsub.py
 lib/surface/builds/triggers/create/repository.py
@@ -7357,6 +7346,8 @@ lib/surface/compute/tpus/queued_resources/delete.yaml
 lib/surface/compute/tpus/queued_resources/describe.yaml
 lib/surface/compute/tpus/queued_resources/list.yaml
 lib/surface/compute/tpus/queued_resources/reset.yaml
+lib/surface/compute/tpus/queued_resources/scp.py
+lib/surface/compute/tpus/queued_resources/ssh.py
 lib/surface/compute/tpus/reimage.yaml
 lib/surface/compute/tpus/start.yaml
 lib/surface/compute/tpus/stop.yaml
@@ -7668,6 +7659,8 @@ lib/surface/container/fleet/cloudrun/apply.py
 lib/surface/container/fleet/cloudrun/describe.py
 lib/surface/container/fleet/cloudrun/disable.py
 lib/surface/container/fleet/cloudrun/enable.py
+lib/surface/container/fleet/clusterupgrade/__init__.py
+lib/surface/container/fleet/clusterupgrade/update.py
 lib/surface/container/fleet/config_management/__init__.py
 lib/surface/container/fleet/config_management/apply.py
 lib/surface/container/fleet/config_management/delete.py
@@ -9883,6 +9876,7 @@ lib/surface/mps/instances/create.py
 lib/surface/mps/instances/delete.py
 lib/surface/mps/instances/describe.py
 lib/surface/mps/instances/list.py
+lib/surface/mps/instances/update.py
 lib/surface/mps/networks/__init__.py
 lib/surface/mps/networks/describe.py
 lib/surface/mps/networks/list.py
@@ -11216,6 +11210,7 @@ lib/surface/telecomdatafabric/deployments/create.yaml
 lib/surface/telecomdatafabric/deployments/delete.yaml
 lib/surface/telecomdatafabric/deployments/describe.yaml
 lib/surface/telecomdatafabric/deployments/list.yaml
+lib/surface/telecomdatafabric/deployments/update.yaml
 lib/surface/telecomdatafabric/fabrics/__init__.py
 lib/surface/telecomdatafabric/fabrics/create.yaml
 lib/surface/telecomdatafabric/fabrics/delete.yaml
@@ -11275,6 +11270,12 @@ lib/surface/transfer/agent_pools/update.py
 lib/surface/transfer/agents/__init__.py
 lib/surface/transfer/agents/delete.py
 lib/surface/transfer/agents/install.py
+lib/surface/transfer/appliances/__init__.py
+lib/surface/transfer/appliances/describe.py
+lib/surface/transfer/appliances/list.py
+lib/surface/transfer/appliances/orders/__init__.py
+lib/surface/transfer/appliances/orders/describe.py
+lib/surface/transfer/appliances/orders/list.py
 lib/surface/transfer/authorize.py
 lib/surface/transfer/jobs/__init__.py
 lib/surface/transfer/jobs/config/__init__.py
