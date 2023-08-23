@@ -934,6 +934,7 @@ lib/googlecloudsdk/api_lib/tasks/queues.py
 lib/googlecloudsdk/api_lib/tasks/task_queues_convertors.py
 lib/googlecloudsdk/api_lib/tasks/tasks.py
 lib/googlecloudsdk/api_lib/telecomdatafabric/__init__.py
+lib/googlecloudsdk/api_lib/telecomdatafabric/create_deployment_args.py
 lib/googlecloudsdk/api_lib/telecomdatafabric/lake.py
 lib/googlecloudsdk/api_lib/trace/__init__.py
 lib/googlecloudsdk/api_lib/trace/util.py
@@ -1005,6 +1006,7 @@ lib/googlecloudsdk/api_lib/workstations/workstations.py
 lib/googlecloudsdk/calliope/__init__.py
 lib/googlecloudsdk/calliope/actions.py
 lib/googlecloudsdk/calliope/arg_parsers.py
+lib/googlecloudsdk/calliope/arg_parsers_usage_text.py
 lib/googlecloudsdk/calliope/backend.py
 lib/googlecloudsdk/calliope/base.py
 lib/googlecloudsdk/calliope/cli.py
@@ -1456,6 +1458,8 @@ lib/googlecloudsdk/command_lib/compute/packet_mirrorings/__init__.py
 lib/googlecloudsdk/command_lib/compute/packet_mirrorings/client.py
 lib/googlecloudsdk/command_lib/compute/packet_mirrorings/flags.py
 lib/googlecloudsdk/command_lib/compute/packet_mirrorings/utils.py
+lib/googlecloudsdk/command_lib/compute/project_zonal_metadata/__init__.py
+lib/googlecloudsdk/command_lib/compute/project_zonal_metadata/flags.py
 lib/googlecloudsdk/command_lib/compute/public_advertised_prefixes/__init__.py
 lib/googlecloudsdk/command_lib/compute/public_advertised_prefixes/flags.py
 lib/googlecloudsdk/command_lib/compute/public_delegated_prefixes/__init__.py
@@ -2269,6 +2273,8 @@ lib/googlecloudsdk/command_lib/netapp/active_directories/__init__.py
 lib/googlecloudsdk/command_lib/netapp/active_directories/flags.py
 lib/googlecloudsdk/command_lib/netapp/backup_policies/__init__.py
 lib/googlecloudsdk/command_lib/netapp/backup_policies/flags.py
+lib/googlecloudsdk/command_lib/netapp/backup_vaults/__init__.py
+lib/googlecloudsdk/command_lib/netapp/backup_vaults/flags.py
 lib/googlecloudsdk/command_lib/netapp/flags.py
 lib/googlecloudsdk/command_lib/netapp/kms_configs/__init__.py
 lib/googlecloudsdk/command_lib/netapp/kms_configs/flags.py
@@ -3427,6 +3433,11 @@ lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/__init__.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/config_v1alpha2_client.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/config_v1alpha2_messages.py
 lib/googlecloudsdk/generated_clients/apis/config/v1alpha2/resources.py
+lib/googlecloudsdk/generated_clients/apis/connectors/__init__.py
+lib/googlecloudsdk/generated_clients/apis/connectors/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/connectors/v1/connectors_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/connectors/v1/connectors_v1_messages.py
+lib/googlecloudsdk/generated_clients/apis/connectors/v1/resources.py
 lib/googlecloudsdk/generated_clients/apis/container/__init__.py
 lib/googlecloudsdk/generated_clients/apis/container/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/container/v1/container_v1_client.py
@@ -3855,6 +3866,11 @@ lib/googlecloudsdk/generated_clients/apis/managedidentities/v1beta1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/managedidentities/v1beta1/managedidentities_v1beta1_client.py
 lib/googlecloudsdk/generated_clients/apis/managedidentities/v1beta1/managedidentities_v1beta1_messages.py
 lib/googlecloudsdk/generated_clients/apis/managedidentities/v1beta1/resources.py
+lib/googlecloudsdk/generated_clients/apis/managedkafka/__init__.py
+lib/googlecloudsdk/generated_clients/apis/managedkafka/v1alpha/__init__.py
+lib/googlecloudsdk/generated_clients/apis/managedkafka/v1alpha/managedkafka_v1alpha_client.py
+lib/googlecloudsdk/generated_clients/apis/managedkafka/v1alpha/managedkafka_v1alpha_messages.py
+lib/googlecloudsdk/generated_clients/apis/managedkafka/v1alpha/resources.py
 lib/googlecloudsdk/generated_clients/apis/marketplacesolutions/__init__.py
 lib/googlecloudsdk/generated_clients/apis/marketplacesolutions/v1alpha1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/marketplacesolutions/v1alpha1/marketplacesolutions_v1alpha1_client.py
@@ -4220,6 +4236,11 @@ lib/googlecloudsdk/generated_clients/apis/securitycenter/v1/securitycenter_v1_me
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/__init__.py
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/securitycenter_v1beta2_client.py
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/securitycenter_v1beta2_messages.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/resources.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/securityposture_v1alpha_client.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/securityposture_v1alpha_messages.py
 lib/googlecloudsdk/generated_clients/apis/serviceconsumermanagement/__init__.py
 lib/googlecloudsdk/generated_clients/apis/serviceconsumermanagement/v1beta1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/serviceconsumermanagement/v1beta1/resources.py
@@ -6356,7 +6377,6 @@ lib/surface/builds/triggers/update/bitbucketserver.py
 lib/surface/builds/triggers/update/cloud_source_repositories.py
 lib/surface/builds/triggers/update/github.py
 lib/surface/builds/triggers/update/gitlab.py
-lib/surface/builds/triggers/update/gitlab_enterprise.py
 lib/surface/builds/triggers/update/manual.py
 lib/surface/builds/triggers/update/pubsub.py
 lib/surface/builds/triggers/update/webhook.py
@@ -7054,6 +7074,8 @@ lib/surface/compute/project_info/remove_metadata.py
 lib/surface/compute/project_info/set_default_service_account.py
 lib/surface/compute/project_info/set_usage_bucket.py
 lib/surface/compute/project_info/update.py
+lib/surface/compute/project_zonal_metadata/__init__.py
+lib/surface/compute/project_zonal_metadata/describe.py
 lib/surface/compute/public_advertised_prefixes/__init__.py
 lib/surface/compute/public_advertised_prefixes/create.py
 lib/surface/compute/public_advertised_prefixes/delete.py
@@ -7660,6 +7682,8 @@ lib/surface/container/fleet/cloudrun/describe.py
 lib/surface/container/fleet/cloudrun/disable.py
 lib/surface/container/fleet/cloudrun/enable.py
 lib/surface/container/fleet/clusterupgrade/__init__.py
+lib/surface/container/fleet/clusterupgrade/create.py
+lib/surface/container/fleet/clusterupgrade/describe.py
 lib/surface/container/fleet/clusterupgrade/update.py
 lib/surface/container/fleet/config_management/__init__.py
 lib/surface/container/fleet/config_management/apply.py
@@ -8771,6 +8795,7 @@ lib/surface/fault_injection/faults/list.py
 lib/surface/fault_injection/faults/update.py
 lib/surface/fault_injection/jobs/__init__.py
 lib/surface/fault_injection/jobs/create.py
+lib/surface/fault_injection/jobs/delete.py
 lib/surface/fault_injection/jobs/describe.py
 lib/surface/fault_injection/jobs/list.py
 lib/surface/feedback.py
@@ -9893,6 +9918,8 @@ lib/surface/netapp/active_directories/delete.py
 lib/surface/netapp/active_directories/describe.py
 lib/surface/netapp/active_directories/list.py
 lib/surface/netapp/active_directories/update.py
+lib/surface/netapp/backup_vaults/__init__.py
+lib/surface/netapp/backup_vaults/create.py
 lib/surface/netapp/kms_configs/__init__.py
 lib/surface/netapp/kms_configs/create.py
 lib/surface/netapp/kms_configs/delete.py
@@ -11271,9 +11298,11 @@ lib/surface/transfer/agents/__init__.py
 lib/surface/transfer/agents/delete.py
 lib/surface/transfer/agents/install.py
 lib/surface/transfer/appliances/__init__.py
+lib/surface/transfer/appliances/delete.py
 lib/surface/transfer/appliances/describe.py
 lib/surface/transfer/appliances/list.py
 lib/surface/transfer/appliances/orders/__init__.py
+lib/surface/transfer/appliances/orders/delete.py
 lib/surface/transfer/appliances/orders/describe.py
 lib/surface/transfer/appliances/orders/list.py
 lib/surface/transfer/authorize.py
