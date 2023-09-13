@@ -650,6 +650,7 @@ class CreateBeta(Create):
         flags.CLOUD_DATA_LINEAGE_INTEGRATION_GROUP_DESCRIPTION)
     flags.ENABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG.AddToParser(
         cloud_data_lineage_integration_params_group)
+    flags.STORAGE_BUCKET_FLAG.AddToParser(parser)
 
     AddComposer3Flags(parser)
 
@@ -697,19 +698,26 @@ class CreateBeta(Create):
         worker_cpu=args.worker_cpu,
         web_server_cpu=args.web_server_cpu,
         scheduler_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.scheduler_memory),
+            args.scheduler_memory
+        ),
         triggerer_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.triggerer_memory),
+            args.triggerer_memory
+        ),
         worker_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.worker_memory),
+            args.worker_memory
+        ),
         web_server_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.web_server_memory),
+            args.web_server_memory
+        ),
         scheduler_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.scheduler_storage),
+            args.scheduler_storage
+        ),
         worker_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.worker_storage),
+            args.worker_storage
+        ),
         web_server_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.web_server_storage),
+            args.web_server_storage
+        ),
         min_workers=args.min_workers,
         max_workers=args.max_workers,
         scheduler_count=args.scheduler_count,
@@ -718,16 +726,13 @@ class CreateBeta(Create):
         maintenance_window_end=args.maintenance_window_end,
         maintenance_window_recurrence=args.maintenance_window_recurrence,
         environment_size=args.environment_size,
-        enable_master_authorized_networks=args
-        .enable_master_authorized_networks,
+        enable_master_authorized_networks=args.enable_master_authorized_networks,
         master_authorized_networks=args.master_authorized_networks,
-        enable_scheduled_snapshot_creation=args
-        .enable_scheduled_snapshot_creation,
+        enable_scheduled_snapshot_creation=args.enable_scheduled_snapshot_creation,
         snapshot_creation_schedule=args.snapshot_creation_schedule,
         snapshot_location=args.snapshot_location,
         snapshot_schedule_timezone=args.snapshot_schedule_timezone,
-        enable_cloud_data_lineage_integration=args
-        .enable_cloud_data_lineage_integration,
+        enable_cloud_data_lineage_integration=args.enable_cloud_data_lineage_integration,
         enable_high_resilience=args.enable_high_resilience,
         support_web_server_plugins=args.support_web_server_plugins,
         dag_processor_cpu=args.dag_processor_cpu,
@@ -739,7 +744,11 @@ class CreateBeta(Create):
             args.dag_processor_storage
         ),
         composer_internal_ipv4_cidr_block=args.composer_internal_ipv4_cidr_block,
-        release_track=self.ReleaseTrack())
+        enable_private_builds_only=args.enable_private_builds_only,
+        disable_private_builds_only=args.disable_private_builds_only,
+        release_track=self.ReleaseTrack(),
+        storage_bucket=args.storage_bucket,
+    )
 
     return environments_api_util.Create(self.env_ref, create_flags,
                                         is_composer_v1)
@@ -764,7 +773,10 @@ class CreateBeta(Create):
         'composer-internal-ipv4-cidr-block': (
             args.composer_internal_ipv4_cidr_block
         ),
+        'enable-private-builds-only': args.enable_private_builds_only,
+        'disable-private-builds-only': args.disable_private_builds_only,
     }
+
     for k, v in possible_args.items():
       if v is not None and not is_composer3:
         raise command_util.InvalidUserInputError(
@@ -840,6 +852,10 @@ def AddComposer3Flags(parser):
   flags.DAG_PROCESSOR_STORAGE.AddToParser(dag_processor_params_group)
   # other flags
   flags.COMPOSER_INTERNAL_IPV4_CIDR_FLAG.AddToParser(parser)
+  # support-private-builds-only
+  private_builds_only_group = parser.add_mutually_exclusive_group(hidden=True)
+  flags.ENABLE_PRIVATE_BUILDS_ONLY.AddToParser(private_builds_only_group)
+  flags.DISABLE_PRIVATE_BUILDS_ONLY.AddToParser(private_builds_only_group)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -917,19 +933,26 @@ class CreateAlpha(CreateBeta):
         worker_cpu=args.worker_cpu,
         web_server_cpu=args.web_server_cpu,
         scheduler_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.scheduler_memory),
+            args.scheduler_memory
+        ),
         triggerer_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.triggerer_memory),
+            args.triggerer_memory
+        ),
         worker_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.worker_memory),
+            args.worker_memory
+        ),
         web_server_memory_gb=environments_api_util.MemorySizeBytesToGB(
-            args.web_server_memory),
+            args.web_server_memory
+        ),
         scheduler_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.scheduler_storage),
+            args.scheduler_storage
+        ),
         worker_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.worker_storage),
+            args.worker_storage
+        ),
         web_server_storage_gb=environments_api_util.MemorySizeBytesToGB(
-            args.web_server_storage),
+            args.web_server_storage
+        ),
         min_workers=args.min_workers,
         max_workers=args.max_workers,
         scheduler_count=args.scheduler_count,
@@ -937,17 +960,14 @@ class CreateAlpha(CreateBeta):
         maintenance_window_start=args.maintenance_window_start,
         maintenance_window_end=args.maintenance_window_end,
         maintenance_window_recurrence=args.maintenance_window_recurrence,
-        enable_master_authorized_networks=args
-        .enable_master_authorized_networks,
+        enable_master_authorized_networks=args.enable_master_authorized_networks,
         master_authorized_networks=args.master_authorized_networks,
         airflow_database_retention_days=args.airflow_database_retention_days,
-        enable_scheduled_snapshot_creation=args
-        .enable_scheduled_snapshot_creation,
+        enable_scheduled_snapshot_creation=args.enable_scheduled_snapshot_creation,
         snapshot_creation_schedule=args.snapshot_creation_schedule,
         snapshot_location=args.snapshot_location,
         snapshot_schedule_timezone=args.snapshot_schedule_timezone,
-        enable_cloud_data_lineage_integration=args
-        .enable_cloud_data_lineage_integration,
+        enable_cloud_data_lineage_integration=args.enable_cloud_data_lineage_integration,
         enable_high_resilience=args.enable_high_resilience,
         support_web_server_plugins=args.support_web_server_plugins,
         dag_processor_cpu=args.dag_processor_cpu,
@@ -959,7 +979,11 @@ class CreateAlpha(CreateBeta):
             args.dag_processor_storage
         ),
         composer_internal_ipv4_cidr_block=args.composer_internal_ipv4_cidr_block,
-        release_track=self.ReleaseTrack())
+        enable_private_builds_only=args.enable_private_builds_only,
+        disable_private_builds_only=args.disable_private_builds_only,
+        release_track=self.ReleaseTrack(),
+        storage_bucket=args.storage_bucket,
+    )
 
     return environments_api_util.Create(self.env_ref, create_flags,
                                         is_composer_v1)

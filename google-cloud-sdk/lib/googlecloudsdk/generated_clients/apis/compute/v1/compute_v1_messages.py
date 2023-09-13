@@ -653,6 +653,8 @@ class AccessConfig(_messages.Message):
       accessConfig. If this field is unspecified in ipv6AccessConfig, a
       default PTR record will be createc for first IP in associated external
       IPv6 range.
+    securityPolicy: [Output Only] The resource URL for the security policy
+      associated with this access config.
     setPublicPtr: Specifies whether a public DNS 'PTR' record should be
       created to map the external IP address of the instance to a DNS domain
       name. This field is not used in ipv6AccessConfig. A default PTR record
@@ -703,8 +705,9 @@ class AccessConfig(_messages.Message):
   natIP = _messages.StringField(5)
   networkTier = _messages.EnumField('NetworkTierValueValuesEnum', 6)
   publicPtrDomainName = _messages.StringField(7)
-  setPublicPtr = _messages.BooleanField(8)
-  type = _messages.EnumField('TypeValueValuesEnum', 9)
+  securityPolicy = _messages.StringField(8)
+  setPublicPtr = _messages.BooleanField(9)
+  type = _messages.EnumField('TypeValueValuesEnum', 10)
 
 
 class Address(_messages.Message):
@@ -3291,7 +3294,7 @@ class AutoscalingPolicyScalingSchedule(_messages.Message):
       additional time to become serving.
     timeZone: The time zone to use when interpreting the schedule. The value
       of this field must be a time zone name from the tz database:
-      http://en.wikipedia.org/wiki/Tz_database. This field is assigned a
+      https://en.wikipedia.org/wiki/Tz_database. This field is assigned a
       default value of "UTC" if left empty.
   """
 
@@ -4965,8 +4968,7 @@ class BackendServiceIAP(_messages.Message):
 
   Fields:
     enabled: Whether the serving infrastructure will authenticate and
-      authorize all incoming requests. If true, the oauth2ClientId and
-      oauth2ClientSecret fields must be non-empty.
+      authorize all incoming requests.
     oauth2ClientId: OAuth2 client ID to use for the authentication flow.
     oauth2ClientSecret: OAuth2 client secret to use for the authentication
       flow. For security reasons, this value cannot be retrieved via the API.
@@ -6157,6 +6159,7 @@ class Commitment(_messages.Message):
       COMPUTE_OPTIMIZED: <no description>
       COMPUTE_OPTIMIZED_C2D: <no description>
       COMPUTE_OPTIMIZED_C3: <no description>
+      COMPUTE_OPTIMIZED_C3D: <no description>
       COMPUTE_OPTIMIZED_H3: <no description>
       GENERAL_PURPOSE: <no description>
       GENERAL_PURPOSE_E2: <no description>
@@ -6173,16 +6176,17 @@ class Commitment(_messages.Message):
     COMPUTE_OPTIMIZED = 2
     COMPUTE_OPTIMIZED_C2D = 3
     COMPUTE_OPTIMIZED_C3 = 4
-    COMPUTE_OPTIMIZED_H3 = 5
-    GENERAL_PURPOSE = 6
-    GENERAL_PURPOSE_E2 = 7
-    GENERAL_PURPOSE_N2 = 8
-    GENERAL_PURPOSE_N2D = 9
-    GENERAL_PURPOSE_T2D = 10
-    GRAPHICS_OPTIMIZED = 11
-    MEMORY_OPTIMIZED = 12
-    MEMORY_OPTIMIZED_M3 = 13
-    TYPE_UNSPECIFIED = 14
+    COMPUTE_OPTIMIZED_C3D = 5
+    COMPUTE_OPTIMIZED_H3 = 6
+    GENERAL_PURPOSE = 7
+    GENERAL_PURPOSE_E2 = 8
+    GENERAL_PURPOSE_N2 = 9
+    GENERAL_PURPOSE_N2D = 10
+    GENERAL_PURPOSE_T2D = 11
+    GRAPHICS_OPTIMIZED = 12
+    MEMORY_OPTIMIZED = 13
+    MEMORY_OPTIMIZED_M3 = 14
+    TYPE_UNSPECIFIED = 15
 
   autoRenew = _messages.BooleanField(1)
   category = _messages.EnumField('CategoryValueValuesEnum', 2)
@@ -13980,6 +13984,35 @@ class ComputeInstancesSetSchedulingRequest(_messages.Message):
   zone = _messages.StringField(5, required=True)
 
 
+class ComputeInstancesSetSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeInstancesSetSecurityPolicyRequest object.
+
+  Fields:
+    instance: Name of the Instance resource to which the security policy
+      should be set. The name should conform to RFC1035.
+    instancesSetSecurityPolicyRequest: A InstancesSetSecurityPolicyRequest
+      resource to be passed as the request body.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      ( 00000000-0000-0000-0000-000000000000).
+    zone: Name of the zone scoping this request.
+  """
+
+  instance = _messages.StringField(1, required=True)
+  instancesSetSecurityPolicyRequest = _messages.MessageField('InstancesSetSecurityPolicyRequest', 2)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  zone = _messages.StringField(5, required=True)
+
+
 class ComputeInstancesSetServiceAccountRequest(_messages.Message):
   r"""A ComputeInstancesSetServiceAccountRequest object.
 
@@ -19372,6 +19405,35 @@ class ComputeRegionBackendServicesSetIamPolicyRequest(_messages.Message):
   region = _messages.StringField(2, required=True)
   regionSetPolicyRequest = _messages.MessageField('RegionSetPolicyRequest', 3)
   resource = _messages.StringField(4, required=True)
+
+
+class ComputeRegionBackendServicesSetSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeRegionBackendServicesSetSecurityPolicyRequest object.
+
+  Fields:
+    backendService: Name of the BackendService resource to which the security
+      policy should be set. The name should conform to RFC1035.
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      ( 00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+  """
+
+  backendService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  region = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 5)
 
 
 class ComputeRegionBackendServicesUpdateRequest(_messages.Message):
@@ -27498,6 +27560,35 @@ class ComputeTargetInstancesListRequest(_messages.Message):
   zone = _messages.StringField(7, required=True)
 
 
+class ComputeTargetInstancesSetSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeTargetInstancesSetSecurityPolicyRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      ( 00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+    targetInstance: Name of the TargetInstance resource to which the security
+      policy should be set. The name should conform to RFC1035.
+    zone: Name of the zone scoping this request.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 3)
+  targetInstance = _messages.StringField(4, required=True)
+  zone = _messages.StringField(5, required=True)
+
+
 class ComputeTargetPoolsAddHealthCheckRequest(_messages.Message):
   r"""A ComputeTargetPoolsAddHealthCheckRequest object.
 
@@ -27862,6 +27953,35 @@ class ComputeTargetPoolsSetBackupRequest(_messages.Message):
   requestId = _messages.StringField(4)
   targetPool = _messages.StringField(5, required=True)
   targetReference = _messages.MessageField('TargetReference', 6)
+
+
+class ComputeTargetPoolsSetSecurityPolicyRequest(_messages.Message):
+  r"""A ComputeTargetPoolsSetSecurityPolicyRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    region: Name of the region scoping this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed. For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments. The request ID
+      must be a valid UUID with the exception that zero UUID is not supported
+      ( 00000000-0000-0000-0000-000000000000).
+    securityPolicyReference: A SecurityPolicyReference resource to be passed
+      as the request body.
+    targetPool: Name of the TargetPool resource to which the security policy
+      should be set. The name should conform to RFC1035.
+  """
+
+  project = _messages.StringField(1, required=True)
+  region = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  securityPolicyReference = _messages.MessageField('SecurityPolicyReference', 4)
+  targetPool = _messages.StringField(5, required=True)
 
 
 class ComputeTargetSslProxiesDeleteRequest(_messages.Message):
@@ -30021,7 +30141,7 @@ class Disk(_messages.Message):
       or sourceDisk parameter, or specify it alone to create an empty
       persistent disk. If you specify this field along with a source, the
       value of sizeGb must not be less than the size of the source. Acceptable
-      values are 1 to 65536, inclusive.
+      values are greater than 0.
     sourceConsistencyGroupPolicy: [Output Only] URL of the
       DiskConsistencyGroupPolicy for a secondary disk that was created using a
       consistency group.
@@ -33369,13 +33489,13 @@ class ForwardingRule(_messages.Message):
       forward traffic to Google APIs, the forwarding rule name must be a 1-20
       characters string with lowercase letters and numbers and must start with
       a letter.
-    network: This field is not used for external load balancing. For Internal
-      TCP/UDP Load Balancing, this field identifies the network that the load
-      balanced IP should belong to for this Forwarding Rule. If the subnetwork
-      is specified, the network of the subnetwork will be used. If neither
-      subnetwork nor this field is specified, the default network will be
-      used. For Private Service Connect forwarding rules that forward traffic
-      to Google APIs, a network must be provided.
+    network: This field is not used for global external load balancing. For
+      Internal TCP/UDP Load Balancing, this field identifies the network that
+      the load balanced IP should belong to for this Forwarding Rule. If the
+      subnetwork is specified, the network of the subnetwork will be used. If
+      neither subnetwork nor this field is specified, the default network will
+      be used. For Private Service Connect forwarding rules that forward
+      traffic to Google APIs, a network must be provided.
     networkTier: This signifies the networking tier used for configuring this
       load balancer and can only take the following values: PREMIUM, STANDARD.
       For regional ForwardingRule, the valid values are PREMIUM and STANDARD.
@@ -36513,9 +36633,9 @@ class HttpRouteAction(_messages.Message):
       ignored by clients that are configured with a fault_injection_policy if:
       1. The traffic is generated by fault injection AND 2. The fault
       injection is not a delay fault injection. Fault injection is not
-      supported with the global external HTTP(S) load balancer (classic). To
-      see which load balancers support fault injection, see Load balancing:
-      Routing and traffic management features.
+      supported with the classic Application Load Balancer . To see which load
+      balancers support fault injection, see Load balancing: Routing and
+      traffic management features.
     maxStreamDuration: Specifies the maximum duration (timeout) for streams on
       the selected route. Unlike the timeout field where the timeout duration
       starts from the time the request has been fully processed (known as
@@ -36543,8 +36663,8 @@ class HttpRouteAction(_messages.Message):
       set to true.
     urlRewrite: The spec to modify the URL of the request, before forwarding
       the request to the matched service. urlRewrite is the only action
-      supported in UrlMaps for external HTTP(S) load balancers. Not supported
-      when the URL map is bound to a target gRPC proxy that has the
+      supported in UrlMaps for classic Application Load Balancers. Not
+      supported when the URL map is bound to a target gRPC proxy that has the
       validateForProxyless field set to true.
     weightedBackendServices: A list of weighted backend services to send
       traffic to when a route match occurs. The weights determine the fraction
@@ -36606,9 +36726,9 @@ class HttpRouteRule(_messages.Message):
       If routeAction specifies any weightedBackendServices, service must not
       be set. Conversely if service is set, routeAction cannot contain any
       weightedBackendServices. Only one of urlRedirect, service or
-      routeAction.weightedBackendService must be set. URL maps for Classic
-      external HTTP(S) load balancers only support the urlRewrite action
-      within a route rule's routeAction.
+      routeAction.weightedBackendService must be set. URL maps for classic
+      Application Load Balancers only support the urlRewrite action within a
+      route rule's routeAction.
     service: The full or partial URL of the backend service resource to which
       traffic is directed if this rule is matched. If routeAction is also
       specified, advanced routing actions, such as URL rewrites, take effect
@@ -41781,6 +41901,22 @@ class InstancesSetNameRequest(_messages.Message):
 
   currentName = _messages.StringField(1)
   name = _messages.StringField(2)
+
+
+class InstancesSetSecurityPolicyRequest(_messages.Message):
+  r"""A InstancesSetSecurityPolicyRequest object.
+
+  Fields:
+    networkInterfaces: The network interfaces that the security policy will be
+      applied to. Network interfaces use the nicN naming format. You can only
+      set a security policy for network interfaces with an access config.
+    securityPolicy: A full or partial URL to a security policy to add to this
+      instance. If this field is set to an empty string it will remove the
+      associated security policy.
+  """
+
+  networkInterfaces = _messages.StringField(1, repeated=True)
+  securityPolicy = _messages.StringField(2)
 
 
 class InstancesSetServiceAccountRequest(_messages.Message):
@@ -47502,10 +47638,8 @@ class NetworkEndpoint(_messages.Message):
 class NetworkEndpointGroup(_messages.Message):
   r"""Represents a collection of network endpoints. A network endpoint group
   (NEG) defines how a set of endpoints should be reached, whether they are
-  reachable, and where they are located. For more information about using
-  NEGs, see Setting up external HTTP(S) Load Balancing with internet NEGs,
-  Setting up zonal NEGs, or Setting up external HTTP(S) Load Balancing with
-  serverless NEGs.
+  reachable, and where they are located. For more information about using NEGs
+  for different use cases, see Network endpoint groups overview.
 
   Enums:
     NetworkEndpointTypeValueValuesEnum: Type of network endpoints in this
@@ -53082,9 +53216,9 @@ class PathMatcher(_messages.Message):
       specifies any weightedBackendServices, defaultService must not be set.
       Conversely if defaultService is set, defaultRouteAction cannot contain
       any weightedBackendServices. Only one of defaultRouteAction or
-      defaultUrlRedirect must be set. URL maps for Classic external HTTP(S)
-      load balancers only support the urlRewrite action within a path
-      matcher's defaultRouteAction.
+      defaultUrlRedirect must be set. URL maps for classic Application Load
+      Balancers only support the urlRewrite action within a path matcher's
+      defaultRouteAction.
     defaultService: The full or partial URL to the BackendService resource.
       This URL is used if none of the pathRules or routeRules defined by this
       PathMatcher are matched. For example, the following are all valid URLs
@@ -53157,8 +53291,8 @@ class PathRule(_messages.Message):
       If routeAction specifies any weightedBackendServices, service must not
       be set. Conversely if service is set, routeAction cannot contain any
       weightedBackendServices. Only one of routeAction or urlRedirect must be
-      set. URL maps for Classic external HTTP(S) load balancers only support
-      the urlRewrite action within a path rule's routeAction.
+      set. URL maps for classic Application Load Balancers only support the
+      urlRewrite action within a path rule's routeAction.
     service: The full or partial URL of the backend service resource to which
       traffic is directed if this rule is matched. If routeAction is also
       specified, advanced routing actions, such as URL rewrites, take effect
@@ -58795,9 +58929,11 @@ class Router(_messages.Message):
       with encrypted VLAN attachments (interconnectAttachments).
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
-    interfaces: Router interfaces. Each interface requires either one linked
-      resource, (for example, linkedVpnTunnel), or IP address and IP address
-      range (for example, ipRange), or both.
+    interfaces: Router interfaces. To create a BGP peer that uses a router
+      interface, the interface must have one of the following fields
+      specified: - linkedVpnTunnel - linkedInterconnectAttachment - subnetwork
+      You can create a router interface without any of these fields specified.
+      However, you cannot create a BGP peer that uses that interface.
     kind: [Output Only] Type of resource. Always compute#router for routers.
     md5AuthenticationKeys: Keys used for MD5 authentication.
     name: Name of the resource. Provided by the client when the resource is
@@ -59346,11 +59482,10 @@ class RouterInterface(_messages.Message):
     linkedInterconnectAttachment: URI of the linked Interconnect attachment.
       It must be in the same region as the router. Each interface can have one
       linked resource, which can be a VPN tunnel, an Interconnect attachment,
-      or a virtual machine instance.
+      or a subnetwork.
     linkedVpnTunnel: URI of the linked VPN tunnel, which must be in the same
       region as the router. Each interface can have one linked resource, which
-      can be a VPN tunnel, an Interconnect attachment, or a virtual machine
-      instance.
+      can be a VPN tunnel, an Interconnect attachment, or a subnetwork.
     managementType: [Output Only] The resource that configures and manages
       this interface. - MANAGED_BY_USER is the default value and can be
       managed directly by users. - MANAGED_BY_ATTACHMENT is an interface that
@@ -59589,7 +59724,7 @@ class RouterMd5AuthenticationKey(_messages.Message):
       Maximum length is 80 characters. Can only contain printable ASCII
       characters.
     name: Name used to identify the key. Must be unique within a router. Must
-      be referenced by at least one bgpPeer. Must comply with RFC1035.
+      be referenced by exactly one bgpPeer. Must comply with RFC1035.
   """
 
   key = _messages.StringField(1)
@@ -59837,9 +59972,8 @@ class RouterNatRule(_messages.Message):
       '1.1.0.0/16') || inIpRange(destination.ip, '2.2.0.0/16')"
       "destination.ip == '1.1.0.1' || destination.ip == '8.8.8.8'" The
       following example is a valid match expression for private NAT:
-      "nexthop.hub ==
-      'https://networkconnectivity.googleapis.com/v1alpha1/projects/my-
-      project/global/hub/hub-1'"
+      "nexthop.hub == '//networkconnectivity.googleapis.com/projects/my-
+      project/locations/global/hubs/hub-1'"
     ruleNumber: An integer uniquely identifying a rule in the list. The rule
       number must be a positive value between 0 and 65000, and must be unique
       among rules within a NAT.
@@ -61216,6 +61350,13 @@ class SecurityPolicy(_messages.Message):
       with external IPs. They filter requests before the request is served
       from the application. This field can be set only at resource creation
       time.
+    userDefinedFields: Definitions of user-defined fields for
+      CLOUD_ARMOR_NETWORK policies. A user-defined field consists of up to 4
+      bytes extracted from a fixed offset in the packet, relative to the IPv4,
+      IPv6, TCP, or UDP header, with an optional mask to select certain bits.
+      Rules may then specify matching values for these fields. Example:
+      userDefinedFields: - name: "ipv4_fragment_offset" base: IPV4 offset: 6
+      size: 2 mask: "0x1fff"
   """
 
   class TypeValueValuesEnum(_messages.Enum):
@@ -61287,6 +61428,7 @@ class SecurityPolicy(_messages.Message):
   rules = _messages.MessageField('SecurityPolicyRule', 14, repeated=True)
   selfLink = _messages.StringField(15)
   type = _messages.EnumField('TypeValueValuesEnum', 16)
+  userDefinedFields = _messages.MessageField('SecurityPolicyUserDefinedField', 17, repeated=True)
 
 
 class SecurityPolicyAdaptiveProtectionConfig(_messages.Message):
@@ -61649,6 +61791,28 @@ class SecurityPolicyRule(_messages.Message):
       compute#securityPolicyRule for security policy rules
     match: A match condition that incoming traffic is evaluated against. If it
       evaluates to true, the corresponding 'action' is enforced.
+    networkMatch: A match condition that incoming packets are evaluated
+      against for CLOUD_ARMOR_NETWORK security policies. If it matches, the
+      corresponding 'action' is enforced. The match criteria for a rule
+      consists of built-in match fields (like 'srcIpRanges') and potentially
+      multiple user-defined match fields ('userDefinedFields'). Field values
+      may be extracted directly from the packet or derived from it (e.g.
+      'srcRegionCodes'). Some fields may not be present in every packet (e.g.
+      'srcPorts'). A user-defined field is only present if the base header is
+      found in the packet and the entire field is in bounds. Each match field
+      may specify which values can match it, listing one or more ranges,
+      prefixes, or exact values that are considered a match for the field. A
+      field value must be present in order to match a specified match field.
+      If no match values are specified for a match field, then any field value
+      is considered to match it, and it's not required to be present. For
+      strings specifying '*' is also equivalent to match all. For a packet to
+      match a rule, all specified match fields must match the corresponding
+      field values derived from the packet. Example: networkMatch:
+      srcIpRanges: - "192.0.2.0/24" - "198.51.100.0/24" userDefinedFields: -
+      name: "ipv4_fragment_offset" values: - "1-0x1fff" The above match
+      condition matches packets with a source IP in 192.0.2.0/24 or
+      198.51.100.0/24 and a user-defined field named "ipv4_fragment_offset"
+      with a value between 1 and 0x1fff inclusive.
     preconfiguredWafConfig: Preconfigured WAF configuration to be applied for
       the rule. If the rule does not evaluate preconfigured WAF rules, i.e.,
       if evaluatePreconfiguredWaf() is not used, this field will have no
@@ -61670,11 +61834,12 @@ class SecurityPolicyRule(_messages.Message):
   headerAction = _messages.MessageField('SecurityPolicyRuleHttpHeaderAction', 3)
   kind = _messages.StringField(4, default='compute#securityPolicyRule')
   match = _messages.MessageField('SecurityPolicyRuleMatcher', 5)
-  preconfiguredWafConfig = _messages.MessageField('SecurityPolicyRulePreconfiguredWafConfig', 6)
-  preview = _messages.BooleanField(7)
-  priority = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  rateLimitOptions = _messages.MessageField('SecurityPolicyRuleRateLimitOptions', 9)
-  redirectOptions = _messages.MessageField('SecurityPolicyRuleRedirectOptions', 10)
+  networkMatch = _messages.MessageField('SecurityPolicyRuleNetworkMatcher', 6)
+  preconfiguredWafConfig = _messages.MessageField('SecurityPolicyRulePreconfiguredWafConfig', 7)
+  preview = _messages.BooleanField(8)
+  priority = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  rateLimitOptions = _messages.MessageField('SecurityPolicyRuleRateLimitOptions', 10)
+  redirectOptions = _messages.MessageField('SecurityPolicyRuleRedirectOptions', 11)
 
 
 class SecurityPolicyRuleHttpHeaderAction(_messages.Message):
@@ -61754,6 +61919,55 @@ class SecurityPolicyRuleMatcherConfig(_messages.Message):
   """
 
   srcIpRanges = _messages.StringField(1, repeated=True)
+
+
+class SecurityPolicyRuleNetworkMatcher(_messages.Message):
+  r"""Represents a match condition that incoming network traffic is evaluated
+  against.
+
+  Fields:
+    destIpRanges: Destination IPv4/IPv6 addresses or CIDR prefixes, in
+      standard text format.
+    destPorts: Destination port numbers for TCP/UDP/SCTP. Each element can be
+      a 16-bit unsigned decimal number (e.g. "80") or range (e.g. "0-1023").
+    ipProtocols: IPv4 protocol / IPv6 next header (after extension headers).
+      Each element can be an 8-bit unsigned decimal number (e.g. "6"), range
+      (e.g. "253-254"), or one of the following protocol names: "tcp", "udp",
+      "icmp", "esp", "ah", "ipip", or "sctp".
+    srcAsns: BGP Autonomous System Number associated with the source IP
+      address.
+    srcIpRanges: Source IPv4/IPv6 addresses or CIDR prefixes, in standard text
+      format.
+    srcPorts: Source port numbers for TCP/UDP/SCTP. Each element can be a
+      16-bit unsigned decimal number (e.g. "80") or range (e.g. "0-1023").
+    srcRegionCodes: Two-letter ISO 3166-1 alpha-2 country code associated with
+      the source IP address.
+    userDefinedFields: User-defined fields. Each element names a defined field
+      and lists the matching values for that field.
+  """
+
+  destIpRanges = _messages.StringField(1, repeated=True)
+  destPorts = _messages.StringField(2, repeated=True)
+  ipProtocols = _messages.StringField(3, repeated=True)
+  srcAsns = _messages.IntegerField(4, repeated=True, variant=_messages.Variant.UINT32)
+  srcIpRanges = _messages.StringField(5, repeated=True)
+  srcPorts = _messages.StringField(6, repeated=True)
+  srcRegionCodes = _messages.StringField(7, repeated=True)
+  userDefinedFields = _messages.MessageField('SecurityPolicyRuleNetworkMatcherUserDefinedFieldMatch', 8, repeated=True)
+
+
+class SecurityPolicyRuleNetworkMatcherUserDefinedFieldMatch(_messages.Message):
+  r"""A SecurityPolicyRuleNetworkMatcherUserDefinedFieldMatch object.
+
+  Fields:
+    name: Name of the user-defined field, as given in the definition.
+    values: Matching values of the field. Each element can be a 32-bit
+      unsigned decimal or hexadecimal (starting with "0x") number (e.g. "64")
+      or range (e.g. "0x400-0x7ff").
+  """
+
+  name = _messages.StringField(1)
+  values = _messages.StringField(2, repeated=True)
 
 
 class SecurityPolicyRulePreconfiguredWafConfig(_messages.Message):
@@ -62101,6 +62315,63 @@ class SecurityPolicyRuleRedirectOptions(_messages.Message):
 
   target = _messages.StringField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
+
+
+class SecurityPolicyUserDefinedField(_messages.Message):
+  r"""A SecurityPolicyUserDefinedField object.
+
+  Enums:
+    BaseValueValuesEnum: The base relative to which 'offset' is measured.
+      Possible values are: - IPV4: Points to the beginning of the IPv4 header.
+      - IPV6: Points to the beginning of the IPv6 header. - TCP: Points to the
+      beginning of the TCP header, skipping over any IPv4 options or IPv6
+      extension headers. Not present for non-first fragments. - UDP: Points to
+      the beginning of the UDP header, skipping over any IPv4 options or IPv6
+      extension headers. Not present for non-first fragments. required
+
+  Fields:
+    base: The base relative to which 'offset' is measured. Possible values
+      are: - IPV4: Points to the beginning of the IPv4 header. - IPV6: Points
+      to the beginning of the IPv6 header. - TCP: Points to the beginning of
+      the TCP header, skipping over any IPv4 options or IPv6 extension
+      headers. Not present for non-first fragments. - UDP: Points to the
+      beginning of the UDP header, skipping over any IPv4 options or IPv6
+      extension headers. Not present for non-first fragments. required
+    mask: If specified, apply this mask (bitwise AND) to the field to ignore
+      bits before matching. Encoded as a hexadecimal number (starting with
+      "0x"). The last byte of the field (in network byte order) corresponds to
+      the least significant byte of the mask.
+    name: The name of this field. Must be unique within the policy.
+    offset: Offset of the first byte of the field (in network byte order)
+      relative to 'base'.
+    size: Size of the field in bytes. Valid values: 1-4.
+  """
+
+  class BaseValueValuesEnum(_messages.Enum):
+    r"""The base relative to which 'offset' is measured. Possible values are:
+    - IPV4: Points to the beginning of the IPv4 header. - IPV6: Points to the
+    beginning of the IPv6 header. - TCP: Points to the beginning of the TCP
+    header, skipping over any IPv4 options or IPv6 extension headers. Not
+    present for non-first fragments. - UDP: Points to the beginning of the UDP
+    header, skipping over any IPv4 options or IPv6 extension headers. Not
+    present for non-first fragments. required
+
+    Values:
+      IPV4: <no description>
+      IPV6: <no description>
+      TCP: <no description>
+      UDP: <no description>
+    """
+    IPV4 = 0
+    IPV6 = 1
+    TCP = 2
+    UDP = 3
+
+  base = _messages.EnumField('BaseValueValuesEnum', 1)
+  mask = _messages.StringField(2)
+  name = _messages.StringField(3)
+  offset = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  size = _messages.IntegerField(5, variant=_messages.Variant.INT32)
 
 
 class SecuritySettings(_messages.Message):
@@ -63635,14 +63906,17 @@ class SourceInstanceProperties(_messages.Message):
 
 
 class SslCertificate(_messages.Message):
-  r"""Represents an SSL Certificate resource. Google Compute Engine has two
-  SSL Certificate resources: *
+  r"""Represents an SSL certificate resource. Google Compute Engine has two
+  SSL certificate resources: *
   [Global](/compute/docs/reference/rest/v1/sslCertificates) *
-  [Regional](/compute/docs/reference/rest/v1/regionSslCertificates) The
-  sslCertificates are used by: - external HTTPS load balancers - SSL proxy
-  load balancers The regionSslCertificates are used by internal HTTPS load
-  balancers. Optionally, certificate file contents that you upload can contain
-  a set of up to five PEM-encoded certificates. The API call creates an object
+  [Regional](/compute/docs/reference/rest/v1/regionSslCertificates) The global
+  SSL certificates (sslCertificates) are used by: - Global external
+  Application Load Balancers - Classic Application Load Balancers - Proxy
+  Network Load Balancers (with target SSL proxies) The regional SSL
+  certificates (regionSslCertificates) are used by: - Regional external
+  Application Load Balancers - Regional internal Application Load Balancers
+  Optionally, certificate file contents that you upload can contain a set of
+  up to five PEM-encoded certificates. The API call creates an object
   (sslCertificate) that holds this data. You can use SSL keys and certificates
   to secure connections to a load balancer. For more information, read
   Creating and using SSL certificates, SSL certificates quotas and limits, and
@@ -65514,20 +65788,23 @@ class Subnetwork(_messages.Message):
     set to REGIONAL_MANAGED_PROXY.
 
     Values:
+      GLOBAL_MANAGED_PROXY: Subnet reserved for Global Envoy-based Load
+        Balancing.
       INTERNAL_HTTPS_LOAD_BALANCER: Subnet reserved for Internal HTTP(S) Load
         Balancing.
       PRIVATE: Regular user created or automatically created subnet.
       PRIVATE_RFC_1918: Regular user created or automatically created subnet.
       PRIVATE_SERVICE_CONNECT: Subnetworks created for Private Service Connect
         in the producer network.
-      REGIONAL_MANAGED_PROXY: Subnetwork used for Regional Internal/External
-        HTTP(S) Load Balancing.
+      REGIONAL_MANAGED_PROXY: Subnetwork used for Regional Envoy-based Load
+        Balancing.
     """
-    INTERNAL_HTTPS_LOAD_BALANCER = 0
-    PRIVATE = 1
-    PRIVATE_RFC_1918 = 2
-    PRIVATE_SERVICE_CONNECT = 3
-    REGIONAL_MANAGED_PROXY = 4
+    GLOBAL_MANAGED_PROXY = 0
+    INTERNAL_HTTPS_LOAD_BALANCER = 1
+    PRIVATE = 2
+    PRIVATE_RFC_1918 = 3
+    PRIVATE_SERVICE_CONNECT = 4
+    REGIONAL_MANAGED_PROXY = 5
 
   class RoleValueValuesEnum(_messages.Enum):
     r"""The role of subnetwork. Currently, this field is only used when
@@ -66786,11 +67063,13 @@ class TargetHttpProxy(_messages.Message):
   [Global](/compute/docs/reference/rest/v1/targetHttpProxies) *
   [Regional](/compute/docs/reference/rest/v1/regionTargetHttpProxies) A target
   HTTP proxy is a component of GCP HTTP load balancers. * targetHttpProxies
-  are used by external HTTP load balancers and Traffic Director. *
-  regionTargetHttpProxies are used by internal HTTP load balancers. Forwarding
-  rules reference a target HTTP proxy, and the target proxy then references a
-  URL map. For more information, read Using Target Proxies and Forwarding rule
-  concepts.
+  are used by global external Application Load Balancers, classic Application
+  Load Balancers, cross-region internal Application Load Balancers, and
+  Traffic Director. * regionTargetHttpProxies are used by regional internal
+  Application Load Balancers and regional external Application Load Balancers.
+  Forwarding rules reference a target HTTP proxy, and the target proxy then
+  references a URL map. For more information, read Using Target Proxies and
+  Forwarding rule concepts.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -66807,10 +67086,10 @@ class TargetHttpProxy(_messages.Message):
     httpKeepAliveTimeoutSec: Specifies how long to keep a connection open,
       after completing a response, while there is no matching traffic (in
       seconds). If an HTTP keep-alive is not specified, a default value (610
-      seconds) will be used. For Global external HTTP(S) load balancer, the
-      minimum allowed value is 5 seconds and the maximum allowed value is 1200
-      seconds. For Global external HTTP(S) load balancer (classic), this
-      option is not available publicly.
+      seconds) will be used. For global external Application Load Balancers,
+      the minimum allowed value is 5 seconds and the maximum allowed value is
+      1200 seconds. For classic Application Load Balancers, this option is not
+      supported.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of resource. Always compute#targetHttpProxy for
@@ -67280,11 +67559,13 @@ class TargetHttpsProxy(_messages.Message):
   [Global](/compute/docs/reference/rest/v1/targetHttpsProxies) *
   [Regional](/compute/docs/reference/rest/v1/regionTargetHttpsProxies) A
   target HTTPS proxy is a component of GCP HTTPS load balancers. *
-  targetHttpsProxies are used by external HTTPS load balancers. *
-  regionTargetHttpsProxies are used by internal HTTPS load balancers.
-  Forwarding rules reference a target HTTPS proxy, and the target proxy then
-  references a URL map. For more information, read Using Target Proxies and
-  Forwarding rule concepts.
+  targetHttpProxies are used by global external Application Load Balancers,
+  classic Application Load Balancers, cross-region internal Application Load
+  Balancers, and Traffic Director. * regionTargetHttpProxies are used by
+  regional internal Application Load Balancers and regional external
+  Application Load Balancers. Forwarding rules reference a target HTTPS proxy,
+  and the target proxy then references a URL map. For more information, read
+  Using Target Proxies and Forwarding rule concepts.
 
   Enums:
     QuicOverrideValueValuesEnum: Specifies the QUIC override policy for this
@@ -67324,10 +67605,10 @@ class TargetHttpsProxy(_messages.Message):
     httpKeepAliveTimeoutSec: Specifies how long to keep a connection open,
       after completing a response, while there is no matching traffic (in
       seconds). If an HTTP keep-alive is not specified, a default value (610
-      seconds) will be used. For Global external HTTP(S) load balancer, the
-      minimum allowed value is 5 seconds and the maximum allowed value is 1200
-      seconds. For Global external HTTP(S) load balancer (classic), this
-      option is not available publicly.
+      seconds) will be used. For global external Application Load Balancers,
+      the minimum allowed value is 5 seconds and the maximum allowed value is
+      1200 seconds. For classic Application Load Balancers, this option is not
+      supported.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output Only] Type of resource. Always compute#targetHttpsProxy for
@@ -67817,6 +68098,8 @@ class TargetInstance(_messages.Message):
     network: The URL of the network this target instance uses to forward
       traffic. If not specified, the traffic will be forwarded to the network
       that the default network interface belongs to.
+    securityPolicy: [Output Only] The resource URL for the security policy
+      associated with this target instance.
     selfLink: [Output Only] Server-defined URL for the resource.
     zone: [Output Only] URL of the zone where the target instance resides. You
       must specify this field as part of the HTTP request URL. It is not
@@ -67841,8 +68124,9 @@ class TargetInstance(_messages.Message):
   name = _messages.StringField(6)
   natPolicy = _messages.EnumField('NatPolicyValueValuesEnum', 7)
   network = _messages.StringField(8)
-  selfLink = _messages.StringField(9)
-  zone = _messages.StringField(10)
+  securityPolicy = _messages.StringField(9)
+  selfLink = _messages.StringField(10)
+  zone = _messages.StringField(11)
 
 
 class TargetInstanceAggregatedList(_messages.Message):
@@ -68412,6 +68696,8 @@ class TargetPool(_messages.Message):
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
     region: [Output Only] URL of the region where the target pool resides.
+    securityPolicy: [Output Only] The resource URL for the security policy
+      associated with this target pool.
     selfLink: [Output Only] Server-defined URL for the resource.
     sessionAffinity: Session affinity option, must be one of the following
       values: NONE: Connections from the same client IP may go to any instance
@@ -68476,8 +68762,9 @@ class TargetPool(_messages.Message):
   kind = _messages.StringField(8, default='compute#targetPool')
   name = _messages.StringField(9)
   region = _messages.StringField(10)
-  selfLink = _messages.StringField(11)
-  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 12)
+  securityPolicy = _messages.StringField(11)
+  selfLink = _messages.StringField(12)
+  sessionAffinity = _messages.EnumField('SessionAffinityValueValuesEnum', 13)
 
 
 class TargetPoolAggregatedList(_messages.Message):
@@ -70653,18 +70940,20 @@ class UrlMap(_messages.Message):
   * [Global](/compute/docs/reference/rest/v1/urlMaps) *
   [Regional](/compute/docs/reference/rest/v1/regionUrlMaps) A URL map resource
   is a component of certain types of cloud load balancers and Traffic
-  Director: * urlMaps are used by external HTTP(S) load balancers and Traffic
-  Director. * regionUrlMaps are used by internal HTTP(S) load balancers. For a
-  list of supported URL map features by the load balancer type, see the Load
-  balancing features: Routing and traffic management table. For a list of
-  supported URL map features for Traffic Director, see the Traffic Director
-  features: Routing and traffic management table. This resource defines
-  mappings from hostnames and URL paths to either a backend service or a
-  backend bucket. To use the global urlMaps resource, the backend service must
-  have a loadBalancingScheme of either EXTERNAL or INTERNAL_SELF_MANAGED. To
-  use the regionUrlMaps resource, the backend service must have a
-  loadBalancingScheme of INTERNAL_MANAGED. For more information, read URL Map
-  Concepts.
+  Director: * urlMaps are used by global external Application Load Balancers,
+  classic Application Load Balancers, and cross-region internal Application
+  Load Balancers. * regionUrlMaps are used by internal Application Load
+  Balancers, regional external Application Load Balancers and regional
+  internal Application Load Balancers. For a list of supported URL map
+  features by the load balancer type, see the Load balancing features: Routing
+  and traffic management table. For a list of supported URL map features for
+  Traffic Director, see the Traffic Director features: Routing and traffic
+  management table. This resource defines mappings from hostnames and URL
+  paths to either a backend service or a backend bucket. To use the global
+  urlMaps resource, the backend service must have a loadBalancingScheme of
+  either EXTERNAL or INTERNAL_SELF_MANAGED. To use the regionUrlMaps resource,
+  the backend service must have a loadBalancingScheme of INTERNAL_MANAGED. For
+  more information, read URL Map Concepts.
 
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -70676,11 +70965,10 @@ class UrlMap(_messages.Message):
       weightedBackendServices, defaultService must not be set. Conversely if
       defaultService is set, defaultRouteAction cannot contain any
       weightedBackendServices. Only one of defaultRouteAction or
-      defaultUrlRedirect must be set. URL maps for Classic external HTTP(S)
-      load balancers only support the urlRewrite action within
-      defaultRouteAction. defaultRouteAction has no effect when the URL map is
-      bound to a target gRPC proxy that has the validateForProxyless field set
-      to true.
+      defaultUrlRedirect must be set. URL maps for classic Application Load
+      Balancers only support the urlRewrite action within defaultRouteAction.
+      defaultRouteAction has no effect when the URL map is bound to a target
+      gRPC proxy that has the validateForProxyless field set to true.
     defaultService: The full or partial URL of the defaultService resource to
       which traffic is directed if none of the hostRules match. If
       defaultRouteAction is also specified, advanced routing actions, such as
@@ -71346,17 +71634,18 @@ class UrlMapsValidateRequest(_messages.Message):
 
   Fields:
     loadBalancingSchemes: Specifies the load balancer type(s) this validation
-      request is for. Use EXTERNAL_MANAGED for HTTP/HTTPS External Global Load
-      Balancer with Advanced Traffic Management. Use EXTERNAL for Classic
-      HTTP/HTTPS External Global Load Balancer. Other load balancer types are
-      not supported. For more information, refer to Choosing a load balancer.
-      If unspecified, the load balancing scheme will be inferred from the
-      backend service resources this URL map references. If that can not be
-      inferred (for example, this URL map only references backend buckets, or
-      this Url map is for rewrites and redirects only and doesn't reference
-      any backends), EXTERNAL will be used as the default type. If specified,
-      the scheme(s) must not conflict with the load balancing scheme of the
-      backend service resources this Url map references.
+      request is for. Use EXTERNAL_MANAGED for global external Application
+      Load Balancers and regional external Application Load Balancers. Use
+      EXTERNAL for classic Application Load Balancers. Use INTERNAL_MANAGED
+      for internal Application Load Balancers. For more information, refer to
+      Choosing a load balancer. If unspecified, the load balancing scheme will
+      be inferred from the backend service resources this URL map references.
+      If that can not be inferred (for example, this URL map only references
+      backend buckets, or this Url map is for rewrites and redirects only and
+      doesn't reference any backends), EXTERNAL will be used as the default
+      type. If specified, the scheme(s) must not conflict with the load
+      balancing scheme of the backend service resources this Url map
+      references.
     resource: Content of the UrlMap to be validated.
   """
 
@@ -71364,13 +71653,13 @@ class UrlMapsValidateRequest(_messages.Message):
     r"""LoadBalancingSchemesValueListEntryValuesEnum enum type.
 
     Values:
-      EXTERNAL: Signifies that this will be used for Classic L7 External Load
-        Balancing.
-      EXTERNAL_MANAGED: Signifies that this will be used for Envoy-based L7
-        External Load Balancing.
+      EXTERNAL: Signifies that this will be used for classic Application Load
+        Balancers.
+      EXTERNAL_MANAGED: Signifies that this will be used for Envoy-based
+        global external Application Load Balancers.
       LOAD_BALANCING_SCHEME_UNSPECIFIED: If unspecified, the validation will
         try to infer the scheme from the backend service resources this Url
-        map references. If the inferrence is not possible, EXTERNAL will be
+        map references. If the inference is not possible, EXTERNAL will be
         used as the default type.
     """
     EXTERNAL = 0
@@ -71528,20 +71817,23 @@ class UsableSubnetwork(_messages.Message):
     set to REGIONAL_MANAGED_PROXY.
 
     Values:
+      GLOBAL_MANAGED_PROXY: Subnet reserved for Global Envoy-based Load
+        Balancing.
       INTERNAL_HTTPS_LOAD_BALANCER: Subnet reserved for Internal HTTP(S) Load
         Balancing.
       PRIVATE: Regular user created or automatically created subnet.
       PRIVATE_RFC_1918: Regular user created or automatically created subnet.
       PRIVATE_SERVICE_CONNECT: Subnetworks created for Private Service Connect
         in the producer network.
-      REGIONAL_MANAGED_PROXY: Subnetwork used for Regional Internal/External
-        HTTP(S) Load Balancing.
+      REGIONAL_MANAGED_PROXY: Subnetwork used for Regional Envoy-based Load
+        Balancing.
     """
-    INTERNAL_HTTPS_LOAD_BALANCER = 0
-    PRIVATE = 1
-    PRIVATE_RFC_1918 = 2
-    PRIVATE_SERVICE_CONNECT = 3
-    REGIONAL_MANAGED_PROXY = 4
+    GLOBAL_MANAGED_PROXY = 0
+    INTERNAL_HTTPS_LOAD_BALANCER = 1
+    PRIVATE = 2
+    PRIVATE_RFC_1918 = 3
+    PRIVATE_SERVICE_CONNECT = 4
+    REGIONAL_MANAGED_PROXY = 5
 
   class RoleValueValuesEnum(_messages.Enum):
     r"""The role of subnetwork. Currently, this field is only used when

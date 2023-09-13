@@ -158,6 +158,32 @@ class AutoscalingPolicy(_messages.Message):
   workerConfig = _messages.MessageField('InstanceGroupAutoscalingPolicyConfig', 6)
 
 
+class AutotuningConfig(_messages.Message):
+  r"""Autotuning configuration of the workload.
+
+  Enums:
+    ScenariosValueListEntryValuesEnum:
+
+  Fields:
+    cohort: Required. Autotuning cohort identifier. Identifies families of the
+      workloads having the same shape, e.g. daily ETL jobs.
+    scenarios: Required. Scenarios for which tunings are applied.
+  """
+
+  class ScenariosValueListEntryValuesEnum(_messages.Enum):
+    r"""ScenariosValueListEntryValuesEnum enum type.
+
+    Values:
+      SCENARIO_UNSPECIFIED: Default value.
+      OOM: Out-of-memory errors remediation.
+    """
+    SCENARIO_UNSPECIFIED = 0
+    OOM = 1
+
+  cohort = _messages.StringField(1)
+  scenarios = _messages.EnumField('ScenariosValueListEntryValuesEnum', 2, repeated=True)
+
+
 class AuxiliaryNodeGroup(_messages.Message):
   r"""Node group identification and configuration information.
 
@@ -1286,7 +1312,7 @@ class DataprocProjectsLocationsSessionTemplatesListRequest(_messages.Message):
       response. The service may return fewer than this value.
     pageToken: Optional. A page token received from a previous ListSessions
       call. Provide this token to retrieve the subsequent page.
-    parent: Required. The parent, which owns this collection of session
+    parent: Required. The parent that owns this collection of session
       templates.
   """
 
@@ -1302,11 +1328,11 @@ class DataprocProjectsLocationsSessionsCreateRequest(_messages.Message):
   Fields:
     parent: Required. The parent resource where this session will be created.
     requestId: Optional. A unique ID used to identify the request. If the
-      service receives two CreateSessionRequest (https://cloud.google.com/data
-      proc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v
-      1.CreateSessionRequest)s with the same ID, the second request is ignored
-      and the first Session is created and stored in the backend is
-      returned.Recommendation: Set this value to a UUID
+      service receives two CreateSessionRequests (https://cloud.google.com/dat
+      aproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.
+      v1.CreateSessionRequest)s with the same ID, the second request is
+      ignored, and the first Session is created and stored in the
+      backend.Recommendation: Set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The value
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
       and hyphens (-). The maximum length is 40 characters.
@@ -1372,14 +1398,14 @@ class DataprocProjectsLocationsSessionsListRequest(_messages.Message):
     filter: Optional. A filter for the sessions to return in the response.A
       filter is a logical expression constraining the values of various fields
       in each session resource. Filters are case sensitive, and may contain
-      multiple clauses combined with logical operators (AND/OR). Supported
-      fields are session_id, session_uuid, state, and create_time.e.g. state =
-      ACTIVE and create_time < "2023-01-01T00:00:00Z" filters for sessions in
-      state ACTIVE that were created before 2023-01-01See
+      multiple clauses combined with logical operators (AND, OR). Supported
+      fields are session_id, session_uuid, state, and create_time.Example:
+      state = ACTIVE and create_time < "2023-01-01T00:00:00Z" is a filter for
+      sessions in an ACTIVE state that were created before 2023-01-01.See
       https://google.aip.dev/assets/misc/ebnf-filtering.txt for a detailed
-      description of the filter syntax and a list of supported comparisons.
+      description of the filter syntax and a list of supported comparators.
     orderBy: Optional. Field(s) on which to sort the list of sessions. See
-      https://google.aip.dev/132#ordering for more details.
+      https://google.aip.dev/132#ordering for more information.
     pageSize: Optional. The maximum number of sessions to return in each
       response. The service may return fewer than this value.
     pageToken: Optional. A page token received from a previous ListSessions
@@ -2841,7 +2867,7 @@ class ExecutionConfig(_messages.Message):
       session to terminate. This field cannot be set on a batch workload.
       Minimum value is 10 minutes; maximum value is 14 days (see JSON
       representation of Duration (https://developers.google.com/protocol-
-      buffers/docs/proto3#json)). Defaults to 4 hours if not set. If both ttl
+      buffers/docs/proto3#json)). Defaults to 1 hour if not set. If both ttl
       and idle_ttl are specified for an interactive session, the conditions
       are treated as OR conditions: the workload will be terminated when it
       has been idle for idle_ttl or when ttl has been exceeded, whichever
@@ -3630,19 +3656,19 @@ class InjectCredentialsRequest(_messages.Message):
 
 
 class InjectSessionCredentialsRequest(_messages.Message):
-  r"""A request to inject credentials to a session.
+  r"""A request to inject credentials into a session.
 
   Fields:
     credentialsCiphertext: Required. The encrypted credentials being injected
-      in to the session.The client is responsible for encrypting the
-      credentials in a way that is supported by the session.A wrapped value is
-      used here so that the actual contents of the encrypted credentials are
-      not written to audit logs.
+      into the session.The client is responsible for enuring that the
+      encrypted credentials are supported by the session.A wrapped value is
+      used to avoid writing the contents of the encrypted credentials to audit
+      logs.
     requestId: Optional. A unique ID used to identify the request. If the
       service receives two TerminateSessionRequest (https://cloud.google.com/d
       ataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.datapro
       c.v1.TerminateSessionRequest)s with the same ID, the first request is
-      ignored to ensure the most recent credentials are
+      ignored to ensure that the most recent credentials are
       injected.Recommendation: Set this value to a UUID
       (https://en.wikipedia.org/wiki/Universally_unique_identifier).The value
       must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
@@ -3660,12 +3686,15 @@ class InstanceFlexibilityPolicy(_messages.Message):
   Fields:
     instanceSelectionList: Optional. List of instance selection options that
       the group will use when creating new VMs.
+    instanceSelectionResults: Output only. A list of instance selection
+      results in the group.
     provisioningModelMix: Optional. Defines how the Group selects the
       provisioning model to ensure required reliability.
   """
 
   instanceSelectionList = _messages.MessageField('InstanceSelection', 1, repeated=True)
-  provisioningModelMix = _messages.MessageField('ProvisioningModelMix', 2)
+  instanceSelectionResults = _messages.MessageField('InstanceSelectionResult', 2, repeated=True)
+  provisioningModelMix = _messages.MessageField('ProvisioningModelMix', 3)
 
 
 class InstanceGroupAutoscalingPolicyConfig(_messages.Message):
@@ -3752,20 +3781,15 @@ class InstanceGroupConfig(_messages.Message):
       Instance Group. See Dataproc -> Minimum CPU Platform
       (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-
       cpu).
-    minNumInstances: Optional. The minimum number of instances to create. If
-      min_num_instances is set, min_num_instances is used for a criteria to
-      decide the cluster. Cluster creation will be failed by being an error
-      state if the total number of instances created is less than the
-      min_num_instances. For example, given that num_instances = 5 and
-      min_num_instances = 3, * if 4 instances are created and then registered
-      successfully but one instance is failed, the failed VM will be deleted
-      and the cluster will be resized to 4 instances in running state. * if 2
-      instances are created successfully and 3 instances are failed, the
-      cluster will be in an error state and does not delete failed VMs for
-      debugging. * if 2 instance are created and then registered successfully
-      but 3 instances are failed to initialize, the cluster will be in an
-      error state and does not delete failed VMs for debugging. NB: This can
-      only be set for primary workers now.
+    minNumInstances: Optional. The minimum number of primary worker instances
+      to create. If min_num_instances is set, cluster creation will succeed if
+      the number of primary workers created is at least equal to the
+      min_num_instances number.Example: Cluster creation request with
+      num_instances = 5 and min_num_instances = 3: If 4 VMs are created and 1
+      instance fails, the failed VM is deleted. The cluster is resized to 4
+      instances and placed in a RUNNING state. If 2 instances are created and
+      3 instances fail, the cluster in placed in an ERROR state. The failed
+      VMs are not deleted.
     numInstances: Optional. The number of VM instances in the instance group.
       For HA cluster master_config groups, must be set to 3. For standard
       cluster master_config groups, must be set to 1.
@@ -3854,6 +3878,19 @@ class InstanceSelection(_messages.Message):
 
   machineTypes = _messages.StringField(1, repeated=True)
   rank = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
+class InstanceSelectionResult(_messages.Message):
+  r"""Defines a mapping from machine types to the number of VMs that are
+  created with each machine type.
+
+  Fields:
+    machineType: Output only. Full machine-type names, e.g. "n1-standard-16".
+    vmCount: Output only. Number of VM provisioned with the machine_type.
+  """
+
+  machineType = _messages.StringField(1)
+  vmCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class InstantiateWorkflowTemplateRequest(_messages.Message):
@@ -4579,7 +4616,7 @@ class ListSessionsResponse(_messages.Message):
   r"""A list of interactive sessions.
 
   Fields:
-    nextPageToken: A token, which can be sent as page_token to retrieve the
+    nextPageToken: A token, which can be sent as page_token, to retrieve the
       next page. If this field is omitted, there are no subsequent pages.
     sessions: Output only. The sessions from the specified collection.
   """
@@ -5883,6 +5920,7 @@ class RuntimeConfig(_messages.Message):
       are used to configure workload execution.
 
   Fields:
+    autotuningConfig: Optional. Autotuning configuration of the workload.
     containerImage: Optional. Optional custom container image for the job
       runtime environment. If not specified, a default container image will be
       used.
@@ -5917,10 +5955,11 @@ class RuntimeConfig(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  containerImage = _messages.StringField(1)
-  properties = _messages.MessageField('PropertiesValue', 2)
-  repositoryConfig = _messages.MessageField('RepositoryConfig', 3)
-  version = _messages.StringField(4)
+  autotuningConfig = _messages.MessageField('AutotuningConfig', 1)
+  containerImage = _messages.StringField(2)
+  properties = _messages.MessageField('PropertiesValue', 3)
+  repositoryConfig = _messages.MessageField('RepositoryConfig', 4)
+  version = _messages.StringField(5)
 
 
 class RuntimeInfo(_messages.Message):
@@ -5997,13 +6036,13 @@ class SecurityConfig(_messages.Message):
 
 
 class Session(_messages.Message):
-  r"""A representation of a session in the service. Next ID: 18
+  r"""A representation of a session.
 
   Enums:
     StateValueValuesEnum: Output only. A state of the session.
 
   Messages:
-    LabelsValue: Optional. The labels to associate with this session. Label
+    LabelsValue: Optional. The labels to associate with the session. Label
       keys must contain 1 to 63 characters, and must conform to RFC 1035
       (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but,
       if present, must contain 1 to 63 characters, and must conform to RFC
@@ -6017,7 +6056,7 @@ class Session(_messages.Message):
     environmentConfig: Optional. Environment configuration for the session
       execution.
     jupyterSession: Optional. Jupyter session config.
-    labels: Optional. The labels to associate with this session. Label keys
+    labels: Optional. The labels to associate with the session. Label keys
       must contain 1 to 63 characters, and must conform to RFC 1035
       (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but,
       if present, must contain 1 to 63 characters, and must conform to RFC
@@ -6027,18 +6066,19 @@ class Session(_messages.Message):
     runtimeConfig: Optional. Runtime configuration for the session execution.
     runtimeInfo: Output only. Runtime information about session execution.
     sessionTemplate: Optional. The session template used by the session.Only
-      resource names including project ID and location are valid.Example: * ht
-      tps://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dat
-      aproc_region]/sessionTemplates/[template_id] * projects/[project_id]/loc
-      ations/[dataproc_region]/sessionTemplates/[template_id]Note that the
-      template must be in the same project and Dataproc region.
+      resource names, including project ID and location, are valid.Example: *
+      https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[d
+      ataproc_region]/sessionTemplates/[template_id] * projects/[project_id]/l
+      ocations/[dataproc_region]/sessionTemplates/[template_id]The template
+      must be in the same project and Dataproc region as the session.
     spark: Optional. Spark engine config.
     sparkConnectSession: Optional. Spark connect session config.
     state: Output only. A state of the session.
     stateHistory: Output only. Historical state information for the session.
-    stateMessage: Output only. Session state details, such as a failure
+    stateMessage: Output only. Session state details, such as the failure
       description if the state is FAILED.
-    stateTime: Output only. The time when the session entered a current state.
+    stateTime: Output only. The time when the session entered the current
+      state.
     user: Optional. The email address of the user who owns the session.
     uuid: Output only. A session UUID (Unique Universal Identifier). The
       service generates this value when it creates the session.
@@ -6049,7 +6089,7 @@ class Session(_messages.Message):
 
     Values:
       STATE_UNSPECIFIED: The session state is unknown.
-      CREATING: The session is created before running.
+      CREATING: The session is created prior to running.
       ACTIVE: The session is running.
       TERMINATING: The session is terminating.
       TERMINATED: The session is terminated successfully.
@@ -6064,7 +6104,7 @@ class Session(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Optional. The labels to associate with this session. Label keys must
+    r"""Optional. The labels to associate with the session. Label keys must
     contain 1 to 63 characters, and must conform to RFC 1035
     (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if
     present, must contain 1 to 63 characters, and must conform to RFC 1035
@@ -6183,22 +6223,24 @@ class SessionStateHistory(_messages.Message):
 
   Enums:
     StateValueValuesEnum: Output only. The state of the session at this point
-      in history.
+      in the session history.
 
   Fields:
-    state: Output only. The state of the session at this point in history.
-    stateMessage: Output only. Details about the state at this point in
+    state: Output only. The state of the session at this point in the session
       history.
+    stateMessage: Output only. Details about the state at this point in the
+      session history.
     stateStartTime: Output only. The time when the session entered the
       historical state.
   """
 
   class StateValueValuesEnum(_messages.Enum):
-    r"""Output only. The state of the session at this point in history.
+    r"""Output only. The state of the session at this point in the session
+    history.
 
     Values:
       STATE_UNSPECIFIED: The session state is unknown.
-      CREATING: The session is created before running.
+      CREATING: The session is created prior to running.
       ACTIVE: The session is running.
       TERMINATING: The session is terminating.
       TERMINATED: The session is terminated successfully.
@@ -6217,13 +6259,13 @@ class SessionStateHistory(_messages.Message):
 
 
 class SessionTemplate(_messages.Message):
-  r"""A representation of a session template in the service. Next ID: 12
+  r"""A representation of a session template.
 
   Messages:
-    LabelsValue: Optional. The labels to associate with sessions created using
+    LabelsValue: Optional. Labels to associate with sessions created using
       this template. Label keys must contain 1 to 63 characters, and must
       conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values
-      may be empty, but, if present, must contain 1 to 63 characters, and must
+      can be empty, but, if present, must contain 1 to 63 characters and
       conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than
       32 labels can be associated with a session.
 
@@ -6235,27 +6277,27 @@ class SessionTemplate(_messages.Message):
     environmentConfig: Optional. Environment configuration for session
       execution.
     jupyterSession: Optional. Jupyter session config.
-    labels: Optional. The labels to associate with sessions created using this
+    labels: Optional. Labels to associate with sessions created using this
       template. Label keys must contain 1 to 63 characters, and must conform
-      to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be
-      empty, but, if present, must contain 1 to 63 characters, and must
-      conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than
-      32 labels can be associated with a session.
+      to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values can be
+      empty, but, if present, must contain 1 to 63 characters and conform to
+      RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels
+      can be associated with a session.
     name: Required. The resource name of the session template.
     runtimeConfig: Optional. Runtime configuration for session execution.
     spark: Optional. Spark engine config.
     sparkConnectSession: Optional. Spark connect session config.
-    updateTime: Output only. The time template was last updated.
+    updateTime: Output only. The time the template was last updated.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    r"""Optional. The labels to associate with sessions created using this
+    r"""Optional. Labels to associate with sessions created using this
     template. Label keys must contain 1 to 63 characters, and must conform to
-    RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be
-    empty, but, if present, must contain 1 to 63 characters, and must conform
-    to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels
-    can be associated with a session.
+    RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values can be
+    empty, but, if present, must contain 1 to 63 characters and conform to RFC
+    1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+    associated with a session.
 
     Messages:
       AdditionalProperty: An additional property for a LabelsValue object.

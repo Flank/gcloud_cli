@@ -20,9 +20,10 @@ from __future__ import unicode_literals
 
 import hashlib
 import json
+
 from googlecloudsdk.api_lib.artifacts import exceptions as ar_exceptions
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.command_lib.artifacts import docker_util
+from googlecloudsdk.core import log
 from  googlecloudsdk.core.util.files import FileReader
 
 
@@ -47,12 +48,13 @@ POSSIBLE_REMEDIATION_CATEGORIES = [
     'workaround']
 
 
-def ParseVexFile(filename, uri):
+def ParseVexFile(filename, image, version):
   """Reads a vex file and extracts notes.
 
   Args:
     filename: str, path to the vex file.
-    uri: str, artifact path.
+    image: image object
+    version:  version of image object
 
   Returns:
     A list of notes.
@@ -71,31 +73,37 @@ def ParseVexFile(filename, uri):
         'Reading json file has failed'
     )
   _Validate(vex)
+  name = ''
+  namespace = ''
+  document = vex.get('document')
+  if document is not None:
+    publisher = document.get('publisher')
+    if publisher is not None:
+      name = publisher.get('name')
+      namespace = publisher.get('namespace')
   publisher = ca_messages.Publisher(
-      name=vex['document']['publisher']['name'],
-      publisherNamespace=vex['document']['publisher']['namespace'],
+      name=name,
+      publisherNamespace=namespace,
   )
 
-  uri = _RemoveHTTPS(uri)
-  image, version = docker_util.DockerUrlToVersion(uri)
   uri_without_tag_or_digest = image.GetDockerString()
-  uri_with_digest = version.GetDockerString()
-
-  document = vex['document']
+  generic_uri = uri_without_tag_or_digest
+  if version is not None:
+    generic_uri = version.GetDockerString()
 
   productid_to_product_proto_map = {}
   for product_info in vex['product_tree']['branches']:
     artifact_uri = product_info['name']
-    artifact_uri = _RemoveHTTPS(artifact_uri)
+    artifact_uri = RemoveHTTPS(artifact_uri)
     if uri_without_tag_or_digest != artifact_uri:
       continue
     product = product_info['product']
     product_id = product['product_id']
-    uri_with_digest = 'https://{}'.format(uri_with_digest)
+    generic_uri = 'https://{}'.format(generic_uri)
     product_proto = ca_messages.Product(
         name=product['name'],
         id=product_id,
-        genericUri=uri_with_digest,
+        genericUri=generic_uri,
     )
     productid_to_product_proto_map[product_id] = product_proto
 
@@ -115,7 +123,7 @@ def ParseVexFile(filename, uri):
             )
         )
         notes.append(note)
-  return notes, uri_with_digest
+  return notes, generic_uri
 
 
 def _Validate(vex):
@@ -159,9 +167,7 @@ def _Validate(vex):
         'vulnerabilities are required in csaf document'
     )
   if len(vulnerabilities) < 1:
-    raise ar_exceptions.InvalidInputValueError(
-        'at least one vulnerability is expected in csaf document'
-    )
+    log.warning('at least one vulnerability is expected in csaf document')
   for vuln in vulnerabilities:
     _ValidateVulnerability(vuln)
 
@@ -342,9 +348,8 @@ def _GetJustifications(vuln, product, msgs):
   return justification
 
 
-def _RemoveHTTPS(uri):
+def RemoveHTTPS(uri):
   prefix = 'https://'
   if uri.startswith(prefix):
     return uri[len(prefix):]
-  else:
-    return uri
+  return uri

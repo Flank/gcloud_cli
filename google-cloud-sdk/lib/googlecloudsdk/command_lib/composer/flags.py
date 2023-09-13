@@ -559,6 +559,32 @@ SUPPORT_WEB_SERVER_PLUGINS = base.Argument(
     """.format(MIN_COMPOSER3_VERSION),
 )
 
+ENABLE_PRIVATE_BUILDS_ONLY = base.Argument(
+    '--enable-private-builds-only',
+    action='store_const',
+    default=None,
+    const=True,
+    hidden=True,
+    help="""\
+    Builds performed during operations that install Python
+    packages have only private connectivity to Google services,
+    supported in Composer {} or greater.
+    """.format(MIN_COMPOSER3_VERSION),
+)
+
+DISABLE_PRIVATE_BUILDS_ONLY = base.Argument(
+    '--disable-private-builds-only',
+    action='store_const',
+    default=None,
+    const=True,
+    hidden=True,
+    help="""\
+    Builds performed during operations that install Python
+    packages have an access to the internet
+    supported in Composer {} or greater.
+    """.format(MIN_COMPOSER3_VERSION),
+)
+
 CLOUD_SQL_MACHINE_TYPE = base.Argument(
     '--cloud-sql-machine-type',
     type=str,
@@ -930,6 +956,17 @@ DISABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
     help="""\
     Disable Cloud Data Lineage integration.
     """)
+
+STORAGE_BUCKET_FLAG = base.Argument(
+    '--storage-bucket',
+    type=str,
+    hidden=True,
+    action=V2ExclusiveStoreAction,
+    help="""\
+    Name of an exisiting Cloud Storage bucket to be used by the environment.
+    Supported only for Composer 2.4.X and above.
+    """,
+)
 
 
 def _IsValidIpv4CidrBlock(ipv4_cidr_block):
@@ -1783,6 +1820,12 @@ def AddComposer3FlagsToGroup(update_type_group):
     update_type_group: argument group, the group to which flags should be added.
   """
   SUPPORT_WEB_SERVER_PLUGINS.AddToParser(update_type_group)
+
+  private_builds_only_group = update_type_group.add_argument_group(
+      mutex=True, hidden=True
+  )
+  ENABLE_PRIVATE_BUILDS_ONLY.AddToParser(private_builds_only_group)
+  DISABLE_PRIVATE_BUILDS_ONLY.AddToParser(private_builds_only_group)
 
   vpc_connectivity_group = update_type_group.add_argument_group(
       hidden=True, mutex=True

@@ -109,6 +109,7 @@ class ComputeAlpha(base_api.BaseApiClient):
     self.regionNotificationEndpoints = self.RegionNotificationEndpointsService(self)
     self.regionOperations = self.RegionOperationsService(self)
     self.regionSecurityPolicies = self.RegionSecurityPoliciesService(self)
+    self.regionSnapshots = self.RegionSnapshotsService(self)
     self.regionSslCertificates = self.RegionSslCertificatesService(self)
     self.regionSslPolicies = self.RegionSslPoliciesService(self)
     self.regionTargetHttpProxies = self.RegionTargetHttpProxiesService(self)
@@ -1231,6 +1232,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComputeBackendServicesListRequest',
         response_type_name='BackendServiceList',
+        supports_download=False,
+    )
+
+    def ListUsable(self, request, global_params=None):
+      r"""Retrieves an aggregated list of all usable backend services in the specified project.
+
+      Args:
+        request: (ComputeBackendServicesListUsableRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (BackendServiceListUsable) The response message.
+      """
+      config = self.GetMethodConfig('ListUsable')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListUsable.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.backendServices.listUsable',
+        ordered_params=['project'],
+        path_params=['project'],
+        query_params=['filter', 'maxResults', 'orderBy', 'pageToken', 'returnPartialSuccess'],
+        relative_path='projects/{project}/global/backendServices/listUsable',
+        request_field='',
+        request_type_name='ComputeBackendServicesListUsableRequest',
+        response_type_name='BackendServiceListUsable',
         supports_download=False,
     )
 
@@ -16380,7 +16407,7 @@ class ComputeAlpha(base_api.BaseApiClient):
         method_id='compute.regionNetworkFirewallPolicies.addAssociation',
         ordered_params=['project', 'region', 'firewallPolicy'],
         path_params=['firewallPolicy', 'project', 'region'],
-        query_params=['replaceExistingAssociation', 'requestId'],
+        query_params=['associatedPolicyToBeReplaced', 'replaceExistingAssociation', 'requestId'],
         relative_path='projects/{project}/regions/{region}/firewallPolicies/{firewallPolicy}/addAssociation',
         request_field='firewallPolicyAssociation',
         request_type_name='ComputeRegionNetworkFirewallPoliciesAddAssociationRequest',
@@ -17351,6 +17378,224 @@ class ComputeAlpha(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComputeRegionSecurityPoliciesRemoveRuleRequest',
         response_type_name='Operation',
+        supports_download=False,
+    )
+
+  class RegionSnapshotsService(base_api.BaseApiService):
+    """Service class for the regionSnapshots resource."""
+
+    _NAME = 'regionSnapshots'
+
+    def __init__(self, client):
+      super(ComputeAlpha.RegionSnapshotsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified Snapshot resource. Keep in mind that deleting a single snapshot might not necessarily delete all the data on that snapshot. If any data on the snapshot that is marked for deletion is needed for subsequent snapshots, the data will be moved to the next corresponding snapshot. For more information, see Deleting snapshots.
+
+      Args:
+        request: (ComputeRegionSnapshotsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='DELETE',
+        method_id='compute.regionSnapshots.delete',
+        ordered_params=['project', 'region', 'snapshot'],
+        path_params=['project', 'region', 'snapshot'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/regions/{region}/snapshots/{snapshot}',
+        request_field='',
+        request_type_name='ComputeRegionSnapshotsDeleteRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified Snapshot resource.
+
+      Args:
+        request: (ComputeRegionSnapshotsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Snapshot) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.regionSnapshots.get',
+        ordered_params=['project', 'region', 'snapshot'],
+        path_params=['project', 'region', 'snapshot'],
+        query_params=[],
+        relative_path='projects/{project}/regions/{region}/snapshots/{snapshot}',
+        request_field='',
+        request_type_name='ComputeRegionSnapshotsGetRequest',
+        response_type_name='Snapshot',
+        supports_download=False,
+    )
+
+    def GetIamPolicy(self, request, global_params=None):
+      r"""Gets the access control policy for a resource. May be empty if no such policy or resource exists.
+
+      Args:
+        request: (ComputeRegionSnapshotsGetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('GetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.regionSnapshots.getIamPolicy',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=['optionsRequestedPolicyVersion'],
+        relative_path='projects/{project}/regions/{region}/snapshots/{resource}/getIamPolicy',
+        request_field='',
+        request_type_name='ComputeRegionSnapshotsGetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a snapshot in the specified region using the data included in the request.
+
+      Args:
+        request: (ComputeRegionSnapshotsInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionSnapshots.insert',
+        ordered_params=['project', 'region'],
+        path_params=['project', 'region'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/regions/{region}/snapshots',
+        request_field='snapshot',
+        request_type_name='ComputeRegionSnapshotsInsertRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves the list of Snapshot resources contained within the specified region.
+
+      Args:
+        request: (ComputeRegionSnapshotsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (SnapshotList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.regionSnapshots.list',
+        ordered_params=['project', 'region'],
+        path_params=['project', 'region'],
+        query_params=['filter', 'maxResults', 'orderBy', 'pageToken', 'returnPartialSuccess'],
+        relative_path='projects/{project}/regions/{region}/snapshots',
+        request_field='',
+        request_type_name='ComputeRegionSnapshotsListRequest',
+        response_type_name='SnapshotList',
+        supports_download=False,
+    )
+
+    def SetIamPolicy(self, request, global_params=None):
+      r"""Sets the access control policy on the specified resource. Replaces any existing policy.
+
+      Args:
+        request: (ComputeRegionSnapshotsSetIamPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Policy) The response message.
+      """
+      config = self.GetMethodConfig('SetIamPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetIamPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionSnapshots.setIamPolicy',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=[],
+        relative_path='projects/{project}/regions/{region}/snapshots/{resource}/setIamPolicy',
+        request_field='regionSetPolicyRequest',
+        request_type_name='ComputeRegionSnapshotsSetIamPolicyRequest',
+        response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def SetLabels(self, request, global_params=None):
+      r"""Sets the labels on a regional snapshot. To learn more about labels, read the Labeling Resources documentation.
+
+      Args:
+        request: (ComputeRegionSnapshotsSetLabelsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetLabels')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetLabels.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionSnapshots.setLabels',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/regions/{region}/snapshots/{resource}/setLabels',
+        request_field='regionSetLabelsRequest',
+        request_type_name='ComputeRegionSnapshotsSetLabelsRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource.
+
+      Args:
+        request: (ComputeRegionSnapshotsTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.regionSnapshots.testIamPermissions',
+        ordered_params=['project', 'region', 'resource'],
+        path_params=['project', 'region', 'resource'],
+        query_params=[],
+        relative_path='projects/{project}/regions/{region}/snapshots/{resource}/testIamPermissions',
+        request_field='testPermissionsRequest',
+        request_type_name='ComputeRegionSnapshotsTestIamPermissionsRequest',
+        response_type_name='TestPermissionsResponse',
         supports_download=False,
     )
 
@@ -19128,6 +19373,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def DeleteRoutePolicy(self, request, global_params=None):
+      r"""Deletes Route Policy.
+
+      Args:
+        request: (ComputeRoutersDeleteRoutePolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('DeleteRoutePolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DeleteRoutePolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.routers.deleteRoutePolicy',
+        ordered_params=['project', 'region', 'router'],
+        path_params=['project', 'region', 'router'],
+        query_params=['policy', 'requestId'],
+        relative_path='projects/{project}/regions/{region}/routers/{router}/deleteRoutePolicy',
+        request_field='',
+        request_type_name='ComputeRoutersDeleteRoutePolicyRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
       r"""Returns the specified Router resource.
 
@@ -19206,6 +19477,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def GetRoutePolicy(self, request, global_params=None):
+      r"""Returns specified Route Policy.
+
+      Args:
+        request: (ComputeRoutersGetRoutePolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (RoutersGetRoutePolicyResponse) The response message.
+      """
+      config = self.GetMethodConfig('GetRoutePolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetRoutePolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.routers.getRoutePolicy',
+        ordered_params=['project', 'region', 'router'],
+        path_params=['project', 'region', 'router'],
+        query_params=['policy'],
+        relative_path='projects/{project}/regions/{region}/routers/{router}/getRoutePolicy',
+        request_field='',
+        request_type_name='ComputeRoutersGetRoutePolicyRequest',
+        response_type_name='RoutersGetRoutePolicyResponse',
+        supports_download=False,
+    )
+
     def GetRouterStatus(self, request, global_params=None):
       r"""Retrieves runtime information of the specified router.
 
@@ -19281,6 +19578,58 @@ class ComputeAlpha(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComputeRoutersListRequest',
         response_type_name='RouterList',
+        supports_download=False,
+    )
+
+    def ListBgpRoutes(self, request, global_params=None):
+      r"""Retrieves a list of router bgp routes available to the specified project.
+
+      Args:
+        request: (ComputeRoutersListBgpRoutesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (RoutersListBgpRoutes) The response message.
+      """
+      config = self.GetMethodConfig('ListBgpRoutes')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListBgpRoutes.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.routers.listBgpRoutes',
+        ordered_params=['project', 'region', 'router'],
+        path_params=['project', 'region', 'router'],
+        query_params=['addressFamily', 'destinationPrefix', 'filter', 'maxResults', 'orderBy', 'pageToken', 'peer', 'policyApplied', 'returnPartialSuccess', 'routeType'],
+        relative_path='projects/{project}/regions/{region}/routers/{router}/listBgpRoutes',
+        request_field='',
+        request_type_name='ComputeRoutersListBgpRoutesRequest',
+        response_type_name='RoutersListBgpRoutes',
+        supports_download=False,
+    )
+
+    def ListRoutePolicies(self, request, global_params=None):
+      r"""Retrieves a list of router route policy subresources available to the specified project.
+
+      Args:
+        request: (ComputeRoutersListRoutePoliciesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (RoutersListRoutePolicies) The response message.
+      """
+      config = self.GetMethodConfig('ListRoutePolicies')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListRoutePolicies.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.routers.listRoutePolicies',
+        ordered_params=['project', 'region', 'router'],
+        path_params=['project', 'region', 'router'],
+        query_params=['filter', 'maxResults', 'orderBy', 'pageToken', 'returnPartialSuccess'],
+        relative_path='projects/{project}/regions/{region}/routers/{router}/listRoutePolicies',
+        request_field='',
+        request_type_name='ComputeRoutersListRoutePoliciesRequest',
+        response_type_name='RoutersListRoutePolicies',
         supports_download=False,
     )
 
@@ -19384,6 +19733,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         relative_path='projects/{project}/regions/{region}/routers/{router}',
         request_field='routerResource',
         request_type_name='ComputeRoutersUpdateRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def UpdateRoutePolicy(self, request, global_params=None):
+      r"""Updates or creates new Route Policy.
+
+      Args:
+        request: (ComputeRoutersUpdateRoutePolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('UpdateRoutePolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateRoutePolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.routers.updateRoutePolicy',
+        ordered_params=['project', 'region', 'router'],
+        path_params=['project', 'region', 'router'],
+        query_params=['requestId'],
+        relative_path='projects/{project}/regions/{region}/routers/{router}/updateRoutePolicy',
+        request_field='routePolicy',
+        request_type_name='ComputeRoutersUpdateRoutePolicyRequest',
         response_type_name='Operation',
         supports_download=False,
     )

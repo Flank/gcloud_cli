@@ -58,6 +58,7 @@ class _AwsClientBase(client.ClientBase):
         'management': self._NodeManagement(args),
         'name': node_pool_ref.awsNodePoolsId,
         'subnetId': flags.GetSubnetID(args),
+        'updateSettings': self._UpdateSettings(args),
         'version': flags.GetNodeVersion(args),
     }
     return (
@@ -109,18 +110,28 @@ class _AwsClientBase(client.ClientBase):
 
   def _Authorization(self, args):
     admin_users = flags.GetAdminUsers(args)
-    if not admin_users:
+    admin_groups = flags.GetAdminGroups(args)
+    if not admin_users and not admin_groups:
       return None
-    kwargs = {
-        'adminUsers': [
-            self._messages.GoogleCloudGkemulticloudV1AwsClusterUser(username=u)
-            for u in admin_users
-        ]
-    }
+    kwargs = {}
+    if admin_users:
+      kwargs['adminUsers'] = [
+          self._messages.GoogleCloudGkemulticloudV1AwsClusterUser(
+              username=u
+          )
+          for u in admin_users
+      ]
+    if admin_groups:
+      kwargs['adminGroups'] = [
+          self._messages.GoogleCloudGkemulticloudV1AwsClusterGroup(group=g)
+          for g in admin_groups
+      ]
+    if not any(kwargs.values()):
+      return None
     return (
-        self._messages.GoogleCloudGkemulticloudV1AwsAuthorization(**kwargs)
-        if any(kwargs.values())
-        else None
+        self._messages.GoogleCloudGkemulticloudV1AwsAuthorization(
+            **kwargs
+        )
     )
 
   def _ServicesAuthentication(self, args):
@@ -222,6 +233,27 @@ class _AwsClientBase(client.ClientBase):
     }
     return (
         self._messages.GoogleCloudGkemulticloudV1AwsNodeManagement(**kwargs)
+        if any(kwargs.values())
+        else None
+    )
+
+  def _UpdateSettings(self, args):
+    kwargs = {
+        'surgeSettings': self._SurgeSettings(args),
+    }
+    return (
+        self._messages.GoogleCloudGkemulticloudV1UpdateSettings(**kwargs)
+        if any(kwargs.values())
+        else None
+    )
+
+  def _SurgeSettings(self, args):
+    kwargs = {
+        'maxSurge': flags.GetMaxSurgeUpdate(args),
+        'maxUnavailable': flags.GetMaxUnavailableUpdate(args),
+    }
+    return (
+        self._messages.GoogleCloudGkemulticloudV1SurgeSettings(**kwargs)
         if any(kwargs.values())
         else None
     )

@@ -389,7 +389,7 @@ def AddVolumeRevertSnapshotArg(parser, required=True):
   """Adds the --snapshot arg to the arg parser."""
   concept_parsers.ConceptParser.ForResource(
       '--snapshot',
-      flags.GetSnapshotResourceSpec(revert_op=True, positional=False),
+      flags.GetSnapshotResourceSpec(source_snapshot_op=True, positional=False),
       required=required,
       flag_name_overrides={'location': '',
                            'volume': ''},
@@ -401,11 +401,43 @@ def AddVolumeSourceSnapshotArg(parser):
   """Adds the --source-snapshot arg to the arg parser."""
   concept_parsers.ConceptParser.ForResource(
       '--source-snapshot',
-      flags.GetSnapshotResourceSpec(revert_op=True, positional=False),
+      flags.GetSnapshotResourceSpec(source_snapshot_op=True, positional=False),
       flag_name_overrides={'location': '',
                            'volume': ''},
       group_help='The source Snapshot to create the Volume from.').AddToParser(
           parser)
+
+
+def GetVolumeRestrictedActionsEnumFromArg(choice, messages):
+  """Returns the Choice Enum for Restricted Actions.
+
+  Args:
+      choice: The choice for restricted actions input as string.
+      messages: The messages module.
+
+  Returns:
+      the Restricted Actions enum.
+  """
+  return arg_utils.ChoiceToEnum(
+      choice=choice,
+      enum_type=messages.Volume.RestrictedActionsValueListEntryValuesEnum)
+
+
+def AddVolumeRestrictedActionsArg(parser):
+  """Adds the --restricted-actions arg to the arg parser."""
+  parser.add_argument(
+      '--restricted-actions',
+      type=arg_parsers.ArgList(min_length=1, element_type=str),
+      metavar='RESTRICTED_ACTION',
+      help="""Actions to be restricted for a volume.\
+Valid restricted action options are:
+          'DELETE'
+
+For more information, look at \
+https://cloud.google.com/netapp/volumes/docs/reference/rest/v1/projects.locations.volumes#restrictedaction.
+          """
+  )
+
 
 ## Helper functions to combine Volumes args / flags for gcloud commands #
 
@@ -434,6 +466,7 @@ def AddVolumeCreateArgs(parser, release_track):
   AddVolumeSnapshotDirectoryArg(parser)
   AddVolumeSecurityStyleArg(parser, messages)
   AddVolumeEnableKerberosArg(parser)
+  AddVolumeRestrictedActionsArg(parser)
   labels_util.AddCreateLabelsFlags(parser)
 
 
@@ -470,4 +503,5 @@ def AddVolumeUpdateArgs(parser, release_track):
   AddVolumeSnapshotDirectoryArg(parser)
   AddVolumeSecurityStyleArg(parser, messages)
   AddVolumeEnableKerberosArg(parser)
+  AddVolumeRestrictedActionsArg(parser)
   labels_util.AddUpdateLabelsFlags(parser)

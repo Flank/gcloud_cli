@@ -173,6 +173,12 @@ class CreateEnvironmentFlags:
     composer_internal_ipv4_cidr_block: str or None. The IP range in CIDR
       notation to use internally by Cloud Composer. Can be specified only in
       Composer 3.
+    enable_private_builds_only: bool or None, whether to enable the
+      support for private only builds.
+    disable_private_builds_only: bool or None, whether to disable the
+      support for private only builds.
+    storage_bucket: str or None. An existing Cloud Storage bucket to be used by
+      the environment.
   """
 
   # TODO(b/154131605): This a type that is an immutable data object. Can't use
@@ -180,79 +186,84 @@ class CreateEnvironmentFlags:
   # because it's not efficient on python 2 (it generates code, which needs
   # to be parsed and interpretted). Remove this code when we get support
   # for attrs or another dumb data object in gcloud.
-  def __init__(self,
-               node_count=None,
-               environment_size=None,
-               labels=None,
-               location=None,
-               machine_type=None,
-               network=None,
-               subnetwork=None,
-               network_attachment=None,
-               env_variables=None,
-               airflow_config_overrides=None,
-               service_account=None,
-               oauth_scopes=None,
-               tags=None,
-               disk_size_gb=None,
-               python_version=None,
-               image_version=None,
-               airflow_executor_type=None,
-               use_ip_aliases=None,
-               cluster_secondary_range_name=None,
-               services_secondary_range_name=None,
-               cluster_ipv4_cidr_block=None,
-               services_ipv4_cidr_block=None,
-               max_pods_per_node=None,
-               enable_ip_masq_agent=None,
-               private_environment=None,
-               private_endpoint=None,
-               master_ipv4_cidr=None,
-               privately_used_public_ips=None,
-               web_server_ipv4_cidr=None,
-               cloud_sql_ipv4_cidr=None,
-               composer_network_ipv4_cidr=None,
-               connection_subnetwork=None,
-               connection_type=None,
-               web_server_access_control=None,
-               cloud_sql_machine_type=None,
-               web_server_machine_type=None,
-               kms_key=None,
-               scheduler_cpu=None,
-               worker_cpu=None,
-               web_server_cpu=None,
-               scheduler_memory_gb=None,
-               worker_memory_gb=None,
-               web_server_memory_gb=None,
-               scheduler_storage_gb=None,
-               worker_storage_gb=None,
-               web_server_storage_gb=None,
-               min_workers=None,
-               max_workers=None,
-               scheduler_count=None,
-               maintenance_window_start=None,
-               maintenance_window_end=None,
-               maintenance_window_recurrence=None,
-               enable_master_authorized_networks=None,
-               master_authorized_networks=None,
-               airflow_database_retention_days=None,
-               release_track=base.ReleaseTrack.GA,
-               enable_triggerer=None,
-               triggerer_cpu=None,
-               triggerer_count=None,
-               triggerer_memory_gb=None,
-               enable_scheduled_snapshot_creation=None,
-               snapshot_creation_schedule=None,
-               snapshot_location=None,
-               snapshot_schedule_timezone=None,
-               enable_cloud_data_lineage_integration=None,
-               enable_high_resilience=None,
-               support_web_server_plugins=None,
-               dag_processor_cpu=None,
-               dag_processor_count=None,
-               dag_processor_memory_gb=None,
-               dag_processor_storage_gb=None,
-               composer_internal_ipv4_cidr_block=None):
+  def __init__(
+      self,
+      node_count=None,
+      environment_size=None,
+      labels=None,
+      location=None,
+      machine_type=None,
+      network=None,
+      subnetwork=None,
+      network_attachment=None,
+      env_variables=None,
+      airflow_config_overrides=None,
+      service_account=None,
+      oauth_scopes=None,
+      tags=None,
+      disk_size_gb=None,
+      python_version=None,
+      image_version=None,
+      airflow_executor_type=None,
+      use_ip_aliases=None,
+      cluster_secondary_range_name=None,
+      services_secondary_range_name=None,
+      cluster_ipv4_cidr_block=None,
+      services_ipv4_cidr_block=None,
+      max_pods_per_node=None,
+      enable_ip_masq_agent=None,
+      private_environment=None,
+      private_endpoint=None,
+      master_ipv4_cidr=None,
+      privately_used_public_ips=None,
+      web_server_ipv4_cidr=None,
+      cloud_sql_ipv4_cidr=None,
+      composer_network_ipv4_cidr=None,
+      connection_subnetwork=None,
+      connection_type=None,
+      web_server_access_control=None,
+      cloud_sql_machine_type=None,
+      web_server_machine_type=None,
+      kms_key=None,
+      scheduler_cpu=None,
+      worker_cpu=None,
+      web_server_cpu=None,
+      scheduler_memory_gb=None,
+      worker_memory_gb=None,
+      web_server_memory_gb=None,
+      scheduler_storage_gb=None,
+      worker_storage_gb=None,
+      web_server_storage_gb=None,
+      min_workers=None,
+      max_workers=None,
+      scheduler_count=None,
+      maintenance_window_start=None,
+      maintenance_window_end=None,
+      maintenance_window_recurrence=None,
+      enable_master_authorized_networks=None,
+      master_authorized_networks=None,
+      airflow_database_retention_days=None,
+      release_track=base.ReleaseTrack.GA,
+      enable_triggerer=None,
+      triggerer_cpu=None,
+      triggerer_count=None,
+      triggerer_memory_gb=None,
+      enable_scheduled_snapshot_creation=None,
+      snapshot_creation_schedule=None,
+      snapshot_location=None,
+      snapshot_schedule_timezone=None,
+      enable_cloud_data_lineage_integration=None,
+      enable_high_resilience=None,
+      support_web_server_plugins=None,
+      dag_processor_cpu=None,
+      dag_processor_count=None,
+      dag_processor_memory_gb=None,
+      dag_processor_storage_gb=None,
+      composer_internal_ipv4_cidr_block=None,
+      enable_private_builds_only=None,
+      disable_private_builds_only=None,
+      storage_bucket=None,
+  ):
     self.node_count = node_count
     self.environment_size = environment_size
     self.labels = labels
@@ -327,6 +338,9 @@ class CreateEnvironmentFlags:
     self.dag_processor_memory_gb = dag_processor_memory_gb
     self.dag_processor_count = dag_processor_count
     self.composer_internal_ipv4_cidr_block = composer_internal_ipv4_cidr_block
+    self.enable_private_builds_only = enable_private_builds_only
+    self.disable_private_builds_only = disable_private_builds_only
+    self.storage_bucket = storage_bucket
 
 
 def _CreateNodeConfig(messages, flags):
@@ -473,7 +487,11 @@ def _CreateConfig(messages, flags, is_composer_v1):
             snapshotLocation=flags.snapshot_location,
             timeZone=flags.snapshot_schedule_timezone))
 
-  if flags.private_environment:
+  if (
+      flags.private_environment
+      or flags.enable_private_builds_only
+      or flags.disable_private_builds_only
+  ):
     # Adds a PrivateClusterConfig, if necessary.
     private_cluster_config = None
     networking_config = None
@@ -515,6 +533,10 @@ def _CreateConfig(messages, flags, is_composer_v1):
     if flags.connection_subnetwork is not None:
       private_env_config_args[
           'cloudComposerConnectionSubnetwork'] = flags.connection_subnetwork
+    if flags.enable_private_builds_only or flags.disable_private_builds_only:
+      private_env_config_args['enablePrivateBuildsOnly'] = (
+          True if flags.enable_private_builds_only else False
+      )
     config.privateEnvironmentConfig = messages.PrivateEnvironmentConfig(
         **private_env_config_args)
 
@@ -637,6 +659,11 @@ def Create(environment_ref, flags, is_composer_v1):
   if flags.labels:
     environment.labels = api_util.DictToMessage(
         flags.labels, messages.Environment.LabelsValue)
+
+  if flags.storage_bucket:
+    environment.storageConfig = messages.StorageConfig(
+        bucket=flags.storage_bucket
+    )
 
   try:
     return GetService(release_track=flags.release_track).Create(

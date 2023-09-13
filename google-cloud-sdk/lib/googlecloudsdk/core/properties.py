@@ -100,6 +100,16 @@ _PUBSUB_NOTICE_URL = (
 )
 
 
+def _DefaultToFastUpdate():
+  # TODO(b/153353954): Roll this out everywhere; limited to internal users
+  # initially.
+  return (
+      (encoding.GetEncodedValue(os.environ,
+                                'CLOUDSDK_INTERNAL_USER_FAST_UPDATE') == 'true')
+      or config.INSTALLATION_CONFIG.IsAlternateReleaseChannel()
+  )
+
+
 def Stringize(value):
   if isinstance(value, six.string_types):
     return value
@@ -1316,7 +1326,6 @@ class _SectionApiEndpointOverrides(_Section):
         'storageinsights', command='gcloud storage insights', hidden=True)
     self.stream = self._Add('stream', hidden=True)
     self.telcoautomation = self._Add('telcoautomation', hidden=True)
-    self.telecomdatafabric = self._Add('telecomdatafabric', hidden=True)
     self.testing = self._Add('testing', command='gcloud firebase test')
     self.toolresults = self._Add('toolresults', hidden=True)
     self.tpu = self._Add('tpu', hidden=True)
@@ -2536,7 +2545,7 @@ class _SectionExperimental(_Section):
     super(_SectionExperimental, self).__init__('experimental', hidden=True)
     self.fast_component_update = self._AddBool(
         'fast_component_update',
-        callbacks=[config.INSTALLATION_CONFIG.IsAlternateReleaseChannel])
+        callbacks=[_DefaultToFastUpdate])
 
 
 class _SectionFilestore(_Section):
@@ -3426,6 +3435,33 @@ class _SectionStorage(_Section):
         help_text='The number of threads parallel execution should use per '
         'process. When process_count and thread_count are both 1, commands use '
         'sequential execution.')
+
+    self.parallel_composite_upload_component_prefix = self._Add(
+        'parallel_composite_upload_component_prefix',
+        default=(
+            '/gcloud/tmp/parallel_composite_uploads/'
+            'see_gcloud_storage_cp_help_for_details/'
+        ),
+        hidden=True,
+        help_text=(
+            'The prefix used when naming temporary components created by'
+            ' composite uploads. If the prefix begins with a `/`, the temporary'
+            ' components are uploaded relative to the bucket name. If the'
+            ' prefix does not begin with a `/`, the temporary components are'
+            ' uploaded relative to the prefix portion of the destination object'
+            ' name. For example, consider an upload that will create a final'
+            ' object named `gs://bucket/dir1/dir2/object`. Using a prefix of'
+            ' `/prefix` means temporary components use names like'
+            ' `gs://bucket/prefix/COMPONENT_NAME`. Using a prefix of `prefix`'
+            ' means temporary components use names like'
+            ' `gs://bucket/dir1/dir2/prefix/COMPONENT_NAME`. If this property'
+            ' is not specified, gcloud storage uses the prefix'
+            ' `/gcloud/tmp/parallel_composite_uploads/see_gcloud_storage_cp_help_for_details/`.'
+            ' If a chosen prefix results in temporary component names longer'
+            ' than the maximum length Cloud Storage allows, gcloud storage'
+            ' performs a non-composite upload.'
+        ),
+    )
 
     self.parallel_composite_upload_component_size = self._Add(
         'parallel_composite_upload_component_size',

@@ -827,8 +827,6 @@ apis:
           path: projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/vulnerabilityReport
         projects.locations.instances.inventories:
           path: projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/inventory
-    v1alpha2:
-      discovery_doc: osconfig_v1alpha2.json
     v1beta:
       discovery_doc: osconfig_v1beta.json
     v1:
@@ -927,10 +925,6 @@ apis:
     v1:
       discovery_doc: managedidentities_v1.json
       default: true
-  managedkafka:
-    v1alpha:
-      discovery_doc: managedkafka_v1alpha.json
-      default: true
   logging:
     v2:
       discovery_doc: logging_v2.json
@@ -1004,6 +998,8 @@ apis:
     v1alpha1:
       discovery_doc: networkconnectivity_v1alpha1.json
       default: true
+    v1beta:
+      discovery_doc: networkconnectivity_v1beta.json
     v1:
       discovery_doc: networkconnectivity_v1.json
   networkmanagement:
@@ -1090,6 +1086,12 @@ apis:
         iam:
           path: iam
       discovery_doc: policytroubleshooter_v3beta.json
+    v3:
+      enable_mtls: false
+      resources:
+        iam:
+          path: iam
+      discovery_doc: policytroubleshooter_v3.json
   policyanalyzer:
     v1:
       discovery_doc: policyanalyzer_v1.json
@@ -1517,10 +1519,6 @@ apis:
     v1alpha1:
       discovery_doc: telcoautomation_v1alpha1.json
       default: true
-  telecomdatafabric:
-    v1alpha:
-      discovery_doc: telecomdatafabric_v1alpha.json
-      default: true
   workloadcertificate:
     v1alpha1:
       discovery_doc: workloadcertificate_v1alpha1.json
@@ -1815,9 +1813,6 @@ canonical_surfaces:
   managedidentities:
     name: managedidentities
     command: active-directory
-  managedkafka:
-    name: managedkafka
-    command: managed-kafka
   manager:
     name: manager
     hidden: true

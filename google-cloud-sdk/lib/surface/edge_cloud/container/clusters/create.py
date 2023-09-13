@@ -28,7 +28,6 @@ from googlecloudsdk.command_lib.edge_cloud.container import resource_args
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
-from googlecloudsdk.core.console import console_io
 
 _EXAMPLES = """
 To create a cluster called `my-cluster` in region us-central1,
@@ -71,23 +70,19 @@ class Create(base.CreateCommand):
     container_flags.AddMaintenanceWindowStart(parser)
     container_flags.AddControlPlaneKMSKey(parser)
     container_flags.AddLROMaximumTimeout(parser)
+    container_flags.AddSystemAddonsConfig(parser)
+    container_flags.AddExternalLbIpv4AddressPools(parser)
+    container_flags.AddControlPlaneNodeLocation(parser)
+    container_flags.AddControlPlaneNodeCount(parser)
+    container_flags.AddControlPlaneMachineFilter(parser)
+    container_flags.AddControlPlaneSharedDeploymentPolicy(parser)
+    container_flags.AddReleaseChannel(parser)
+    container_flags.AddVersion(parser)
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
     cluster_ref = cluster.GetClusterReference(args)
     req = cluster.GetClusterCreateRequest(args, self.ReleaseTrack())
-    if cluster.IsLCPCluster(args):
-      console_io.PromptContinue(
-          message=(
-              'Warning: You must create local control plane clusters in their'
-              ' own project. Local control plane clusters cannot coexist in the'
-              ' same project with any other type of clusters, including'
-              ' non-GDCE clusters. Mixing local control plane GDCE clusters'
-              ' with any other type of clusters in the same project can result'
-              ' in data loss.'
-          ),
-          cancel_on_no=True,
-      )
     cluster_client = util.GetClientInstance(self.ReleaseTrack())
     op = cluster_client.projects_locations_clusters.Create(req)
     op_ref = resources.REGISTRY.ParseRelativeName(
@@ -146,11 +141,4 @@ class CreateAlpha(Create):
     Create.Args(parser)
     container_flags.AddClusterIPV6CIDR(parser)
     container_flags.AddServicesIPV6CIDR(parser)
-    container_flags.AddSystemAddonsConfig(parser)
-    container_flags.AddExternalLbIpv4AddressPools(parser)
-    container_flags.AddControlPlaneNodeLocation(parser)
-    container_flags.AddControlPlaneNodeCount(parser)
-    container_flags.AddControlPlaneMachineFilter(parser)
-    container_flags.AddControlPlaneSharedDeploymentPolicy(parser)
-    container_flags.AddReleaseChannel(parser)
-    container_flags.AddVersion(parser)
+
