@@ -28,11 +28,11 @@
       }
     }
   ],
-  "revision": 20230908131923,
+  "revision": 20230915145114,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "446.0.0"
+  "version": "447.0.0"
 }
