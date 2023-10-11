@@ -143,6 +143,9 @@ lib/googlecloudsdk/api_lib/auth/refresh_token.py
 lib/googlecloudsdk/api_lib/auth/service_account.py
 lib/googlecloudsdk/api_lib/auth/util.py
 lib/googlecloudsdk/api_lib/authz_toolkit/__init__.py
+lib/googlecloudsdk/api_lib/backupdr/__init__.py
+lib/googlecloudsdk/api_lib/backupdr/management_servers.py
+lib/googlecloudsdk/api_lib/backupdr/util.py
 lib/googlecloudsdk/api_lib/batch/__init__.py
 lib/googlecloudsdk/api_lib/batch/jobs.py
 lib/googlecloudsdk/api_lib/batch/tasks.py
@@ -508,6 +511,7 @@ lib/googlecloudsdk/api_lib/edge/util.py
 lib/googlecloudsdk/api_lib/edge_cloud/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/container/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/container/cluster.py
+lib/googlecloudsdk/api_lib/edge_cloud/container/nodepool.py
 lib/googlecloudsdk/api_lib/edge_cloud/container/util.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/__init__.py
 lib/googlecloudsdk/api_lib/edge_cloud/networking/interconnects/__init__.py
@@ -1203,6 +1207,7 @@ lib/googlecloudsdk/command_lib/authz_toolkit/__init__.py
 lib/googlecloudsdk/command_lib/authz_toolkit/hooks.py
 lib/googlecloudsdk/command_lib/authz_toolkit/resources.yaml
 lib/googlecloudsdk/command_lib/backupdr/__init__.py
+lib/googlecloudsdk/command_lib/backupdr/flags.py
 lib/googlecloudsdk/command_lib/backupdr/resources.yaml
 lib/googlecloudsdk/command_lib/backupdr/util.py
 lib/googlecloudsdk/command_lib/batch/__init__.py
@@ -1656,9 +1661,11 @@ lib/googlecloudsdk/command_lib/container/fleet/features/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/features/base.py
 lib/googlecloudsdk/command_lib/container/fleet/features/info.py
 lib/googlecloudsdk/command_lib/container/fleet/flags.py
+lib/googlecloudsdk/command_lib/container/fleet/format_util.py
 lib/googlecloudsdk/command_lib/container/fleet/gwkubeconfig_util.py
 lib/googlecloudsdk/command_lib/container/fleet/identity_service/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/identity_service/utils.py
+lib/googlecloudsdk/command_lib/container/fleet/invalid_args_error.py
 lib/googlecloudsdk/command_lib/container/fleet/kube_util.py
 lib/googlecloudsdk/command_lib/container/fleet/memberships/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/memberships/errors.py
@@ -2516,6 +2523,7 @@ lib/googlecloudsdk/command_lib/scc/findings/flags.yaml
 lib/googlecloudsdk/command_lib/scc/findings/request_hooks.py
 lib/googlecloudsdk/command_lib/scc/findings/resource_hooks.py
 lib/googlecloudsdk/command_lib/scc/findings/response_hooks.py
+lib/googlecloudsdk/command_lib/scc/findings/util.py
 lib/googlecloudsdk/command_lib/scc/flags.py
 lib/googlecloudsdk/command_lib/scc/flags.yaml
 lib/googlecloudsdk/command_lib/scc/hooks.py
@@ -2524,6 +2532,7 @@ lib/googlecloudsdk/command_lib/scc/muteconfigs/flags.yaml
 lib/googlecloudsdk/command_lib/scc/muteconfigs/request_hooks.py
 lib/googlecloudsdk/command_lib/scc/notifications/__init__.py
 lib/googlecloudsdk/command_lib/scc/notifications/flags.yaml
+lib/googlecloudsdk/command_lib/scc/notifications/notification_util.py
 lib/googlecloudsdk/command_lib/scc/notifications/request_hooks.py
 lib/googlecloudsdk/command_lib/scc/resources.yaml
 lib/googlecloudsdk/command_lib/scc/settings/__init__.py
@@ -2606,6 +2615,7 @@ lib/googlecloudsdk/command_lib/storage/errors_util.py
 lib/googlecloudsdk/command_lib/storage/expansion.py
 lib/googlecloudsdk/command_lib/storage/fast_crc32c_util.py
 lib/googlecloudsdk/command_lib/storage/flags.py
+lib/googlecloudsdk/command_lib/storage/folder_util.py
 lib/googlecloudsdk/command_lib/storage/gzip_util.py
 lib/googlecloudsdk/command_lib/storage/hash_util.py
 lib/googlecloudsdk/command_lib/storage/iam_command_util.py
@@ -2620,6 +2630,7 @@ lib/googlecloudsdk/command_lib/storage/name_expansion.py
 lib/googlecloudsdk/command_lib/storage/notification_configuration_iterator.py
 lib/googlecloudsdk/command_lib/storage/operations_util.py
 lib/googlecloudsdk/command_lib/storage/optimize_parameters_util.py
+lib/googlecloudsdk/command_lib/storage/path_util.py
 lib/googlecloudsdk/command_lib/storage/paths.py
 lib/googlecloudsdk/command_lib/storage/plurality_checkable_iterator.py
 lib/googlecloudsdk/command_lib/storage/posix_util.py
@@ -2637,6 +2648,7 @@ lib/googlecloudsdk/command_lib/storage/resources/resource_util.py
 lib/googlecloudsdk/command_lib/storage/resources/resources.yaml
 lib/googlecloudsdk/command_lib/storage/resources/s3_resource_reference.py
 lib/googlecloudsdk/command_lib/storage/resources/shim_format_util.py
+lib/googlecloudsdk/command_lib/storage/rm_command_util.py
 lib/googlecloudsdk/command_lib/storage/rsync_command_util.py
 lib/googlecloudsdk/command_lib/storage/sign_url_util.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
@@ -2660,6 +2672,7 @@ lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_task_factory.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_task_iterator.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/copy_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/daisy_chain_copy_task.py
+lib/googlecloudsdk/command_lib/storage/tasks/cp/delete_managed_folder_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/delete_temporary_components_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/download_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/cp/file_download_task.py
@@ -2698,7 +2711,6 @@ lib/googlecloudsdk/command_lib/storage/thread_messages.py
 lib/googlecloudsdk/command_lib/storage/tracker_file_util.py
 lib/googlecloudsdk/command_lib/storage/upload_stream.py
 lib/googlecloudsdk/command_lib/storage/user_request_args_factory.py
-lib/googlecloudsdk/command_lib/storage/util.py
 lib/googlecloudsdk/command_lib/storage/wildcard_iterator.py
 lib/googlecloudsdk/command_lib/survey/__init__.py
 lib/googlecloudsdk/command_lib/survey/contents/GeneralSurvey.yaml
@@ -6099,8 +6111,12 @@ lib/surface/backup_dr/__init__.py
 lib/surface/backup_dr/locations/__init__.py
 lib/surface/backup_dr/locations/list.yaml
 lib/surface/backup_dr/management_servers/__init__.py
+lib/surface/backup_dr/management_servers/create.py
+lib/surface/backup_dr/management_servers/delete.py
+lib/surface/backup_dr/management_servers/describe.yaml
 lib/surface/backup_dr/management_servers/list.yaml
 lib/surface/backup_dr/operations/__init__.py
+lib/surface/backup_dr/operations/describe.yaml
 lib/surface/backup_dr/operations/list.yaml
 lib/surface/batch/__init__.py
 lib/surface/batch/jobs/__init__.py
@@ -6354,6 +6370,7 @@ lib/surface/builds/cancel.py
 lib/surface/builds/connections/__init__.py
 lib/surface/builds/connections/add_iam_policy_binding.yaml
 lib/surface/builds/connections/create/__init__.py
+lib/surface/builds/connections/create/bitbucket_data_center.yaml
 lib/surface/builds/connections/create/github.yaml
 lib/surface/builds/connections/create/github_enterprise.yaml
 lib/surface/builds/connections/create/gitlab.yaml
@@ -6363,6 +6380,7 @@ lib/surface/builds/connections/get_iam_policy.yaml
 lib/surface/builds/connections/list.yaml
 lib/surface/builds/connections/set_iam_policy.yaml
 lib/surface/builds/connections/update/__init__.py
+lib/surface/builds/connections/update/bitbucket_data_center.yaml
 lib/surface/builds/connections/update/github.yaml
 lib/surface/builds/connections/update/github_enterprise.yaml
 lib/surface/builds/connections/update/gitlab.yaml
@@ -8688,11 +8706,11 @@ lib/surface/edge_cloud/container/clusters/describe.yaml
 lib/surface/edge_cloud/container/clusters/get_credentials.py
 lib/surface/edge_cloud/container/clusters/list.yaml
 lib/surface/edge_cloud/container/clusters/node_pools/__init__.py
-lib/surface/edge_cloud/container/clusters/node_pools/create.yaml
+lib/surface/edge_cloud/container/clusters/node_pools/create.py
 lib/surface/edge_cloud/container/clusters/node_pools/delete.yaml
 lib/surface/edge_cloud/container/clusters/node_pools/describe.yaml
 lib/surface/edge_cloud/container/clusters/node_pools/list.yaml
-lib/surface/edge_cloud/container/clusters/node_pools/update.yaml
+lib/surface/edge_cloud/container/clusters/node_pools/update.py
 lib/surface/edge_cloud/container/clusters/print_access_token.py
 lib/surface/edge_cloud/container/clusters/update.yaml
 lib/surface/edge_cloud/container/clusters/upgrade.py
@@ -9252,7 +9270,7 @@ lib/surface/iam/workload_identity_pools/delete.yaml
 lib/surface/iam/workload_identity_pools/describe.yaml
 lib/surface/iam/workload_identity_pools/list.yaml
 lib/surface/iam/workload_identity_pools/managed_identities/__init__.py
-lib/surface/iam/workload_identity_pools/managed_identities/create.py
+lib/surface/iam/workload_identity_pools/managed_identities/create.yaml
 lib/surface/iam/workload_identity_pools/managed_identities/delete.yaml
 lib/surface/iam/workload_identity_pools/managed_identities/describe.yaml
 lib/surface/iam/workload_identity_pools/managed_identities/list.yaml
@@ -9269,7 +9287,7 @@ lib/surface/iam/workload_identity_pools/managed_identities/workload_sources/oper
 lib/surface/iam/workload_identity_pools/managed_identities/workload_sources/operations/describe.yaml
 lib/surface/iam/workload_identity_pools/managed_identities/workload_sources/update.py
 lib/surface/iam/workload_identity_pools/namespaces/__init__.py
-lib/surface/iam/workload_identity_pools/namespaces/create.py
+lib/surface/iam/workload_identity_pools/namespaces/create.yaml
 lib/surface/iam/workload_identity_pools/namespaces/delete.yaml
 lib/surface/iam/workload_identity_pools/namespaces/describe.yaml
 lib/surface/iam/workload_identity_pools/namespaces/list.yaml
@@ -10111,6 +10129,11 @@ lib/surface/network_connectivity/policy_based_routes/create.yaml
 lib/surface/network_connectivity/policy_based_routes/delete.yaml
 lib/surface/network_connectivity/policy_based_routes/describe.yaml
 lib/surface/network_connectivity/policy_based_routes/list.yaml
+lib/surface/network_connectivity/regional_endpoints/__init__.py
+lib/surface/network_connectivity/regional_endpoints/create.yaml
+lib/surface/network_connectivity/regional_endpoints/delete.yaml
+lib/surface/network_connectivity/regional_endpoints/describe.yaml
+lib/surface/network_connectivity/regional_endpoints/list.yaml
 lib/surface/network_connectivity/service_connection_policies/__init__.py
 lib/surface/network_connectivity/service_connection_policies/create.yaml
 lib/surface/network_connectivity/service_connection_policies/delete.yaml
@@ -10887,9 +10910,9 @@ lib/surface/scc/custom_modules/sha/list_effective.yaml
 lib/surface/scc/custom_modules/sha/test.yaml
 lib/surface/scc/custom_modules/sha/update.yaml
 lib/surface/scc/findings/__init__.py
-lib/surface/scc/findings/bulk_mute.yaml
-lib/surface/scc/findings/create.yaml
-lib/surface/scc/findings/group.yaml
+lib/surface/scc/findings/bulk_mute.py
+lib/surface/scc/findings/create.py
+lib/surface/scc/findings/group.py
 lib/surface/scc/findings/list.py
 lib/surface/scc/findings/list_marks.yaml
 lib/surface/scc/findings/set_mute.yaml
@@ -10904,7 +10927,7 @@ lib/surface/scc/muteconfigs/update.yaml
 lib/surface/scc/notifications/__init__.py
 lib/surface/scc/notifications/create.yaml
 lib/surface/scc/notifications/delete.yaml
-lib/surface/scc/notifications/describe.yaml
+lib/surface/scc/notifications/describe.py
 lib/surface/scc/notifications/list.yaml
 lib/surface/scc/notifications/update.yaml
 lib/surface/scc/operations/__init__.py
@@ -11332,6 +11355,15 @@ lib/surface/storage/insights/inventory_reports/list.py
 lib/surface/storage/insights/inventory_reports/update.py
 lib/surface/storage/list.py
 lib/surface/storage/ls.py
+lib/surface/storage/managed_folders/__init__.py
+lib/surface/storage/managed_folders/add_iam_policy_binding.py
+lib/surface/storage/managed_folders/create.py
+lib/surface/storage/managed_folders/delete.py
+lib/surface/storage/managed_folders/describe.py
+lib/surface/storage/managed_folders/get_iam_policy.py
+lib/surface/storage/managed_folders/list.py
+lib/surface/storage/managed_folders/remove_iam_policy_binding.py
+lib/surface/storage/managed_folders/set_iam_policy.py
 lib/surface/storage/mv.py
 lib/surface/storage/objects/__init__.py
 lib/surface/storage/objects/add_iam_policy_binding.py
