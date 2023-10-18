@@ -85,7 +85,6 @@ lib/googlecloudsdk/api_lib/app/api/appengine_domains_api_client.py
 lib/googlecloudsdk/api_lib/app/api/appengine_firewall_api_client.py
 lib/googlecloudsdk/api_lib/app/api/appengine_ssl_api_client.py
 lib/googlecloudsdk/api_lib/app/appengine_api_client.py
-lib/googlecloudsdk/api_lib/app/appengine_client.py
 lib/googlecloudsdk/api_lib/app/build.py
 lib/googlecloudsdk/api_lib/app/cloud_build.py
 lib/googlecloudsdk/api_lib/app/deploy_app_command_util.py
@@ -853,6 +852,7 @@ lib/googlecloudsdk/api_lib/secrets/__init__.py
 lib/googlecloudsdk/api_lib/secrets/api.py
 lib/googlecloudsdk/api_lib/securesourcemanager/__init__.py
 lib/googlecloudsdk/api_lib/securesourcemanager/instances.py
+lib/googlecloudsdk/api_lib/securesourcemanager/repositories.py
 lib/googlecloudsdk/api_lib/service_directory/__init__.py
 lib/googlecloudsdk/api_lib/service_directory/base.py
 lib/googlecloudsdk/api_lib/service_directory/endpoints.py
@@ -1683,6 +1683,8 @@ lib/googlecloudsdk/command_lib/container/fleet/policycontroller/flags.py
 lib/googlecloudsdk/command_lib/container/fleet/rbac_util.py
 lib/googlecloudsdk/command_lib/container/fleet/resources.py
 lib/googlecloudsdk/command_lib/container/fleet/resources.yaml
+lib/googlecloudsdk/command_lib/container/fleet/rollouts/__init__.py
+lib/googlecloudsdk/command_lib/container/fleet/rollouts/flags.py
 lib/googlecloudsdk/command_lib/container/fleet/scopes/__init__.py
 lib/googlecloudsdk/command_lib/container/fleet/scopes/errors.py
 lib/googlecloudsdk/command_lib/container/fleet/scopes/rollout_sequencing/__init__.py
@@ -4283,6 +4285,11 @@ lib/googlecloudsdk/generated_clients/apis/securitycenter/v1/securitycenter_v1_me
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/__init__.py
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/securitycenter_v1beta2_client.py
 lib/googlecloudsdk/generated_clients/apis/securitycenter/v1beta2/securitycenter_v1beta2_messages.py
+lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/resources.py
+lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/securitycentermanagement_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/securitycentermanagement_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/__init__.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/__init__.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/resources.py
@@ -5553,6 +5560,8 @@ lib/surface/access_context_manager/policies/delete.yaml
 lib/surface/access_context_manager/policies/describe.yaml
 lib/surface/access_context_manager/policies/get_iam_policy.yaml
 lib/surface/access_context_manager/policies/list.yaml
+lib/surface/access_context_manager/policies/quotas/__init__.py
+lib/surface/access_context_manager/policies/quotas/list.py
 lib/surface/access_context_manager/policies/remove_iam_policy_binding.yaml
 lib/surface/access_context_manager/policies/set_iam_policy.yaml
 lib/surface/access_context_manager/policies/update.py
@@ -6983,6 +6992,7 @@ lib/surface/compute/network_attachments/create.py
 lib/surface/compute/network_attachments/delete.py
 lib/surface/compute/network_attachments/describe.py
 lib/surface/compute/network_attachments/list.py
+lib/surface/compute/network_attachments/update.py
 lib/surface/compute/network_edge_security_services/__init__.py
 lib/surface/compute/network_edge_security_services/create.py
 lib/surface/compute/network_edge_security_services/delete.py
@@ -7874,6 +7884,8 @@ lib/surface/container/fleet/policycontroller/update.py
 lib/surface/container/fleet/policycontroller/violations/__init__.py
 lib/surface/container/fleet/policycontroller/violations/describe.py
 lib/surface/container/fleet/policycontroller/violations/list.py
+lib/surface/container/fleet/rollouts/__init__.py
+lib/surface/container/fleet/rollouts/create.py
 lib/surface/container/fleet/scopes/__init__.py
 lib/surface/container/fleet/scopes/add_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/create.yaml
@@ -10914,7 +10926,7 @@ lib/surface/scc/findings/bulk_mute.py
 lib/surface/scc/findings/create.py
 lib/surface/scc/findings/group.py
 lib/surface/scc/findings/list.py
-lib/surface/scc/findings/list_marks.yaml
+lib/surface/scc/findings/list_marks.py
 lib/surface/scc/findings/set_mute.yaml
 lib/surface/scc/findings/update.yaml
 lib/surface/scc/findings/update_marks.yaml
@@ -10928,7 +10940,7 @@ lib/surface/scc/notifications/__init__.py
 lib/surface/scc/notifications/create.yaml
 lib/surface/scc/notifications/delete.yaml
 lib/surface/scc/notifications/describe.py
-lib/surface/scc/notifications/list.yaml
+lib/surface/scc/notifications/list.py
 lib/surface/scc/notifications/update.yaml
 lib/surface/scc/operations/__init__.py
 lib/surface/scc/operations/describe.yaml
@@ -11158,6 +11170,8 @@ lib/surface/source_manager/locations/list.yaml
 lib/surface/source_manager/operations/__init__.py
 lib/surface/source_manager/operations/describe.yaml
 lib/surface/source_manager/operations/list.yaml
+lib/surface/source_manager/repos/__init__.py
+lib/surface/source_manager/repos/create.py
 lib/surface/spanner/__init__.py
 lib/surface/spanner/backups/__init__.py
 lib/surface/spanner/backups/add_iam_policy_binding.yaml
