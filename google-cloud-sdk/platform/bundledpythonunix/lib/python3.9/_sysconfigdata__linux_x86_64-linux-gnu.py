@@ -13,7 +13,8 @@ build_time_vars = {'ABIFLAGS': '',
  'BINDIR': '/install/bin',
  'BINLIBDEST': '/install/lib/python3.9',
  'BLDLIBRARY': '-L. -lpython3.9',
- 'BLDSHARED': 'clang -pthread -shared -L/tools/deps/lib',
+ 'BLDSHARED': 'clang -pthread -shared -L/tools/deps/lib -Wl,--exclude-libs,ALL '
+              '-L/tools/deps/libedit/lib',
  'BUILDEXE': '',
  'BUILDPYTHON': 'python',
  'BUILD_GNU_TYPE': 'x86_64-unknown-linux-gnu',
@@ -22,41 +23,47 @@ build_time_vars = {'ABIFLAGS': '',
  'CCSHARED': '-fPIC',
  'CFLAGS': '-Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -g '
            '-fwrapv -O3 -Wall -fPIC -I/tools/deps/include '
-           '-I/tools/deps/include/ncursesw',
+           '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
  'CFLAGSFORSHARED': '-fPIC',
  'CFLAGS_ALIASING': '-fno-strict-aliasing',
  'CFLAGS_NODIST': '',
  'CONFIGFILES': 'configure configure.ac acconfig.h pyconfig.h.in '
                 'Makefile.pre.in',
  'CONFIGURE_CFLAGS': '-fPIC -I/tools/deps/include '
-                     '-I/tools/deps/include/ncursesw',
+                     '-I/tools/deps/include/ncursesw '
+                     '-I/tools/deps/libedit/include',
  'CONFIGURE_CFLAGS_NODIST': '-std=c99 -Wextra -Wno-unused-result '
                             '-Wno-unused-parameter '
                             '-Wno-missing-field-initializers '
-                            '-Wstrict-prototypes '
                             '-Werror=implicit-function-declaration '
                             '-fvisibility=hidden',
  'CONFIGURE_CPPFLAGS': '-fPIC -I/tools/deps/include '
-                       '-I/tools/deps/include/ncursesw',
- 'CONFIGURE_LDFLAGS': '-L/tools/deps/lib',
+                       '-I/tools/deps/include/ncursesw '
+                       '-I/tools/deps/libedit/include',
+ 'CONFIGURE_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
+                      '-L/tools/deps/libedit/lib',
  'CONFIGURE_LDFLAGS_NODIST': '',
  'CONFIG_ARGS': "'--build=x86_64-unknown-linux-gnu' "
                 "'--host=x86_64-unknown-linux-gnu' '--prefix=/install' "
-                "'--with-openssl=/tools/deps' '--without-ensurepip' "
-                "'--enable-shared' 'build_alias=x86_64-unknown-linux-gnu' "
+                "'--with-openssl=/tools/deps' '--with-system-expat' "
+                "'--with-system-libmpdec' '--without-ensurepip' "
+                "'--enable-shared' '--with-dbmliborder=bdb' "
+                "'build_alias=x86_64-unknown-linux-gnu' "
                 "'host_alias=x86_64-unknown-linux-gnu' 'CC=clang' 'CFLAGS= "
-                "-fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw' "
-                "'LDFLAGS= -L/tools/deps/lib' 'CPPFLAGS= -fPIC "
-                "-I/tools/deps/include -I/tools/deps/include/ncursesw'",
+                '-fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw '
+                "-I/tools/deps/libedit/include' 'LDFLAGS= -L/tools/deps/lib "
+                "-Wl,--exclude-libs,ALL -L/tools/deps/libedit/lib' 'CPPFLAGS= "
+                '-fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw '
+                "-I/tools/deps/libedit/include'",
  'CONFINCLUDEDIR': '/install/include',
  'CONFINCLUDEPY': '/install/include/python3.9',
  'COREPYTHONPATH': '',
- 'COVERAGE_INFO': '/build/Python-3.9.16/coverage.info',
- 'COVERAGE_REPORT': '/build/Python-3.9.16/lcov-report',
+ 'COVERAGE_INFO': '/build/Python-3.9.17/coverage.info',
+ 'COVERAGE_REPORT': '/build/Python-3.9.17/lcov-report',
  'COVERAGE_REPORT_OPTIONS': '--no-branch-coverage --title "CPython lcov '
                             'report"',
  'CPPFLAGS': '-I. -I./Include -fPIC -I/tools/deps/include '
-             '-I/tools/deps/include/ncursesw',
+             '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
  'CXX': 'clang++ -pthread',
  'DESTDIRS': '/install /install/lib /install/lib/python3.9 '
              '/install/lib/python3.9/lib-dynload',
@@ -275,7 +282,7 @@ build_time_vars = {'ABIFLAGS': '',
  'HAVE_LIBDLD': 0,
  'HAVE_LIBIEEE': 0,
  'HAVE_LIBINTL_H': 1,
- 'HAVE_LIBREADLINE': 1,
+ 'HAVE_LIBREADLINE': 0,
  'HAVE_LIBRESOLV': 0,
  'HAVE_LIBSENDFILE': 0,
  'HAVE_LIBUTIL_H': 0,
@@ -356,14 +363,14 @@ build_time_vars = {'ABIFLAGS': '',
  'HAVE_READV': 1,
  'HAVE_REALPATH': 1,
  'HAVE_RENAMEAT': 1,
- 'HAVE_RL_APPEND_HISTORY': 1,
+ 'HAVE_RL_APPEND_HISTORY': 0,
  'HAVE_RL_CATCH_SIGNAL': 1,
  'HAVE_RL_COMPLETION_APPEND_CHARACTER': 1,
- 'HAVE_RL_COMPLETION_DISPLAY_MATCHES_HOOK': 1,
- 'HAVE_RL_COMPLETION_MATCHES': 1,
+ 'HAVE_RL_COMPLETION_DISPLAY_MATCHES_HOOK': 0,
+ 'HAVE_RL_COMPLETION_MATCHES': 0,
  'HAVE_RL_COMPLETION_SUPPRESS_APPEND': 1,
- 'HAVE_RL_PRE_INPUT_HOOK': 1,
- 'HAVE_RL_RESIZE_TERMINAL': 1,
+ 'HAVE_RL_PRE_INPUT_HOOK': 0,
+ 'HAVE_RL_RESIZE_TERMINAL': 0,
  'HAVE_ROUND': 1,
  'HAVE_RTPSPAWN': 0,
  'HAVE_SCHED_GET_PRIORITY_MAX': 1,
@@ -539,11 +546,13 @@ build_time_vars = {'ABIFLAGS': '',
  'IO_H': 'Modules/_io/_iomodule.h',
  'IO_OBJS': '\\',
  'LDCXXSHARED': 'clang++ -pthread -shared',
- 'LDFLAGS': '-L/tools/deps/lib',
+ 'LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
+            '-L/tools/deps/libedit/lib',
  'LDFLAGS_NODIST': '',
  'LDLIBRARY': 'libpython3.9.so',
  'LDLIBRARYDIR': '',
- 'LDSHARED': 'clang -pthread -shared -L/tools/deps/lib',
+ 'LDSHARED': 'clang -pthread -shared -L/tools/deps/lib -Wl,--exclude-libs,ALL '
+             '-L/tools/deps/libedit/lib',
  'LDVERSION': '3.9',
  'LIBC': '',
  'LIBDEST': '/install/lib/python3.9',
@@ -566,17 +575,14 @@ build_time_vars = {'ABIFLAGS': '',
  'LIPO_INTEL64_FLAGS': '',
  'LLVM_PROF_ERR': 'no',
  'LLVM_PROF_FILE': 'LLVM_PROFILE_FILE="code-%p.profclangr"',
- 'LLVM_PROF_MERGER': '/tools/clang-linux64/bin/llvm-profdata merge '
+ 'LLVM_PROF_MERGER': '/tools/llvm/bin/llvm-profdata merge '
                      '-output=code.profclangd *.profclangr',
  'LN': 'ln',
- 'LOCALMODLIBS': '-L/install/lib -lz         -lbz2  -lcrypt  -L/tools/deps/lib '
-                 '-lncursesw  -L/tools/deps/lib -lpanelw -lncursesw  '
-                 '-L/tools/deps/lib -lffi -ldl  -lm   -L/tools/deps/lib -ldb   '
-                 '-L/tools/deps/lib -lgdbm  -L/tools/deps/lib -lssl '
-                 '-lcrypto    -L/tools/deps/lib -llzma    -lrt   '
-                 '-L/tools/deps/lib -lsqlite3  -lssl -lcrypto      '
-                 '-L/tools/deps/lib -ltcl8.6 -ltk8.6 -lX11 -lxcb -lXau  '
-                 '-luuid      -L/tools/deps/lib -lreadline -lncursesw',
+ 'LOCALMODLIBS': '-lbz2          -lffi -ldl  -lm  -lncursesw  -lpanelw '
+                 '-lncursesw   -ldb  -lmpdec  -lexpat  -lcrypto     '
+                 '-llzma       -lrt          -lsqlite3  -lssl -lcrypto        '
+                 '-ltcl8.6 -ltk8.6 -lX11 -lxcb -lXau  -luuid        -lm    '
+                 '-lm     -lexpat  -ledit -lncursesw        -lz',
  'MACHDEP': 'linux',
  'MACHDEP_OBJS': '',
  'MACHDESTLIB': '/install/lib/python3.9',
@@ -587,42 +593,39 @@ build_time_vars = {'ABIFLAGS': '',
  'MAKESETUP': './Modules/makesetup',
  'MANDIR': '/install/share/man',
  'MKDIR_P': '/bin/mkdir -p',
- 'MODBUILT_NAMES': 'array  cmath  math  _contextvars  _struct  _weakref  '
-                   '_testinternalcapi  _random  _pickle  _datetime  _zoneinfo  '
-                   '_bisect  _heapq  _asyncio  _statistics  unicodedata  '
-                   'fcntl  spwd  grp  select  mmap  _csv  _socket  termios  '
-                   'resource  _posixsubprocess  audioop  _md5  _sha1  _sha256  '
-                   '_sha512  _sha3  _blake2  syslog  binascii  parser  zlib  '
-                   '_multibytecodec  _codecs_cn  _codecs_hk  _codecs_iso2022  '
-                   '_codecs_jp  _codecs_kr  _codecs_tw  _bz2  _crypt  _curses  '
-                   '_curses_panel  _ctypes  _ctypes_test  _decimal  _dbm  '
-                   '_elementtree  _gdbm  _hashlib  _json  _lsprof  _lzma  '
-                   '_multiprocessing  _opcode  _posixshmem  _queue  _sqlite3  '
-                   '_ssl  _testbuffer  _testimportmultiple  _testinternalcapi  '
-                   '_testmultiphase  _tkinter  _uuid  _xxsubinterpreters  '
-                   '_xxtestfuzz  ossaudiodev  pyexpat  readline  posix  errno  '
+ 'MODBUILT_NAMES': '_crypt  _asyncio  _bisect  _blake2  _bz2  _codecs_cn  '
+                   '_codecs_hk  _codecs_iso2022  _codecs_jp  _codecs_kr  '
+                   '_codecs_tw  _contextvars  _csv  _ctypes  _ctypes_test  '
+                   '_curses  _curses_panel  _datetime  _dbm  _decimal  '
+                   '_elementtree  _hashlib  _heapq  _json  _lsprof  _lzma  '
+                   '_md5  _multibytecodec  _multiprocessing  _opcode  _pickle  '
+                   '_posixshmem  _posixsubprocess  _queue  _random  _sha1  '
+                   '_sha256  _sha3  _sha512  _socket  _sqlite3  _ssl  '
+                   '_statistics  _struct  _testbuffer  _testimportmultiple  '
+                   '_testinternalcapi  _testmultiphase  _tkinter  _uuid  '
+                   '_xxsubinterpreters  _xxtestfuzz  _zoneinfo  array  '
+                   'audioop  binascii  cmath  fcntl  grp  math  mmap  '
+                   'ossaudiodev  parser  pyexpat  readline  resource  select  '
+                   'spwd  syslog  termios  unicodedata  zlib  posix  errno  '
                    'pwd  _sre  _codecs  _weakref  _functools  _operator  '
                    '_collections  _abc  itertools  atexit  _signal  _stat  '
                    'time  _thread  _locale  _io  faulthandler  _tracemalloc  '
                    '_peg_parser  _symtable  xxsubtype',
- 'MODDISABLED_NAMES': 'nis',
- 'MODLIBS': '-L/install/lib -lz         -lbz2  -lcrypt  -L/tools/deps/lib '
-            '-lncursesw  -L/tools/deps/lib -lpanelw -lncursesw  '
-            '-L/tools/deps/lib -lffi -ldl  -lm   -L/tools/deps/lib -ldb   '
-            '-L/tools/deps/lib -lgdbm  -L/tools/deps/lib -lssl -lcrypto    '
-            '-L/tools/deps/lib -llzma    -lrt   -L/tools/deps/lib -lsqlite3  '
-            '-lssl -lcrypto      -L/tools/deps/lib -ltcl8.6 -ltk8.6 -lX11 '
-            '-lxcb -lXau  -luuid      -L/tools/deps/lib -lreadline -lncursesw',
+ 'MODDISABLED_NAMES': '_gdbm  _scproxy  _testcapi  nis  xxlimited',
+ 'MODLIBS': '-lbz2          -lffi -ldl  -lm  -lncursesw  -lpanelw -lncursesw   '
+            '-ldb  -lmpdec  -lexpat  -lcrypto     -llzma       -lrt          '
+            '-lsqlite3  -lssl -lcrypto        -ltcl8.6 -ltk8.6 -lX11 -lxcb '
+            '-lXau  -luuid        -lm    -lm     -lexpat  -ledit '
+            '-lncursesw        -lz',
  'MODOBJS': 'Modules/_abc.o Modules/_asynciomodule.o Modules/_bisectmodule.o '
             'Modules/_bz2module.o Modules/_codecs_cn.o Modules/_codecs_hk.o '
             'Modules/_codecs_iso2022.o Modules/_codecs_jp.o '
             'Modules/_codecs_kr.o Modules/_codecs_tw.o Modules/_codecsmodule.o '
             'Modules/_collectionsmodule.o Modules/_contextvarsmodule.o '
-            'Modules/_cryptmodule.o Modules/_csv.o Modules/_ctypes.o '
-            'Modules/_ctypes_test.o Modules/_curses_panel.o '
-            'Modules/_cursesmodule.o Modules/_datetimemodule.o '
-            'Modules/_dbmmodule.o Modules/_decimal.o Modules/_elementtree.o '
-            'Modules/_functoolsmodule.o Modules/_gdbmmodule.o '
+            'Modules/_csv.o Modules/_ctypes.o Modules/_ctypes_test.o '
+            'Modules/_curses_panel.o Modules/_cursesmodule.o '
+            'Modules/_datetimemodule.o Modules/_dbmmodule.o Modules/_decimal.o '
+            'Modules/_elementtree.o Modules/_functoolsmodule.o '
             'Modules/_hashopenssl.o Modules/_heapqmodule.o Modules/_iomodule.o '
             'Modules/_json.o Modules/_localemodule.o Modules/_lsprof.o '
             'Modules/_lzmamodule.o Modules/_math.o Modules/_opcode.o '
@@ -636,35 +639,28 @@ build_time_vars = {'ABIFLAGS': '',
             'Modules/_uuidmodule.o Modules/_weakref.o '
             'Modules/_xxsubinterpretersmodule.o Modules/_xxtestfuzz.o '
             'Modules/_zoneinfo.o Modules/arraymodule.o Modules/atexitmodule.o '
-            'Modules/audioop.o Modules/basearith.o Modules/binascii.o '
-            'Modules/blake2b_impl.o Modules/blake2module.o '
-            'Modules/blake2s_impl.o Modules/bufferedio.o Modules/bytesio.o '
-            'Modules/cache.o Modules/callbacks.o Modules/callproc.o '
-            'Modules/cfield.o Modules/cmathmodule.o Modules/connection.o '
-            'Modules/constants.o Modules/context.o Modules/convolute.o '
-            'Modules/crt.o Modules/cursor.o Modules/difradix2.o '
+            'Modules/audioop.o Modules/binascii.o Modules/blake2b_impl.o '
+            'Modules/blake2module.o Modules/blake2s_impl.o '
+            'Modules/bufferedio.o Modules/bytesio.o Modules/cache.o '
+            'Modules/callbacks.o Modules/callproc.o Modules/cfield.o '
+            'Modules/cmathmodule.o Modules/connection.o Modules/cursor.o '
             'Modules/errnomodule.o Modules/faulthandler.o '
-            'Modules/fcntlmodule.o Modules/fileio.o Modules/fnt.o '
-            'Modules/fourstep.o Modules/fuzzer.o Modules/grpmodule.o '
-            'Modules/io.o Modules/iobase.o Modules/itertoolsmodule.o '
+            'Modules/fcntlmodule.o Modules/fileio.o Modules/fuzzer.o '
+            'Modules/grpmodule.o Modules/iobase.o Modules/itertoolsmodule.o '
             'Modules/mathmodule.o Modules/md5module.o Modules/microprotocols.o '
-            'Modules/mmapmodule.o Modules/module.o Modules/mpalloc.o '
-            'Modules/mpdecimal.o Modules/multibytecodec.o '
-            'Modules/multiprocessing.o Modules/numbertheory.o '
-            'Modules/ossaudiodev.o Modules/parsermodule.o '
-            'Modules/posixmodule.o Modules/posixshmem.o '
+            'Modules/mmapmodule.o Modules/module.o Modules/multibytecodec.o '
+            'Modules/multiprocessing.o Modules/ossaudiodev.o '
+            'Modules/parsermodule.o Modules/posixmodule.o Modules/posixshmem.o '
             'Modules/prepare_protocol.o Modules/pwdmodule.o Modules/pyexpat.o '
             'Modules/readline.o Modules/resource.o Modules/rotatingtree.o '
             'Modules/row.o Modules/selectmodule.o Modules/semaphore.o '
             'Modules/sha1module.o Modules/sha256module.o Modules/sha3module.o '
-            'Modules/sha512module.o Modules/signalmodule.o Modules/sixstep.o '
+            'Modules/sha512module.o Modules/signalmodule.o '
             'Modules/socketmodule.o Modules/spwdmodule.o Modules/statement.o '
             'Modules/stgdict.o Modules/stringio.o Modules/symtablemodule.o '
             'Modules/syslogmodule.o Modules/termios.o Modules/textio.o '
-            'Modules/timemodule.o Modules/tkappinit.o Modules/transpose.o '
-            'Modules/unicodedata.o Modules/util.o Modules/xmlparse.o '
-            'Modules/xmlrole.o Modules/xmltok.o Modules/xxsubtype.o '
-            'Modules/zlibmodule.o',
+            'Modules/timemodule.o Modules/tkappinit.o Modules/unicodedata.o '
+            'Modules/util.o Modules/xxsubtype.o Modules/zlibmodule.o',
  'MODULE_OBJS': '\\',
  'MULTIARCH': 'x86_64-linux-gnu',
  'MULTIARCH_CPPFLAGS': '-DMULTIARCH=\\"x86_64-linux-gnu\\"',
@@ -694,7 +690,7 @@ build_time_vars = {'ABIFLAGS': '',
  'POSIX_SEMAPHORES_NOT_ENABLED': 0,
  'PROFILE_TASK': '-m test --pgo',
  'PTHREAD_KEY_T_IS_COMPATIBLE_WITH_INT': 1,
- 'PTHREAD_SYSTEM_SCHED_SUPPORTED': 1,
+ 'PTHREAD_SYSTEM_SCHED_SUPPORTED': 0,
  'PURIFY': '',
  'PY3LIBRARY': 'libpython3.so',
  'PYLONG_BITS_IN_DIGIT': 0,
@@ -711,51 +707,55 @@ build_time_vars = {'ABIFLAGS': '',
  'PY_BUILTIN_MODULE_CFLAGS': '-Wno-unused-result -Wsign-compare '
                              '-Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall '
                              '-fPIC -I/tools/deps/include '
-                             '-I/tools/deps/include/ncursesw -std=c99 -Wextra '
+                             '-I/tools/deps/include/ncursesw '
+                             '-I/tools/deps/libedit/include -std=c99 -Wextra '
                              '-Wno-unused-result -Wno-unused-parameter '
                              '-Wno-missing-field-initializers '
-                             '-Wstrict-prototypes '
                              '-Werror=implicit-function-declaration '
                              '-fvisibility=hidden  -I./Include/internal -I. '
                              '-I./Include -fPIC -I/tools/deps/include '
-                             '-I/tools/deps/include/ncursesw -fPIC '
+                             '-I/tools/deps/include/ncursesw '
+                             '-I/tools/deps/libedit/include -fPIC '
                              '-DPy_BUILD_CORE_BUILTIN',
  'PY_CFLAGS': '-Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG '
               '-g -fwrapv -O3 -Wall -fPIC -I/tools/deps/include '
-              '-I/tools/deps/include/ncursesw',
+              '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
  'PY_CFLAGS_NODIST': '-std=c99 -Wextra -Wno-unused-result '
                      '-Wno-unused-parameter -Wno-missing-field-initializers '
-                     '-Wstrict-prototypes '
                      '-Werror=implicit-function-declaration '
                      '-fvisibility=hidden  -I./Include/internal',
  'PY_COERCE_C_LOCALE': 1,
  'PY_CORE_CFLAGS': '-Wno-unused-result -Wsign-compare -Wunreachable-code '
                    '-DNDEBUG -g -fwrapv -O3 -Wall -fPIC -I/tools/deps/include '
-                   '-I/tools/deps/include/ncursesw -std=c99 -Wextra '
+                   '-I/tools/deps/include/ncursesw '
+                   '-I/tools/deps/libedit/include -std=c99 -Wextra '
                    '-Wno-unused-result -Wno-unused-parameter '
-                   '-Wno-missing-field-initializers -Wstrict-prototypes '
+                   '-Wno-missing-field-initializers '
                    '-Werror=implicit-function-declaration -fvisibility=hidden  '
                    '-I./Include/internal -I. -I./Include -fPIC '
-                   '-I/tools/deps/include -I/tools/deps/include/ncursesw -fPIC '
-                   '-DPy_BUILD_CORE',
- 'PY_CORE_LDFLAGS': '-L/tools/deps/lib',
+                   '-I/tools/deps/include -I/tools/deps/include/ncursesw '
+                   '-I/tools/deps/libedit/include -fPIC -DPy_BUILD_CORE',
+ 'PY_CORE_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
+                    '-L/tools/deps/libedit/lib',
  'PY_CPPFLAGS': '-I. -I./Include -fPIC -I/tools/deps/include '
-                '-I/tools/deps/include/ncursesw',
+                '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
  'PY_FORMAT_SIZE_T': '"z"',
- 'PY_LDFLAGS': '-L/tools/deps/lib',
+ 'PY_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
+               '-L/tools/deps/libedit/lib',
  'PY_LDFLAGS_NODIST': '',
  'PY_SSL_DEFAULT_CIPHERS': 1,
  'PY_SSL_DEFAULT_CIPHER_STRING': 0,
  'PY_STDMODULE_CFLAGS': '-Wno-unused-result -Wsign-compare -Wunreachable-code '
                         '-DNDEBUG -g -fwrapv -O3 -Wall -fPIC '
                         '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                        '-std=c99 -Wextra -Wno-unused-result '
-                        '-Wno-unused-parameter -Wno-missing-field-initializers '
-                        '-Wstrict-prototypes '
+                        '-I/tools/deps/libedit/include -std=c99 -Wextra '
+                        '-Wno-unused-result -Wno-unused-parameter '
+                        '-Wno-missing-field-initializers '
                         '-Werror=implicit-function-declaration '
                         '-fvisibility=hidden  -I./Include/internal -I. '
                         '-I./Include -fPIC -I/tools/deps/include '
-                        '-I/tools/deps/include/ncursesw -fPIC',
+                        '-I/tools/deps/include/ncursesw '
+                        '-I/tools/deps/libedit/include -fPIC',
  'Py_DEBUG': 0,
  'Py_ENABLE_SHARED': 1,
  'Py_HASH_ALGORITHM': 0,
@@ -764,9 +764,10 @@ build_time_vars = {'ABIFLAGS': '',
  'READELF': 'readelf',
  'RESSRCDIR': 'Mac/Resources/framework',
  'RETSIGTYPE': 'void',
- 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.9.16',
+ 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.9.17',
  'SCRIPTDIR': '/install/lib',
  'SETPGRP_HAVE_ARG': 0,
+ 'SHAREDMODS': 'Modules/_crypt.cpython-39-x86_64-linux-gnu.so',
  'SHELL': '/bin/sh',
  'SHLIBS': '-lcrypt -lpthread -ldl  -lutil -lm',
  'SHLIB_SUFFIX': '.so',
@@ -805,9 +806,9 @@ build_time_vars = {'ABIFLAGS': '',
  'TCLTK_LIBS': '',
  'TESTOPTS': '',
  'TESTPATH': '',
- 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.9.16 ./python',
+ 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.9.17 ./python',
  'TESTPYTHONOPTS': '',
- 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.9.16 ./python '
+ 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.9.17 ./python '
                './Tools/scripts/run_tests.py',
  'TESTTIMEOUT': 1200,
  'TIMEMODULE_LIB': 0,
@@ -830,8 +831,8 @@ build_time_vars = {'ABIFLAGS': '',
  'WITH_VALGRIND': 0,
  'X87_DOUBLE_ROUNDING': 0,
  'XMLLIBSUBDIRS': 'xml xml/dom xml/etree xml/parsers xml/sax',
- 'abs_builddir': '/build/Python-3.9.16',
- 'abs_srcdir': '/build/Python-3.9.16',
+ 'abs_builddir': '/build/Python-3.9.17',
+ 'abs_srcdir': '/build/Python-3.9.17',
  'datarootdir': '/install/share',
  'exec_prefix': '/install',
  'prefix': '/install',

@@ -840,6 +840,9 @@ lib/googlecloudsdk/api_lib/runtime_config/exceptions.py
 lib/googlecloudsdk/api_lib/runtime_config/transforms.py
 lib/googlecloudsdk/api_lib/runtime_config/util.py
 lib/googlecloudsdk/api_lib/scc/__init__.py
+lib/googlecloudsdk/api_lib/scc/manage/__init__.py
+lib/googlecloudsdk/api_lib/scc/manage/sha/__init__.py
+lib/googlecloudsdk/api_lib/scc/manage/sha/clients.py
 lib/googlecloudsdk/api_lib/scc/postures/__init__.py
 lib/googlecloudsdk/api_lib/scc/postures/util.py
 lib/googlecloudsdk/api_lib/scc/securitycenter_client.py
@@ -2457,11 +2460,8 @@ lib/googlecloudsdk/command_lib/run/integrations/deployment_states.py
 lib/googlecloudsdk/command_lib/run/integrations/flags.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/base.py
-lib/googlecloudsdk/command_lib/run/integrations/formatters/cloudsql_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/default_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/domain_routing_formatter.py
-lib/googlecloudsdk/command_lib/run/integrations/formatters/firebasehosting_formatter.py
-lib/googlecloudsdk/command_lib/run/integrations/formatters/redis_formatter.py
 lib/googlecloudsdk/command_lib/run/integrations/formatters/states.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_list_printer.py
 lib/googlecloudsdk/command_lib/run/integrations/integration_printer.py
@@ -2470,9 +2470,7 @@ lib/googlecloudsdk/command_lib/run/integrations/run_apps_operations.py
 lib/googlecloudsdk/command_lib/run/integrations/stages.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/base.py
-lib/googlecloudsdk/command_lib/run/integrations/typekits/cloudsql_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/domain_routing_typekit.py
-lib/googlecloudsdk/command_lib/run/integrations/typekits/firebasehosting_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits/redis_typekit.py
 lib/googlecloudsdk/command_lib/run/integrations/typekits_util.py
 lib/googlecloudsdk/command_lib/run/integrations/types_describe_printer.py
@@ -2529,6 +2527,11 @@ lib/googlecloudsdk/command_lib/scc/findings/util.py
 lib/googlecloudsdk/command_lib/scc/flags.py
 lib/googlecloudsdk/command_lib/scc/flags.yaml
 lib/googlecloudsdk/command_lib/scc/hooks.py
+lib/googlecloudsdk/command_lib/scc/manage/__init__.py
+lib/googlecloudsdk/command_lib/scc/manage/constants.py
+lib/googlecloudsdk/command_lib/scc/manage/errors.py
+lib/googlecloudsdk/command_lib/scc/manage/flags.py
+lib/googlecloudsdk/command_lib/scc/manage/parsing.py
 lib/googlecloudsdk/command_lib/scc/muteconfigs/__init__.py
 lib/googlecloudsdk/command_lib/scc/muteconfigs/flags.yaml
 lib/googlecloudsdk/command_lib/scc/muteconfigs/request_hooks.py
@@ -3004,7 +3007,6 @@ lib/googlecloudsdk/core/util/files.py
 lib/googlecloudsdk/core/util/hashing.py
 lib/googlecloudsdk/core/util/http_encoding.py
 lib/googlecloudsdk/core/util/http_proxy_types.py
-lib/googlecloudsdk/core/util/importing.py
 lib/googlecloudsdk/core/util/iso_duration.py
 lib/googlecloudsdk/core/util/keyboard_interrupt.py
 lib/googlecloudsdk/core/util/lazy_regex.py
@@ -3369,6 +3371,9 @@ lib/googlecloudsdk/generated_clients/apis/cloudkms/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/cloudkms/v1/cloudkms_v1_client.py
 lib/googlecloudsdk/generated_clients/apis/cloudkms/v1/cloudkms_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/cloudkms/v1/resources.py
+lib/googlecloudsdk/generated_clients/apis/cloudkms/v1alpha1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/cloudkms/v1alpha1/cloudkms_v1alpha1_client.py
+lib/googlecloudsdk/generated_clients/apis/cloudkms/v1alpha1/cloudkms_v1alpha1_messages.py
 lib/googlecloudsdk/generated_clients/apis/cloudquotas/__init__.py
 lib/googlecloudsdk/generated_clients/apis/cloudquotas/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/cloudquotas/v1/cloudquotas_v1_client.py
@@ -3843,6 +3848,10 @@ lib/googlecloudsdk/generated_clients/apis/iam/v2beta/__init__.py
 lib/googlecloudsdk/generated_clients/apis/iam/v2beta/iam_v2beta_client.py
 lib/googlecloudsdk/generated_clients/apis/iam/v2beta/iam_v2beta_messages.py
 lib/googlecloudsdk/generated_clients/apis/iam/v2beta/resources.py
+lib/googlecloudsdk/generated_clients/apis/iam/v3beta/__init__.py
+lib/googlecloudsdk/generated_clients/apis/iam/v3beta/iam_v3beta_client.py
+lib/googlecloudsdk/generated_clients/apis/iam/v3beta/iam_v3beta_messages.py
+lib/googlecloudsdk/generated_clients/apis/iam/v3beta/resources.py
 lib/googlecloudsdk/generated_clients/apis/iamcredentials/__init__.py
 lib/googlecloudsdk/generated_clients/apis/iamcredentials/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/iamcredentials/v1/iamcredentials_v1_client.py
@@ -6292,6 +6301,7 @@ lib/surface/blockchain_node_engine/operations/describe.yaml
 lib/surface/blockchain_node_engine/operations/list.yaml
 lib/surface/bms/__init__.py
 lib/surface/bms/instances/__init__.py
+lib/surface/bms/instances/auth_info.py
 lib/surface/bms/instances/describe.py
 lib/surface/bms/instances/disable_serial_console.yaml
 lib/surface/bms/instances/enable_serial_console.yaml
@@ -7886,6 +7896,8 @@ lib/surface/container/fleet/policycontroller/violations/describe.py
 lib/surface/container/fleet/policycontroller/violations/list.py
 lib/surface/container/fleet/rollouts/__init__.py
 lib/surface/container/fleet/rollouts/create.py
+lib/surface/container/fleet/rollouts/describe.py
+lib/surface/container/fleet/rollouts/list.py
 lib/surface/container/fleet/scopes/__init__.py
 lib/surface/container/fleet/scopes/add_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/create.yaml
@@ -9530,6 +9542,7 @@ lib/surface/kms/inventory/__init__.py
 lib/surface/kms/inventory/get_protected_resources_summary.py
 lib/surface/kms/inventory/list_keys.py
 lib/surface/kms/inventory/search_protected_resources.py
+lib/surface/kms/key_deletion_opt_out.py
 lib/surface/kms/keyrings/__init__.py
 lib/surface/kms/keyrings/add_iam_policy_binding.yaml
 lib/surface/kms/keyrings/config/__init__.py
@@ -10406,6 +10419,7 @@ lib/surface/notebooks/runtimes/delete.py
 lib/surface/notebooks/runtimes/describe.py
 lib/surface/notebooks/runtimes/diagnose.py
 lib/surface/notebooks/runtimes/list.py
+lib/surface/notebooks/runtimes/migrate.py
 lib/surface/notebooks/runtimes/reset.py
 lib/surface/notebooks/runtimes/start.py
 lib/surface/notebooks/runtimes/stop.py
@@ -10930,6 +10944,10 @@ lib/surface/scc/findings/list_marks.py
 lib/surface/scc/findings/set_mute.yaml
 lib/surface/scc/findings/update.yaml
 lib/surface/scc/findings/update_marks.yaml
+lib/surface/scc/manage/__init__.py
+lib/surface/scc/manage/custom_modules/__init__.py
+lib/surface/scc/manage/custom_modules/sha/__init__.py
+lib/surface/scc/manage/custom_modules/sha/describe.py
 lib/surface/scc/muteconfigs/__init__.py
 lib/surface/scc/muteconfigs/create.yaml
 lib/surface/scc/muteconfigs/delete.yaml
@@ -11330,6 +11348,14 @@ lib/surface/sql/users/set_password_policy.py
 lib/surface/storage/__init__.py
 lib/surface/storage/buckets/__init__.py
 lib/surface/storage/buckets/add_iam_policy_binding.py
+lib/surface/storage/buckets/anywhere_caches/__init__.py
+lib/surface/storage/buckets/anywhere_caches/create.py
+lib/surface/storage/buckets/anywhere_caches/describe.py
+lib/surface/storage/buckets/anywhere_caches/disable.py
+lib/surface/storage/buckets/anywhere_caches/list.py
+lib/surface/storage/buckets/anywhere_caches/pause.py
+lib/surface/storage/buckets/anywhere_caches/resume.py
+lib/surface/storage/buckets/anywhere_caches/update.py
 lib/surface/storage/buckets/config/__init__.py
 lib/surface/storage/buckets/config/export.yaml
 lib/surface/storage/buckets/create.py
@@ -11358,6 +11384,8 @@ lib/surface/storage/hmac/describe.py
 lib/surface/storage/hmac/list.py
 lib/surface/storage/hmac/update.py
 lib/surface/storage/insights/__init__.py
+lib/surface/storage/insights/dataset_configs/__init__.py
+lib/surface/storage/insights/dataset_configs/create.py
 lib/surface/storage/insights/inventory_reports/__init__.py
 lib/surface/storage/insights/inventory_reports/create.py
 lib/surface/storage/insights/inventory_reports/delete.py

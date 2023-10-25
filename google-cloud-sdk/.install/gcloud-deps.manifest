@@ -2931,9 +2931,12 @@ lib/third_party/proto/marshal/collections/repeated.py
 lib/third_party/proto/marshal/compat.py
 lib/third_party/proto/marshal/marshal.py
 lib/third_party/proto/marshal/rules/__init__.py
+lib/third_party/proto/marshal/rules/bytes.py
 lib/third_party/proto/marshal/rules/dates.py
 lib/third_party/proto/marshal/rules/enums.py
+lib/third_party/proto/marshal/rules/field_mask.py
 lib/third_party/proto/marshal/rules/message.py
+lib/third_party/proto/marshal/rules/stringy_numbers.py
 lib/third_party/proto/marshal/rules/struct.py
 lib/third_party/proto/marshal/rules/wrappers.py
 lib/third_party/proto/message.py

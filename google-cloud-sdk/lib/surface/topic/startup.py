@@ -28,8 +28,8 @@ class Startup(base.TopicCommand):
 
   # Choosing a Python Interpreter
 
-  The `gcloud` CLI runs under Python. Note that `gcloud` requires Python version
-  3.5-3.9. Certain Windows and Linux installs include a bundled Python
+  The `gcloud` CLI runs under Python. Note that `gcloud` supports Python version
+  3.8-3.10. Certain Windows and Linux installs include a bundled Python
   interpreter depending on the package and architecture. Similarly, Intel-based
   Macs offer the option to install CPython as part of the main install script.
   Otherwise, you must have a Python interpreter available on your system. The
@@ -66,7 +66,7 @@ class Startup(base.TopicCommand):
     # Use a python you have installed in a special location
     $ export CLOUDSDK_PYTHON=/usr/local/my-custom-python-install/python
 
-  `gsutil` versions 5.0 and onward support Python 3.5-3.8. To use a different
+  `gsutil` versions 5.0 and onward support Python 3.8-3.11. To use a different
   interpreter for `gsutil` than for the other Python tools, set the
   `CLOUDSDK_GSUTIL_PYTHON` environment variable to the desired interpreter.
 

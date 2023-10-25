@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/bin/sh
+"exec" "$(dirname $0)/python3.9" "$0" "$@"
 # -*- python -*-
 
 # Keep this script in sync with python-config.sh.in
