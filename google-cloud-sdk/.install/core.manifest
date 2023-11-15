@@ -128,8 +128,6 @@ lib/googlecloudsdk/api_lib/apphub/discovered_services.py
 lib/googlecloudsdk/api_lib/apphub/discovered_workloads.py
 lib/googlecloudsdk/api_lib/apphub/operations.py
 lib/googlecloudsdk/api_lib/apphub/service_projects.py
-lib/googlecloudsdk/api_lib/apphub/telemetry.py
-lib/googlecloudsdk/api_lib/apphub/topology.py
 lib/googlecloudsdk/api_lib/apphub/utils.py
 lib/googlecloudsdk/api_lib/artifacts/__init__.py
 lib/googlecloudsdk/api_lib/artifacts/exceptions.py
@@ -793,6 +791,7 @@ lib/googlecloudsdk/api_lib/pubsub/subscriptions.py
 lib/googlecloudsdk/api_lib/pubsub/topics.py
 lib/googlecloudsdk/api_lib/quotas/__init__.py
 lib/googlecloudsdk/api_lib/quotas/message_util.py
+lib/googlecloudsdk/api_lib/quotas/quota_info.py
 lib/googlecloudsdk/api_lib/quotas/quota_preference.py
 lib/googlecloudsdk/api_lib/recommender/__init__.py
 lib/googlecloudsdk/api_lib/recommender/base.py
@@ -978,7 +977,7 @@ lib/googlecloudsdk/api_lib/transcoder/templates.py
 lib/googlecloudsdk/api_lib/transfer/__init__.py
 lib/googlecloudsdk/api_lib/transfer/agent_pools_util.py
 lib/googlecloudsdk/api_lib/transfer/appliances/__init__.py
-lib/googlecloudsdk/api_lib/transfer/appliances/operations.py
+lib/googlecloudsdk/api_lib/transfer/appliances/operations_util.py
 lib/googlecloudsdk/api_lib/transfer/jobs_util.py
 lib/googlecloudsdk/api_lib/transfer/operations_util.py
 lib/googlecloudsdk/api_lib/util/__init__.py
@@ -1592,6 +1591,9 @@ lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/flags.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/resources.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/ssh.py
 lib/googlecloudsdk/command_lib/compute/tpus/queued_resources/util.py
+lib/googlecloudsdk/command_lib/compute/tpus/reservations/__init__.py
+lib/googlecloudsdk/command_lib/compute/tpus/reservations/flags.yaml
+lib/googlecloudsdk/command_lib/compute/tpus/reservations/resources.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/resources.yaml
 lib/googlecloudsdk/command_lib/compute/tpus/tpu_vm/__init__.py
 lib/googlecloudsdk/command_lib/compute/tpus/tpu_vm/exceptions.py
@@ -2632,6 +2634,7 @@ lib/googlecloudsdk/command_lib/storage/hash_util.py
 lib/googlecloudsdk/command_lib/storage/iam_command_util.py
 lib/googlecloudsdk/command_lib/storage/insights/__init__.py
 lib/googlecloudsdk/command_lib/storage/insights/dataset_configs/__init__.py
+lib/googlecloudsdk/command_lib/storage/insights/dataset_configs/log_util.py
 lib/googlecloudsdk/command_lib/storage/insights/dataset_configs/resource_args.py
 lib/googlecloudsdk/command_lib/storage/insights/inventory_reports/__init__.py
 lib/googlecloudsdk/command_lib/storage/insights/inventory_reports/resource_args.py
@@ -2670,6 +2673,8 @@ lib/googlecloudsdk/command_lib/storage/storage_url.py
 lib/googlecloudsdk/command_lib/storage/symlink_util.py
 lib/googlecloudsdk/command_lib/storage/tasks/__init__.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/__init__.py
+lib/googlecloudsdk/command_lib/storage/tasks/buckets/anywhere_caches/__init__.py
+lib/googlecloudsdk/command_lib/storage/tasks/buckets/anywhere_caches/create_anywhere_cache_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/create_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/delete_bucket_task.py
 lib/googlecloudsdk/command_lib/storage/tasks/buckets/notifications/__init__.py
@@ -5945,16 +5950,20 @@ lib/surface/app/versions/start.py
 lib/surface/app/versions/stop.py
 lib/surface/apphub/__init__.py
 lib/surface/apphub/applications/__init__.py
+lib/surface/apphub/applications/add_iam_policy_binding.py
 lib/surface/apphub/applications/create.py
 lib/surface/apphub/applications/delete.py
 lib/surface/apphub/applications/describe.py
+lib/surface/apphub/applications/get_iam_policy.py
 lib/surface/apphub/applications/list.py
+lib/surface/apphub/applications/remove_iam_policy_binding.py
 lib/surface/apphub/applications/services/__init__.py
 lib/surface/apphub/applications/services/create.py
 lib/surface/apphub/applications/services/delete.py
 lib/surface/apphub/applications/services/describe.py
 lib/surface/apphub/applications/services/list.py
 lib/surface/apphub/applications/services/update.py
+lib/surface/apphub/applications/set_iam_policy.py
 lib/surface/apphub/applications/update.py
 lib/surface/apphub/applications/workloads/__init__.py
 lib/surface/apphub/applications/workloads/create.py
@@ -5980,12 +5989,6 @@ lib/surface/apphub/service_projects/detach.py
 lib/surface/apphub/service_projects/list.py
 lib/surface/apphub/service_projects/lookup.py
 lib/surface/apphub/service_projects/remove.py
-lib/surface/apphub/telemetry/__init__.py
-lib/surface/apphub/telemetry/describe.py
-lib/surface/apphub/telemetry/update.py
-lib/surface/apphub/topology/__init__.py
-lib/surface/apphub/topology/describe.py
-lib/surface/apphub/topology/update.py
 lib/surface/artifacts/__init__.py
 lib/surface/artifacts/apt/__init__.py
 lib/surface/artifacts/apt/import.py
@@ -7489,6 +7492,8 @@ lib/surface/compute/tpus/queued_resources/reset.yaml
 lib/surface/compute/tpus/queued_resources/scp.py
 lib/surface/compute/tpus/queued_resources/ssh.py
 lib/surface/compute/tpus/reimage.yaml
+lib/surface/compute/tpus/reservations/__init__.py
+lib/surface/compute/tpus/reservations/list.yaml
 lib/surface/compute/tpus/start.yaml
 lib/surface/compute/tpus/stop.yaml
 lib/surface/compute/tpus/topologies/__init__.py
@@ -7930,6 +7935,8 @@ lib/surface/container/fleet/rollouts/__init__.py
 lib/surface/container/fleet/rollouts/create.py
 lib/surface/container/fleet/rollouts/describe.py
 lib/surface/container/fleet/rollouts/list.py
+lib/surface/container/fleet/rollouts/pause.py
+lib/surface/container/fleet/rollouts/resume.py
 lib/surface/container/fleet/scopes/__init__.py
 lib/surface/container/fleet/scopes/add_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/create.yaml
@@ -10647,8 +10654,13 @@ lib/surface/pubsub/topics/set_iam_policy.py
 lib/surface/pubsub/topics/set_iam_policy.yaml
 lib/surface/pubsub/topics/update.py
 lib/surface/quotas/__init__.py
+lib/surface/quotas/quota_info/__init__.py
+lib/surface/quotas/quota_info/describe.py
+lib/surface/quotas/quota_info/list.py
 lib/surface/quotas/quota_preferences/__init__.py
+lib/surface/quotas/quota_preferences/create.py
 lib/surface/quotas/quota_preferences/describe.py
+lib/surface/quotas/quota_preferences/list.py
 lib/surface/quotas/quota_preferences/update.py
 lib/surface/recaptcha/__init__.py
 lib/surface/recaptcha/firewall_policies/__init__.py
@@ -10954,6 +10966,7 @@ lib/surface/scc/custom_modules/sha/get_effective.yaml
 lib/surface/scc/custom_modules/sha/list.yaml
 lib/surface/scc/custom_modules/sha/list_descendant.yaml
 lib/surface/scc/custom_modules/sha/list_effective.yaml
+lib/surface/scc/custom_modules/sha/simulate.yaml
 lib/surface/scc/custom_modules/sha/test.yaml
 lib/surface/scc/custom_modules/sha/update.yaml
 lib/surface/scc/findings/__init__.py
@@ -10968,6 +10981,7 @@ lib/surface/scc/findings/update_marks.py
 lib/surface/scc/manage/__init__.py
 lib/surface/scc/manage/custom_modules/__init__.py
 lib/surface/scc/manage/custom_modules/etd/__init__.py
+lib/surface/scc/manage/custom_modules/etd/delete.py
 lib/surface/scc/manage/custom_modules/etd/describe.py
 lib/surface/scc/manage/custom_modules/etd/describe_effective.py
 lib/surface/scc/manage/custom_modules/sha/__init__.py
@@ -11592,6 +11606,7 @@ lib/surface/transfer/operations/list.py
 lib/surface/transfer/operations/monitor.py
 lib/surface/transfer/operations/pause.py
 lib/surface/transfer/operations/resume.py
+lib/surface/unlock.py
 lib/surface/version.py
 lib/surface/vmware/__init__.py
 lib/surface/vmware/dns_bind_permission/__init__.py

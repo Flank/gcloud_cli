@@ -6,8 +6,8 @@
         "core"
       ],
       "details": {
-        "description": "Provides stand-alone Python 3.9.17 installation for UNIX.",
-        "display_name": "Bundled Python 3.9"
+        "description": "Provides stand-alone Python 3.11.6 installation for UNIX.",
+        "display_name": "Bundled Python 3.11"
       },
       "id": "bundled-python3-unix",
       "is_configuration": false,
@@ -24,15 +24,15 @@
       "platform_required": false,
       "version": {
         "build_number": 0,
-        "version_string": "3.9.17"
+        "version_string": "3.11.6"
       }
     }
   ],
-  "revision": 20231103141548,
+  "revision": 20231110155547,
   "schema_version": {
     "no_update": false,
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz",
     "version": 3
   },
-  "version": "454.0.0"
+  "version": "455.0.0"
 }
