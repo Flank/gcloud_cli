@@ -1292,9 +1292,6 @@ lib/third_party/dulwich/server.py
 lib/third_party/dulwich/stash.py
 lib/third_party/dulwich/walk.py
 lib/third_party/dulwich/web.py
-lib/third_party/enum/LICENSE
-lib/third_party/enum/__init__.py
-lib/third_party/enum/less_than_python_3_4/__init__.py
 lib/third_party/fancy_urllib/LICENSE
 lib/third_party/fancy_urllib/__init__.py
 lib/third_party/fasteners/LICENSE
@@ -1534,6 +1531,8 @@ lib/third_party/google/cloud/pubsub_v1/__init__.py
 lib/third_party/google/cloud/pubsub_v1/_gapic.py
 lib/third_party/google/cloud/pubsub_v1/exceptions.py
 lib/third_party/google/cloud/pubsub_v1/futures.py
+lib/third_party/google/cloud/pubsub_v1/proto/pubsub.proto
+lib/third_party/google/cloud/pubsub_v1/proto/schema.proto
 lib/third_party/google/cloud/pubsub_v1/publisher/__init__.py
 lib/third_party/google/cloud/pubsub_v1/publisher/_batch/__init__.py
 lib/third_party/google/cloud/pubsub_v1/publisher/_batch/base.py
@@ -1557,6 +1556,7 @@ lib/third_party/google/cloud/pubsub_v1/subscriber/_protocol/messages_on_hold.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/_protocol/requests.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/_protocol/streaming_pull_manager.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/client.py
+lib/third_party/google/cloud/pubsub_v1/subscriber/exceptions.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/futures.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/message.py
 lib/third_party/google/cloud/pubsub_v1/subscriber/scheduler.py
@@ -1585,6 +1585,7 @@ lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/single_subscriber.p
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/sorted_list.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/streaming_pull_manager.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/subscriber_impl.py
+lib/third_party/google/cloud/pubsublite/cloudpubsub/internal/wrapped_message.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/message_transformer.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/message_transforms.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/nack_handler.py
@@ -1593,10 +1594,13 @@ lib/third_party/google/cloud/pubsublite/cloudpubsub/publisher_client_interface.p
 lib/third_party/google/cloud/pubsublite/cloudpubsub/reassignment_handler.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/subscriber_client.py
 lib/third_party/google/cloud/pubsublite/cloudpubsub/subscriber_client_interface.py
+lib/third_party/google/cloud/pubsublite/gapic_version.py
 lib/third_party/google/cloud/pubsublite/internal/__init__.py
 lib/third_party/google/cloud/pubsublite/internal/constructable_from_service_account.py
 lib/third_party/google/cloud/pubsublite/internal/endpoints.py
 lib/third_party/google/cloud/pubsublite/internal/fast_serialize.py
+lib/third_party/google/cloud/pubsublite/internal/publish_sequence_number.py
+lib/third_party/google/cloud/pubsublite/internal/publisher_client_id.py
 lib/third_party/google/cloud/pubsublite/internal/require_started.py
 lib/third_party/google/cloud/pubsublite/internal/routing_metadata.py
 lib/third_party/google/cloud/pubsublite/internal/status_codes.py
@@ -1643,6 +1647,7 @@ lib/third_party/google/cloud/pubsublite/types/message_metadata.py
 lib/third_party/google/cloud/pubsublite/types/partition.py
 lib/third_party/google/cloud/pubsublite/types/paths.py
 lib/third_party/google/cloud/pubsublite_v1/__init__.py
+lib/third_party/google/cloud/pubsublite_v1/gapic_version.py
 lib/third_party/google/cloud/pubsublite_v1/services/__init__.py
 lib/third_party/google/cloud/pubsublite_v1/services/admin_service/__init__.py
 lib/third_party/google/cloud/pubsublite_v1/services/admin_service/async_client.py
@@ -1732,8 +1737,11 @@ lib/third_party/google/oauth2/sts.py
 lib/third_party/google/oauth2/utils.py
 lib/third_party/google/pubsub/LICENSE
 lib/third_party/google/pubsub/__init__.py
+lib/third_party/google/pubsub/gapic_version.py
 lib/third_party/google/pubsub/py.typed
 lib/third_party/google/pubsub_v1/__init__.py
+lib/third_party/google/pubsub_v1/gapic_metadata.json
+lib/third_party/google/pubsub_v1/gapic_version.py
 lib/third_party/google/pubsub_v1/py.typed
 lib/third_party/google/pubsub_v1/services/__init__.py
 lib/third_party/google/pubsub_v1/services/publisher/__init__.py
@@ -1744,6 +1752,7 @@ lib/third_party/google/pubsub_v1/services/publisher/transports/__init__.py
 lib/third_party/google/pubsub_v1/services/publisher/transports/base.py
 lib/third_party/google/pubsub_v1/services/publisher/transports/grpc.py
 lib/third_party/google/pubsub_v1/services/publisher/transports/grpc_asyncio.py
+lib/third_party/google/pubsub_v1/services/publisher/transports/rest.py
 lib/third_party/google/pubsub_v1/services/schema_service/__init__.py
 lib/third_party/google/pubsub_v1/services/schema_service/async_client.py
 lib/third_party/google/pubsub_v1/services/schema_service/client.py
@@ -1752,6 +1761,7 @@ lib/third_party/google/pubsub_v1/services/schema_service/transports/__init__.py
 lib/third_party/google/pubsub_v1/services/schema_service/transports/base.py
 lib/third_party/google/pubsub_v1/services/schema_service/transports/grpc.py
 lib/third_party/google/pubsub_v1/services/schema_service/transports/grpc_asyncio.py
+lib/third_party/google/pubsub_v1/services/schema_service/transports/rest.py
 lib/third_party/google/pubsub_v1/services/subscriber/__init__.py
 lib/third_party/google/pubsub_v1/services/subscriber/async_client.py
 lib/third_party/google/pubsub_v1/services/subscriber/client.py
@@ -1760,6 +1770,7 @@ lib/third_party/google/pubsub_v1/services/subscriber/transports/__init__.py
 lib/third_party/google/pubsub_v1/services/subscriber/transports/base.py
 lib/third_party/google/pubsub_v1/services/subscriber/transports/grpc.py
 lib/third_party/google/pubsub_v1/services/subscriber/transports/grpc_asyncio.py
+lib/third_party/google/pubsub_v1/services/subscriber/transports/rest.py
 lib/third_party/google/pubsub_v1/types/__init__.py
 lib/third_party/google/pubsub_v1/types/pubsub.py
 lib/third_party/google/pubsub_v1/types/schema.py
@@ -2634,6 +2645,7 @@ lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/sk_xg_prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/frameworks/tf_prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/prediction_lib.py
 lib/third_party/ml_sdk/cloud/ml/prediction/prediction_utils.py
+lib/third_party/ml_sdk/cloud/ml/setup_runner.py
 lib/third_party/ml_sdk/cloud/ml/util/__init__.py
 lib/third_party/ml_sdk/cloud/ml/util/_decoders.py
 lib/third_party/ml_sdk/cloud/ml/util/_exceptions.py

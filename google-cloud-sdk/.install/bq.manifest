@@ -90,6 +90,7 @@ platform/bq/third_party/google/__init__.py
 platform/bq/third_party/google/api_core/LICENSE
 platform/bq/third_party/google/api_core/__init__.py
 platform/bq/third_party/google/api_core/client_options.py
+platform/bq/third_party/google/api_core/iam.py
 platform/bq/third_party/google/apputils/LICENSE
 platform/bq/third_party/google/apputils/__init__.py
 platform/bq/third_party/google/apputils/app.py
