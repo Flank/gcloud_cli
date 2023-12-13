@@ -441,4 +441,6 @@ platform/bq/third_party/yaml/lib3/resolver.py
 platform/bq/third_party/yaml/lib3/scanner.py
 platform/bq/third_party/yaml/lib3/serializer.py
 platform/bq/third_party/yaml/lib3/tokens.py
+platform/bq/utils/bq_error.py
+platform/bq/utils/bq_logging.py
 platform/bq/wrapped_credentials.py
