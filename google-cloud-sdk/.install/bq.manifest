@@ -353,6 +353,7 @@ platform/bq/third_party/socks/LICENSE
 platform/bq/third_party/socks/__init__.py
 platform/bq/third_party/socks/sockshandler.py
 platform/bq/third_party/tcmalloc/LICENSE
+platform/bq/third_party/termcolor/__init__.py
 platform/bq/third_party/tz/LICENSE
 platform/bq/third_party/uritemplate/LICENSE
 platform/bq/third_party/uritemplate/__init__.py

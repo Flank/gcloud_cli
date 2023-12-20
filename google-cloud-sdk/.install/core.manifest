@@ -2469,6 +2469,7 @@ lib/googlecloudsdk/command_lib/run/container_parser.py
 lib/googlecloudsdk/command_lib/run/deletion.py
 lib/googlecloudsdk/command_lib/run/exceptions.py
 lib/googlecloudsdk/command_lib/run/flags.py
+lib/googlecloudsdk/command_lib/run/functions.py
 lib/googlecloudsdk/command_lib/run/integrations/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/deployment_states.py
 lib/googlecloudsdk/command_lib/run/integrations/flags.py
@@ -5794,6 +5795,7 @@ lib/surface/alloydb/clusters/describe.py
 lib/surface/alloydb/clusters/list.py
 lib/surface/alloydb/clusters/promote.py
 lib/surface/alloydb/clusters/restore.py
+lib/surface/alloydb/clusters/switchover.py
 lib/surface/alloydb/clusters/update.py
 lib/surface/alloydb/instances/__init__.py
 lib/surface/alloydb/instances/create.py
@@ -6398,6 +6400,7 @@ lib/surface/bms/operations/__init__.py
 lib/surface/bms/operations/describe.yaml
 lib/surface/bms/operations/wait.yaml
 lib/surface/bms/os_images/__init__.py
+lib/surface/bms/os_images/describe.py
 lib/surface/bms/os_images/list.py
 lib/surface/bms/serial_console_ssh_keys/__init__.py
 lib/surface/bms/serial_console_ssh_keys/add.py
@@ -7299,6 +7302,7 @@ lib/surface/compute/routers/add_route_policy.py
 lib/surface/compute/routers/create.py
 lib/surface/compute/routers/delete.py
 lib/surface/compute/routers/describe.py
+lib/surface/compute/routers/download_route_policy.py
 lib/surface/compute/routers/get_nat_ip_info.py
 lib/surface/compute/routers/get_nat_mapping_info.py
 lib/surface/compute/routers/get_route_policy.py
@@ -7839,11 +7843,6 @@ lib/surface/container/clusters/resize.py
 lib/surface/container/clusters/update.py
 lib/surface/container/clusters/upgrade.py
 lib/surface/container/fleet/__init__.py
-lib/surface/container/fleet/anthosobservability/__init__.py
-lib/surface/container/fleet/anthosobservability/describe.py
-lib/surface/container/fleet/anthosobservability/disable.py
-lib/surface/container/fleet/anthosobservability/enable.py
-lib/surface/container/fleet/anthosobservability/update.py
 lib/surface/container/fleet/argocd/__init__.py
 lib/surface/container/fleet/argocd/describe.py
 lib/surface/container/fleet/argocd/disable.py
@@ -9504,6 +9503,9 @@ lib/surface/infra_manager/deployments/import_statefile.py
 lib/surface/infra_manager/deployments/list.yaml
 lib/surface/infra_manager/deployments/lock.py
 lib/surface/infra_manager/deployments/unlock.py
+lib/surface/infra_manager/previews/__init__.py
+lib/surface/infra_manager/previews/describe.yaml
+lib/surface/infra_manager/previews/list.yaml
 lib/surface/infra_manager/resources/__init__.py
 lib/surface/infra_manager/resources/describe.yaml
 lib/surface/infra_manager/resources/list.yaml
@@ -10315,13 +10317,11 @@ lib/surface/network_security/org_address_groups/update.yaml
 lib/surface/network_security/secure_service_edge/__init__.py
 lib/surface/network_security/secure_service_edge/gateways/__init__.py
 lib/surface/network_security/secure_service_edge/gateways/add_app_network.yaml
-lib/surface/network_security/secure_service_edge/gateways/add_app_vpc.yaml
 lib/surface/network_security/secure_service_edge/gateways/create.yaml
 lib/surface/network_security/secure_service_edge/gateways/delete.yaml
 lib/surface/network_security/secure_service_edge/gateways/describe.yaml
 lib/surface/network_security/secure_service_edge/gateways/list.yaml
 lib/surface/network_security/secure_service_edge/gateways/remove_app_network.yaml
-lib/surface/network_security/secure_service_edge/gateways/remove_app_vpc.yaml
 lib/surface/network_security/secure_service_edge/partner/__init__.py
 lib/surface/network_security/secure_service_edge/partner/gateway_references/__init__.py
 lib/surface/network_security/secure_service_edge/partner/gateway_references/describe.yaml
@@ -10942,16 +10942,6 @@ lib/surface/run/services/replace.py
 lib/surface/run/services/set_iam_policy.yaml
 lib/surface/run/services/update.py
 lib/surface/run/services/update_traffic.py
-lib/surface/runapps/__init__.py
-lib/surface/runapps/deploy.py
-lib/surface/runapps/resources/__init__.py
-lib/surface/runapps/resources/delete.py
-lib/surface/runapps/resources/describe.py
-lib/surface/runapps/resources/export_graph.py
-lib/surface/runapps/resources/list.py
-lib/surface/runapps/types/__init__.py
-lib/surface/runapps/types/describe.py
-lib/surface/runapps/types/list.py
 lib/surface/runtime_config/__init__.py
 lib/surface/runtime_config/configs/__init__.py
 lib/surface/runtime_config/configs/create.py
@@ -11029,6 +11019,7 @@ lib/surface/scc/manage/custom_modules/etd/list.py
 lib/surface/scc/manage/custom_modules/etd/list_descendant.py
 lib/surface/scc/manage/custom_modules/etd/list_effective.py
 lib/surface/scc/manage/custom_modules/etd/update.py
+lib/surface/scc/manage/custom_modules/etd/validate.py
 lib/surface/scc/manage/custom_modules/sha/__init__.py
 lib/surface/scc/manage/custom_modules/sha/create.py
 lib/surface/scc/manage/custom_modules/sha/delete.py
@@ -11245,6 +11236,7 @@ lib/surface/services/vpc_peerings/connect.py
 lib/surface/services/vpc_peerings/delete.py
 lib/surface/services/vpc_peerings/disable_vpc_service_controls.py
 lib/surface/services/vpc_peerings/enable_vpc_service_controls.py
+lib/surface/services/vpc_peerings/get_vpc_service_controls.py
 lib/surface/services/vpc_peerings/list.py
 lib/surface/services/vpc_peerings/operations/__init__.py
 lib/surface/services/vpc_peerings/operations/describe.py
@@ -11448,6 +11440,16 @@ lib/surface/sql/users/describe.py
 lib/surface/sql/users/list.py
 lib/surface/sql/users/set_password.py
 lib/surface/sql/users/set_password_policy.py
+lib/surface/stacks/__init__.py
+lib/surface/stacks/deploy.py
+lib/surface/stacks/resources/__init__.py
+lib/surface/stacks/resources/delete.py
+lib/surface/stacks/resources/describe.py
+lib/surface/stacks/resources/export_graph.py
+lib/surface/stacks/resources/list.py
+lib/surface/stacks/types/__init__.py
+lib/surface/stacks/types/describe.py
+lib/surface/stacks/types/list.py
 lib/surface/storage/__init__.py
 lib/surface/storage/buckets/__init__.py
 lib/surface/storage/buckets/add_iam_policy_binding.py
