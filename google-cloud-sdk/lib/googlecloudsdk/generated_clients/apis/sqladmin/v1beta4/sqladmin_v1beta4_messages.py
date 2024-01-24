@@ -1087,8 +1087,10 @@ class DatabaseInstance(_messages.Message):
 
     Values:
       SQL_NETWORK_ARCHITECTURE_UNSPECIFIED: <no description>
-      NEW_NETWORK_ARCHITECTURE: Instance is a Tenancy Unit (TU) instance.
-      OLD_NETWORK_ARCHITECTURE: Instance is an Umbrella instance.
+      NEW_NETWORK_ARCHITECTURE: The instance uses the new network
+        architecture.
+      OLD_NETWORK_ARCHITECTURE: The instance uses the old network
+        architecture.
     """
     SQL_NETWORK_ARCHITECTURE_UNSPECIFIED = 0
     NEW_NETWORK_ARCHITECTURE = 1
@@ -1474,7 +1476,7 @@ class ExportContext(_messages.Message):
       tables: Tables to export, or that were exported, from the specified
         database. If you specify tables, specify one and only one database.
         For PostgreSQL instances, you can specify only one table.
-      threads: The number of threads to use for parallel export.
+      threads: Optional. The number of threads to use for parallel export.
     """
 
     class MysqlExportOptionsValue(_messages.Message):
@@ -1882,7 +1884,7 @@ class ImportContext(_messages.Message):
 
     Fields:
       parallel: Optional. Whether or not the import should be parallel.
-      threads: The number of threads to use for parallel import.
+      threads: Optional. The number of threads to use for parallel import.
     """
 
     parallel = _messages.BooleanField(1)
@@ -3061,11 +3063,13 @@ class Settings(_messages.Message):
       PD_HDD: An HDD data disk.
       OBSOLETE_LOCAL_SSD: This field is deprecated and will be removed from a
         future version of the API.
+      HYPERDISK_BALANCED: HYPERDISK_BALANCED data disk
     """
     SQL_DATA_DISK_TYPE_UNSPECIFIED = 0
     PD_SSD = 1
     PD_HDD = 2
     OBSOLETE_LOCAL_SSD = 3
+    HYPERDISK_BALANCED = 4
 
   class EditionValueValuesEnum(_messages.Enum):
     r"""Optional. The edition of the instance.
@@ -3521,6 +3525,9 @@ class SqlExternalSyncSettingError(_messages.Message):
         source to the destination.
       UNABLE_TO_VERIFY_DEFINERS: Unable to verify definers on the source for
         MySQL.
+      SUBSCRIPTION_CALCULATION_STATUS: If a time out occurs while the
+        subscription counts are calculated, then this value is set to 1.
+        Otherwise, this value is set to 2.
     """
     SQL_EXTERNAL_SYNC_SETTING_ERROR_TYPE_UNSPECIFIED = 0
     CONNECTION_FAILURE = 1
@@ -3562,6 +3569,7 @@ class SqlExternalSyncSettingError(_messages.Message):
     INCOMPATIBLE_DATABASE_MINOR_VERSION = 37
     SOURCE_MAX_SUBSCRIPTIONS = 38
     UNABLE_TO_VERIFY_DEFINERS = 39
+    SUBSCRIPTION_CALCULATION_STATUS = 40
 
   detail = _messages.StringField(1)
   kind = _messages.StringField(2)

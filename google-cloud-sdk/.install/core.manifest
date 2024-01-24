@@ -1671,6 +1671,7 @@ lib/googlecloudsdk/command_lib/container/binauthz/exceptions.py
 lib/googlecloudsdk/command_lib/container/binauthz/flags.py
 lib/googlecloudsdk/command_lib/container/binauthz/parsing.py
 lib/googlecloudsdk/command_lib/container/binauthz/pkix.py
+lib/googlecloudsdk/command_lib/container/binauthz/sigstore_image.py
 lib/googlecloudsdk/command_lib/container/binauthz/util.py
 lib/googlecloudsdk/command_lib/container/binauthz/validation.py
 lib/googlecloudsdk/command_lib/container/builds/__init__.py
@@ -2258,6 +2259,11 @@ lib/googlecloudsdk/command_lib/metastore/services/imports/util.py
 lib/googlecloudsdk/command_lib/metastore/services/util.py
 lib/googlecloudsdk/command_lib/metastore/util.py
 lib/googlecloudsdk/command_lib/metastore/validators.py
+lib/googlecloudsdk/command_lib/migration/__init__.py
+lib/googlecloudsdk/command_lib/migration/vms/__init__.py
+lib/googlecloudsdk/command_lib/migration/vms/flags.yaml
+lib/googlecloudsdk/command_lib/migration/vms/hooks.py
+lib/googlecloudsdk/command_lib/migration/vms/resources.yaml
 lib/googlecloudsdk/command_lib/ml/__init__.py
 lib/googlecloudsdk/command_lib/ml/language/__init__.py
 lib/googlecloudsdk/command_lib/ml/language/util.py
@@ -2467,7 +2473,6 @@ lib/googlecloudsdk/command_lib/run/container_parser.py
 lib/googlecloudsdk/command_lib/run/deletion.py
 lib/googlecloudsdk/command_lib/run/exceptions.py
 lib/googlecloudsdk/command_lib/run/flags.py
-lib/googlecloudsdk/command_lib/run/functions.py
 lib/googlecloudsdk/command_lib/run/integrations/__init__.py
 lib/googlecloudsdk/command_lib/run/integrations/deployment_states.py
 lib/googlecloudsdk/command_lib/run/integrations/flags.py
@@ -2508,6 +2513,8 @@ lib/googlecloudsdk/command_lib/run/resource_name_conversion.py
 lib/googlecloudsdk/command_lib/run/resources.yaml
 lib/googlecloudsdk/command_lib/run/secrets_mapping.py
 lib/googlecloudsdk/command_lib/run/serverless_operations.py
+lib/googlecloudsdk/command_lib/run/sourcedeploys/__init__.py
+lib/googlecloudsdk/command_lib/run/sourcedeploys/builders.py
 lib/googlecloudsdk/command_lib/run/stages.py
 lib/googlecloudsdk/command_lib/run/streaming.py
 lib/googlecloudsdk/command_lib/run/volumes.py
@@ -4295,6 +4302,10 @@ lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/resources.
 lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/securitycentermanagement_v1_client.py
 lib/googlecloudsdk/generated_clients/apis/securitycentermanagement/v1/securitycentermanagement_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1/__init__.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1/resources.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1/securityposture_v1_client.py
+lib/googlecloudsdk/generated_clients/apis/securityposture/v1/securityposture_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/__init__.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/resources.py
 lib/googlecloudsdk/generated_clients/apis/securityposture/v1alpha/securityposture_v1alpha_client.py
@@ -6530,6 +6541,7 @@ lib/surface/builds/triggers/import.py
 lib/surface/builds/triggers/list.py
 lib/surface/builds/triggers/run.py
 lib/surface/builds/triggers/update/__init__.py
+lib/surface/builds/triggers/update/bitbucket_data_center.py
 lib/surface/builds/triggers/update/bitbucketserver.py
 lib/surface/builds/triggers/update/cloud_source_repositories.py
 lib/surface/builds/triggers/update/github.py
@@ -6979,6 +6991,7 @@ lib/surface/compute/instances/import.py
 lib/surface/compute/instances/list.py
 lib/surface/compute/instances/move.py
 lib/surface/compute/instances/network_interfaces/__init__.py
+lib/surface/compute/instances/network_interfaces/add.py
 lib/surface/compute/instances/network_interfaces/delete.py
 lib/surface/compute/instances/network_interfaces/get_effective_firewalls.py
 lib/surface/compute/instances/network_interfaces/update.py
@@ -7822,6 +7835,7 @@ lib/surface/container/binauthz/policy/create.py
 lib/surface/container/binauthz/policy/delete.py
 lib/surface/container/binauthz/policy/describe.py
 lib/surface/container/binauthz/policy/evaluate.py
+lib/surface/container/binauthz/policy/evaluate_and_sign.py
 lib/surface/container/binauthz/policy/export.py
 lib/surface/container/binauthz/policy/export_system_policy.py
 lib/surface/container/binauthz/policy/get_iam_policy.py
@@ -7983,6 +7997,7 @@ lib/surface/container/fleet/policycontroller/violations/describe.py
 lib/surface/container/fleet/policycontroller/violations/list.py
 lib/surface/container/fleet/rollouts/__init__.py
 lib/surface/container/fleet/rollouts/create.py
+lib/surface/container/fleet/rollouts/delete.py
 lib/surface/container/fleet/rollouts/describe.py
 lib/surface/container/fleet/rollouts/list.py
 lib/surface/container/fleet/rollouts/pause.py
@@ -9200,6 +9215,7 @@ lib/surface/healthcare/dicom_stores/get_iam_policy.yaml
 lib/surface/healthcare/dicom_stores/import/__init__.py
 lib/surface/healthcare/dicom_stores/import/gcs.yaml
 lib/surface/healthcare/dicom_stores/list.yaml
+lib/surface/healthcare/dicom_stores/metrics.yaml
 lib/surface/healthcare/dicom_stores/remove_iam_policy_binding.yaml
 lib/surface/healthcare/dicom_stores/set_iam_policy.yaml
 lib/surface/healthcare/dicom_stores/update.yaml
@@ -9946,6 +9962,15 @@ lib/surface/microservices/features/__init__.py
 lib/surface/microservices/features/disable.py
 lib/surface/microservices/features/enable.py
 lib/surface/microservices/features/list.py
+lib/surface/migration/__init__.py
+lib/surface/migration/vms/__init__.py
+lib/surface/migration/vms/image_imports/__init__.py
+lib/surface/migration/vms/image_imports/create.yaml
+lib/surface/migration/vms/image_imports/delete.yaml
+lib/surface/migration/vms/image_imports/describe.yaml
+lib/surface/migration/vms/image_imports/list.yaml
+lib/surface/migration/vms/target_projects/__init__.py
+lib/surface/migration/vms/target_projects/list.yaml
 lib/surface/ml/__init__.py
 lib/surface/ml/language/__init__.py
 lib/surface/ml/language/__init__.yaml
@@ -10699,6 +10724,7 @@ lib/surface/recaptcha/firewall_policies/create.yaml
 lib/surface/recaptcha/firewall_policies/delete.yaml
 lib/surface/recaptcha/firewall_policies/describe.yaml
 lib/surface/recaptcha/firewall_policies/list.yaml
+lib/surface/recaptcha/firewall_policies/reorder.yaml
 lib/surface/recaptcha/firewall_policies/update.yaml
 lib/surface/recaptcha/keys/__init__.py
 lib/surface/recaptcha/keys/create.yaml
@@ -10999,6 +11025,8 @@ lib/surface/scc/findings/list_marks.py
 lib/surface/scc/findings/set_mute.py
 lib/surface/scc/findings/update.py
 lib/surface/scc/findings/update_marks.py
+lib/surface/scc/iac_validation_reports/__init__.py
+lib/surface/scc/iac_validation_reports/create.yaml
 lib/surface/scc/manage/__init__.py
 lib/surface/scc/manage/custom_modules/__init__.py
 lib/surface/scc/manage/custom_modules/etd/__init__.py
@@ -11199,6 +11227,7 @@ lib/surface/services/api_keys/update.py
 lib/surface/services/disable.py
 lib/surface/services/enable.py
 lib/surface/services/groups/__init__.py
+lib/surface/services/groups/list_ancestor_groups.py
 lib/surface/services/groups/list_descendant_services.py
 lib/surface/services/groups/list_members.py
 lib/surface/services/identity/__init__.py
@@ -11286,6 +11315,7 @@ lib/surface/spanner/backups/set_iam_policy.yaml
 lib/surface/spanner/backups/update_metadata.yaml
 lib/surface/spanner/databases/__init__.py
 lib/surface/spanner/databases/add_iam_policy_binding.yaml
+lib/surface/spanner/databases/change_quorum.py
 lib/surface/spanner/databases/config/__init__.py
 lib/surface/spanner/databases/config/export.yaml
 lib/surface/spanner/databases/create.py
@@ -11328,6 +11358,7 @@ lib/surface/spanner/instances/remove_iam_policy_binding.yaml
 lib/surface/spanner/instances/set_iam_policy.yaml
 lib/surface/spanner/instances/update.py
 lib/surface/spanner/migrate/__init__.py
+lib/surface/spanner/migrate/cleanup.py
 lib/surface/spanner/migrate/data.py
 lib/surface/spanner/migrate/schema.py
 lib/surface/spanner/migrate/schema_and_data.py
@@ -11380,6 +11411,7 @@ lib/surface/sql/import/bak.py
 lib/surface/sql/import/csv.py
 lib/surface/sql/import/sql.py
 lib/surface/sql/instances/__init__.py
+lib/surface/sql/instances/acquire_ssrs_lease.py
 lib/surface/sql/instances/clone.py
 lib/surface/sql/instances/config/__init__.py
 lib/surface/sql/instances/config/export.yaml
@@ -11396,6 +11428,7 @@ lib/surface/sql/instances/patch.py
 lib/surface/sql/instances/perform_storage_shrink.py
 lib/surface/sql/instances/promote_replica.py
 lib/surface/sql/instances/reencrypt.py
+lib/surface/sql/instances/release_ssrs_lease.py
 lib/surface/sql/instances/reset_replica_size.py
 lib/surface/sql/instances/reset_ssl_config.py
 lib/surface/sql/instances/restart.py

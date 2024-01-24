@@ -1898,6 +1898,17 @@ class CloudbuildProjectsLocationsBuildsListRequest(_messages.Message):
   projectId = _messages.StringField(5)
 
 
+class CloudbuildProjectsLocationsGetDefaultServiceAccountRequest(_messages.Message):
+  r"""A CloudbuildProjectsLocationsGetDefaultServiceAccountRequest object.
+
+  Fields:
+    name: Required. The name of the `DefaultServiceAccount` to retrieve.
+      Format: `projects/{project}/locations/{location}/defaultServiceAccount`
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class CloudbuildProjectsLocationsGitLabConfigsConnectedRepositoriesBatchCreateRequest(_messages.Message):
   r"""A CloudbuildProjectsLocationsGitLabConfigsConnectedRepositoriesBatchCrea
   teRequest object.
@@ -2781,6 +2792,25 @@ class CronConfig(_messages.Message):
   enterpriseConfigResource = _messages.StringField(1)
   schedule = _messages.StringField(2)
   timeZone = _messages.StringField(3)
+
+
+class DefaultServiceAccount(_messages.Message):
+  r"""The default service account used for `Builds`.
+
+  Fields:
+    name: Identifier. Format:
+      `projects/{project}/locations/{location}/defaultServiceAccount
+    serviceAccountEmail: Output only. The email address of the service account
+      identity that will be used for a build by default. This is returned in
+      the format `projects/{project}/serviceAccounts/{service_account}` where
+      `{service_account}` could be the legacy Cloud Build SA, in the format
+      [PROJECT_NUMBER]@cloudbuild.gserviceaccount.com or the Compute SA, in
+      the format [PROJECT_NUMBER]-compute@developer.gserviceaccount.com. If no
+      service account will be used by default, this will be empty.
+  """
+
+  name = _messages.StringField(1)
+  serviceAccountEmail = _messages.StringField(2)
 
 
 class DeleteBitbucketServerConfigOperationMetadata(_messages.Message):
@@ -4185,31 +4215,51 @@ class PullRequestFilter(_messages.Message):
   Requests.
 
   Enums:
-    CommentControlValueValuesEnum: Configure builds to run whether a
-      repository owner or collaborator need to comment `/gcbrun`.
+    CommentControlValueValuesEnum: If CommentControl is enabled, depending on
+      the setting, builds may not fire until a repository writer comments
+      `/gcbrun` on a pull request or `/gcbrun` is in the pull request
+      description. Only PR comments that contain `/gcbrun` will trigger
+      builds. If CommentControl is set to disabled, comments with `/gcbrun`
+      from a user with repository write permission or above will still trigger
+      builds to run.
 
   Fields:
     branch: Regex of branches to match. The syntax of the regular expressions
       accepted is the syntax accepted by RE2 and described at
       https://github.com/google/re2/wiki/Syntax
-    commentControl: Configure builds to run whether a repository owner or
-      collaborator need to comment `/gcbrun`.
+    commentControl: If CommentControl is enabled, depending on the setting,
+      builds may not fire until a repository writer comments `/gcbrun` on a
+      pull request or `/gcbrun` is in the pull request description. Only PR
+      comments that contain `/gcbrun` will trigger builds. If CommentControl
+      is set to disabled, comments with `/gcbrun` from a user with repository
+      write permission or above will still trigger builds to run.
     invertRegex: If true, branches that do NOT match the git_ref will trigger
       a build.
   """
 
   class CommentControlValueValuesEnum(_messages.Enum):
-    r"""Configure builds to run whether a repository owner or collaborator
-    need to comment `/gcbrun`.
+    r"""If CommentControl is enabled, depending on the setting, builds may not
+    fire until a repository writer comments `/gcbrun` on a pull request or
+    `/gcbrun` is in the pull request description. Only PR comments that
+    contain `/gcbrun` will trigger builds. If CommentControl is set to
+    disabled, comments with `/gcbrun` from a user with repository write
+    permission or above will still trigger builds to run.
 
     Values:
-      COMMENTS_DISABLED: Do not require comments on Pull Requests before
-        builds are triggered.
-      COMMENTS_ENABLED: Enforce that repository owners or collaborators must
-        comment on Pull Requests before builds are triggered.
-      COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY: Enforce that repository
-        owners or collaborators must comment on external contributors' Pull
-        Requests before builds are triggered.
+      COMMENTS_DISABLED: Do not require `/gcbrun` comments from a user with
+        repository write permission or above on pull requests before builds
+        are triggered. Comments that contain `/gcbrun` will still fire builds
+        so this should be thought of as comments not required.
+      COMMENTS_ENABLED: Builds will only fire in response to pull requests if:
+        1. The pull request author has repository write permission or above
+        and `/gcbrun` is in the PR description. 2. A user with repository
+        writer permissions or above comments `/gcbrun` on a pull request
+        authored by any user.
+      COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY: Builds will only fire
+        in response to pull requests if: 1. The pull request author is a
+        repository writer or above. 2. If the author does not have write
+        permissions, a user with write permissions or above must comment
+        `/gcbrun` in order to fire a build.
     """
     COMMENTS_DISABLED = 0
     COMMENTS_ENABLED = 1

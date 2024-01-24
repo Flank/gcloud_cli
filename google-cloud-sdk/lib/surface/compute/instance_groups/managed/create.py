@@ -31,12 +31,14 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags
+from googlecloudsdk.command_lib.compute import resource_manager_tags_utils
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.command_lib.compute.instance_groups.managed import flags as managed_flags
 from googlecloudsdk.command_lib.compute.managed_instance_groups import auto_healing_utils
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import properties
+import six
 
 # API allows up to 58 characters but asked us to send only 54 (unless user
 # explicitly asks us for more).
@@ -66,6 +68,30 @@ def _AddInstanceGroupManagerArgs(parser):
       help=('Specifies any target pools you want the instances of this '
             'managed instance group to be part of.'))
   managed_flags.INSTANCE_TEMPLATE_ARG.AddArgument(parser)
+
+
+def _AddInstanceFlexibilityPolicyArgs(parser):
+  """Adds instance flexibility policy args."""
+  parser.add_argument(
+      '--instance-selection-machine-types',
+      type=arg_parsers.ArgList(),
+      metavar='MACHINE_TYPE',
+      help=(
+          'Primary machine types to use for the Compute Engine instances that'
+          ' will be created with the managed instance group. If not provided,'
+          ' machine type specified in the instance template will be used.'
+      ),
+  )
+  parser.add_argument(
+      '--instance-selection-secondary-machine-types',
+      type=arg_parsers.ArgList(),
+      metavar='MACHINE_TYPE',
+      help=(
+          'Secondary machine types to use for the Compute Engine instances that'
+          ' will be created with the managed instance group. If not provided,'
+          ' machine type specified in the instance template will be used.'
+      ),
+  )
 
 
 def _IsZonalGroup(ref):
@@ -104,6 +130,7 @@ class CreateGA(base.CreateCommand):
   """Create Compute Engine managed instance groups."""
 
   support_update_policy_min_ready_flag = False
+  support_resource_manager_tags = False
 
   @classmethod
   def Args(cls, parser):
@@ -121,6 +148,8 @@ class CreateGA(base.CreateCommand):
     managed_flags.AddMigUpdatePolicyFlags(
         parser, support_min_ready_flag=cls.support_update_policy_min_ready_flag)
     managed_flags.AddMigForceUpdateOnRepairFlags(parser)
+    if cls.support_resource_manager_tags:
+      managed_flags.AddMigResourceManagerTagsFlags(parser)
     # When adding RMIG-specific flag, update REGIONAL_FLAGS constant.
 
   def _HandleStatefulArgs(self, instance_group_manager, args, client):
@@ -272,6 +301,23 @@ class CreateGA(base.CreateCommand):
                 collection='compute.targetPools'))
     return [pool_ref.SelfLink() for pool_ref in pool_refs]
 
+  def _CreateParams(self, client, resource_manager_tags):
+    resource_manager_tags_map = (
+        resource_manager_tags_utils.GetResourceManagerTags(
+            resource_manager_tags
+        )
+    )
+    params = client.messages.InstanceGroupManagerParams
+    additional_properties = [
+        params.ResourceManagerTagsValue.AdditionalProperty(key=key, value=value)
+        for key, value in sorted(six.iteritems(resource_manager_tags_map))
+    ]
+    return params(
+        resourceManagerTags=params.ResourceManagerTagsValue(
+            additionalProperties=additional_properties
+        )
+    )
+
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):
     """Create parts of Instance Group Manager shared for the track."""
@@ -316,6 +362,11 @@ class CreateGA(base.CreateCommand):
           client.messages.InstanceGroupManager
           .ListManagedInstancesResultsValueValuesEnum)(
               args.list_managed_instances_results.upper())
+
+    if self.support_resource_manager_tags and args.resource_manager_tags:
+      instance_group_manager.params = self._CreateParams(
+          client, args.resource_manager_tags
+      )
 
     self._HandleStatefulArgs(instance_group_manager, args, client)
 
@@ -406,6 +457,7 @@ class CreateBeta(CreateGA):
   """Create Compute Engine managed instance groups."""
 
   support_update_policy_min_ready_flag = True
+  support_resource_manager_tags = False
 
   @classmethod
   def Args(cls, parser):
@@ -440,9 +492,12 @@ CreateBeta.detailed_help = CreateGA.detailed_help
 class CreateAlpha(CreateBeta):
   """Create Compute Engine managed instance groups."""
 
+  support_resource_manager_tags = True
+
   @classmethod
   def Args(cls, parser):
     super(CreateAlpha, cls).Args(parser)
+    _AddInstanceFlexibilityPolicyArgs(parser)
 
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):
@@ -450,7 +505,14 @@ class CreateAlpha(CreateBeta):
                                    self)._CreateInstanceGroupManager(
                                        args, group_ref, template_ref, client,
                                        holder)
+    instance_flexibility_policy = (
+        managed_instance_groups_utils.CreateInstanceFlexibilityPolicy(
+            client.messages, args
+        )
+    )
+    instance_group_manager.instanceFlexibilityPolicy = (
+        instance_flexibility_policy
+    )
     return instance_group_manager
-
 
 CreateAlpha.detailed_help = CreateGA.detailed_help

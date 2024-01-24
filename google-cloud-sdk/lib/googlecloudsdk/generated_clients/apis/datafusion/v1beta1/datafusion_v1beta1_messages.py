@@ -281,7 +281,10 @@ class DatafusionProjectsLocationsInstancesCreateRequest(_messages.Message):
 
   Fields:
     instance: A Instance resource to be passed as the request body.
-    instanceId: Required. The name of the instance to create.
+    instanceId: Required. The name of the instance to create. Instance name
+      can only contain lowercase alphanumeric characters and hyphens. It must
+      start with a letter and must not end with a hyphen. It can have a
+      maximum of 30 characters.
     parent: Required. The instance's project and location in the format
       projects/{project}/locations/{location}.
   """
@@ -823,7 +826,8 @@ class Instance(_messages.Message):
     createTime: Output only. The time the instance was created.
     cryptoKeyConfig: The crypto key configuration. This field is used by the
       Customer-Managed Encryption Keys (CMEK) feature.
-    dataplexDataLineageIntegrationEnabled: Optional. Reserved for future use.
+    dataplexDataLineageIntegrationEnabled: Optional. Option to enable the
+      Dataplex Lineage Integration feature.
     dataprocServiceAccount: User-managed service account to set on Dataproc
       when Cloud Data Fusion creates Dataproc to run data processing
       pipelines. This allows users to have fine-grained access control on

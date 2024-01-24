@@ -31,7 +31,6 @@ from apitools.base.py import encoding
 from apitools.base.py import exceptions as api_exceptions
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
-from googlecloudsdk.api_lib.cloudbuild.v2 import client_util as cloudbuildv2_util
 from googlecloudsdk.api_lib.run import condition as run_condition
 from googlecloudsdk.api_lib.run import configuration
 from googlecloudsdk.api_lib.run import domain_mapping
@@ -665,9 +664,7 @@ class ServerlessOperations(object):
           )
       )
 
-  def UpdateTraffic(
-      self, service_ref, config_changes, tracker, asyn, use_wait=False
-  ):
+  def UpdateTraffic(self, service_ref, config_changes, tracker, asyn):
     """Update traffic splits for service."""
     if tracker is None:
       tracker = progress_tracker.NoOpStagedProgressTracker(
@@ -681,18 +678,22 @@ class ServerlessOperations(object):
           'Service [{}] could not be found.'.format(service_ref.servicesId)
       )
 
-    self._UpdateOrCreateService(service_ref, config_changes, False, serv)
+    updated_serv = self._UpdateOrCreateService(
+        service_ref, config_changes, False, serv
+    )
 
     if not asyn:
       getter = (
-          functools.partial(self.WaitService, serv.operation_id)
-          if use_wait
-          else functools.partial(self.GetService, service_ref)
+          functools.partial(self.GetService, service_ref)
+          if updated_serv.operation_id is None
+          else functools.partial(self.WaitService, updated_serv.operation_id)
       )
-      poller = op_pollers.ServiceConditionPoller(getter, tracker, serv=serv)
+      poller = op_pollers.ServiceConditionPoller(
+          getter, tracker, serv=updated_serv
+      )
       self.WaitForCondition(poller)
-      serv = poller.GetResource()
-    return serv
+      updated_serv = poller.GetResource()
+    return updated_serv
 
   def _AddRevisionForcingChange(self, serv, config_changes):
     """Get a new revision forcing config change for the given service."""
@@ -706,16 +707,7 @@ class ServerlessOperations(object):
       self, tracker, build_messages, build_config, skip_activation_prompt=False
   ):
     """Build an image from source if a user specifies a source when deploying."""
-    project = properties.VALUES.core.project.Get(required=True)
-    cloud_build_regions = [
-        location.locationId
-        for location in cloudbuildv2_util.ListLocations(project).locations
-    ]
-    build_region = (
-        self._region
-        if self._region in cloud_build_regions
-        else cloudbuild_util.DEFAULT_REGION
-    )
+    build_region = cloudbuild_util.DEFAULT_REGION
     build, _ = submit_util.Build(
         build_messages,
         True,
@@ -746,6 +738,7 @@ class ServerlessOperations(object):
       self,
       service_ref,
       config_changes,
+      release_track,  # pylint: disable=unused-argument
       tracker=None,
       asyn=False,
       allow_unauthenticated=None,
@@ -758,7 +751,6 @@ class ServerlessOperations(object):
       already_activated_services=False,
       dry_run=False,
       generate_name=False,
-      use_wait=False,
   ):
     """Change the given service in prod using the given config_changes.
 
@@ -768,6 +760,7 @@ class ServerlessOperations(object):
     Args:
       service_ref: Resource, the service to release.
       config_changes: list, objects that implement Adjust().
+      release_track: ReleaseTrack, the release track of a command calling this.
       tracker: StagedProgressTracker, to report on the progress of releasing.
       asyn: bool, if True, return without waiting for the service to be updated.
       allow_unauthenticated: bool, True if creating a hosted Cloud Run service
@@ -789,7 +782,6 @@ class ServerlessOperations(object):
         services
       dry_run: bool. If true, only validate the configuration.
       generate_name: bool. If true, create a revision name, otherwise add nonce.
-      use_wait: uses wait-operation for async instead of polling get
 
     Returns:
       service.Service, the service as returned by the server on the POST/PUT
@@ -898,12 +890,15 @@ class ServerlessOperations(object):
 
     if not asyn and not dry_run:
       getter = (
-          functools.partial(self.WaitService, updated_service.operation_id)
-          if use_wait
-          else functools.partial(self.GetService, service_ref)
+          functools.partial(self.GetService, service_ref)
+          if updated_service.operation_id is None
+          else functools.partial(self.WaitService, updated_service.operation_id)
       )
       poller = op_pollers.ServiceConditionPoller(
-          getter, tracker, dependencies=stages.ServiceDependencies(), serv=serv
+          getter,
+          tracker,
+          dependencies=stages.ServiceDependencies(),
+          serv=updated_service,
       )
       self.WaitForCondition(poller)
       for msg in run_condition.GetNonTerminalMessages(poller.GetConditions()):
@@ -1183,6 +1178,7 @@ class ServerlessOperations(object):
       self,
       job_ref,
       config_changes,
+      release_track,  # pylint: disable=unused-argument
       tracker=None,
       asyn=False,
       build_image=None,
@@ -1197,6 +1193,7 @@ class ServerlessOperations(object):
     Args:
       job_ref: Resource, the job to create or update.
       config_changes: list, objects that implement Adjust().
+      release_track: ReleaseTrack, the release track of a command calling this.
       tracker: StagedProgressTracker, to report on the progress of releasing.
       asyn: bool, if True, return without waiting for the job to be updated.
       build_image: The build image reference to the build.
@@ -1287,7 +1284,9 @@ class ServerlessOperations(object):
     )
     with metrics.RecordDuration(metric_names.CREATE_JOB):
       try:
-        created_job = self._client.namespaces_jobs.Create(create_request)
+        created_job = job.Job(
+            self._client.namespaces_jobs.Create(create_request), messages
+        )
       except api_exceptions.HttpConflictError:
         raise serverless_exceptions.DeploymentFailedError(
             'Job [{}] already exists.'.format(job_ref.Name())
@@ -1297,8 +1296,9 @@ class ServerlessOperations(object):
       getter = functools.partial(self.GetJob, job_ref)
       poller = op_pollers.ConditionPoller(getter, tracker)
       self.WaitForCondition(poller)
+      created_job = poller.GetResource()
 
-    return job.Job(created_job, messages)
+    return created_job
 
   def UpdateJob(self, job_ref, config_changes, tracker=None, asyn=False):
     """Update an existing Cloud Run Job.
@@ -1324,14 +1324,17 @@ class ServerlessOperations(object):
         job=update_job.Message(), name=job_ref.RelativeName()
     )
     with metrics.RecordDuration(metric_names.UPDATE_JOB):
-      returned_job = self._client.namespaces_jobs.ReplaceJob(replace_request)
+      returned_job = job.Job(
+          self._client.namespaces_jobs.ReplaceJob(replace_request), messages
+      )
 
     if not asyn:
       getter = functools.partial(self.GetJob, job_ref)
       poller = op_pollers.ConditionPoller(getter, tracker)
       self.WaitForCondition(poller)
+      returned_job = poller.GetResource()
 
-    return job.Job(returned_job, messages)
+    return returned_job
 
   def RunJob(
       self,

@@ -528,11 +528,16 @@ class CopyLogEntriesMetadata(_messages.Message):
   Fields:
     cancellationRequested: Identifies whether the user has requested
       cancellation of the operation.
+    destination: Destination to which to copy log entries.For example, a Cloud
+      Storage bucket:"storage.googleapis.com/my-cloud-storage-bucket"
     endTime: The end time of an operation.
     progress: Estimated progress of the operation (0 - 100%).
     request: CopyLogEntries RPC request.
+    source: Source from which to copy log entries.For example, a log
+      bucket:"projects/my-project/locations/global/buckets/my-source-bucket"
     startTime: The create time of an operation.
     state: Output only. State of an operation.
+    verb: Name of the verb executed by the operation.For example,"copy"
     writerIdentity: The IAM identity of a service account that must be granted
       access to the destination.If the service account is not granted
       permission to the destination within an hour, the operation will be
@@ -563,12 +568,15 @@ class CopyLogEntriesMetadata(_messages.Message):
     OPERATION_STATE_PENDING = 7
 
   cancellationRequested = _messages.BooleanField(1)
-  endTime = _messages.StringField(2)
-  progress = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  request = _messages.MessageField('CopyLogEntriesRequest', 4)
-  startTime = _messages.StringField(5)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
-  writerIdentity = _messages.StringField(7)
+  destination = _messages.StringField(2)
+  endTime = _messages.StringField(3)
+  progress = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  request = _messages.MessageField('CopyLogEntriesRequest', 5)
+  source = _messages.StringField(6)
+  startTime = _messages.StringField(7)
+  state = _messages.EnumField('StateValueValuesEnum', 8)
+  verb = _messages.StringField(9)
+  writerIdentity = _messages.StringField(10)
 
 
 class CopyLogEntriesRequest(_messages.Message):
@@ -1448,17 +1456,9 @@ class LogBucket(_messages.Message):
     indexConfigs: Optional. A list of indexed fields and related configuration
       data.
     lifecycleState: Output only. The bucket lifecycle state.
-    linkedBigqueryDataset: Output only. The name of the BigQuery dataset this
-      log bucket is linked to.For
-      example:bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]
-      DEPRECATED: Do not use this field. Use the Link API instead.
     locked: Optional. Whether the bucket is locked.The retention period on a
       locked bucket cannot be changed. Locked buckets may only be deleted if
       they are empty.
-    logLink: Configures a linked dataset in BigQuery corresponding to this log
-      bucket.Requires analytics_enabled to be true. A log link can only be
-      enabled by updating an existing bucket with analytics enabled.
-      DEPRECATED: Do not use this field. Use the link API instead.
     name: Output only. The resource name of the bucket.For
       example:projects/my-project/locations/global/buckets/my-bucketFor a list
       of supported locations, see Supported Regions
@@ -1527,9 +1527,19 @@ class LogBucket(_messages.Message):
       REQUIRED_RETENTION_DURATION: The requirement that the "_Required" bucket
         must have its default retention of 400 days set.
       FIELD_LEVEL_ACCESS_CONTROLS_UNSET: The requirement that no field level
-        access controls are configured for the bucket.
+        access controls are configured for the bucket. This requirement is
+        deprecated as buckets with restricted field ACLs can now be upgraded
+        to Log Analytics. However, the following applies: 1. Users who do not
+        have access to the restricted fields will not be able to query any
+        views in the bucket using Log Analytics. 2. Users who have access to
+        all restricted fields can query any views they have access to in the
+        bucket using Log Analytics. 3. If a linked dataset exists in the
+        bucket, all data accessible via views in the bucket is queryable via
+        the linked dataset in BigQuery. Field level ACLs should be applied to
+        linked datasets using BigQuery access control mechanisms.
       CMEK_UNSET: The requirement that no CMEK configuration is set for the
-        bucket.
+        bucket. This requirement is deprecated as buckets with CMEK can now be
+        upgraded to Log Analytics.
       NOT_LOCKED: The requirement that the bucket is not locked.
       ORGANIZATION_BUCKET: The requirement that the bucket must not be
         contained within an org.
@@ -1560,14 +1570,12 @@ class LogBucket(_messages.Message):
   description = _messages.StringField(5)
   indexConfigs = _messages.MessageField('IndexConfig', 6, repeated=True)
   lifecycleState = _messages.EnumField('LifecycleStateValueValuesEnum', 7)
-  linkedBigqueryDataset = _messages.StringField(8)
-  locked = _messages.BooleanField(9)
-  logLink = _messages.MessageField('LogLink', 10)
-  name = _messages.StringField(11)
-  restrictedFields = _messages.StringField(12, repeated=True)
-  retentionDays = _messages.IntegerField(13, variant=_messages.Variant.INT32)
-  unmetAnalyticsUpgradeRequirements = _messages.EnumField('UnmetAnalyticsUpgradeRequirementsValueListEntryValuesEnum', 14, repeated=True)
-  updateTime = _messages.StringField(15)
+  locked = _messages.BooleanField(8)
+  name = _messages.StringField(9)
+  restrictedFields = _messages.StringField(10, repeated=True)
+  retentionDays = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  unmetAnalyticsUpgradeRequirements = _messages.EnumField('UnmetAnalyticsUpgradeRequirementsValueListEntryValuesEnum', 12, repeated=True)
+  updateTime = _messages.StringField(13)
 
 
 class LogEntry(_messages.Message):
@@ -1991,23 +1999,6 @@ class LogLine(_messages.Message):
   severity = _messages.EnumField('SeverityValueValuesEnum', 2)
   sourceLocation = _messages.MessageField('SourceLocation', 3)
   time = _messages.StringField(4)
-
-
-class LogLink(_messages.Message):
-  r"""DEPRECATED: Use the Link API to create Log Links.
-
-  Fields:
-    enabled: Enables a log link, and creates a BigQuery dataset in the same
-      parent project as the log bucket. The dataset will be named the same as
-      the log bucket name, and will contain views to access the logs in the
-      bucket.If an active log link is disabled, the dataset and views are
-      deleted.
-    loggingServiceAccount: Output only. An IAM service account used by Cloud
-      Logging to create views on the destination dataset.
-  """
-
-  enabled = _messages.BooleanField(1)
-  loggingServiceAccount = _messages.StringField(2)
 
 
 class LogMetric(_messages.Message):

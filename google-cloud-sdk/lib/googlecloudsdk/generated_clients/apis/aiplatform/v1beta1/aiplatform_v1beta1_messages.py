@@ -2319,7 +2319,7 @@ class AiplatformProjectsLocationsFeatureOnlineStoresCreateRequest(_messages.Mess
       GoogleCloudAiplatformV1beta1FeatureOnlineStore resource to be passed as
       the request body.
     parent: Required. The resource name of the Location to create
-      FeatureOnlineStores. Format: `projects/{project}/locations/{location}'`
+      FeatureOnlineStores. Format: `projects/{project}/locations/{location}`
   """
 
   featureOnlineStoreId = _messages.StringField(1)
@@ -9477,7 +9477,7 @@ class CloudAiNlLlmProtoServiceRaiResult(_messages.Message):
   blocked = _messages.BooleanField(2)
   errorCodes = _messages.IntegerField(3, repeated=True, variant=_messages.Variant.INT32)
   filtered = _messages.BooleanField(4)
-  languageFilterResult = _messages.MessageField('LearningServingLlmLanguageFilterResult', 5)
+  languageFilterResult = _messages.MessageField('LearningGenaiRootLanguageFilterResult', 5)
   raiSignals = _messages.MessageField('CloudAiNlLlmProtoServiceRaiSignal', 6, repeated=True)
   triggeredBlocklist = _messages.BooleanField(7)
   triggeredRecitation = _messages.BooleanField(8)
@@ -11645,9 +11645,11 @@ class GoogleCloudAiplatformV1beta1CreatePersistentResourceOperationMetadata(_mes
 
   Fields:
     genericMetadata: Operation metadata for PersistentResource.
+    progressMessage: Progress Message for Create LRO
   """
 
   genericMetadata = _messages.MessageField('GoogleCloudAiplatformV1beta1GenericOperationMetadata', 1)
+  progressMessage = _messages.StringField(2)
 
 
 class GoogleCloudAiplatformV1beta1CreatePipelineJobRequest(_messages.Message):
@@ -18746,8 +18748,8 @@ class GoogleCloudAiplatformV1beta1Model(_messages.Message):
       scheme, than the one given on input. The output URI will point to a
       location where the user only has a read access.
     modelSourceInfo: Output only. Source of a model. It can either be automl
-      training pipeline, custom training pipeline, BigQuery ML, or existing
-      Vertex AI Model.
+      training pipeline, custom training pipeline, BigQuery ML, or saved and
+      tuned from Genie or Model Garden.
     name: The resource name of the Model.
     originalModelInfo: Output only. If this Model is a copy of another Model,
       this contains info about the original.
@@ -20645,6 +20647,14 @@ class GoogleCloudAiplatformV1beta1NearestNeighborSearchOperationMetadataRecordEr
       EMBEDDING_SIZE_MISMATCH: The size of the embedding vectors does not
         match with the specified dimension.
       NAMESPACE_MISSING: The `namespace` field is missing.
+      PARSING_ERROR: Generic catch-all error. Only used for validation failure
+        where the root cause cannot be easily retrieved programmatically.
+      DUPLICATE_NAMESPACE: There are multiple restricts with the same
+        `namespace` value.
+      OP_IN_DATAPOINT: Numeric restrict has operator specified in datapoint.
+      MULTIPLE_VALUES: Numeric restrict has multiple values specified.
+      INVALID_NUMERIC_VALUE: Numeric restrict has invalid numeric value
+        specified.
     """
     ERROR_TYPE_UNSPECIFIED = 0
     EMPTY_LINE = 1
@@ -20654,6 +20664,11 @@ class GoogleCloudAiplatformV1beta1NearestNeighborSearchOperationMetadataRecordEr
     INVALID_EMBEDDING_ID = 5
     EMBEDDING_SIZE_MISMATCH = 6
     NAMESPACE_MISSING = 7
+    PARSING_ERROR = 8
+    DUPLICATE_NAMESPACE = 9
+    OP_IN_DATAPOINT = 10
+    MULTIPLE_VALUES = 11
+    INVALID_NUMERIC_VALUE = 12
 
   embeddingId = _messages.StringField(1)
   errorMessage = _messages.StringField(2)
@@ -21534,6 +21549,10 @@ class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfig(_messages.Message):
       pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
 
   Fields:
+    defaultRuntime: Optional. The default runtime for the PipelineJob. If not
+      provided, Vertex Custom Job is used as the runtime. For Vertex Custom
+      Job, please refer to https://cloud.google.com/vertex-
+      ai/docs/training/overview
     failurePolicy: Represents the failure policy of a pipeline. Currently, the
       default of a pipeline is that the pipeline will continue to run until no
       more tasks can be executed, also known as
@@ -21669,11 +21688,22 @@ class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfig(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  failurePolicy = _messages.EnumField('FailurePolicyValueValuesEnum', 1)
-  gcsOutputDirectory = _messages.StringField(2)
-  inputArtifacts = _messages.MessageField('InputArtifactsValue', 3)
-  parameterValues = _messages.MessageField('ParameterValuesValue', 4)
-  parameters = _messages.MessageField('ParametersValue', 5)
+  defaultRuntime = _messages.MessageField('GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigDefaultRuntime', 1)
+  failurePolicy = _messages.EnumField('FailurePolicyValueValuesEnum', 2)
+  gcsOutputDirectory = _messages.StringField(3)
+  inputArtifacts = _messages.MessageField('InputArtifactsValue', 4)
+  parameterValues = _messages.MessageField('ParameterValuesValue', 5)
+  parameters = _messages.MessageField('ParametersValue', 6)
+
+
+class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigDefaultRuntime(_messages.Message):
+  r"""The default runtime for the PipelineJob.
+
+  Fields:
+    persistentResourceRuntimeDetail: Persistent resource based runtime detail.
+  """
+
+  persistentResourceRuntimeDetail = _messages.MessageField('GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigPersistentResourceRuntimeDetail', 1)
 
 
 class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigInputArtifact(_messages.Message):
@@ -21688,6 +21718,19 @@ class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigInputArtifact(_message
   """
 
   artifactId = _messages.StringField(1)
+
+
+class GoogleCloudAiplatformV1beta1PipelineJobRuntimeConfigPersistentResourceRuntimeDetail(_messages.Message):
+  r"""Persistent resource based runtime detail. For more information, refer to
+  https://cloud.google.com/vertex-ai/docs/training/persistent-resource-
+  overview
+
+  Fields:
+    persistentResourceName: Persistent resource name. Format: `projects/{proje
+      ct}/locations/{location}/persistentResources/{persistent_resource}`
+  """
+
+  persistentResourceName = _messages.StringField(1)
 
 
 class GoogleCloudAiplatformV1beta1PipelineTaskDetail(_messages.Message):
@@ -22953,16 +22996,6 @@ class GoogleCloudAiplatformV1beta1ReadTensorboardUsageResponsePerUserUsageData(_
   viewCount = _messages.IntegerField(2)
 
 
-class GoogleCloudAiplatformV1beta1RebootPersistentResourceOperationMetadata(_messages.Message):
-  r"""Details of operations that perform reboot PersistentResource.
-
-  Fields:
-    genericMetadata: Operation metadata for PersistentResource.
-  """
-
-  genericMetadata = _messages.MessageField('GoogleCloudAiplatformV1beta1GenericOperationMetadata', 1)
-
-
 class GoogleCloudAiplatformV1beta1RemoveContextChildrenRequest(_messages.Message):
   r"""Request message for MetadataService.DeleteContextChildrenRequest.
 
@@ -23032,8 +23065,7 @@ class GoogleCloudAiplatformV1beta1ReportExecutionEventResponse(_messages.Message
 
 
 class GoogleCloudAiplatformV1beta1ReportRuntimeEventRequest(_messages.Message):
-  r"""LINT.IfChange(report_event_message_types) Request message for
-  NotebookInternalService.ReportRuntimeEvent.
+  r"""Request message for NotebookInternalService.ReportRuntimeEvent.
 
   Enums:
     EventTypeValueValuesEnum: Required. The type of the event.
@@ -29691,9 +29723,11 @@ class GoogleCloudAiplatformV1beta1UpdatePersistentResourceOperationMetadata(_mes
 
   Fields:
     genericMetadata: Operation metadata for PersistentResource.
+    progressMessage: Progress Message for Update LRO
   """
 
   genericMetadata = _messages.MessageField('GoogleCloudAiplatformV1beta1GenericOperationMetadata', 1)
+  progressMessage = _messages.StringField(2)
 
 
 class GoogleCloudAiplatformV1beta1UpdateSpecialistPoolOperationMetadata(_messages.Message):
@@ -30731,7 +30765,7 @@ class LanguageLabsAidaTrustRecitationProtoDocAttribution(_messages.Message):
   whatever fields are most applicable for that document's datasource. For
   example, a Wikipedia article's attribution is in the form of its article
   title, a website is in the form of a URL, and a Github repo is in the form
-  of a repo name. Next id:28
+  of a repo name. Next id: 30
 
   Enums:
     CategoryValueValuesEnum:
@@ -30742,6 +30776,8 @@ class LanguageLabsAidaTrustRecitationProtoDocAttribution(_messages.Message):
     arxivId: A string attribute.
     author: A string attribute.
     bibkey: A string attribute.
+    biorxivId: ID of the paper in bioarxiv like ddoi.org/{biorxiv_id} eg:
+      https://doi.org/10.1101/343517
     bookTitle: A string attribute.
     bookVolumeId: The Oceanographers full-view books dataset uses a 'volume
       id' as the unique ID of a book. There is a deterministic function from a
@@ -30781,6 +30817,7 @@ class LanguageLabsAidaTrustRecitationProtoDocAttribution(_messages.Message):
       includes article titles but not URLs. While a URL is to the best of our
       knowledge a deterministic function of the title, we store the original
       title to reflect the information in the original dataset.
+    youtubeVideoId: The unique video id from Youtube. Example: AkoGsW52Ir0
   """
 
   class CategoryValueValuesEnum(_messages.Enum):
@@ -31511,29 +31548,31 @@ class LanguageLabsAidaTrustRecitationProtoDocAttribution(_messages.Message):
   arxivId = _messages.StringField(2)
   author = _messages.StringField(3)
   bibkey = _messages.StringField(4)
-  bookTitle = _messages.StringField(5)
-  bookVolumeId = _messages.IntegerField(6)
-  category = _messages.EnumField('CategoryValueValuesEnum', 7)
-  conversationId = _messages.StringField(8)
-  dataset = _messages.EnumField('DatasetValueValuesEnum', 9)
-  filepath = _messages.StringField(10)
-  geminiId = _messages.StringField(11)
-  gnewsArticleTitle = _messages.StringField(12)
-  goodallExampleId = _messages.StringField(13)
-  isOptOut = _messages.BooleanField(14)
-  isPrompt = _messages.BooleanField(15)
-  lamdaExampleId = _messages.StringField(16)
-  license = _messages.StringField(17)
-  meenaConversationId = _messages.StringField(18)
-  naturalLanguageCode = _messages.StringField(19)
-  noAttribution = _messages.BooleanField(20)
-  podcastUtteranceId = _messages.StringField(21)
-  publicationDate = _messages.MessageField('GoogleTypeDate', 22)
-  qualityScoreExperimentOnly = _messages.FloatField(23)
-  repo = _messages.StringField(24)
-  url = _messages.StringField(25)
-  volumeId = _messages.StringField(26)
-  wikipediaArticleTitle = _messages.StringField(27)
+  biorxivId = _messages.StringField(5)
+  bookTitle = _messages.StringField(6)
+  bookVolumeId = _messages.IntegerField(7)
+  category = _messages.EnumField('CategoryValueValuesEnum', 8)
+  conversationId = _messages.StringField(9)
+  dataset = _messages.EnumField('DatasetValueValuesEnum', 10)
+  filepath = _messages.StringField(11)
+  geminiId = _messages.StringField(12)
+  gnewsArticleTitle = _messages.StringField(13)
+  goodallExampleId = _messages.StringField(14)
+  isOptOut = _messages.BooleanField(15)
+  isPrompt = _messages.BooleanField(16)
+  lamdaExampleId = _messages.StringField(17)
+  license = _messages.StringField(18)
+  meenaConversationId = _messages.StringField(19)
+  naturalLanguageCode = _messages.StringField(20)
+  noAttribution = _messages.BooleanField(21)
+  podcastUtteranceId = _messages.StringField(22)
+  publicationDate = _messages.MessageField('GoogleTypeDate', 23)
+  qualityScoreExperimentOnly = _messages.FloatField(24)
+  repo = _messages.StringField(25)
+  url = _messages.StringField(26)
+  volumeId = _messages.StringField(27)
+  wikipediaArticleTitle = _messages.StringField(28)
+  youtubeVideoId = _messages.StringField(29)
 
 
 class LanguageLabsAidaTrustRecitationProtoRecitationResult(_messages.Message):
@@ -32387,7 +32426,7 @@ class LearningGenaiRecitationDocAttribution(_messages.Message):
   whatever fields are most applicable for that document's datasource. For
   example, a Wikipedia article's attribution is in the form of its article
   title, a website is in the form of a URL, and a Github repo is in the form
-  of a repo name. Next id: 28
+  of a repo name. Next id: 30
 
   Enums:
     DatasetValueValuesEnum: The dataset this document comes from.
@@ -32397,6 +32436,8 @@ class LearningGenaiRecitationDocAttribution(_messages.Message):
     arxivId: A string attribute.
     author: A string attribute.
     bibkey: A string attribute.
+    biorxivId: ID of the paper in bioarxiv like ddoi.org/{biorxiv_id} eg:
+      https://doi.org/10.1101/343517
     bookTitle: A string attribute.
     bookVolumeId: The Oceanographers full-view books dataset uses a 'volume
       id' as the unique ID of a book. There is a deterministic function from a
@@ -32435,6 +32476,7 @@ class LearningGenaiRecitationDocAttribution(_messages.Message):
       includes article titles but not URLs. While a URL is to the best of our
       knowledge a deterministic function of the title, we store the original
       title to reflect the information in the original dataset.
+    youtubeVideoId: A string attribute.
   """
 
   class DatasetValueValuesEnum(_messages.Enum):
@@ -33148,28 +33190,30 @@ class LearningGenaiRecitationDocAttribution(_messages.Message):
   arxivId = _messages.StringField(2)
   author = _messages.StringField(3)
   bibkey = _messages.StringField(4)
-  bookTitle = _messages.StringField(5)
-  bookVolumeId = _messages.IntegerField(6)
-  conversationId = _messages.StringField(7)
-  dataset = _messages.EnumField('DatasetValueValuesEnum', 8)
-  filepath = _messages.StringField(9)
-  geminiId = _messages.StringField(10)
-  gnewsArticleTitle = _messages.StringField(11)
-  goodallExampleId = _messages.StringField(12)
-  isOptOut = _messages.BooleanField(13)
-  isPrompt = _messages.BooleanField(14)
-  lamdaExampleId = _messages.StringField(15)
-  license = _messages.StringField(16)
-  meenaConversationId = _messages.StringField(17)
-  naturalLanguageCode = _messages.StringField(18)
-  noAttribution = _messages.BooleanField(19)
-  podcastUtteranceId = _messages.StringField(20)
-  publicationDate = _messages.MessageField('GoogleTypeDate', 21)
-  qualityScoreExperimentOnly = _messages.FloatField(22)
-  repo = _messages.StringField(23)
-  url = _messages.StringField(24)
-  volumeId = _messages.StringField(25)
-  wikipediaArticleTitle = _messages.StringField(26)
+  biorxivId = _messages.StringField(5)
+  bookTitle = _messages.StringField(6)
+  bookVolumeId = _messages.IntegerField(7)
+  conversationId = _messages.StringField(8)
+  dataset = _messages.EnumField('DatasetValueValuesEnum', 9)
+  filepath = _messages.StringField(10)
+  geminiId = _messages.StringField(11)
+  gnewsArticleTitle = _messages.StringField(12)
+  goodallExampleId = _messages.StringField(13)
+  isOptOut = _messages.BooleanField(14)
+  isPrompt = _messages.BooleanField(15)
+  lamdaExampleId = _messages.StringField(16)
+  license = _messages.StringField(17)
+  meenaConversationId = _messages.StringField(18)
+  naturalLanguageCode = _messages.StringField(19)
+  noAttribution = _messages.BooleanField(20)
+  podcastUtteranceId = _messages.StringField(21)
+  publicationDate = _messages.MessageField('GoogleTypeDate', 22)
+  qualityScoreExperimentOnly = _messages.FloatField(23)
+  repo = _messages.StringField(24)
+  url = _messages.StringField(25)
+  volumeId = _messages.StringField(26)
+  wikipediaArticleTitle = _messages.StringField(27)
+  youtubeVideoId = _messages.StringField(28)
 
 
 class LearningGenaiRecitationRecitationResult(_messages.Message):
@@ -34196,7 +34240,7 @@ class LearningGenaiRootFilterMetadataFilterDebugInfo(_messages.Message):
   Fields:
     classifierOutput: A LearningGenaiRootClassifierOutput attribute.
     defaultMetadata: A string attribute.
-    languageFilterResult: A LearningServingLlmLanguageFilterResult attribute.
+    languageFilterResult: A LearningGenaiRootLanguageFilterResult attribute.
     raiOutput: Safety filter output information for LLM Root RAI harm check.
     raiResult: A CloudAiNlLlmProtoServiceRaiResult attribute.
     raiSignal: A CloudAiNlLlmProtoServiceRaiSignal attribute.
@@ -34208,13 +34252,48 @@ class LearningGenaiRootFilterMetadataFilterDebugInfo(_messages.Message):
 
   classifierOutput = _messages.MessageField('LearningGenaiRootClassifierOutput', 1)
   defaultMetadata = _messages.StringField(2)
-  languageFilterResult = _messages.MessageField('LearningServingLlmLanguageFilterResult', 3)
+  languageFilterResult = _messages.MessageField('LearningGenaiRootLanguageFilterResult', 3)
   raiOutput = _messages.MessageField('LearningGenaiRootRAIOutput', 4)
   raiResult = _messages.MessageField('CloudAiNlLlmProtoServiceRaiResult', 5)
   raiSignal = _messages.MessageField('CloudAiNlLlmProtoServiceRaiSignal', 6)
   streamRecitationResult = _messages.MessageField('LanguageLabsAidaTrustRecitationProtoStreamRecitationResult', 7)
   takedownResult = _messages.MessageField('LearningGenaiRootTakedownResult', 8)
   toxicityResult = _messages.MessageField('LearningGenaiRootToxicityResult', 9)
+
+
+class LearningGenaiRootGroundingMetadata(_messages.Message):
+  r"""A LearningGenaiRootGroundingMetadata object.
+
+  Fields:
+    citations: A LearningGenaiRootGroundingMetadataCitation attribute.
+    groundingCancelled: True if grounding is cancelled, for example, no facts
+      being retrieved.
+    searchQueries: A string attribute.
+  """
+
+  citations = _messages.MessageField('LearningGenaiRootGroundingMetadataCitation', 1, repeated=True)
+  groundingCancelled = _messages.BooleanField(2)
+  searchQueries = _messages.StringField(3, repeated=True)
+
+
+class LearningGenaiRootGroundingMetadataCitation(_messages.Message):
+  r"""A LearningGenaiRootGroundingMetadataCitation object.
+
+  Fields:
+    endIndex: Index in the prediction output where the citation ends
+      (exclusive). Must be > start_index and < len(output).
+    factIndex: Index of the fact supporting this claim. Should be within the
+      range of the `world_facts` in the GenerateResponse.
+    score: Confidence score of this entailment. Value is [0,1] with 1 is the
+      most confidence.
+    startIndex: Index in the prediction output where the citation starts
+      (inclusive). Must be >= 0 and < end_index.
+  """
+
+  endIndex = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  factIndex = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  score = _messages.FloatField(3)
+  startIndex = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
 class LearningGenaiRootHarm(_messages.Message):
@@ -34435,6 +34514,22 @@ class LearningGenaiRootInternalMetadata(_messages.Message):
   """
 
   scoredTokens = _messages.MessageField('LearningGenaiRootScoredToken', 1, repeated=True)
+
+
+class LearningGenaiRootLanguageFilterResult(_messages.Message):
+  r"""A LearningGenaiRootLanguageFilterResult object.
+
+  Fields:
+    allowed: False when query or response should be filtered out due to
+      unsupported language.
+    detectedLanguage: Language of the query or response.
+    detectedLanguageProbability: Probability of the language predicted as
+      returned by LangID.
+  """
+
+  allowed = _messages.BooleanField(1)
+  detectedLanguage = _messages.StringField(2)
+  detectedLanguageProbability = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
 
 
 class LearningGenaiRootMetricOutput(_messages.Message):
@@ -34880,22 +34975,6 @@ class LearningGenaiRootToxicitySignal(_messages.Message):
   score = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
 
 
-class LearningServingLlmLanguageFilterResult(_messages.Message):
-  r"""A LearningServingLlmLanguageFilterResult object.
-
-  Fields:
-    allowed: False when query or response should be filtered out due to
-      unsupported language.
-    detectedLanguage: Language of the query or response.
-    detectedLanguageProbability: Probability of the language predicted as
-      returned by LangID.
-  """
-
-  allowed = _messages.BooleanField(1)
-  detectedLanguage = _messages.StringField(2)
-  detectedLanguageProbability = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
-
-
 class LearningServingLlmMessageMetadata(_messages.Message):
   r"""LINT.IfChange This metadata contains additional information required for
   debugging.
@@ -34912,6 +34991,7 @@ class LearningServingLlmMessageMetadata(_messages.Message):
     finalMessageScore: This score is finally used for ranking the message.
       This will be same as the score present in `Message.score` field.
     finishReason: NOT YET IMPLEMENTED.
+    groundingMetadata: A LearningGenaiRootGroundingMetadata attribute.
     isFallback: Applies to Response message only. Indicates whether the
       message is a fallback and the response would have otherwise been empty.
     langidResult: Result from nlp_saft DetectLanguage method. Currently the
@@ -34970,20 +35050,21 @@ class LearningServingLlmMessageMetadata(_messages.Message):
   filterMeta = _messages.MessageField('LearningGenaiRootFilterMetadata', 4, repeated=True)
   finalMessageScore = _messages.MessageField('LearningGenaiRootScore', 5)
   finishReason = _messages.EnumField('FinishReasonValueValuesEnum', 6)
-  isFallback = _messages.BooleanField(7)
-  langidResult = _messages.MessageField('NlpSaftLangIdResult', 8)
-  language = _messages.StringField(9)
-  lmPrefix = _messages.StringField(10)
-  originalText = _messages.StringField(11)
-  perStreamDecodedTokenCount = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  raiOutputs = _messages.MessageField('LearningGenaiRootRAIOutput', 13, repeated=True)
-  recitationResult = _messages.MessageField('LearningGenaiRecitationRecitationResult', 14)
-  returnTokenCount = _messages.IntegerField(15, variant=_messages.Variant.INT32)
-  scores = _messages.MessageField('LearningGenaiRootScore', 16, repeated=True)
-  streamTerminated = _messages.BooleanField(17)
-  totalDecodedTokenCount = _messages.IntegerField(18, variant=_messages.Variant.INT32)
-  translatedUserPrompts = _messages.StringField(19, repeated=True)
-  vertexRaiResult = _messages.MessageField('CloudAiNlLlmProtoServiceRaiResult', 20)
+  groundingMetadata = _messages.MessageField('LearningGenaiRootGroundingMetadata', 7)
+  isFallback = _messages.BooleanField(8)
+  langidResult = _messages.MessageField('NlpSaftLangIdResult', 9)
+  language = _messages.StringField(10)
+  lmPrefix = _messages.StringField(11)
+  originalText = _messages.StringField(12)
+  perStreamDecodedTokenCount = _messages.IntegerField(13, variant=_messages.Variant.INT32)
+  raiOutputs = _messages.MessageField('LearningGenaiRootRAIOutput', 14, repeated=True)
+  recitationResult = _messages.MessageField('LearningGenaiRecitationRecitationResult', 15)
+  returnTokenCount = _messages.IntegerField(16, variant=_messages.Variant.INT32)
+  scores = _messages.MessageField('LearningGenaiRootScore', 17, repeated=True)
+  streamTerminated = _messages.BooleanField(18)
+  totalDecodedTokenCount = _messages.IntegerField(19, variant=_messages.Variant.INT32)
+  translatedUserPrompts = _messages.StringField(20, repeated=True)
+  vertexRaiResult = _messages.MessageField('CloudAiNlLlmProtoServiceRaiResult', 21)
 
 
 class NlpSaftLangIdLocalesResult(_messages.Message):

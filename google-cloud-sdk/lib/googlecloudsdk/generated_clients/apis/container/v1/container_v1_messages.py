@@ -273,8 +273,8 @@ class Autopilot(_messages.Message):
   r"""Autopilot is the configuration for Autopilot settings on the cluster.
 
   Fields:
-    conversionStatus: ConversionStatus is the status of conversion between
-      Autopilot and standard.
+    conversionStatus: Output only. ConversionStatus is the status of
+      conversion between Autopilot and standard.
     enabled: Enable Autopilot
     workloadPolicyConfig: Workload policy configuration for Autopilot.
   """
@@ -333,13 +333,16 @@ class AutopilotConversionStatus(_messages.Message):
 
   Enums:
     StateValueValuesEnum: Output only. The current state of the conversion.
-    TypeValueValuesEnum: Type represents the direction of conversion.
+    TypeValueValuesEnum: Output only. Type represents the direction of
+      conversion.
 
   Fields:
-    nodesMigrated: The number of nodes that have been migrated.
-    nodesRemaining: The number of nodes waiting for migration.
+    autopilotNodeCount: Output only. The number of Autopilot nodes in the
+      cluster. This field is only updated while MIGRATING.
+    standardNodeCount: Output only. The number of Standard nodes in the
+      cluster. This field is only updated while MIGRATING.
     state: Output only. The current state of the conversion.
-    type: Type represents the direction of conversion.
+    type: Output only. Type represents the direction of conversion.
   """
 
   class StateValueValuesEnum(_messages.Enum):
@@ -373,7 +376,7 @@ class AutopilotConversionStatus(_messages.Message):
     DONE = 5
 
   class TypeValueValuesEnum(_messages.Enum):
-    r"""Type represents the direction of conversion.
+    r"""Output only. Type represents the direction of conversion.
 
     Values:
       TYPE_UNSPECIFIED: TYPE_UNSPECIFIED indicates the conversion type is
@@ -387,8 +390,8 @@ class AutopilotConversionStatus(_messages.Message):
     CONVERT_TO_AUTOPILOT = 1
     CONVERT_TO_STANDARD = 2
 
-  nodesMigrated = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  nodesRemaining = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  autopilotNodeCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  standardNodeCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   state = _messages.EnumField('StateValueValuesEnum', 3)
   type = _messages.EnumField('TypeValueValuesEnum', 4)
 
@@ -1212,6 +1215,10 @@ class ClusterUpdate(_messages.Message):
       as an empty string,`monitoring.googleapis.com/kubernetes` will be used
       for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     desiredNetworkPerformanceConfig: The desired network performance config.
+    desiredNodeKubeletConfig: The desired node kubelet config for the cluster.
+    desiredNodePoolAutoConfigKubeletConfig: The desired node kubelet config
+      for all auto-provisioned node pools in autopilot clusters and node auto-
+      provisioning enabled clusters.
     desiredNodePoolAutoConfigNetworkTags: The desired network tags that apply
       to all auto-provisioned node pools in autopilot clusters and node auto-
       provisioning enabled clusters.
@@ -1376,29 +1383,31 @@ class ClusterUpdate(_messages.Message):
   desiredMonitoringConfig = _messages.MessageField('MonitoringConfig', 39)
   desiredMonitoringService = _messages.StringField(40)
   desiredNetworkPerformanceConfig = _messages.MessageField('ClusterNetworkPerformanceConfig', 41)
-  desiredNodePoolAutoConfigNetworkTags = _messages.MessageField('NetworkTags', 42)
-  desiredNodePoolAutoConfigResourceManagerTags = _messages.MessageField('ResourceManagerTags', 43)
-  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 44)
-  desiredNodePoolId = _messages.StringField(45)
-  desiredNodePoolLoggingConfig = _messages.MessageField('NodePoolLoggingConfig', 46)
-  desiredNodeVersion = _messages.StringField(47)
-  desiredNotificationConfig = _messages.MessageField('NotificationConfig', 48)
-  desiredParentProductConfig = _messages.MessageField('ParentProductConfig', 49)
-  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 50)
-  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 51)
-  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 52)
-  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 53)
-  desiredRuntimeVulnerabilityInsightConfig = _messages.MessageField('RuntimeVulnerabilityInsightConfig', 54)
-  desiredSecretManagerConfig = _messages.MessageField('SecretManagerConfig', 55)
-  desiredSecurityPostureConfig = _messages.MessageField('SecurityPostureConfig', 56)
-  desiredServiceExternalIpsConfig = _messages.MessageField('ServiceExternalIPsConfig', 57)
-  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 58)
-  desiredStackType = _messages.EnumField('DesiredStackTypeValueValuesEnum', 59)
-  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 60)
-  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 61)
-  enableK8sBetaApis = _messages.MessageField('K8sBetaAPIConfig', 62)
-  etag = _messages.StringField(63)
-  removedAdditionalPodRangesConfig = _messages.MessageField('AdditionalPodRangesConfig', 64)
+  desiredNodeKubeletConfig = _messages.MessageField('NodeKubeletConfig', 42)
+  desiredNodePoolAutoConfigKubeletConfig = _messages.MessageField('NodeKubeletConfig', 43)
+  desiredNodePoolAutoConfigNetworkTags = _messages.MessageField('NetworkTags', 44)
+  desiredNodePoolAutoConfigResourceManagerTags = _messages.MessageField('ResourceManagerTags', 45)
+  desiredNodePoolAutoscaling = _messages.MessageField('NodePoolAutoscaling', 46)
+  desiredNodePoolId = _messages.StringField(47)
+  desiredNodePoolLoggingConfig = _messages.MessageField('NodePoolLoggingConfig', 48)
+  desiredNodeVersion = _messages.StringField(49)
+  desiredNotificationConfig = _messages.MessageField('NotificationConfig', 50)
+  desiredParentProductConfig = _messages.MessageField('ParentProductConfig', 51)
+  desiredPrivateClusterConfig = _messages.MessageField('PrivateClusterConfig', 52)
+  desiredPrivateIpv6GoogleAccess = _messages.EnumField('DesiredPrivateIpv6GoogleAccessValueValuesEnum', 53)
+  desiredReleaseChannel = _messages.MessageField('ReleaseChannel', 54)
+  desiredResourceUsageExportConfig = _messages.MessageField('ResourceUsageExportConfig', 55)
+  desiredRuntimeVulnerabilityInsightConfig = _messages.MessageField('RuntimeVulnerabilityInsightConfig', 56)
+  desiredSecretManagerConfig = _messages.MessageField('SecretManagerConfig', 57)
+  desiredSecurityPostureConfig = _messages.MessageField('SecurityPostureConfig', 58)
+  desiredServiceExternalIpsConfig = _messages.MessageField('ServiceExternalIPsConfig', 59)
+  desiredShieldedNodes = _messages.MessageField('ShieldedNodes', 60)
+  desiredStackType = _messages.EnumField('DesiredStackTypeValueValuesEnum', 61)
+  desiredVerticalPodAutoscaling = _messages.MessageField('VerticalPodAutoscaling', 62)
+  desiredWorkloadIdentityConfig = _messages.MessageField('WorkloadIdentityConfig', 63)
+  enableK8sBetaApis = _messages.MessageField('K8sBetaAPIConfig', 64)
+  etag = _messages.StringField(65)
+  removedAdditionalPodRangesConfig = _messages.MessageField('AdditionalPodRangesConfig', 66)
 
 
 class CompleteConvertToAutopilotRequest(_messages.Message):
@@ -2077,13 +2086,22 @@ class ContainerdConfig(_messages.Message):
 
 
 class ControlPlaneEndpointsConfig(_messages.Message):
-  r"""Configuration for all cluster's control plane endpoints.
+  r"""Configuration for all of the cluster's control plane endpoints.
 
   Fields:
-    dnsEndpointConfig: Cluster's DNS endpoint configuration.
+    dnsEndpointConfig: Internal DNS endpoint information. The enabled field
+      will always be true, because the DNS endpoint is always available for
+      internal clients. This field will *never* be exposed to end users
+      directly, i.e. never remove the GOOGLE_INTERNAL visibility label here.
+      End users should use the ingress_type fields to get this data, which
+      incentivizes them towards enhanced ingress. Once all clusters have an
+      externally visible DNS endpoint, we can migrate internal usage of this
+      field to those fields and remove this.
+    enhancedIngress: Enhanced KCP ingress configuration.
   """
 
   dnsEndpointConfig = _messages.MessageField('DNSEndpointConfig', 1)
+  enhancedIngress = _messages.MessageField('EnhancedKCPIngress', 2)
 
 
 class CostManagementConfig(_messages.Message):
@@ -2221,14 +2239,13 @@ class DNSConfig(_messages.Message):
 
 
 class DNSEndpointConfig(_messages.Message):
-  r"""Cluster's DNS endpoint configuration.
+  r"""Describes the configuration of a DNS endpoint.
 
   Fields:
-    enabled: Whether cluster's control plane access via DNS endpoint is
-      allowed or not. In the Pre-GA stage, field can be enabled at cluster
-      creation time only. Post creation mutation will not be permitted.
-    endpoint: Output only. Cluster's full domain name. Ex: uid.us-
-      central1.gke.goog.
+    enabled: Controls whether this endpoint is available.
+    endpoint: Output only. The KCP's full domain name. Ex: uid.us-
+      central1.gke.goog. If this endpoint is not enabled, this field will be
+      empty.
   """
 
   enabled = _messages.BooleanField(1)
@@ -2344,6 +2361,21 @@ class Empty(_messages.Message):
   Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
   """
 
+
+
+class EnhancedKCPIngress(_messages.Message):
+  r"""Enhanced KCP ingress configuration.
+
+  Fields:
+    enabled: Controls whether the cluster is configured to use enhanced KCP
+      ingress.
+    endpoint: Output only. The cluster's DNS endpoint configuration. A DNS
+      format address. This is accessible from the public internet. Ex: uid.us-
+      central1.gke.goog.
+  """
+
+  enabled = _messages.BooleanField(1)
+  endpoint = _messages.StringField(2)
 
 
 class EnterpriseConfig(_messages.Message):
@@ -4024,11 +4056,15 @@ class NodeConfigDefaults(_messages.Message):
     gcfsConfig: GCFS (Google Container File System, also known as Riptide)
       options.
     loggingConfig: Logging configuration for node pools.
+    nodeKubeletConfig: NodeKubeletConfig controls the defaults for new node-
+      pools. Currently only `insecure_kubelet_readonly_port_enabled` can be
+      set here.
   """
 
   containerdConfig = _messages.MessageField('ContainerdConfig', 1)
   gcfsConfig = _messages.MessageField('GcfsConfig', 2)
   loggingConfig = _messages.MessageField('NodePoolLoggingConfig', 3)
+  nodeKubeletConfig = _messages.MessageField('NodeKubeletConfig', 4)
 
 
 class NodeKubeletConfig(_messages.Message):
@@ -4318,13 +4354,17 @@ class NodePoolAutoConfig(_messages.Message):
       to identify valid sources or targets for network firewalls and are
       specified by the client during cluster creation. Each tag within the
       list must comply with RFC1035.
+    nodeKubeletConfig: NodeKubeletConfig controls the defaults for
+      autoprovisioned node-pools. Currently only
+      `insecure_kubelet_readonly_port_enabled` can be set here.
     resourceManagerTags: Resource manager tag keys and values to be attached
       to the nodes for managing Compute Engine firewalls using Network
       Firewall Policies.
   """
 
   networkTags = _messages.MessageField('NetworkTags', 1)
-  resourceManagerTags = _messages.MessageField('ResourceManagerTags', 2)
+  nodeKubeletConfig = _messages.MessageField('NodeKubeletConfig', 2)
+  resourceManagerTags = _messages.MessageField('ResourceManagerTags', 3)
 
 
 class NodePoolAutoscaling(_messages.Message):
@@ -6382,6 +6422,8 @@ class UpdateNodePoolRequest(_messages.Message):
       attached to the nodes for managing Compute Engine firewalls using
       Network Firewall Policies. Existing tags will be replaced with new
       values.
+    storagePools: List of Storage Pools where boot disks are provisioned.
+      Existing Storage Pools will be replaced with storage-pools.
     tags: The desired network tags to be applied to all nodes in the node
       pool. If this field is not present, the tags will not be changed.
       Otherwise, the existing network tags will be *replaced* with the
@@ -6426,12 +6468,13 @@ class UpdateNodePoolRequest(_messages.Message):
   projectId = _messages.StringField(23)
   resourceLabels = _messages.MessageField('ResourceLabels', 24)
   resourceManagerTags = _messages.MessageField('ResourceManagerTags', 25)
-  tags = _messages.MessageField('NetworkTags', 26)
-  taints = _messages.MessageField('NodeTaints', 27)
-  upgradeSettings = _messages.MessageField('UpgradeSettings', 28)
-  windowsNodeConfig = _messages.MessageField('WindowsNodeConfig', 29)
-  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 30)
-  zone = _messages.StringField(31)
+  storagePools = _messages.StringField(26, repeated=True)
+  tags = _messages.MessageField('NetworkTags', 27)
+  taints = _messages.MessageField('NodeTaints', 28)
+  upgradeSettings = _messages.MessageField('UpgradeSettings', 29)
+  windowsNodeConfig = _messages.MessageField('WindowsNodeConfig', 30)
+  workloadMetadataConfig = _messages.MessageField('WorkloadMetadataConfig', 31)
+  zone = _messages.StringField(32)
 
 
 class UpgradeAvailableEvent(_messages.Message):

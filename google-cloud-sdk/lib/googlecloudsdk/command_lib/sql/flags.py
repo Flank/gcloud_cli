@@ -109,6 +109,7 @@ def AddInstance(parser, support_wildcard_instances=False):
 def AddOptionalInstance(parser, support_wildcard_instances=False):
   parser.add_argument(
       '--instance',
+      '-i',
       required=False,
       completer=InstanceCompleter,
       help='Cloud SQL instance ID.'
@@ -832,8 +833,11 @@ def AddSimulateMaintenanceEvent(parser):
       '--simulate-maintenance-event',
       action='store_true',
       required=False,
-      hidden=True,
-      help='Simulate a maintenance event without changing the version.',
+      help=(
+          'Simulate a maintenance event without changing the version. Only'
+          ' applicable to instances that support near-zero downtime planned'
+          ' maintenance.'
+      ),
   )
 
 
@@ -1447,6 +1451,37 @@ def AddBackupRunId(parser):
           'The ID of the backup run. You can find the ID by running '
           '$ gcloud sql backups list -i {instance}.'
       ),
+  )
+
+
+def AddBackupId(parser):
+  """Add the flag for the ID of the backup run.
+
+  Args:
+    parser: The current argparse parser to which to add this.
+  """
+  parser.add_argument(
+      'id',
+      help=(
+          'The ID of the backup run. To find the ID, run the following command:'
+          ' $ gcloud sql backups list -i {instance}.'
+      ),
+  )
+
+
+def AddProjectLevelBackupEndpoint(parser):
+  """Add the flag to specify requests to route to new backup service end point.
+
+  Args:
+    parser: The current argparse parser to add this to.
+  """
+  parser.add_argument(
+      '--project-level',
+      type=bool,
+      hidden=True,
+      required=False,
+      default=False,
+      help='Use project level backup endpoint or not.',
   )
 
 
@@ -2106,4 +2141,53 @@ def AddSslMode(parser):
       required=False,
       default=None,
       help=help_text,
+  )
+
+
+def AddSqlServerSsrs(parser):
+  """Adds SQL Server Reporting Services (SSRS) related flags to the parser."""
+  parser.add_argument(
+      '--setup-login',
+      required=True,
+      hidden=True,
+      help=(
+          'Existing login in the SQL Server instance that will be used'
+          'as the setup login for SSRS setup. '
+          'Only available for SQL Server instances.'
+      ),
+  )
+
+  parser.add_argument(
+      '--service-login',
+      required=True,
+      hidden=True,
+      help=(
+          'Existing login in the SQL Server instance that will be used'
+          'as the service login for SSRS setup. '
+          'Only available for SQL Server instances.'
+      ),
+  )
+
+  parser.add_argument(
+      '--report-database',
+      required=True,
+      hidden=True,
+      help=(
+          'Existing or new report database name in the SQL Server instance that'
+          ' will be used for SSRS setup. that will be usedas the service login'
+          ' for SSRS setup. Only available for SQL Server instances.'
+      ),
+  )
+
+  parser.add_argument(
+      '--duration',
+      default=None,
+      type=arg_parsers.Duration(lower_bound='1h', upper_bound='12h'),
+      required=False,
+      hidden=True,
+      help=(
+          'Time duration, in hours, that the lease will be active to allow SSRS'
+          ' setup. Default lease duration is 5 hours if this flag is not'
+          ' specified. Only available for SQL Server instances.'
+      ),
   )

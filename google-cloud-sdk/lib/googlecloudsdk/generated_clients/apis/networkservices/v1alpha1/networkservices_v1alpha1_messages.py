@@ -2678,9 +2678,9 @@ class LbRouteExtension(_messages.Message):
       Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more
       information, refer to [Choosing a load
       balancer](https://cloud.google.com/load-balancing/docs/backend-service).
-    name: Required. Name of the `LbRouteExtension` resource in the following
-      format: `projects/{project}/locations/{location}/lbRouteExtensions/{lb_r
-      oute_extension}`.
+    name: Required. Identifier. Name of the `LbRouteExtension` resource in the
+      following format: `projects/{project}/locations/{location}/lbRouteExtens
+      ions/{lb_route_extension}`.
     updateTime: Output only. The timestamp when the resource was updated.
   """
 
@@ -2777,9 +2777,9 @@ class LbTrafficExtension(_messages.Message):
       Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more
       information, refer to [Choosing a load
       balancer](https://cloud.google.com/load-balancing/docs/backend-service).
-    name: Required. Name of the `LbTrafficExtension` resource in the following
-      format: `projects/{project}/locations/{location}/lbTrafficExtensions/{lb
-      _traffic_extension}`.
+    name: Required. Identifier. Name of the `LbTrafficExtension` resource in
+      the following format: `projects/{project}/locations/{location}/lbTraffic
+      Extensions/{lb_traffic_extension}`.
     updateTime: Output only. The timestamp when the resource was updated.
   """
 
@@ -3483,7 +3483,8 @@ class MetadataLabelMatcher(_messages.Message):
       label connects, the config from P2 will be selected. If a client with
       label connects, the config from P3 will be selected. If there is more
       than one best match, (for example, if a config P4 with selector exists
-      and if a client with label connects), an error will be thrown.
+      and if a client with label connects), pick up the one with older
+      creation time.
 
   Fields:
     metadataLabelMatchCriteria: Specifies how matching should be done.
@@ -3498,7 +3499,7 @@ class MetadataLabelMatcher(_messages.Message):
       the config from P2 will be selected. If a client with label connects,
       the config from P3 will be selected. If there is more than one best
       match, (for example, if a config P4 with selector exists and if a client
-      with label connects), an error will be thrown.
+      with label connects), pick up the one with older creation time.
     metadataLabels: The list of label value pairs that must match labels in
       the provided metadata based on filterMatchCriteria This list can have at
       most 64 entries. The list can be empty if the match criteria is
@@ -3517,7 +3518,8 @@ class MetadataLabelMatcher(_messages.Message):
     client with label connects, the config from P2 will be selected. If a
     client with label connects, the config from P3 will be selected. If there
     is more than one best match, (for example, if a config P4 with selector
-    exists and if a client with label connects), an error will be thrown.
+    exists and if a client with label connects), pick up the one with older
+    creation time.
 
     Values:
       METADATA_LABEL_MATCH_CRITERIA_UNSPECIFIED: Default value. Should not be
@@ -5163,9 +5165,9 @@ class NetworkservicesProjectsLocationsLbRouteExtensionsPatchRequest(_messages.Me
   Fields:
     lbRouteExtension: A LbRouteExtension resource to be passed as the request
       body.
-    name: Required. Name of the `LbRouteExtension` resource in the following
-      format: `projects/{project}/locations/{location}/lbRouteExtensions/{lb_r
-      oute_extension}`.
+    name: Required. Identifier. Name of the `LbRouteExtension` resource in the
+      following format: `projects/{project}/locations/{location}/lbRouteExtens
+      ions/{lb_route_extension}`.
     requestId: Optional. An optional request ID to identify requests. Specify
       a unique request ID so that if you must retry your request, the server
       can ignore the request if it has already been completed. The server
@@ -5288,9 +5290,9 @@ class NetworkservicesProjectsLocationsLbTrafficExtensionsPatchRequest(_messages.
   Fields:
     lbTrafficExtension: A LbTrafficExtension resource to be passed as the
       request body.
-    name: Required. Name of the `LbTrafficExtension` resource in the following
-      format: `projects/{project}/locations/{location}/lbTrafficExtensions/{lb
-      _traffic_extension}`.
+    name: Required. Identifier. Name of the `LbTrafficExtension` resource in
+      the following format: `projects/{project}/locations/{location}/lbTraffic
+      Extensions/{lb_traffic_extension}`.
     requestId: Optional. An optional request ID to identify requests. Specify
       a unique request ID so that if you must retry your request, the server
       can ignore the request if it has already been completed. The server
