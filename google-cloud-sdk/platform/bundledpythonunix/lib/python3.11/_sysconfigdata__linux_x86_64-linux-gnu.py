@@ -15,8 +15,8 @@ build_time_vars = {'ABIFLAGS': '',
  'BINDIR': '/install/bin',
  'BINLIBDEST': '/install/lib/python3.11',
  'BLDLIBRARY': '-L. -lpython3.11',
- 'BLDSHARED': 'clang -pthread -shared -L/tools/deps/lib -Wl,--exclude-libs,ALL '
-              '-L/tools/deps/libedit/lib',
+ 'BLDSHARED': 'clang -pthread -shared  -Wl,--exclude-libs,ALL '
+              '',
  'BOOTSTRAP_HEADERS': '\\',
  'BUILDEXE': '',
  'BUILDPYTHON': 'python',
@@ -25,26 +25,26 @@ build_time_vars = {'ABIFLAGS': '',
  'CC': 'clang -pthread',
  'CCSHARED': '-fPIC',
  'CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall '
-           '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-           '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
+           ' -fPIC  '
+           ' ',
  'CFLAGSFORSHARED': '-fPIC',
  'CFLAGS_ALIASING': '-fno-strict-aliasing',
  'CFLAGS_NODIST': '',
  'CONFIGFILES': 'configure configure.ac acconfig.h pyconfig.h.in '
                 'Makefile.pre.in',
- 'CONFIGURE_CFLAGS': '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                     '-I/tools/deps/include/ncursesw '
-                     '-I/tools/deps/libedit/include',
+ 'CONFIGURE_CFLAGS': ' -fPIC  '
+                     ' '
+                     '',
  'CONFIGURE_CFLAGS_NODIST': '-std=c11 -Wextra -Wno-unused-parameter '
                             '-Wno-missing-field-initializers '
                             '-Wstrict-prototypes '
                             '-Werror=implicit-function-declaration '
                             '-fvisibility=hidden',
- 'CONFIGURE_CPPFLAGS': '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                       '-I/tools/deps/include/ncursesw '
-                       '-I/tools/deps/libedit/include',
- 'CONFIGURE_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
-                      '-L/tools/deps/libedit/lib',
+ 'CONFIGURE_CPPFLAGS': ' -fPIC  '
+                       ' '
+                       '',
+ 'CONFIGURE_LDFLAGS': ' -Wl,--exclude-libs,ALL '
+                      '',
  'CONFIGURE_LDFLAGS_NODIST': '',
  'CONFIGURE_LDFLAGS_NOLTO': '',
  'CONFIG_ARGS': "'--build=x86_64-unknown-linux-gnu' "
@@ -56,24 +56,24 @@ build_time_vars = {'ABIFLAGS': '',
                 "'--with-dbmliborder=bdb' "
                 "'build_alias=x86_64-unknown-linux-gnu' "
                 "'host_alias=x86_64-unknown-linux-gnu' 'CC=clang' 'CFLAGS= "
-                '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                "-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include' "
-                "'LDFLAGS= -L/tools/deps/lib -Wl,--exclude-libs,ALL "
-                "-L/tools/deps/libedit/lib' 'CPPFLAGS= "
-                '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                "-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include'",
+                ' -fPIC  '
+                " ' "
+                "'LDFLAGS=  -Wl,--exclude-libs,ALL "
+                "' 'CPPFLAGS= "
+                ' -fPIC  '
+                " '",
  'CONFINCLUDEDIR': '/install/include',
  'CONFINCLUDEPY': '/install/include/python3.11',
  'COREPYTHONPATH': '',
- 'COVERAGE_INFO': '/build/Python-3.11.6/coverage.info',
+ 'COVERAGE_INFO': '/build/Python-3.11.7/coverage.info',
  'COVERAGE_LCOV_OPTIONS': '--rc lcov_branch_coverage=1',
- 'COVERAGE_REPORT': '/build/Python-3.11.6/lcov-report',
+ 'COVERAGE_REPORT': '/build/Python-3.11.7/lcov-report',
  'COVERAGE_REPORT_OPTIONS': '--rc lcov_branch_coverage=1 --branch-coverage '
                             '--title "CPython 3.11 LCOV report [commit $(shell '
                             ')]"',
- 'CPPFLAGS': '-I. -I./Include -fdebug-default-version=4 -fPIC '
-             '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-             '-I/tools/deps/libedit/include',
+ 'CPPFLAGS': '-I. -I./Include  -fPIC '
+             '  '
+             '',
  'CXX': 'clang++ -pthread',
  'DECIMAL_CFLAGS': '-DCONFIG_64=1 -DANSI=1 -DHAVE_UINT128_T=1',
  'DECIMAL_LDFLAGS': '-lmpdec',
@@ -428,6 +428,7 @@ build_time_vars = {'ABIFLAGS': '',
  'HAVE_RENAMEAT': 1,
  'HAVE_RL_APPEND_HISTORY': 1,
  'HAVE_RL_CATCH_SIGNAL': 1,
+ 'HAVE_RL_COMPDISP_FUNC_T': 0,
  'HAVE_RL_COMPLETION_APPEND_CHARACTER': 1,
  'HAVE_RL_COMPLETION_DISPLAY_MATCHES_HOOK': 1,
  'HAVE_RL_COMPLETION_MATCHES': 1,
@@ -622,28 +623,28 @@ build_time_vars = {'ABIFLAGS': '',
  'IO_H': 'Modules/_io/_iomodule.h',
  'IO_OBJS': '\\',
  'LDCXXSHARED': 'clang++ -pthread -shared',
- 'LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
-            '-L/tools/deps/libedit/lib',
+ 'LDFLAGS': ' -Wl,--exclude-libs,ALL '
+            '',
  'LDFLAGS_NODIST': '',
  'LDLIBRARY': 'libpython3.11.so',
  'LDLIBRARYDIR': '',
- 'LDSHARED': 'clang -pthread -shared -L/tools/deps/lib -Wl,--exclude-libs,ALL '
-             '-L/tools/deps/libedit/lib',
+ 'LDSHARED': 'clang -pthread -shared  -Wl,--exclude-libs,ALL '
+             '',
  'LDVERSION': '3.11',
  'LIBC': '',
  'LIBDEST': '/install/lib/python3.11',
  'LIBDIR': '/install/lib',
  'LIBEXPAT_A': 'Modules/expat/libexpat.a',
  'LIBEXPAT_CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 '
-                    '-Wall -fdebug-default-version=4 -fPIC '
-                    '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                    '-I/tools/deps/libedit/include -std=c11 -Wextra '
+                    '-Wall  -fPIC '
+                    '  '
+                    ' -std=c11 -Wextra '
                     '-Wno-unused-parameter -Wno-missing-field-initializers '
                     '-Wstrict-prototypes -Werror=implicit-function-declaration '
                     '-fvisibility=hidden  -I./Include/internal -I. -I./Include '
-                    '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                    '-I/tools/deps/include/ncursesw '
-                    '-I/tools/deps/libedit/include -fPIC -fPIC',
+                    ' -fPIC  '
+                    ' '
+                    ' -fPIC -fPIC',
  'LIBEXPAT_HEADERS': '\\',
  'LIBEXPAT_OBJS': '\\',
  'LIBFFI_INCLUDEDIR': '',
@@ -651,15 +652,15 @@ build_time_vars = {'ABIFLAGS': '',
  'LIBMPDEC_A': 'Modules/_decimal/libmpdec/libmpdec.a',
  'LIBMPDEC_CFLAGS': '-DCONFIG_64=1 -DANSI=1 -DHAVE_UINT128_T=1 -Wsign-compare '
                     '-Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall '
-                    '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                    '-I/tools/deps/include/ncursesw '
-                    '-I/tools/deps/libedit/include -std=c11 -Wextra '
+                    ' -fPIC  '
+                    ' '
+                    ' -std=c11 -Wextra '
                     '-Wno-unused-parameter -Wno-missing-field-initializers '
                     '-Wstrict-prototypes -Werror=implicit-function-declaration '
                     '-fvisibility=hidden  -I./Include/internal -I. -I./Include '
-                    '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                    '-I/tools/deps/include/ncursesw '
-                    '-I/tools/deps/libedit/include -fPIC -fPIC',
+                    ' -fPIC  '
+                    ' '
+                    ' -fPIC -fPIC',
  'LIBMPDEC_HEADERS': '\\',
  'LIBMPDEC_OBJS': '\\',
  'LIBOBJDIR': 'Python/',
@@ -976,8 +977,8 @@ build_time_vars = {'ABIFLAGS': '',
  'MVWDELCH_IS_EXPRESSION': 1,
  'NO_AS_NEEDED': '-Wl,--no-as-needed',
  'OBJECT_OBJS': '\\',
- 'OPENSSL_INCLUDES': '-I/tools/deps/include',
- 'OPENSSL_LDFLAGS': '-L/tools/deps/lib',
+ 'OPENSSL_INCLUDES': '',
+ 'OPENSSL_LDFLAGS': '',
  'OPENSSL_LIBS': '-lssl -lcrypto',
  'OPENSSL_RPATH': '',
  'OPT': '-DNDEBUG -g -fwrapv -O3 -Wall',
@@ -1009,10 +1010,10 @@ build_time_vars = {'ABIFLAGS': '',
  'PYTHONFRAMEWORKINSTALLDIR': '',
  'PYTHONFRAMEWORKPREFIX': '',
  'PYTHONPATH': '',
- 'PYTHON_FOR_BUILD': '_PYTHON_PROJECT_BASE=/build/Python-3.11.6 '
+ 'PYTHON_FOR_BUILD': '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
                      '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                      'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-                     '/build/Python-3.11.6/`cat pybuilddir.txt`:)./Lib '
+                     '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
                      '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                      '/tools/host/bin/python3.11',
  'PYTHON_FOR_BUILD_DEPS': '',
@@ -1022,76 +1023,77 @@ build_time_vars = {'ABIFLAGS': '',
  'PYTHON_OBJS': '\\',
  'PY_BUILTIN_HASHLIB_HASHES': '"md5,sha1,sha256,sha512,sha3,blake2"',
  'PY_BUILTIN_MODULE_CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g '
-                             '-fwrapv -O3 -Wall -fdebug-default-version=4 '
-                             '-fPIC -I/tools/deps/include '
-                             '-I/tools/deps/include/ncursesw '
-                             '-I/tools/deps/libedit/include -std=c11 -Wextra '
+                             '-fwrapv -O3 -Wall  '
+                             '-fPIC  '
+                             ' '
+                             ' -std=c11 -Wextra '
                              '-Wno-unused-parameter '
                              '-Wno-missing-field-initializers '
                              '-Wstrict-prototypes '
                              '-Werror=implicit-function-declaration '
                              '-fvisibility=hidden  -I./Include/internal -I. '
-                             '-I./Include -fdebug-default-version=4 -fPIC '
-                             '-I/tools/deps/include '
-                             '-I/tools/deps/include/ncursesw '
-                             '-I/tools/deps/libedit/include -fPIC '
+                             '-I./Include  -fPIC '
+                             ' '
+                             ' '
+                             ' -fPIC '
                              '-DPy_BUILD_CORE_BUILTIN',
  'PY_CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall '
-              '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-              '-I/tools/deps/include/ncursesw -I/tools/deps/libedit/include',
+              ' -fPIC  '
+              ' ',
  'PY_CFLAGS_NODIST': '-std=c11 -Wextra -Wno-unused-parameter '
                      '-Wno-missing-field-initializers -Wstrict-prototypes '
                      '-Werror=implicit-function-declaration '
                      '-fvisibility=hidden  -I./Include/internal',
  'PY_COERCE_C_LOCALE': 1,
  'PY_CORE_CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 '
-                   '-Wall -fdebug-default-version=4 -fPIC '
-                   '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                   '-I/tools/deps/libedit/include -std=c11 -Wextra '
+                   '-Wall  -fPIC '
+                   '  '
+                   ' -std=c11 -Wextra '
                    '-Wno-unused-parameter -Wno-missing-field-initializers '
                    '-Wstrict-prototypes -Werror=implicit-function-declaration '
                    '-fvisibility=hidden  -I./Include/internal -I. -I./Include '
-                   '-fdebug-default-version=4 -fPIC -I/tools/deps/include '
-                   '-I/tools/deps/include/ncursesw '
-                   '-I/tools/deps/libedit/include -fPIC -DPy_BUILD_CORE',
- 'PY_CORE_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
-                    '-L/tools/deps/libedit/lib',
- 'PY_CPPFLAGS': '-I. -I./Include -fdebug-default-version=4 -fPIC '
-                '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                '-I/tools/deps/libedit/include',
+                   ' -fPIC  '
+                   ' '
+                   ' -fPIC -DPy_BUILD_CORE',
+ 'PY_CORE_LDFLAGS': ' -Wl,--exclude-libs,ALL '
+                    '',
+ 'PY_CPPFLAGS': '-I. -I./Include  -fPIC '
+                '  '
+                '',
  'PY_ENABLE_SHARED': 1,
  'PY_FORMAT_SIZE_T': '"z"',
- 'PY_LDFLAGS': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
-               '-L/tools/deps/libedit/lib',
+ 'PY_LDFLAGS': ' -Wl,--exclude-libs,ALL '
+               '',
  'PY_LDFLAGS_NODIST': '',
- 'PY_LDFLAGS_NOLTO': '-L/tools/deps/lib -Wl,--exclude-libs,ALL '
-                     '-L/tools/deps/libedit/lib',
+ 'PY_LDFLAGS_NOLTO': ' -Wl,--exclude-libs,ALL '
+                     '',
  'PY_SQLITE_ENABLE_LOAD_EXTENSION': 0,
  'PY_SQLITE_HAVE_SERIALIZE': 0,
  'PY_SSL_DEFAULT_CIPHERS': 1,
  'PY_SSL_DEFAULT_CIPHER_STRING': 0,
  'PY_STDMODULE_CFLAGS': '-Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv '
-                        '-O3 -Wall -fdebug-default-version=4 -fPIC '
-                        '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                        '-I/tools/deps/libedit/include -std=c11 -Wextra '
+                        '-O3 -Wall  -fPIC '
+                        '  '
+                        ' -std=c11 -Wextra '
                         '-Wno-unused-parameter -Wno-missing-field-initializers '
                         '-Wstrict-prototypes '
                         '-Werror=implicit-function-declaration '
                         '-fvisibility=hidden  -I./Include/internal -I. '
-                        '-I./Include -fdebug-default-version=4 -fPIC '
-                        '-I/tools/deps/include -I/tools/deps/include/ncursesw '
-                        '-I/tools/deps/libedit/include -fPIC',
+                        '-I./Include  -fPIC '
+                        '  '
+                        ' -fPIC',
  'PY_SUPPORT_TIER': 2,
  'Py_DEBUG': 0,
  'Py_ENABLE_SHARED': 1,
  'Py_HASH_ALGORITHM': 0,
  'Py_STATS': 0,
+ 'Py_SUNOS_VERSION': 0,
  'Py_TRACE_REFS': 0,
  'QUICKTESTOPTS': '-x test_subprocess test_io test_lib2to3 \\',
  'READELF': 'readelf',
  'RESSRCDIR': 'Mac/Resources/framework',
  'RETSIGTYPE': 'void',
- 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.11.6',
+ 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.11.7',
  'SCRIPTDIR': '/install/lib',
  'SETPGRP_HAVE_ARG': 0,
  'SHAREDMODS': 'Modules/_crypt.cpython-311-x86_64-linux-gnu.so',
@@ -1136,19 +1138,19 @@ build_time_vars = {'ABIFLAGS': '',
  'SYS_SELECT_WITH_SYS_TIME': 1,
  'TESTOPTS': '',
  'TESTPATH': '',
- 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.11.6 '
-               '_PYTHON_PROJECT_BASE=/build/Python-3.11.6 '
+ 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.11.7 '
+               '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
                '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-               '/build/Python-3.11.6/`cat pybuilddir.txt`:)./Lib '
+               '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
                '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                '/tools/host/bin/python3.11',
  'TESTPYTHONOPTS': '',
- 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.11.6 '
-               '_PYTHON_PROJECT_BASE=/build/Python-3.11.6 '
+ 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.11.7 '
+               '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
                '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-               '/build/Python-3.11.6/`cat pybuilddir.txt`:)./Lib '
+               '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
                '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                '/tools/host/bin/python3.11 ./Tools/scripts/run_tests.py',
  'TESTSUBDIRS': 'ctypes/test \\',
@@ -1180,8 +1182,8 @@ build_time_vars = {'ABIFLAGS': '',
  'WITH_VALGRIND': 0,
  'X87_DOUBLE_ROUNDING': 0,
  'XMLLIBSUBDIRS': 'xml xml/dom xml/etree xml/parsers xml/sax',
- 'abs_builddir': '/build/Python-3.11.6',
- 'abs_srcdir': '/build/Python-3.11.6',
+ 'abs_builddir': '/build/Python-3.11.7',
+ 'abs_srcdir': '/build/Python-3.11.7',
  'datarootdir': '/install/share',
  'exec_prefix': '/install',
  'prefix': '/install',

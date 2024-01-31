@@ -31,8 +31,8 @@ MODLIBS=           $(LOCALMODLIBS) $(BASEMODLIBS)
 VERSION=	3.11
 srcdir=		.
 
-abs_srcdir=	/build/Python-3.11.6
-abs_builddir=	/build/Python-3.11.6
+abs_srcdir=	/build/Python-3.11.7
+abs_builddir=	/build/Python-3.11.7
 
 
 CC=		clang -pthread
@@ -82,7 +82,7 @@ MAKESETUP=      $(srcdir)/Modules/makesetup
 OPT=		-DNDEBUG -g -fwrapv -O3 -Wall
 BASECFLAGS=	 -Wsign-compare -Wunreachable-code
 BASECPPFLAGS=	
-CONFIGURE_CFLAGS=	 -fdebug-default-version=4 -fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw -I/tools/deps/libedit/include
+CONFIGURE_CFLAGS=	  -fPIC   
 # CFLAGS_NODIST is used for building the interpreter and stdlib C extensions.
 # Use it when a compiler flag should _not_ be part of the distutils CFLAGS
 # once Python is installed (Issue #21121).
@@ -94,8 +94,8 @@ CONFIGURE_LDFLAGS_NODIST=
 # LDFLAGS_NOLTO is an extra flag to disable lto. It is used to speed up building
 # of _bootstrap_python and _freeze_module tools, which don't need LTO.
 CONFIGURE_LDFLAGS_NOLTO=
-CONFIGURE_CPPFLAGS=	 -fdebug-default-version=4 -fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw -I/tools/deps/libedit/include
-CONFIGURE_LDFLAGS=	 -L/tools/deps/lib -Wl,--exclude-libs,ALL -L/tools/deps/libedit/lib
+CONFIGURE_CPPFLAGS=	  -fPIC   
+CONFIGURE_LDFLAGS=	  -Wl,--exclude-libs,ALL 
 # Avoid assigning CFLAGS, LDFLAGS, etc. so users can use them on the
 # command line to append to these values without stomping the pre-set
 # values.
@@ -201,7 +201,7 @@ LIPO_INTEL64_FLAGS=
 OTHER_LIBTOOL_OPT=
 
 # Environment to run shared python without installed libraries
-RUNSHARED=       LD_LIBRARY_PATH=/build/Python-3.11.6
+RUNSHARED=       LD_LIBRARY_PATH=/build/Python-3.11.7
 
 # ensurepip options
 ENSUREPIP=      no
@@ -211,9 +211,9 @@ LIBMPDEC_A= Modules/_decimal/libmpdec/libmpdec.a
 LIBEXPAT_A= Modules/expat/libexpat.a
 
 # OpenSSL options for setup.py so sysconfig can pick up AC_SUBST() vars.
-OPENSSL_INCLUDES=-I/tools/deps/include
+OPENSSL_INCLUDES=
 OPENSSL_LIBS=-lssl -lcrypto
-OPENSSL_LDFLAGS=-L/tools/deps/lib
+OPENSSL_LDFLAGS=
 OPENSSL_RPATH=
 
 # Module state, compiler flags and linker flags
@@ -315,7 +315,7 @@ EXEMODE=	755
 FILEMODE=	644
 
 # configure script arguments
-CONFIG_ARGS=	 '--build=x86_64-unknown-linux-gnu' '--host=x86_64-unknown-linux-gnu' '--prefix=/install' '--with-openssl=/tools/deps' '--with-system-expat' '--with-system-libmpdec' '--without-ensurepip' '--with-readline=editline' '--enable-shared' '--with-build-python=/tools/host/bin/python3.11' '--with-dbmliborder=bdb' 'build_alias=x86_64-unknown-linux-gnu' 'host_alias=x86_64-unknown-linux-gnu' 'CC=clang' 'CFLAGS= -fdebug-default-version=4 -fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw -I/tools/deps/libedit/include' 'LDFLAGS= -L/tools/deps/lib -Wl,--exclude-libs,ALL -L/tools/deps/libedit/lib' 'CPPFLAGS= -fdebug-default-version=4 -fPIC -I/tools/deps/include -I/tools/deps/include/ncursesw -I/tools/deps/libedit/include'
+CONFIG_ARGS=	 '--build=x86_64-unknown-linux-gnu' '--host=x86_64-unknown-linux-gnu' '--prefix=/install' '--with-openssl=/tools/deps' '--with-system-expat' '--with-system-libmpdec' '--without-ensurepip' '--with-readline=editline' '--enable-shared' '--with-build-python=/tools/host/bin/python3.11' '--with-dbmliborder=bdb' 'build_alias=x86_64-unknown-linux-gnu' 'host_alias=x86_64-unknown-linux-gnu' 'CC=clang' 'CFLAGS=  -fPIC   ' 'LDFLAGS=  -Wl,--exclude-libs,ALL ' 'CPPFLAGS=  -fPIC   '
 
 
 # Subdirectories with code
@@ -683,7 +683,8 @@ build_wasm: check-clean-src $(BUILDPYTHON) platform oldsharedmods python-config
 # Check that the source is clean when building out of source.
 check-clean-src:
 	@if test -n "$(VPATH)" -a \( \
-	    -f "$(srcdir)/Programs/python.o" \
+	    -f "$(srcdir)/$(BUILDPYTHON)" \
+	    -o -f "$(srcdir)/Programs/python.o" \
 	    -o -f "$(srcdir)\Python/frozen_modules/importlib._bootstrap.h" \
 	\); then \
 		echo "Error: The source directory ($(srcdir)) is not clean" ; \
@@ -1396,8 +1397,8 @@ regen-pegen:
 	PYTHONPATH=$(srcdir)/Tools/peg_generator $(PYTHON_FOR_REGEN) -m pegen -q c \
 		$(srcdir)/Grammar/python.gram \
 		$(srcdir)/Grammar/Tokens \
-		-o $(srcdir)/Parser/parser.new.c
-	$(UPDATE_FILE) $(srcdir)/Parser/parser.c $(srcdir)/Parser/parser.new.c
+		-o $(srcdir)/Parser/parser.c.new
+	$(UPDATE_FILE) $(srcdir)/Parser/parser.c $(srcdir)/Parser/parser.c.new
 
 .PHONY=regen-ast
 regen-ast:
@@ -2041,9 +2042,11 @@ TESTSUBDIRS=	ctypes/test \
 		lib2to3/tests/data/fixers/myfixes \
 		test \
 		test/audiodata \
-		test/capath \
+		test/certdata \
+		test/certdata/capath \
 		test/cjkencodings \
 		test/crashers \
+		test/configdata \
 		test/data \
 		test/decimaltestdata \
 		test/dtracedata \
@@ -2061,6 +2064,8 @@ TESTSUBDIRS=	ctypes/test \
 		test/test_email \
 		test/test_email/data \
 		test/test_future_stmt \
+		test/test_gdb \
+		test/test_inspect \
 		test/test_import \
 		test/test_import/data \
 		test/test_import/data/circular_imports \
@@ -2495,7 +2500,9 @@ regen-configure:
 	@if command -v podman >/dev/null; then RUNTIME="podman"; else RUNTIME="docker"; fi; \
 	if ! command -v $$RUNTIME; then echo "$@ needs either Podman or Docker container runtime." >&2; exit 1; fi; \
 	if command -v selinuxenabled >/dev/null && selinuxenabled; then OPT=":Z"; fi; \
-	CMD="$$RUNTIME run --rm --pull=always -v $(abs_srcdir):/src$$OPT quay.io/tiran/cpython_autoconf:269"; \
+	# Manifest corresponds with tag '269' \
+	CPYTHON_AUTOCONF_MANIFEST="sha256:f370fee95eefa3d57b00488bce4911635411fa83e2d293ced8cf8a3674ead939" \
+	CMD="$$RUNTIME run --rm --pull=missing -v $(abs_srcdir):/src$$OPT quay.io/tiran/cpython_autoconf@$$CPYTHON_AUTOCONF_MANIFEST"; \
 	echo $$CMD; \
 	$$CMD || exit $?
 
@@ -2727,27 +2734,27 @@ Modules/_contextvarsmodule.o: $(srcdir)/Modules/_contextvarsmodule.c $(MODULE__C
 Modules/_contextvars$(EXT_SUFFIX):  Modules/_contextvarsmodule.o; $(BLDSHARED)  Modules/_contextvarsmodule.o $(MODULE__CONTEXTVARS_LDFLAGS)  -o Modules/_contextvars$(EXT_SUFFIX)
 Modules/_csv.o: $(srcdir)/Modules/_csv.c $(MODULE__CSV_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__CSV_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_csv.c -o Modules/_csv.o
 Modules/_csv$(EXT_SUFFIX):  Modules/_csv.o; $(BLDSHARED)  Modules/_csv.o $(MODULE__CSV_LDFLAGS)  -o Modules/_csv$(EXT_SUFFIX)
-Modules/_ctypes/_ctypes.o: $(srcdir)/Modules/_ctypes/_ctypes.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/_ctypes.c -o Modules/_ctypes/_ctypes.o
-Modules/_ctypes/callbacks.o: $(srcdir)/Modules/_ctypes/callbacks.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/callbacks.c -o Modules/_ctypes/callbacks.o
-Modules/_ctypes/callproc.o: $(srcdir)/Modules/_ctypes/callproc.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/callproc.c -o Modules/_ctypes/callproc.o
-Modules/_ctypes/stgdict.o: $(srcdir)/Modules/_ctypes/stgdict.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/stgdict.c -o Modules/_ctypes/stgdict.o
-Modules/_ctypes/cfield.o: $(srcdir)/Modules/_ctypes/cfield.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/cfield.c -o Modules/_ctypes/cfield.o
+Modules/_ctypes/_ctypes.o: $(srcdir)/Modules/_ctypes/_ctypes.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/_ctypes.c -o Modules/_ctypes/_ctypes.o
+Modules/_ctypes/callbacks.o: $(srcdir)/Modules/_ctypes/callbacks.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/callbacks.c -o Modules/_ctypes/callbacks.o
+Modules/_ctypes/callproc.o: $(srcdir)/Modules/_ctypes/callproc.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/callproc.c -o Modules/_ctypes/callproc.o
+Modules/_ctypes/stgdict.o: $(srcdir)/Modules/_ctypes/stgdict.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/stgdict.c -o Modules/_ctypes/stgdict.o
+Modules/_ctypes/cfield.o: $(srcdir)/Modules/_ctypes/cfield.c $(MODULE__CTYPES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/cfield.c -o Modules/_ctypes/cfield.o
 Modules/_ctypes$(EXT_SUFFIX):  Modules/_ctypes/_ctypes.o Modules/_ctypes/callbacks.o Modules/_ctypes/callproc.o Modules/_ctypes/stgdict.o Modules/_ctypes/cfield.o; $(BLDSHARED)  Modules/_ctypes/_ctypes.o Modules/_ctypes/callbacks.o Modules/_ctypes/callproc.o Modules/_ctypes/stgdict.o Modules/_ctypes/cfield.o  -lffi -ldl  -o Modules/_ctypes$(EXT_SUFFIX)
 Modules/_ctypes/_ctypes_test.o: $(srcdir)/Modules/_ctypes/_ctypes_test.c $(MODULE__CTYPES_TEST_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ctypes/_ctypes_test.c -o Modules/_ctypes/_ctypes_test.o
 Modules/_ctypes_test$(EXT_SUFFIX):  Modules/_ctypes/_ctypes_test.o; $(BLDSHARED)  Modules/_ctypes/_ctypes_test.o  -lm  -o Modules/_ctypes_test$(EXT_SUFFIX)
-Modules/_cursesmodule.o: $(srcdir)/Modules/_cursesmodule.c $(MODULE__CURSES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include/ncursesw $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_cursesmodule.c -o Modules/_cursesmodule.o
+Modules/_cursesmodule.o: $(srcdir)/Modules/_cursesmodule.c $(MODULE__CURSES_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_cursesmodule.c -o Modules/_cursesmodule.o
 Modules/_curses$(EXT_SUFFIX):  Modules/_cursesmodule.o; $(BLDSHARED)  Modules/_cursesmodule.o  -lncursesw  -o Modules/_curses$(EXT_SUFFIX)
-Modules/_curses_panel.o: $(srcdir)/Modules/_curses_panel.c $(MODULE__CURSES_PANEL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include/ncursesw $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_curses_panel.c -o Modules/_curses_panel.o
+Modules/_curses_panel.o: $(srcdir)/Modules/_curses_panel.c $(MODULE__CURSES_PANEL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_curses_panel.c -o Modules/_curses_panel.o
 Modules/_curses_panel$(EXT_SUFFIX):  Modules/_curses_panel.o; $(BLDSHARED)  Modules/_curses_panel.o  -lpanelw -lncursesw  -o Modules/_curses_panel$(EXT_SUFFIX)
 Modules/_datetimemodule.o: $(srcdir)/Modules/_datetimemodule.c $(MODULE__DATETIME_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__DATETIME_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_datetimemodule.c -o Modules/_datetimemodule.o
 Modules/_datetime$(EXT_SUFFIX):  Modules/_datetimemodule.o; $(BLDSHARED)  Modules/_datetimemodule.o $(MODULE__DATETIME_LDFLAGS)  -o Modules/_datetime$(EXT_SUFFIX)
-Modules/_dbmmodule.o: $(srcdir)/Modules/_dbmmodule.c $(MODULE__DBM_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DUSE_BERKDB -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_dbmmodule.c -o Modules/_dbmmodule.o
+Modules/_dbmmodule.o: $(srcdir)/Modules/_dbmmodule.c $(MODULE__DBM_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DUSE_BERKDB  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_dbmmodule.c -o Modules/_dbmmodule.o
 Modules/_dbm$(EXT_SUFFIX):  Modules/_dbmmodule.o; $(BLDSHARED)  Modules/_dbmmodule.o  -ldb  -o Modules/_dbm$(EXT_SUFFIX)
-Modules/_decimal/_decimal.o: $(srcdir)/Modules/_decimal/_decimal.c $(MODULE__DECIMAL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_decimal/_decimal.c -o Modules/_decimal/_decimal.o
+Modules/_decimal/_decimal.o: $(srcdir)/Modules/_decimal/_decimal.c $(MODULE__DECIMAL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_decimal/_decimal.c -o Modules/_decimal/_decimal.o
 Modules/_decimal$(EXT_SUFFIX):  Modules/_decimal/_decimal.o; $(BLDSHARED)  Modules/_decimal/_decimal.o  -lmpdec  -o Modules/_decimal$(EXT_SUFFIX)
 Modules/_elementtree.o: $(srcdir)/Modules/_elementtree.c $(MODULE__ELEMENTTREE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_elementtree.c -o Modules/_elementtree.o
 Modules/_elementtree$(EXT_SUFFIX):  Modules/_elementtree.o; $(BLDSHARED)  Modules/_elementtree.o  -lexpat  -o Modules/_elementtree$(EXT_SUFFIX)
-Modules/_hashopenssl.o: $(srcdir)/Modules/_hashopenssl.c $(MODULE__HASHLIB_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_hashopenssl.c -o Modules/_hashopenssl.o
+Modules/_hashopenssl.o: $(srcdir)/Modules/_hashopenssl.c $(MODULE__HASHLIB_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_hashopenssl.c -o Modules/_hashopenssl.o
 Modules/_hashlib$(EXT_SUFFIX):  Modules/_hashopenssl.o; $(BLDSHARED)  Modules/_hashopenssl.o  -lcrypto -l:libatomic.a  -o Modules/_hashlib$(EXT_SUFFIX)
 Modules/_heapqmodule.o: $(srcdir)/Modules/_heapqmodule.c $(MODULE__HEAPQ_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__HEAPQ_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_heapqmodule.c -o Modules/_heapqmodule.o
 Modules/_heapq$(EXT_SUFFIX):  Modules/_heapqmodule.o; $(BLDSHARED)  Modules/_heapqmodule.o $(MODULE__HEAPQ_LDFLAGS)  -o Modules/_heapq$(EXT_SUFFIX)
@@ -2756,7 +2763,7 @@ Modules/_json$(EXT_SUFFIX):  Modules/_json.o; $(BLDSHARED)  Modules/_json.o $(MO
 Modules/_lsprof.o: $(srcdir)/Modules/_lsprof.c $(MODULE__LSPROF_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__LSPROF_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_lsprof.c -o Modules/_lsprof.o
 Modules/rotatingtree.o: $(srcdir)/Modules/rotatingtree.c $(MODULE__LSPROF_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__LSPROF_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/rotatingtree.c -o Modules/rotatingtree.o
 Modules/_lsprof$(EXT_SUFFIX):  Modules/_lsprof.o Modules/rotatingtree.o; $(BLDSHARED)  Modules/_lsprof.o Modules/rotatingtree.o $(MODULE__LSPROF_LDFLAGS)  -o Modules/_lsprof$(EXT_SUFFIX)
-Modules/_lzmamodule.o: $(srcdir)/Modules/_lzmamodule.c $(MODULE__LZMA_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_lzmamodule.c -o Modules/_lzmamodule.o
+Modules/_lzmamodule.o: $(srcdir)/Modules/_lzmamodule.c $(MODULE__LZMA_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_lzmamodule.c -o Modules/_lzmamodule.o
 Modules/_lzma$(EXT_SUFFIX):  Modules/_lzmamodule.o; $(BLDSHARED)  Modules/_lzmamodule.o  -llzma  -o Modules/_lzma$(EXT_SUFFIX)
 Modules/md5module.o: $(srcdir)/Modules/md5module.c $(MODULE__MD5_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_hacl/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/md5module.c -o Modules/md5module.o
 Modules/_md5$(EXT_SUFFIX):  Modules/md5module.o; $(BLDSHARED)  Modules/md5module.o   -o Modules/_md5$(EXT_SUFFIX)
@@ -2787,17 +2794,17 @@ Modules/sha512module.o: $(srcdir)/Modules/sha512module.c $(MODULE__SHA512_DEPS) 
 Modules/_sha512$(EXT_SUFFIX):  Modules/sha512module.o; $(BLDSHARED)  Modules/sha512module.o $(MODULE__SHA512_LDFLAGS)  -o Modules/_sha512$(EXT_SUFFIX)
 Modules/socketmodule.o: $(srcdir)/Modules/socketmodule.c $(MODULE__SOCKET_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__SOCKET_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/socketmodule.c -o Modules/socketmodule.o
 Modules/_socket$(EXT_SUFFIX):  Modules/socketmodule.o; $(BLDSHARED)  Modules/socketmodule.o $(MODULE__SOCKET_LDFLAGS)  -o Modules/_socket$(EXT_SUFFIX)
-Modules/_sqlite/connection.o: $(srcdir)/Modules/_sqlite/connection.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/connection.c -o Modules/_sqlite/connection.o
-Modules/_sqlite/cursor.o: $(srcdir)/Modules/_sqlite/cursor.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/cursor.c -o Modules/_sqlite/cursor.o
-Modules/_sqlite/microprotocols.o: $(srcdir)/Modules/_sqlite/microprotocols.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/microprotocols.c -o Modules/_sqlite/microprotocols.o
-Modules/_sqlite/module.o: $(srcdir)/Modules/_sqlite/module.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/module.c -o Modules/_sqlite/module.o
-Modules/_sqlite/prepare_protocol.o: $(srcdir)/Modules/_sqlite/prepare_protocol.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/prepare_protocol.c -o Modules/_sqlite/prepare_protocol.o
-Modules/_sqlite/row.o: $(srcdir)/Modules/_sqlite/row.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/row.c -o Modules/_sqlite/row.o
-Modules/_sqlite/statement.o: $(srcdir)/Modules/_sqlite/statement.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/statement.c -o Modules/_sqlite/statement.o
-Modules/_sqlite/util.o: $(srcdir)/Modules/_sqlite/util.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/util.c -o Modules/_sqlite/util.o
-Modules/_sqlite/blob.o: $(srcdir)/Modules/_sqlite/blob.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/blob.c -o Modules/_sqlite/blob.o
+Modules/_sqlite/connection.o: $(srcdir)/Modules/_sqlite/connection.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/connection.c -o Modules/_sqlite/connection.o
+Modules/_sqlite/cursor.o: $(srcdir)/Modules/_sqlite/cursor.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/cursor.c -o Modules/_sqlite/cursor.o
+Modules/_sqlite/microprotocols.o: $(srcdir)/Modules/_sqlite/microprotocols.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/microprotocols.c -o Modules/_sqlite/microprotocols.o
+Modules/_sqlite/module.o: $(srcdir)/Modules/_sqlite/module.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/module.c -o Modules/_sqlite/module.o
+Modules/_sqlite/prepare_protocol.o: $(srcdir)/Modules/_sqlite/prepare_protocol.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/prepare_protocol.c -o Modules/_sqlite/prepare_protocol.o
+Modules/_sqlite/row.o: $(srcdir)/Modules/_sqlite/row.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/row.c -o Modules/_sqlite/row.o
+Modules/_sqlite/statement.o: $(srcdir)/Modules/_sqlite/statement.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/statement.c -o Modules/_sqlite/statement.o
+Modules/_sqlite/util.o: $(srcdir)/Modules/_sqlite/util.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/util.c -o Modules/_sqlite/util.o
+Modules/_sqlite/blob.o: $(srcdir)/Modules/_sqlite/blob.c $(MODULE__SQLITE3_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -IModules/_sqlite  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_sqlite/blob.c -o Modules/_sqlite/blob.o
 Modules/_sqlite3$(EXT_SUFFIX):  Modules/_sqlite/connection.o Modules/_sqlite/cursor.o Modules/_sqlite/microprotocols.o Modules/_sqlite/module.o Modules/_sqlite/prepare_protocol.o Modules/_sqlite/row.o Modules/_sqlite/statement.o Modules/_sqlite/util.o Modules/_sqlite/blob.o; $(BLDSHARED)  Modules/_sqlite/connection.o Modules/_sqlite/cursor.o Modules/_sqlite/microprotocols.o Modules/_sqlite/module.o Modules/_sqlite/prepare_protocol.o Modules/_sqlite/row.o Modules/_sqlite/statement.o Modules/_sqlite/util.o Modules/_sqlite/blob.o  -lsqlite3  -o Modules/_sqlite3$(EXT_SUFFIX)
-Modules/_ssl.o: $(srcdir)/Modules/_ssl.c $(MODULE__SSL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ssl.c -o Modules/_ssl.o
+Modules/_ssl.o: $(srcdir)/Modules/_ssl.c $(MODULE__SSL_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_ssl.c -o Modules/_ssl.o
 Modules/_ssl$(EXT_SUFFIX):  Modules/_ssl.o; $(BLDSHARED)  Modules/_ssl.o  -lssl -lcrypto -l:libatomic.a  -o Modules/_ssl$(EXT_SUFFIX)
 Modules/_statisticsmodule.o: $(srcdir)/Modules/_statisticsmodule.c $(MODULE__STATISTICS_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__STATISTICS_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_statisticsmodule.c -o Modules/_statisticsmodule.o
 Modules/_statistics$(EXT_SUFFIX):  Modules/_statisticsmodule.o; $(BLDSHARED)  Modules/_statisticsmodule.o $(MODULE__STATISTICS_LDFLAGS)  -o Modules/_statistics$(EXT_SUFFIX)
@@ -2811,12 +2818,12 @@ Modules/_testinternalcapi.o: $(srcdir)/Modules/_testinternalcapi.c $(MODULE__TES
 Modules/_testinternalcapi$(EXT_SUFFIX):  Modules/_testinternalcapi.o; $(BLDSHARED)  Modules/_testinternalcapi.o   -o Modules/_testinternalcapi$(EXT_SUFFIX)
 Modules/_testmultiphase.o: $(srcdir)/Modules/_testmultiphase.c $(MODULE__TESTMULTIPHASE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__TESTMULTIPHASE_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_testmultiphase.c -o Modules/_testmultiphase.o
 Modules/_testmultiphase$(EXT_SUFFIX):  Modules/_testmultiphase.o; $(BLDSHARED)  Modules/_testmultiphase.o $(MODULE__TESTMULTIPHASE_LDFLAGS)  -o Modules/_testmultiphase$(EXT_SUFFIX)
-Modules/_tkinter.o: $(srcdir)/Modules/_tkinter.c $(MODULE__TKINTER_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DWITH_APPINIT -I/tools/deps/include/X11 $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_tkinter.c -o Modules/_tkinter.o
-Modules/tkappinit.o: $(srcdir)/Modules/tkappinit.c $(MODULE__TKINTER_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DWITH_APPINIT -I/tools/deps/include/X11 $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/tkappinit.c -o Modules/tkappinit.o
+Modules/_tkinter.o: $(srcdir)/Modules/_tkinter.c $(MODULE__TKINTER_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DWITH_APPINIT /X11 $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_tkinter.c -o Modules/_tkinter.o
+Modules/tkappinit.o: $(srcdir)/Modules/tkappinit.c $(MODULE__TKINTER_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -DWITH_APPINIT /X11 $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/tkappinit.c -o Modules/tkappinit.o
 Modules/_tkinter$(EXT_SUFFIX):  Modules/_tkinter.o Modules/tkappinit.o; $(BLDSHARED)  Modules/_tkinter.o Modules/tkappinit.o  -ltcl8.6 -ltk8.6 -lX11 -lxcb -lXau  -o Modules/_tkinter$(EXT_SUFFIX)
 Modules/_typingmodule.o: $(srcdir)/Modules/_typingmodule.c $(MODULE__TYPING_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__TYPING_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_typingmodule.c -o Modules/_typingmodule.o
 Modules/_typing$(EXT_SUFFIX):  Modules/_typingmodule.o; $(BLDSHARED)  Modules/_typingmodule.o $(MODULE__TYPING_LDFLAGS)  -o Modules/_typing$(EXT_SUFFIX)
-Modules/_uuidmodule.o: $(srcdir)/Modules/_uuidmodule.c $(MODULE__UUID_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include/uuid $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_uuidmodule.c -o Modules/_uuidmodule.o
+Modules/_uuidmodule.o: $(srcdir)/Modules/_uuidmodule.c $(MODULE__UUID_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_uuidmodule.c -o Modules/_uuidmodule.o
 Modules/_uuid$(EXT_SUFFIX):  Modules/_uuidmodule.o; $(BLDSHARED)  Modules/_uuidmodule.o  -luuid  -o Modules/_uuid$(EXT_SUFFIX)
 Modules/_xxsubinterpretersmodule.o: $(srcdir)/Modules/_xxsubinterpretersmodule.c $(MODULE__XXSUBINTERPRETERS_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE__XXSUBINTERPRETERS_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/_xxsubinterpretersmodule.c -o Modules/_xxsubinterpretersmodule.o
 Modules/_xxsubinterpreters$(EXT_SUFFIX):  Modules/_xxsubinterpretersmodule.o; $(BLDSHARED)  Modules/_xxsubinterpretersmodule.o $(MODULE__XXSUBINTERPRETERS_LDFLAGS)  -o Modules/_xxsubinterpreters$(EXT_SUFFIX)
@@ -2845,7 +2852,7 @@ Modules/ossaudiodev.o: $(srcdir)/Modules/ossaudiodev.c $(MODULE_OSSAUDIODEV_DEPS
 Modules/ossaudiodev$(EXT_SUFFIX):  Modules/ossaudiodev.o; $(BLDSHARED)  Modules/ossaudiodev.o $(MODULE_OSSAUDIODEV_LDFLAGS)  -o Modules/ossaudiodev$(EXT_SUFFIX)
 Modules/pyexpat.o: $(srcdir)/Modules/pyexpat.c $(MODULE_PYEXPAT_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/pyexpat.c -o Modules/pyexpat.o
 Modules/pyexpat$(EXT_SUFFIX):  Modules/pyexpat.o; $(BLDSHARED)  Modules/pyexpat.o  -lexpat  -o Modules/pyexpat$(EXT_SUFFIX)
-Modules/readline.o: $(srcdir)/Modules/readline.c $(MODULE_READLINE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/libedit/include -I/tools/deps/libedit/include/ncursesw $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/readline.c -o Modules/readline.o
+Modules/readline.o: $(srcdir)/Modules/readline.c $(MODULE_READLINE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   /ncursesw $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/readline.c -o Modules/readline.o
 Modules/readline$(EXT_SUFFIX):  Modules/readline.o; $(BLDSHARED)  Modules/readline.o  -ledit -lncursesw  -o Modules/readline$(EXT_SUFFIX)
 Modules/resource.o: $(srcdir)/Modules/resource.c $(MODULE_RESOURCE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE_RESOURCE_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/resource.c -o Modules/resource.o
 Modules/resource$(EXT_SUFFIX):  Modules/resource.o; $(BLDSHARED)  Modules/resource.o $(MODULE_RESOURCE_LDFLAGS)  -o Modules/resource$(EXT_SUFFIX)
@@ -2861,7 +2868,7 @@ Modules/unicodedata.o: $(srcdir)/Modules/unicodedata.c $(MODULE_UNICODEDATA_DEPS
 Modules/unicodedata$(EXT_SUFFIX):  Modules/unicodedata.o; $(BLDSHARED)  Modules/unicodedata.o $(MODULE_UNICODEDATA_LDFLAGS)  -o Modules/unicodedata$(EXT_SUFFIX)
 Modules/xxsubtype.o: $(srcdir)/Modules/xxsubtype.c $(MODULE_XXSUBTYPE_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE_XXSUBTYPE_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/xxsubtype.c -o Modules/xxsubtype.o
 Modules/xxsubtype$(EXT_SUFFIX):  Modules/xxsubtype.o; $(BLDSHARED)  Modules/xxsubtype.o $(MODULE_XXSUBTYPE_LDFLAGS)  -o Modules/xxsubtype$(EXT_SUFFIX)
-Modules/zlibmodule.o: $(srcdir)/Modules/zlibmodule.c $(MODULE_ZLIB_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)  -I/tools/deps/include $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/zlibmodule.c -o Modules/zlibmodule.o
+Modules/zlibmodule.o: $(srcdir)/Modules/zlibmodule.c $(MODULE_ZLIB_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC)   $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/zlibmodule.c -o Modules/zlibmodule.o
 Modules/zlib$(EXT_SUFFIX):  Modules/zlibmodule.o; $(BLDSHARED)  Modules/zlibmodule.o  -lz  -o Modules/zlib$(EXT_SUFFIX)
 Modules/atexitmodule.o: $(srcdir)/Modules/atexitmodule.c $(MODULE_ATEXIT_DEPS) $(PYTHON_HEADERS) Modules/config.c; $(CC) $(MODULE_ATEXIT_CFLAGS) $(PY_BUILTIN_MODULE_CFLAGS) -c $(srcdir)/Modules/atexitmodule.c -o Modules/atexitmodule.o
 Modules/atexit$(EXT_SUFFIX):  Modules/atexitmodule.o; $(BLDSHARED)  Modules/atexitmodule.o $(MODULE_ATEXIT_LDFLAGS)  -o Modules/atexit$(EXT_SUFFIX)
