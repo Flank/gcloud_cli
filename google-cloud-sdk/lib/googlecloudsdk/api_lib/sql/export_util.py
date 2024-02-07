@@ -53,16 +53,28 @@ def SqlExportContext(
   Returns:
     ExportContext, for use in InstancesExportRequest.exportContext.
   """
-  return sql_messages.ExportContext(
-      kind='sql#exportContext',
-      uri=uri,
-      databases=database or [],
-      offload=offload,
-      fileType=sql_messages.ExportContext.FileTypeValueValuesEnum.SQL,
-      sqlExportOptions=sql_messages.ExportContext.SqlExportOptionsValue(
-          tables=table or [], parallel=parallel, threads=threads
-      ),
-  )
+  if parallel:
+    return sql_messages.ExportContext(
+        kind='sql#exportContext',
+        uri=uri,
+        databases=database or [],
+        offload=offload,
+        fileType=sql_messages.ExportContext.FileTypeValueValuesEnum.SQL,
+        sqlExportOptions=sql_messages.ExportContext.SqlExportOptionsValue(
+            tables=table or [], parallel=parallel, threads=threads
+        ),
+    )
+  else:
+    return sql_messages.ExportContext(
+        kind='sql#exportContext',
+        uri=uri,
+        databases=database or [],
+        offload=offload,
+        fileType=sql_messages.ExportContext.FileTypeValueValuesEnum.SQL,
+        sqlExportOptions=sql_messages.ExportContext.SqlExportOptionsValue(
+            tables=table or [], threads=threads
+        ),
+    )
 
 
 def CsvExportContext(sql_messages,

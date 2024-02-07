@@ -47,16 +47,28 @@ def SqlImportContext(
   Returns:
     ImportContext, for use in InstancesImportRequest.importContext.
   """
-  return sql_messages.ImportContext(
-      kind='sql#importContext',
-      uri=uri,
-      database=database,
-      fileType=sql_messages.ImportContext.FileTypeValueValuesEnum.SQL,
-      importUser=user,
-      sqlImportOptions=sql_messages.ImportContext.SqlImportOptionsValue(
-          parallel=parallel, threads=threads
-      ),
-  )
+  if parallel:
+    return sql_messages.ImportContext(
+        kind='sql#importContext',
+        uri=uri,
+        database=database,
+        fileType=sql_messages.ImportContext.FileTypeValueValuesEnum.SQL,
+        importUser=user,
+        sqlImportOptions=sql_messages.ImportContext.SqlImportOptionsValue(
+            parallel=parallel, threads=threads
+        ),
+    )
+  else:
+    return sql_messages.ImportContext(
+        kind='sql#importContext',
+        uri=uri,
+        database=database,
+        fileType=sql_messages.ImportContext.FileTypeValueValuesEnum.SQL,
+        importUser=user,
+        sqlImportOptions=sql_messages.ImportContext.SqlImportOptionsValue(
+            threads=threads
+        ),
+    )
 
 
 def CsvImportContext(sql_messages,

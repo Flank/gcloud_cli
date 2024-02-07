@@ -201,6 +201,7 @@ lib/googlecloudsdk/api_lib/cloudbuild/v2/input_util.py
 lib/googlecloudsdk/api_lib/cloudbuild/v2/logs.py
 lib/googlecloudsdk/api_lib/cloudbuild/v2/pipeline_input_util.py
 lib/googlecloudsdk/api_lib/cloudbuild/v2/workflow_input_util.py
+lib/googlecloudsdk/api_lib/cloudbuild/v2/workflow_output_util.py
 lib/googlecloudsdk/api_lib/cloudbuild/workerpool_config.py
 lib/googlecloudsdk/api_lib/clouddeploy/__init__.py
 lib/googlecloudsdk/api_lib/clouddeploy/automation.py
@@ -3285,6 +3286,11 @@ lib/googlecloudsdk/generated_clients/apis/blockchainnodeengine/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/blockchainnodeengine/v1/blockchainnodeengine_v1_client.py
 lib/googlecloudsdk/generated_clients/apis/blockchainnodeengine/v1/blockchainnodeengine_v1_messages.py
 lib/googlecloudsdk/generated_clients/apis/blockchainnodeengine/v1/resources.py
+lib/googlecloudsdk/generated_clients/apis/blockchainvalidatormanager/__init__.py
+lib/googlecloudsdk/generated_clients/apis/blockchainvalidatormanager/v1alpha/__init__.py
+lib/googlecloudsdk/generated_clients/apis/blockchainvalidatormanager/v1alpha/blockchainvalidatormanager_v1alpha_client.py
+lib/googlecloudsdk/generated_clients/apis/blockchainvalidatormanager/v1alpha/blockchainvalidatormanager_v1alpha_messages.py
+lib/googlecloudsdk/generated_clients/apis/blockchainvalidatormanager/v1alpha/resources.py
 lib/googlecloudsdk/generated_clients/apis/certificatemanager/__init__.py
 lib/googlecloudsdk/generated_clients/apis/certificatemanager/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/certificatemanager/v1/certificatemanager_v1_client.py
@@ -6044,12 +6050,12 @@ lib/surface/apphub/applications/workloads/list.py
 lib/surface/apphub/applications/workloads/update.py
 lib/surface/apphub/discovered_services/__init__.py
 lib/surface/apphub/discovered_services/describe.py
-lib/surface/apphub/discovered_services/find_discovered.py
+lib/surface/apphub/discovered_services/find.py
 lib/surface/apphub/discovered_services/find_unregistered.py
 lib/surface/apphub/discovered_services/list.py
 lib/surface/apphub/discovered_workloads/__init__.py
 lib/surface/apphub/discovered_workloads/describe.py
-lib/surface/apphub/discovered_workloads/find_discovered.py
+lib/surface/apphub/discovered_workloads/find.py
 lib/surface/apphub/discovered_workloads/find_unregistered.py
 lib/surface/apphub/discovered_workloads/list.py
 lib/surface/apphub/operations/__init__.py
@@ -6562,6 +6568,7 @@ lib/surface/builds/triggers/__init__.py
 lib/surface/builds/triggers/config/__init__.py
 lib/surface/builds/triggers/config/export.yaml
 lib/surface/builds/triggers/create/__init__.py
+lib/surface/builds/triggers/create/bitbucket_cloud.py
 lib/surface/builds/triggers/create/bitbucket_data_center.py
 lib/surface/builds/triggers/create/bitbucketserver.py
 lib/surface/builds/triggers/create/cloud_source_repositories.py
@@ -6578,6 +6585,7 @@ lib/surface/builds/triggers/import.py
 lib/surface/builds/triggers/list.py
 lib/surface/builds/triggers/run.py
 lib/surface/builds/triggers/update/__init__.py
+lib/surface/builds/triggers/update/bitbucket_cloud.py
 lib/surface/builds/triggers/update/bitbucket_data_center.py
 lib/surface/builds/triggers/update/bitbucketserver.py
 lib/surface/builds/triggers/update/cloud_source_repositories.py
@@ -7982,6 +7990,7 @@ lib/surface/container/fleet/mesh/__init__.py
 lib/surface/container/fleet/mesh/debug/__init__.py
 lib/surface/container/fleet/mesh/debug/bug_report.py
 lib/surface/container/fleet/mesh/debug/proxy_config.py
+lib/surface/container/fleet/mesh/debug/proxy_status.py
 lib/surface/container/fleet/mesh/describe.py
 lib/surface/container/fleet/mesh/disable.py
 lib/surface/container/fleet/mesh/enable.py
@@ -8631,10 +8640,14 @@ lib/surface/deploy/automations/describe.yaml
 lib/surface/deploy/automations/export.py
 lib/surface/deploy/automations/list.yaml
 lib/surface/deploy/custom_target_types/__init__.py
+lib/surface/deploy/custom_target_types/add_iam_policy_binding.yaml
 lib/surface/deploy/custom_target_types/delete.yaml
 lib/surface/deploy/custom_target_types/describe.yaml
 lib/surface/deploy/custom_target_types/export.py
+lib/surface/deploy/custom_target_types/get_iam_policy.yaml
 lib/surface/deploy/custom_target_types/list.yaml
+lib/surface/deploy/custom_target_types/remove_iam_policy_binding.yaml
+lib/surface/deploy/custom_target_types/set_iam_policy.yaml
 lib/surface/deploy/delete.py
 lib/surface/deploy/delivery_pipelines/__init__.py
 lib/surface/deploy/delivery_pipelines/add_iam_policy_binding.yaml
