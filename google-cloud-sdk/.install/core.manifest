@@ -144,6 +144,7 @@ lib/googlecloudsdk/api_lib/assured/violations.py
 lib/googlecloudsdk/api_lib/assured/workloads.py
 lib/googlecloudsdk/api_lib/audit_manager/__init__.py
 lib/googlecloudsdk/api_lib/audit_manager/audit_reports.py
+lib/googlecloudsdk/api_lib/audit_manager/audit_scopes.py
 lib/googlecloudsdk/api_lib/audit_manager/enrollments.py
 lib/googlecloudsdk/api_lib/audit_manager/operations.py
 lib/googlecloudsdk/api_lib/audit_manager/util.py
@@ -6085,6 +6086,7 @@ lib/surface/artifacts/docker/tags/add.py
 lib/surface/artifacts/docker/tags/delete.py
 lib/surface/artifacts/docker/tags/list.py
 lib/surface/artifacts/docker/upgrade/__init__.py
+lib/surface/artifacts/docker/upgrade/migrate.yaml
 lib/surface/artifacts/docker/upgrade/print_iam_policy.py
 lib/surface/artifacts/files/__init__.py
 lib/surface/artifacts/files/delete.yaml
@@ -6202,6 +6204,8 @@ lib/surface/assured/workloads/violations/list.py
 lib/surface/audit_manager/__init__.py
 lib/surface/audit_manager/audit_reports/__init__.py
 lib/surface/audit_manager/audit_reports/generate.py
+lib/surface/audit_manager/audit_scopes/__init__.py
+lib/surface/audit_manager/audit_scopes/generate.py
 lib/surface/audit_manager/enrollments/__init__.py
 lib/surface/audit_manager/enrollments/add.py
 lib/surface/audit_manager/operations/__init__.py
@@ -7497,6 +7501,9 @@ lib/surface/compute/ssl_policies/list.py
 lib/surface/compute/ssl_policies/list_available_features.py
 lib/surface/compute/ssl_policies/update.py
 lib/surface/compute/start_iap_tunnel.py
+lib/surface/compute/storage_pool_types/__init__.py
+lib/surface/compute/storage_pool_types/describe.yaml
+lib/surface/compute/storage_pool_types/list.yaml
 lib/surface/compute/storage_pools/__init__.py
 lib/surface/compute/storage_pools/create.yaml
 lib/surface/compute/storage_pools/delete.yaml
@@ -9465,6 +9472,7 @@ lib/surface/iam/workload_identity_pools/providers/__init__.py
 lib/surface/iam/workload_identity_pools/providers/create_aws.yaml
 lib/surface/iam/workload_identity_pools/providers/create_oidc.yaml
 lib/surface/iam/workload_identity_pools/providers/create_saml.yaml
+lib/surface/iam/workload_identity_pools/providers/create_x509.yaml
 lib/surface/iam/workload_identity_pools/providers/delete.yaml
 lib/surface/iam/workload_identity_pools/providers/describe.yaml
 lib/surface/iam/workload_identity_pools/providers/keys/__init__.py
@@ -9482,6 +9490,7 @@ lib/surface/iam/workload_identity_pools/providers/undelete.yaml
 lib/surface/iam/workload_identity_pools/providers/update_aws.yaml
 lib/surface/iam/workload_identity_pools/providers/update_oidc.yaml
 lib/surface/iam/workload_identity_pools/providers/update_saml.yaml
+lib/surface/iam/workload_identity_pools/providers/update_x509.yaml
 lib/surface/iam/workload_identity_pools/undelete.yaml
 lib/surface/iam/workload_identity_pools/update.yaml
 lib/surface/iap/__init__.py
