@@ -1341,8 +1341,8 @@ def AddInvokerIamCheckFlag(parser):
       action=arg_parsers.StoreTrueFalseAction,
       help=(
           'Indicates whether an IAM check should occur when invoking the '
-          'container. This is Enabled by default. It can only be disabled on '
-          'services with internal, and internal+load-balancer ingress settings.'
+          'container. This is Enabled by default. Disabling this flag is not '
+          'available in all projects.'
       ),
   )
 
@@ -2530,7 +2530,7 @@ def GetServiceConfigurationChanges(args, release_track=base.ReleaseTrack.GA):
         for container_name, container_args in args.containers.items()
         if container_args.IsSpecified('depends_on')
     }
-    if dependency_changes or args.IsSpecified('remove_containers'):
+    if dependency_changes:
       changes.append(
           config_changes.ContainerDependenciesChange(dependency_changes)
       )
@@ -2585,6 +2585,18 @@ def GetJobConfigurationChanges(args, release_track=base.ReleaseTrack.GA):
     changes.append(config_changes.JobTaskTimeoutChange(args.task_timeout))
 
   _PrependClientNameAndVersionChange(args, changes)
+
+  if FlagIsExplicitlySet(args, 'containers'):
+    dependency_changes = {
+        container_name: container_args.depends_on
+        for container_name, container_args in args.containers.items()
+        if container_args.IsSpecified('depends_on')
+    }
+    if dependency_changes:
+      changes.append(
+          config_changes.ContainerDependenciesChange(dependency_changes)
+      )
+
   return changes
 
 
@@ -2693,6 +2705,9 @@ def GetAllowUnauthenticated(args, client=None, service_ref=None, prompt=False):
   """
   if getattr(args, 'allow_unauthenticated', None) is not None:
     return args.allow_unauthenticated
+
+  if FlagIsExplicitlySet(args, 'default_url') and not args.default_url:
+    return None
 
   if prompt:
     # Need to check if the user has permissions before we prompt

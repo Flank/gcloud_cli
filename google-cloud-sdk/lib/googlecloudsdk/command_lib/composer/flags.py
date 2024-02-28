@@ -37,7 +37,7 @@ import six
 
 MIN_TRIGGERER_AIRFLOW_VERSION = '2.2.5'
 MIN_TRIGGERER_COMPOSER_VERSION = '2.0.31'
-MIN_COMPOSER3_VERSION = '3.0.0'
+MIN_COMPOSER3_VERSION = '3'
 MIN_SCHEDULED_SNAPSHOTS_COMPOSER_VERSION = '2.0.32'
 MIN_COMPOSER_RUN_AIRFLOW_CLI_VERSION = '2.4.0'
 
@@ -113,13 +113,11 @@ class V2ExclusiveStoreAction(argparse._StoreAction):  # pylint: disable=protecte
   """StoreActionClass first validating if option is Composer >=2 exclusive."""
 
 
-# TODO(b/309750417): Update help text
 _AIRFLOW_VERSION_TYPE = arg_parsers.RegexpValidator(
     r'^(\d+(?:\.\d+(?:\.\d+(?:-build\.\d+)?)?)?)',
     'must be in the form X[.Y[.Z]].',
 )
 
-# TODO(b/309750417): Update help text
 _IMAGE_VERSION_TYPE = arg_parsers.RegexpValidator(
     r'^composer-(\d+(?:\.\d+\.\d+(?:-[a-z]+\.\d+)?)?|latest)-airflow-(\d+(?:\.\d+(?:\.\d+(?:-build\.\d+)?)?)?)',
     'must be in the form \'composer-A[.B.C[-D.E]]-airflow-X[.Y[.Z]]\' or '
@@ -979,7 +977,7 @@ ENABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
     default=None,
     action='store_true',
     help="""\
-    Enable Cloud Data Lineage integration.
+    Enable Cloud Data Lineage integration, supported for Composer 2 Environments.
     """)
 
 DISABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
@@ -987,7 +985,7 @@ DISABLE_CLOUD_DATA_LINEAGE_INTEGRATION_FLAG = base.Argument(
     default=None,
     action='store_true',
     help="""\
-    Disable Cloud Data Lineage integration.
+    Disable Cloud Data Lineage integration, supported for Composer 2 Environments.
     """)
 
 STORAGE_BUCKET_FLAG = base.Argument(

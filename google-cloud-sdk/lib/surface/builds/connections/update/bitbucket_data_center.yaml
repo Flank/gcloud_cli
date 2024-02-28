@@ -1,5 +1,4 @@
-- release_tracks: [ALPHA]
-  hidden: true
+- hidden: true
   help_text:
     brief: Update a Cloud Build Connection of type Bitbucket Data Center.
     description: |
@@ -11,8 +10,7 @@
         $ {command} my-gle-conn --region=us-west1
           --ssl-ca-file=mycertificate.crt
 
-      To update the authorization token, provide the connection name and the new authorization token
-       secret version.
+      To update the authorization token, provide the connection name and the new authorization token secret version name.
 
         $ {command} my-gle-conn --region=us-west1
           --authorizer-token-secret-version=projects/myproj/secrets/admin-pat/versions/1

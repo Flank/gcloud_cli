@@ -1140,6 +1140,10 @@ class _SectionApiEndpointOverrides(_Section):
         command='gcloud container fleet policycontroller')
     self.apigateway = self._Add('apigateway', command='gcloud api-gateway')
     self.apigee = self._Add('apigee', command='gcloud apigee')
+    self.apigeeregistry = self._Add(
+        'apigeeregistry', command='gcloud apigee-registry', hidden=True)
+    self.appconfigmanager = self._Add(
+        'appconfigmanager', command='gcloud app-config-manager', hidden=True)
     self.appengine = self._Add('appengine', command='gcloud app')
     self.apphub = self._Add('apphub', command='gcloud apphub')
     self.artifactregistry = self._Add(
@@ -1178,6 +1182,9 @@ class _SectionApiEndpointOverrides(_Section):
     self.cloudidentity = self._Add('cloudidentity', command='gcloud identity')
     self.cloudiot = self._Add('cloudiot', command='gcloud iot')
     self.cloudkms = self._Add('cloudkms', command='gcloud kms')
+    self.cloudnumberregistry = self._Add(
+        'cloudnumberregistry',
+        command='gcloud cloudnumberregistry', hidden=True)
     self.cloudquotas = self._Add(
         'cloudquotas', command='gcloud quotas', hidden=True)
     self.cloudresourcemanager = self._Add(
@@ -1285,6 +1292,7 @@ class _SectionApiEndpointOverrides(_Section):
     self.policysimulator = self._Add('policysimulator', hidden=True)
     self.policytroubleshooter = self._Add('policytroubleshooter', hidden=True)
     self.privateca = self._Add('privateca', command='gcloud privateca')
+    self.privilegedaccessmanager = self._Add('pam', command='gcloud pam')
     self.publicca = self._Add('publicca', command='gcloud publicca')
     self.pubsub = self._Add('pubsub', command='gcloud pubsub')
     self.pubsublite = self._Add('pubsublite', hidden=True)
@@ -1303,6 +1311,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.sasportal = self._Add('sasportal', hidden=True)
     self.scc = self._Add('securitycenter', command='gcloud scc')
     self.sddc = self._Add('sddc', command='gcloud vmware sddc')
+    self.seclm = self._Add(
+        'seclm', command='gcloud seclm', hidden=True)
     self.secrets = self._Add('secretmanager', command='gcloud secrets')
     self.securedlandingzone = self._Add(
         'securedlandingzone', hidden=True, command='gcloud scc slz-overwatch')
@@ -3617,6 +3627,16 @@ class _SectionStorage(_Section):
         ' `gcloud storage`, else it will fallback to using the JSON API.',
         choices=([api.value for api in StoragePreferredApi]))
 
+    self.use_grpc_if_available = self._AddBool(
+        'use_grpc_if_available',
+        default=False,
+        hidden=True,
+        help_text=(
+            'If True, uses gRPC when possible. If False, uses existing'
+            ' implementation.'
+        ),
+    )
+
 
 class _SectionSurvey(_Section):
   """Contains the properties for the 'survey' section."""
@@ -4437,6 +4457,14 @@ def GetUniverseDomain():
   """Get the universe domain."""
 
   return VALUES.core.universe_domain.Get()
+
+
+def GetUniverseDocumentDomain():
+  """Get the universe document domain."""
+
+  # Temporary returning universe document domain
+  # this will be updated when Descriptor data is ready.
+  return 'cloud.google.com'
 
 
 def GetMetricsEnvironment():

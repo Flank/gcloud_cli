@@ -70,30 +70,6 @@ def _AddInstanceGroupManagerArgs(parser):
   managed_flags.INSTANCE_TEMPLATE_ARG.AddArgument(parser)
 
 
-def _AddInstanceFlexibilityPolicyArgs(parser):
-  """Adds instance flexibility policy args."""
-  parser.add_argument(
-      '--instance-selection-machine-types',
-      type=arg_parsers.ArgList(),
-      metavar='MACHINE_TYPE',
-      help=(
-          'Primary machine types to use for the Compute Engine instances that'
-          ' will be created with the managed instance group. If not provided,'
-          ' machine type specified in the instance template will be used.'
-      ),
-  )
-  parser.add_argument(
-      '--instance-selection-secondary-machine-types',
-      type=arg_parsers.ArgList(),
-      metavar='MACHINE_TYPE',
-      help=(
-          'Secondary machine types to use for the Compute Engine instances that'
-          ' will be created with the managed instance group. If not provided,'
-          ' machine type specified in the instance template will be used.'
-      ),
-  )
-
-
 def _IsZonalGroup(ref):
   """Checks if reference to instance group is zonal."""
   return ref.Collection() == 'compute.instanceGroupManagers'
@@ -150,6 +126,7 @@ class CreateGA(base.CreateCommand):
     managed_flags.AddMigForceUpdateOnRepairFlags(parser)
     if cls.support_resource_manager_tags:
       managed_flags.AddMigResourceManagerTagsFlags(parser)
+    managed_flags.AddMigDefaultActionOnVmFailure(parser)
     # When adding RMIG-specific flag, update REGIONAL_FLAGS constant.
 
   def _HandleStatefulArgs(self, instance_group_manager, args, client):
@@ -463,7 +440,6 @@ class CreateBeta(CreateGA):
   def Args(cls, parser):
     super(CreateBeta, cls).Args(parser)
     managed_flags.AddStandbyPolicyFlags(parser)
-    managed_flags.AddMigDefaultActionOnVmFailure(parser)
 
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):
@@ -497,7 +473,7 @@ class CreateAlpha(CreateBeta):
   @classmethod
   def Args(cls, parser):
     super(CreateAlpha, cls).Args(parser)
-    _AddInstanceFlexibilityPolicyArgs(parser)
+    managed_flags.AddInstanceFlexibilityPolicyArgs(parser)
 
   def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
                                   holder):

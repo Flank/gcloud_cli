@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://blockchainvalidatormanager.googleapis.com/v1alpha/'
-DOCS_URL = 'http://go/cloud-web3:validator-manager'
+DOCS_URL = 'https://cloud.google.com/blockchain-node-engine/docs/create-node-ethereum#validator_configuration'
 
 
 class Collections(enum.Enum):
@@ -61,6 +61,13 @@ class Collections(enum.Enum):
               '{operationsId}',
       },
       ['name'],
+      True
+  )
+  PROJECTS_LOCATIONS_SECRETS = (
+      'projects.locations.secrets',
+      'projects/{projectsId}/locations/{locationsId}/secrets/{secretsId}',
+      {},
+      ['projectsId', 'locationsId', 'secretsId'],
       True
   )
 

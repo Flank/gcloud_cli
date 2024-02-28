@@ -20,14 +20,15 @@ from __future__ import unicode_literals
 
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.apphub import utils as api_lib_utils
+from googlecloudsdk.calliope import base
 
 
 class DiscoveredWorkloadsClient(object):
   """Client for workloads in apphub API."""
 
-  def __init__(self, client=None, messages=None):
-    self.client = client or api_lib_utils.GetClientInstance()
-    self.messages = messages or api_lib_utils.GetMessagesModule()
+  def __init__(self, release_track=base.ReleaseTrack.ALPHA):
+    self.client = api_lib_utils.GetClientInstance(release_track)
+    self.messages = api_lib_utils.GetMessagesModule(release_track)
     self._dis_workloads_client = (
         self.client.projects_locations_discoveredWorkloads
     )
@@ -55,7 +56,7 @@ class DiscoveredWorkloadsClient(object):
       limit=None,
       page_size=100,
   ):
-    """List discovered workloads in the Projects/Location.
+    """List discovered workloads that could be added to an application.
 
     Args:
       parent: str, projects/{projectId}/locations/{location}
@@ -106,39 +107,6 @@ class DiscoveredWorkloadsClient(object):
         self._dis_workloads_client,
         find_unregistered_req,
         method='FindUnregistered',
-        field='discoveredWorkloads',
-        batch_size=page_size,
-        limit=limit,
-        batch_size_attribute='pageSize',
-    )
-
-  def Find(
-      self,
-      parent,
-      limit=None,
-      page_size=100,
-  ):
-    """Find discovered workloads that could be added to an application the Projects/Location.
-
-    Args:
-      parent: str, projects/{projectId}/locations/{location}
-      limit: int or None, the total number of results to return. Default value
-        is None
-      page_size: int, the number of entries in each batch (affects requests
-        made, but not the yielded results). Default value is 100.
-
-    Returns:
-      Generator of matching discovered workloads.
-    """
-    find_discovered_req = (
-        self.messages.ApphubProjectsLocationsDiscoveredWorkloadsFindRequest(
-            parent=parent
-        )
-    )
-    return list_pager.YieldFromList(
-        self._dis_workloads_client,
-        find_discovered_req,
-        method='Find',
         field='discoveredWorkloads',
         batch_size=page_size,
         limit=limit,

@@ -33,8 +33,10 @@ from googlecloudsdk.command_lib.infra_manager import deterministic_snapshot
 from googlecloudsdk.command_lib.infra_manager import errors
 from googlecloudsdk.command_lib.infra_manager import staging_bucket_util
 from googlecloudsdk.core import log
+from googlecloudsdk.core import requests
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.resource import resource_transform
+from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
 import six
 
@@ -276,6 +278,7 @@ def Apply(
     async_,
     deployment_full_name,
     service_account,
+    tf_version_constraint=None,
     local_source=None,
     stage_bucket=None,
     ignore_file=None,
@@ -303,6 +306,8 @@ def Apply(
       credential to manage resources. e.g.
       `projects/{projectID}/serviceAccounts/{serviceAccount}` The default Cloud
       Build SA will be used initially if this field is not set.
+    tf_version_constraint: User-specified Terraform version constraint, for
+      example, "=1.3.10".
     local_source: Local storage path where config files are stored.
     stage_bucket: optional string. Destination for storing local config files
       specified by local source flag. e.g. "gs://bucket-name/".
@@ -431,6 +436,7 @@ def Apply(
       workerPool=worker_pool,
       terraformBlueprint=tf_blueprint,
       labels=labels_message,
+      tfVersionConstraint=tf_version_constraint,
   )
 
   if artifacts_gcs_bucket is not None:
@@ -838,7 +844,7 @@ def GetRevisionNumber(revision_full_name):
   return int(revision_short_name[2:])
 
 
-def ExportPreviewResult(messages, preview_full_name):
+def ExportPreviewResult(messages, preview_full_name, file=None):
   """Creates a signed uri to download the preview results.
 
   Args:
@@ -846,6 +852,7 @@ def ExportPreviewResult(messages, preview_full_name):
       API messages based on our protos.
     preview_full_name: string, the fully qualified name of the preview,
       e.g. "projects/p/locations/l/previews/p".]
+    file: string, the file name to download results to.
   Returns:
     A messages.ExportPreviewResultResponse which contains signed uri to
     download binary and json plan files.
@@ -860,8 +867,22 @@ def ExportPreviewResult(messages, preview_full_name):
   preview_result_resp = configmanager_util.ExportPreviewResult(
       export_preview_result_request, preview_full_name
   )
-
-  return preview_result_resp
+  if file is None:
+    return preview_result_resp
+  binary_data = requests.GetSession().get(
+      preview_result_resp.result.binarySignedUri
+      )
+  json_data = requests.GetSession().get(
+      preview_result_resp.result.jsonSignedUri
+      )
+  if file.endswith(os.sep):
+    file += 'preview'
+  files.WriteBinaryFileContents(file +'.tfplan', binary_data.content)
+  files.WriteBinaryFileContents(file + '.json', json_data.content)
+  log.status.Print(
+      f'Exported preview artifacts {file}.tfplan and {file}.json'
+      )
+  return
 
 
 def Create(

@@ -356,6 +356,56 @@ def AddBackup(parser, hidden=False):
   )
 
 
+def AddSkipFinalBackup(parser):
+  parser.add_argument(
+      '--skip-final-backup',
+      required=False,
+      action='store_true',
+      default=False,
+      hidden=True,
+      help=(
+          'Skips the final backup to be taken at the time of instance deletion.'
+      ),
+  )
+
+
+def AddFinalbackupRetentionDays(parser):
+  help_text = (
+      'Specifies number of days to retain final backup. The valid range is'
+      ' between 1 and 365. Default value is 30 days.'
+  )
+  parser.add_argument(
+      '--final-backup-retention-days',
+      type=arg_parsers.BoundedInt(1, 365, unlimited=False),
+      required=False,
+      help=help_text,
+      hidden=True,
+      default=30,
+  )
+
+
+def AddFinalbackupDescription(parser):
+  parser.add_argument(
+      '--final-backup-description',
+      required=False,
+      hidden=True,
+      help='Provides description for the final backup going to be taken.'
+  )
+
+
+def AddFinalBackupExpiryTimeArgument(parser):
+  parser.add_argument(
+      '--final-backup-expiry-time',
+      type=arg_parsers.Datetime.Parse,
+      required=False,
+      hidden=True,
+      help=(
+          'Specifies the time at which the final backup will expire. Maximum'
+          ' time allowed is 365 days from now. Format: YYYY-MM-DDTHH:MM:SS.'
+      ),
+  )
+
+
 # Currently, MAX_BACKUP_RETENTION_COUNT=365, and MIN_BACKUP_RETENTION_COUNT=1.
 def AddRetainedBackupsCount(parser, hidden=False):
   help_text = (
@@ -2045,6 +2095,18 @@ OPERATION_FORMAT_BETA = """
   table(
     name,
     operationType:label=TYPE,
+    startTime.iso():label=START,
+    endTime.iso():label=END,
+    error.errors[0].code.yesno(no="-"):label=ERROR,
+    status:label=STATUS
+  )
+"""
+
+OPERATION_FORMAT_BETA_WITH_INSERT_TIME = """
+  table(
+    name,
+    operationType:label=TYPE,
+    insertTime.iso():label=INSERTED_AT,
     startTime.iso():label=START,
     endTime.iso():label=END,
     error.errors[0].code.yesno(no="-"):label=ERROR,
