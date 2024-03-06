@@ -65,9 +65,9 @@ build_time_vars = {'ABIFLAGS': '',
  'CONFINCLUDEDIR': '/install/include',
  'CONFINCLUDEPY': '/install/include/python3.11',
  'COREPYTHONPATH': '',
- 'COVERAGE_INFO': '/build/Python-3.11.7/coverage.info',
+ 'COVERAGE_INFO': '/build/Python-3.11.8/coverage.info',
  'COVERAGE_LCOV_OPTIONS': '--rc lcov_branch_coverage=1',
- 'COVERAGE_REPORT': '/build/Python-3.11.7/lcov-report',
+ 'COVERAGE_REPORT': '/build/Python-3.11.8/lcov-report',
  'COVERAGE_REPORT_OPTIONS': '--rc lcov_branch_coverage=1 --branch-coverage '
                             '--title "CPython 3.11 LCOV report [commit $(shell '
                             ')]"',
@@ -1010,10 +1010,10 @@ build_time_vars = {'ABIFLAGS': '',
  'PYTHONFRAMEWORKINSTALLDIR': '',
  'PYTHONFRAMEWORKPREFIX': '',
  'PYTHONPATH': '',
- 'PYTHON_FOR_BUILD': '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
+ 'PYTHON_FOR_BUILD': '_PYTHON_PROJECT_BASE=/build/Python-3.11.8 '
                      '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                      'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-                     '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
+                     '/build/Python-3.11.8/`cat pybuilddir.txt`:)./Lib '
                      '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                      '/tools/host/bin/python3.11',
  'PYTHON_FOR_BUILD_DEPS': '',
@@ -1093,7 +1093,7 @@ build_time_vars = {'ABIFLAGS': '',
  'READELF': 'readelf',
  'RESSRCDIR': 'Mac/Resources/framework',
  'RETSIGTYPE': 'void',
- 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.11.7',
+ 'RUNSHARED': 'LD_LIBRARY_PATH=/build/Python-3.11.8',
  'SCRIPTDIR': '/install/lib',
  'SETPGRP_HAVE_ARG': 0,
  'SHAREDMODS': 'Modules/_crypt.cpython-311-x86_64-linux-gnu.so',
@@ -1138,19 +1138,19 @@ build_time_vars = {'ABIFLAGS': '',
  'SYS_SELECT_WITH_SYS_TIME': 1,
  'TESTOPTS': '',
  'TESTPATH': '',
- 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.11.7 '
-               '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
+ 'TESTPYTHON': 'LD_LIBRARY_PATH=/build/Python-3.11.8 '
+               '_PYTHON_PROJECT_BASE=/build/Python-3.11.8 '
                '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-               '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
+               '/build/Python-3.11.8/`cat pybuilddir.txt`:)./Lib '
                '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                '/tools/host/bin/python3.11',
  'TESTPYTHONOPTS': '',
- 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.11.7 '
-               '_PYTHON_PROJECT_BASE=/build/Python-3.11.7 '
+ 'TESTRUNNER': 'LD_LIBRARY_PATH=/build/Python-3.11.8 '
+               '_PYTHON_PROJECT_BASE=/build/Python-3.11.8 '
                '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                'PYTHONPATH=$(shell test -f pybuilddir.txt && echo '
-               '/build/Python-3.11.7/`cat pybuilddir.txt`:)./Lib '
+               '/build/Python-3.11.8/`cat pybuilddir.txt`:)./Lib '
                '_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata__linux_x86_64-linux-gnu '
                '/tools/host/bin/python3.11 ./Tools/scripts/run_tests.py',
  'TESTSUBDIRS': 'ctypes/test \\',
@@ -1182,8 +1182,8 @@ build_time_vars = {'ABIFLAGS': '',
  'WITH_VALGRIND': 0,
  'X87_DOUBLE_ROUNDING': 0,
  'XMLLIBSUBDIRS': 'xml xml/dom xml/etree xml/parsers xml/sax',
- 'abs_builddir': '/build/Python-3.11.7',
- 'abs_srcdir': '/build/Python-3.11.7',
+ 'abs_builddir': '/build/Python-3.11.8',
+ 'abs_srcdir': '/build/Python-3.11.8',
  'datarootdir': '/install/share',
  'exec_prefix': '/install',
  'prefix': '/install',

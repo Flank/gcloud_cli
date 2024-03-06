@@ -783,6 +783,7 @@ lib/googlecloudsdk/api_lib/orgpolicy/service.py
 lib/googlecloudsdk/api_lib/orgpolicy/utils.py
 lib/googlecloudsdk/api_lib/oslogin/__init__.py
 lib/googlecloudsdk/api_lib/oslogin/client.py
+lib/googlecloudsdk/api_lib/pam/__init__.py
 lib/googlecloudsdk/api_lib/policy_intelligence/__init__.py
 lib/googlecloudsdk/api_lib/policy_intelligence/orgpolicy_simulator.py
 lib/googlecloudsdk/api_lib/policy_intelligence/policy_analyzer.py
@@ -2405,6 +2406,8 @@ lib/googlecloudsdk/command_lib/orglifecycle/resources.yaml
 lib/googlecloudsdk/command_lib/oslogin/__init__.py
 lib/googlecloudsdk/command_lib/oslogin/flags.py
 lib/googlecloudsdk/command_lib/oslogin/oslogin_utils.py
+lib/googlecloudsdk/command_lib/pam/__init__.py
+lib/googlecloudsdk/command_lib/pam/resources.yaml
 lib/googlecloudsdk/command_lib/parallelstore/generated_resources.yaml
 lib/googlecloudsdk/command_lib/parallelstore/resources.yaml
 lib/googlecloudsdk/command_lib/policy_intelligence/__init__.py
@@ -10659,6 +10662,9 @@ lib/surface/orglifecycle/managed_organizations/delete.yaml
 lib/surface/orglifecycle/managed_organizations/describe.yaml
 lib/surface/orglifecycle/managed_organizations/list.yaml
 lib/surface/orglifecycle/managed_organizations/update.yaml
+lib/surface/pam/__init__.py
+lib/surface/pam/entitlements/__init__.py
+lib/surface/pam/entitlements/describe.yaml
 lib/surface/parallelstore/__init__.py
 lib/surface/parallelstore/instances/__init__.py
 lib/surface/parallelstore/instances/_partials/_create_v1alpha.yaml
