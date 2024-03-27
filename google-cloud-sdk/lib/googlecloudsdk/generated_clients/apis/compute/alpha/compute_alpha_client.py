@@ -82,6 +82,7 @@ class ComputeAlpha(base_api.BaseApiClient):
     self.networkEdgeSecurityServices = self.NetworkEdgeSecurityServicesService(self)
     self.networkEndpointGroups = self.NetworkEndpointGroupsService(self)
     self.networkFirewallPolicies = self.NetworkFirewallPoliciesService(self)
+    self.networkPlacements = self.NetworkPlacementsService(self)
     self.networks = self.NetworksService(self)
     self.nodeGroups = self.NodeGroupsService(self)
     self.nodeTemplates = self.NodeTemplatesService(self)
@@ -2249,6 +2250,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def AddPacketMirroringRule(self, request, global_params=None):
+      r"""Inserts a packet mirroring rule into a firewall policy.
+
+      Args:
+        request: (ComputeFirewallPoliciesAddPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.firewallPolicies.addPacketMirroringRule',
+        ordered_params=['firewallPolicy'],
+        path_params=['firewallPolicy'],
+        query_params=['requestId'],
+        relative_path='locations/global/firewallPolicies/{firewallPolicy}/addPacketMirroringRule',
+        request_field='firewallPolicyRule',
+        request_type_name='ComputeFirewallPoliciesAddPacketMirroringRuleRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def AddRule(self, request, global_params=None):
       r"""Inserts a rule into a firewall policy.
 
@@ -2402,6 +2429,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         request_field='',
         request_type_name='ComputeFirewallPoliciesGetIamPolicyRequest',
         response_type_name='Policy',
+        supports_download=False,
+    )
+
+    def GetPacketMirroringRule(self, request, global_params=None):
+      r"""Gets a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeFirewallPoliciesGetPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (FirewallPolicyRule) The response message.
+      """
+      config = self.GetMethodConfig('GetPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.firewallPolicies.getPacketMirroringRule',
+        ordered_params=['firewallPolicy'],
+        path_params=['firewallPolicy'],
+        query_params=['priority'],
+        relative_path='locations/global/firewallPolicies/{firewallPolicy}/getPacketMirroringRule',
+        request_field='',
+        request_type_name='ComputeFirewallPoliciesGetPacketMirroringRuleRequest',
+        response_type_name='FirewallPolicyRule',
         supports_download=False,
     )
 
@@ -2561,6 +2614,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def PatchPacketMirroringRule(self, request, global_params=None):
+      r"""Patches a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeFirewallPoliciesPatchPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('PatchPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    PatchPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.firewallPolicies.patchPacketMirroringRule',
+        ordered_params=['firewallPolicy'],
+        path_params=['firewallPolicy'],
+        query_params=['priority', 'requestId'],
+        relative_path='locations/global/firewallPolicies/{firewallPolicy}/patchPacketMirroringRule',
+        request_field='firewallPolicyRule',
+        request_type_name='ComputeFirewallPoliciesPatchPacketMirroringRuleRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def PatchRule(self, request, global_params=None):
       r"""Patches a rule of the specified priority.
 
@@ -2609,6 +2688,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         relative_path='locations/global/firewallPolicies/{firewallPolicy}/removeAssociation',
         request_field='',
         request_type_name='ComputeFirewallPoliciesRemoveAssociationRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def RemovePacketMirroringRule(self, request, global_params=None):
+      r"""Deletes a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeFirewallPoliciesRemovePacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('RemovePacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RemovePacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.firewallPolicies.removePacketMirroringRule',
+        ordered_params=['firewallPolicy'],
+        path_params=['firewallPolicy'],
+        query_params=['priority', 'requestId'],
+        relative_path='locations/global/firewallPolicies/{firewallPolicy}/removePacketMirroringRule',
+        request_field='',
+        request_type_name='ComputeFirewallPoliciesRemovePacketMirroringRuleRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -10353,6 +10458,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def AddPacketMirroringRule(self, request, global_params=None):
+      r"""Inserts a packet mirroring rule into a firewall policy.
+
+      Args:
+        request: (ComputeNetworkFirewallPoliciesAddPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AddPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AddPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.networkFirewallPolicies.addPacketMirroringRule',
+        ordered_params=['project', 'firewallPolicy'],
+        path_params=['firewallPolicy', 'project'],
+        query_params=['maxPriority', 'minPriority', 'requestId'],
+        relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/addPacketMirroringRule',
+        request_field='firewallPolicyRule',
+        request_type_name='ComputeNetworkFirewallPoliciesAddPacketMirroringRuleRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def AddRule(self, request, global_params=None):
       r"""Inserts a rule into a firewall policy.
 
@@ -10509,6 +10640,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def GetPacketMirroringRule(self, request, global_params=None):
+      r"""Gets a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeNetworkFirewallPoliciesGetPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (FirewallPolicyRule) The response message.
+      """
+      config = self.GetMethodConfig('GetPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.networkFirewallPolicies.getPacketMirroringRule',
+        ordered_params=['project', 'firewallPolicy'],
+        path_params=['firewallPolicy', 'project'],
+        query_params=['priority'],
+        relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/getPacketMirroringRule',
+        request_field='',
+        request_type_name='ComputeNetworkFirewallPoliciesGetPacketMirroringRuleRequest',
+        response_type_name='FirewallPolicyRule',
+        supports_download=False,
+    )
+
     def GetRule(self, request, global_params=None):
       r"""Gets a rule of the specified priority.
 
@@ -10639,6 +10796,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         supports_download=False,
     )
 
+    def PatchPacketMirroringRule(self, request, global_params=None):
+      r"""Patches a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeNetworkFirewallPoliciesPatchPacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('PatchPacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    PatchPacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.networkFirewallPolicies.patchPacketMirroringRule',
+        ordered_params=['project', 'firewallPolicy'],
+        path_params=['firewallPolicy', 'project'],
+        query_params=['priority', 'requestId'],
+        relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/patchPacketMirroringRule',
+        request_field='firewallPolicyRule',
+        request_type_name='ComputeNetworkFirewallPoliciesPatchPacketMirroringRuleRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
     def PatchRule(self, request, global_params=None):
       r"""Patches a rule of the specified priority.
 
@@ -10687,6 +10870,32 @@ class ComputeAlpha(base_api.BaseApiClient):
         relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/removeAssociation',
         request_field='',
         request_type_name='ComputeNetworkFirewallPoliciesRemoveAssociationRequest',
+        response_type_name='Operation',
+        supports_download=False,
+    )
+
+    def RemovePacketMirroringRule(self, request, global_params=None):
+      r"""Deletes a packet mirroring rule of the specified priority.
+
+      Args:
+        request: (ComputeNetworkFirewallPoliciesRemovePacketMirroringRuleRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('RemovePacketMirroringRule')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    RemovePacketMirroringRule.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='POST',
+        method_id='compute.networkFirewallPolicies.removePacketMirroringRule',
+        ordered_params=['project', 'firewallPolicy'],
+        path_params=['firewallPolicy', 'project'],
+        query_params=['priority', 'requestId'],
+        relative_path='projects/{project}/global/firewallPolicies/{firewallPolicy}/removePacketMirroringRule',
+        request_field='',
+        request_type_name='ComputeNetworkFirewallPoliciesRemovePacketMirroringRuleRequest',
         response_type_name='Operation',
         supports_download=False,
     )
@@ -10766,6 +10975,68 @@ class ComputeAlpha(base_api.BaseApiClient):
         request_field='testPermissionsRequest',
         request_type_name='ComputeNetworkFirewallPoliciesTestIamPermissionsRequest',
         response_type_name='TestPermissionsResponse',
+        supports_download=False,
+    )
+
+  class NetworkPlacementsService(base_api.BaseApiService):
+    """Service class for the networkPlacements resource."""
+
+    _NAME = 'networkPlacements'
+
+    def __init__(self, client):
+      super(ComputeAlpha.NetworkPlacementsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified network placement.
+
+      Args:
+        request: (ComputeNetworkPlacementsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkPlacement) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.networkPlacements.get',
+        ordered_params=['project', 'networkPlacement'],
+        path_params=['networkPlacement', 'project'],
+        query_params=[],
+        relative_path='projects/{project}/global/networkPlacements/{networkPlacement}',
+        request_field='',
+        request_type_name='ComputeNetworkPlacementsGetRequest',
+        response_type_name='NetworkPlacement',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves a list of network placements available to the specified project.
+
+      Args:
+        request: (ComputeNetworkPlacementsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkPlacementsListResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method='GET',
+        method_id='compute.networkPlacements.list',
+        ordered_params=['project'],
+        path_params=['project'],
+        query_params=['filter', 'maxResults', 'orderBy', 'pageToken', 'returnPartialSuccess'],
+        relative_path='projects/{project}/global/networkPlacements',
+        request_field='',
+        request_type_name='ComputeNetworkPlacementsListRequest',
+        response_type_name='NetworkPlacementsListResponse',
         supports_download=False,
     )
 

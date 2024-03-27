@@ -832,6 +832,7 @@ class DatabaseInstance(_messages.Message):
       from. This value could be different from the zone that was specified
       when the instance was created if the instance has failed over to its
       secondary zone. WARNING: Changing this might restart the instance.
+    geminiConfig: Gemini instance configuration.
     installedVersion: Stores the current database version including minor
       version such as `MYSQL_8_0_18`.
     instanceType: The instance type.
@@ -864,8 +865,9 @@ class DatabaseInstance(_messages.Message):
     replicaConfiguration: Configuration specific to failover replicas and read
       replicas.
     replicaNames: The replicas of the instance.
-    replicationCluster: Primary-DR replica pair. DR replica is a Cross region
-      replica designated for Disaster Recovery(DR) if the primary has regional
+    replicationCluster: The pair of a primary instance and disaster recovery
+      (DR) replica. A DR replica is a cross-region replica that you designate
+      for failover in the event that the primary instance has regional
       failure.
     rootPassword: Initial root password. Use only on creation. You must set
       root passwords before you can connect to PostgreSQL instances.
@@ -1238,36 +1240,37 @@ class DatabaseInstance(_messages.Message):
   etag = _messages.StringField(11)
   failoverReplica = _messages.MessageField('FailoverReplicaValue', 12)
   gceZone = _messages.StringField(13)
-  installedVersion = _messages.EnumField('InstalledVersionValueValuesEnum', 14)
-  instanceType = _messages.EnumField('InstanceTypeValueValuesEnum', 15)
-  ipAddresses = _messages.MessageField('IpMapping', 16, repeated=True)
-  ipv6Address = _messages.StringField(17)
-  kind = _messages.StringField(18)
-  maintenanceVersion = _messages.StringField(19)
-  masterInstanceName = _messages.StringField(20)
-  maxDiskSize = _messages.IntegerField(21)
-  name = _messages.StringField(22)
-  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 23)
-  outOfDiskReport = _messages.MessageField('SqlOutOfDiskReport', 24)
-  primaryDnsName = _messages.StringField(25)
-  project = _messages.StringField(26)
-  pscServiceAttachmentLink = _messages.StringField(27)
-  region = _messages.StringField(28)
-  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 29)
-  replicaNames = _messages.StringField(30, repeated=True)
-  replicationCluster = _messages.MessageField('ReplicationCluster', 31)
-  rootPassword = _messages.StringField(32)
-  satisfiesPzs = _messages.BooleanField(33)
-  scheduledMaintenance = _messages.MessageField('SqlScheduledMaintenance', 34)
-  secondaryGceZone = _messages.StringField(35)
-  selfLink = _messages.StringField(36)
-  serverCaCert = _messages.MessageField('SslCert', 37)
-  serviceAccountEmailAddress = _messages.StringField(38)
-  settings = _messages.MessageField('Settings', 39)
-  sqlNetworkArchitecture = _messages.EnumField('SqlNetworkArchitectureValueValuesEnum', 40)
-  state = _messages.EnumField('StateValueValuesEnum', 41)
-  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 42, repeated=True)
-  writeEndpoint = _messages.StringField(43)
+  geminiConfig = _messages.MessageField('GeminiInstanceConfig', 14)
+  installedVersion = _messages.EnumField('InstalledVersionValueValuesEnum', 15)
+  instanceType = _messages.EnumField('InstanceTypeValueValuesEnum', 16)
+  ipAddresses = _messages.MessageField('IpMapping', 17, repeated=True)
+  ipv6Address = _messages.StringField(18)
+  kind = _messages.StringField(19)
+  maintenanceVersion = _messages.StringField(20)
+  masterInstanceName = _messages.StringField(21)
+  maxDiskSize = _messages.IntegerField(22)
+  name = _messages.StringField(23)
+  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 24)
+  outOfDiskReport = _messages.MessageField('SqlOutOfDiskReport', 25)
+  primaryDnsName = _messages.StringField(26)
+  project = _messages.StringField(27)
+  pscServiceAttachmentLink = _messages.StringField(28)
+  region = _messages.StringField(29)
+  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 30)
+  replicaNames = _messages.StringField(31, repeated=True)
+  replicationCluster = _messages.MessageField('ReplicationCluster', 32)
+  rootPassword = _messages.StringField(33)
+  satisfiesPzs = _messages.BooleanField(34)
+  scheduledMaintenance = _messages.MessageField('SqlScheduledMaintenance', 35)
+  secondaryGceZone = _messages.StringField(36)
+  selfLink = _messages.StringField(37)
+  serverCaCert = _messages.MessageField('SslCert', 38)
+  serviceAccountEmailAddress = _messages.StringField(39)
+  settings = _messages.MessageField('Settings', 40)
+  sqlNetworkArchitecture = _messages.EnumField('SqlNetworkArchitectureValueValuesEnum', 41)
+  state = _messages.EnumField('StateValueValuesEnum', 42)
+  suspensionReason = _messages.EnumField('SuspensionReasonValueListEntryValuesEnum', 43, repeated=True)
+  writeEndpoint = _messages.StringField(44)
 
 
 class DatabasesListResponse(_messages.Message):
@@ -1789,6 +1792,28 @@ class FlagsListResponse(_messages.Message):
 
   items = _messages.MessageField('Flag', 1, repeated=True)
   kind = _messages.StringField(2)
+
+
+class GeminiInstanceConfig(_messages.Message):
+  r"""Gemini configuration.
+
+  Fields:
+    activeQueryEnabled: Output only. Whether active query is enabled.
+    entitled: Output only. Whether Gemini is enabled.
+    flagRecommenderEnabled: Output only. Whether flag recommender is enabled.
+    googleVacuumMgmtEnabled: Output only. Whether vacuum management is
+      enabled.
+    indexAdvisorEnabled: Output only. Whether index advisor is enabled.
+    oomSessionCancelEnabled: Output only. Whether oom session cancel is
+      enabled.
+  """
+
+  activeQueryEnabled = _messages.BooleanField(1)
+  entitled = _messages.BooleanField(2)
+  flagRecommenderEnabled = _messages.BooleanField(3)
+  googleVacuumMgmtEnabled = _messages.BooleanField(4)
+  indexAdvisorEnabled = _messages.BooleanField(5)
+  oomSessionCancelEnabled = _messages.BooleanField(6)
 
 
 class GenerateEphemeralCertRequest(_messages.Message):
@@ -2639,6 +2664,10 @@ class Operation(_messages.Message):
         Reporting Services (SSRS).
       RELEASE_SSRS_LEASE: Release a lease for the setup of SQL Server
         Reporting Services (SSRS).
+      RECONFIGURE_OLD_PRIMARY: Reconfigures old primary after a promote
+        replica operation. Effect of a promote operation to the old primary is
+        executed in this operation, asynchronously from the promote replica
+        operation executed to the replica.
     """
     SQL_OPERATION_TYPE_UNSPECIFIED = 0
     IMPORT = 1
@@ -2682,6 +2711,7 @@ class Operation(_messages.Message):
     UPDATE_BACKUP = 39
     ACQUIRE_SSRS_LEASE = 40
     RELEASE_SSRS_LEASE = 41
+    RECONFIGURE_OLD_PRIMARY = 42
 
   class StatusValueValuesEnum(_messages.Enum):
     r"""The status of an operation.
@@ -2897,11 +2927,12 @@ class ReplicationCluster(_messages.Message):
   Fields:
     drReplica: Output only. read-only field that indicates if the replica is a
       dr_replica; not set for a primary.
-    failoverDrReplicaName: Optional. If this instance is a primary, this is
-      the Disaster Recovery(DR) replica which is optional for a Cluster. If
-      this instance is a replica, this field is not set. Users can set this
-      field to set a designated DR replica for a primary. Removing this field
-      removes the DR replica.
+    failoverDrReplicaName: Optional. If the instance is a primary instance,
+      then this field identifies the disaster recovery (DR) replica. A DR
+      replica is an optional configuration for Enterprise Plus edition
+      instances. If the instance is a read replica, then the field is not set.
+      Users can set this field to set a designated DR replica for a primary.
+      Removing this field removes the DR replica.
     psaWriteEndpoint: Output only. If set, it indicates this instance has a
       private service access (PSA) dns endpoint that is pointing to the
       primary instance of the cluster. If this instance is the primary, the
@@ -3065,8 +3096,14 @@ class Settings(_messages.Message):
       instance deletion.
     denyMaintenancePeriods: Deny maintenance periods
     edition: Optional. The edition of the instance.
-    enableGoogleMlIntegration: Optional. Configuration to enable Cloud SQL
-      Vertex AI Integration
+    enableDataplexSchemaExtraction: Optional. By default, Cloud SQL instances
+      enable schema extraction for Dataplex. When this parameter is set to
+      false, schema extraction for Dataplex on Cloud SQL instances is
+      deactivated.
+    enableGoogleMlIntegration: Optional. When this parameter is set to true,
+      Cloud SQL instances can connect to Vertex AI to pass requests for real-
+      time predictions and insights to the AI. The default value is false.
+      This applies only to Cloud SQL for PostgreSQL instances.
     insightsConfig: Insights configuration, for now relevant only for
       Postgres.
     instanceVersion: The current software version the instance is running on.
@@ -3274,26 +3311,27 @@ class Settings(_messages.Message):
   deletionProtectionEnabled = _messages.BooleanField(15)
   denyMaintenancePeriods = _messages.MessageField('DenyMaintenancePeriod', 16, repeated=True)
   edition = _messages.EnumField('EditionValueValuesEnum', 17)
-  enableGoogleMlIntegration = _messages.BooleanField(18)
-  insightsConfig = _messages.MessageField('InsightsConfig', 19)
-  instanceVersion = _messages.StringField(20)
-  ipConfiguration = _messages.MessageField('IpConfiguration', 21)
-  kind = _messages.StringField(22)
-  locationPreference = _messages.MessageField('LocationPreference', 23)
-  maintenanceVersion = _messages.StringField(24)
-  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 25)
-  passwordValidationPolicy = _messages.MessageField('PasswordValidationPolicy', 26)
-  pricingPlan = _messages.EnumField('PricingPlanValueValuesEnum', 27)
-  recreateReplicasOnPrimaryCrash = _messages.BooleanField(28)
-  replicationLagMaxSeconds = _messages.IntegerField(29, variant=_messages.Variant.INT32)
-  replicationType = _messages.EnumField('ReplicationTypeValueValuesEnum', 30)
-  settingsVersion = _messages.IntegerField(31)
-  sqlServerAuditConfig = _messages.MessageField('SqlServerAuditConfig', 32)
-  storageAutoResize = _messages.BooleanField(33)
-  storageAutoResizeLimit = _messages.IntegerField(34)
-  tier = _messages.StringField(35)
-  timeZone = _messages.StringField(36)
-  userLabels = _messages.MessageField('UserLabelsValue', 37)
+  enableDataplexSchemaExtraction = _messages.BooleanField(18)
+  enableGoogleMlIntegration = _messages.BooleanField(19)
+  insightsConfig = _messages.MessageField('InsightsConfig', 20)
+  instanceVersion = _messages.StringField(21)
+  ipConfiguration = _messages.MessageField('IpConfiguration', 22)
+  kind = _messages.StringField(23)
+  locationPreference = _messages.MessageField('LocationPreference', 24)
+  maintenanceVersion = _messages.StringField(25)
+  maintenanceWindow = _messages.MessageField('MaintenanceWindow', 26)
+  passwordValidationPolicy = _messages.MessageField('PasswordValidationPolicy', 27)
+  pricingPlan = _messages.EnumField('PricingPlanValueValuesEnum', 28)
+  recreateReplicasOnPrimaryCrash = _messages.BooleanField(29)
+  replicationLagMaxSeconds = _messages.IntegerField(30, variant=_messages.Variant.INT32)
+  replicationType = _messages.EnumField('ReplicationTypeValueValuesEnum', 31)
+  settingsVersion = _messages.IntegerField(32)
+  sqlServerAuditConfig = _messages.MessageField('SqlServerAuditConfig', 33)
+  storageAutoResize = _messages.BooleanField(34)
+  storageAutoResizeLimit = _messages.IntegerField(35)
+  tier = _messages.StringField(36)
+  timeZone = _messages.StringField(37)
+  userLabels = _messages.MessageField('UserLabelsValue', 38)
 
 
 class SqlActiveDirectoryConfig(_messages.Message):

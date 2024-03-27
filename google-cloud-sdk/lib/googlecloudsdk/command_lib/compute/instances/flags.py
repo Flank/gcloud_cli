@@ -690,7 +690,6 @@ def AddCreateDiskArgs(
     support_boot=False,
     support_multi_writer=False,
     support_replica_zones=True,
-    support_storage_pool=False,
     enable_source_instant_snapshots=False,
     enable_confidential_compute=False,
 ):
@@ -782,6 +781,9 @@ def AddCreateDiskArgs(
       *architecture*::: Specifies the architecture or processor type that this
       disk can support. For available processor types on Compute Engine, see
       https://cloud.google.com/compute/docs/cpu-platforms.
+
+      *storage-pool*::: The name of the storage pool in which the new disk is
+      created. The new disk and the storage pool must be in the same location.
       """.format(
           disk_name=disk_name_extra_help,
           disk_mode=disk_mode_extra_help,
@@ -849,6 +851,7 @@ def AddCreateDiskArgs(
       'provisioned-throughput': int,
       'disk-resource-policy': arg_parsers.ArgList(max_length=1),
       'architecture': str,
+      'storage-pool': str,
   }
 
   if include_name:
@@ -942,13 +945,6 @@ def AddCreateDiskArgs(
       must be the same as the instance zone.
     """
     spec['replica-zones'] = arg_parsers.ArgList(max_length=2)
-
-  if support_storage_pool:
-    spec['storage-pool'] = str
-    disk_help += """
-      *storage-pool*::: The name of the storage pool in which the new disk is
-      created. The new disk and the storage pool must be in the same location.
-    """
 
   parser.add_argument(
       '--create-disk',
@@ -1319,7 +1315,7 @@ def ValidateImageFlags(args):
         '[--image-project] flag.')
 
 
-def _ValidateNetworkInterfaceStackType(stack_type_input):
+def ValidateNetworkInterfaceStackType(stack_type_input):
   """Validates stack type field, throws exception if invalid."""
   stack_type = stack_type_input.upper()
   if stack_type in constants.NETWORK_INTERFACE_STACK_TYPE_CHOICES:
@@ -1330,7 +1326,7 @@ def _ValidateNetworkInterfaceStackType(stack_type_input):
         'Invalid value for stack-type [%s].' % stack_type)
 
 
-def _ValidateNetworkInterfaceStackTypeIpv6OnlyNotSupported(stack_type_input):
+def ValidateNetworkInterfaceStackTypeIpv6OnlyNotSupported(stack_type_input):
   """Validates stack type field, throws exception if invalid."""
   stack_type = stack_type_input.upper()
   if (stack_type in constants.NETWORK_INTERFACE_STACK_TYPE_CHOICES and
@@ -1459,10 +1455,10 @@ def AddAddressArgs(parser,
     multiple_network_interface_cards_spec['ipv6-public-ptr-domain'] = str
     if support_ipv6_only:
       multiple_network_interface_cards_spec[
-          'stack-type'] = _ValidateNetworkInterfaceStackType
+          'stack-type'] = ValidateNetworkInterfaceStackType
     else:
       multiple_network_interface_cards_spec[
-          'stack-type'] = _ValidateNetworkInterfaceStackTypeIpv6OnlyNotSupported
+          'stack-type'] = ValidateNetworkInterfaceStackTypeIpv6OnlyNotSupported
     multiple_network_interface_cards_spec[
         'ipv6-network-tier'] = _ValidateNetworkInterfaceIpv6NetworkTier
     network_interface_help_texts.append("""\
@@ -2161,13 +2157,25 @@ def AddNetworkTierArgs(parser, instance=True, for_update=False):
 
 
 def AddDisplayDeviceArg(parser, is_update=False):
-  """Adds public DNS arguments for instance or access configuration."""
+  """Adds display device arguments for instance or access configuration."""
   display_help = 'Enable a display device on VM instances.'
   if not is_update:
     display_help += ' Disabled by default.'
   parser.add_argument(
       '--enable-display-device',
       action=arg_parsers.StoreTrueFalseAction if is_update else 'store_true',
+      help=display_help)
+
+
+def AddWatchdogTimerArg(parser, is_update=False):
+  """Adds watchdog timer arguments for instance or access configuration."""
+  display_help = 'Enable a watchdog timer device on VM instances.'
+  if not is_update:
+    display_help += ' Disabled by default.'
+  parser.add_argument(
+      '--enable-watchdog-timer',
+      action=arg_parsers.StoreTrueFalseAction if is_update else 'store_true',
+      default=None,
       help=display_help)
 
 

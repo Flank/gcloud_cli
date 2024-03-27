@@ -17,6 +17,27 @@ class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
 
 
+class DestinationGcsBucket(_messages.Message):
+  r"""Google Cloud Storage as a destination.
+
+  Fields:
+    uri: Required. URI to a Cloud Storage object in format: 'gs:///'.
+  """
+
+  uri = _messages.StringField(1)
+
+
+class DestinationParallelstore(_messages.Message):
+  r"""Parallelstore as a destination.
+
+  Fields:
+    path: Optional. Root directory path to the Paralellstore filesystem,
+      starting with '/'. Defaults to '/' if unset.
+  """
+
+  path = _messages.StringField(1)
+
+
 class Empty(_messages.Message):
   r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
@@ -24,6 +45,56 @@ class Empty(_messages.Message):
   Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
   """
 
+
+
+class ExportDataRequest(_messages.Message):
+  r"""Message representing the request exporting data from Cloud Storage to
+  parallelstore.
+
+  Fields:
+    destinationGcsBucket: Cloud Storage destination.
+    requestId: Optional. An optional request ID to identify requests. Specify
+      a unique request ID so that if you must retry your request, the server
+      will know to ignore the request if it has already been completed. The
+      server will guarantee that for at least 60 minutes since the first
+      request. For example, consider a situation where you make an initial
+      request and t he request times out. If you make the request again with
+      the same request ID, the server can check if original operation with the
+      same request ID was received, and if so, will ignore the second request.
+      This prevents clients from accidentally creating duplicate commitments.
+      The request ID must be a valid UUID with the exception that zero UUID is
+      not supported (00000000-0000-0000-0000-000000000000).
+    sourceParallelstore: Parallelstore source.
+  """
+
+  destinationGcsBucket = _messages.MessageField('DestinationGcsBucket', 1)
+  requestId = _messages.StringField(2)
+  sourceParallelstore = _messages.MessageField('SourceParallelstore', 3)
+
+
+class ImportDataRequest(_messages.Message):
+  r"""Message representing the request importing data from parallelstore to
+  Cloud Storage.
+
+  Fields:
+    destinationParallelstore: Parallelstore destination.
+    requestId: Optional. An optional request ID to identify requests. Specify
+      a unique request ID so that if you must retry your request, the server
+      will know to ignore the request if it has already been completed. The
+      server will guarantee that for at least 60 minutes since the first
+      request. For example, consider a situation where you make an initial
+      request and t he request times out. If you make the request again with
+      the same request ID, the server can check if original operation with the
+      same request ID was received, and if so, will ignore the second request.
+      This prevents clients from accidentally creating duplicate commitments.
+      The request ID must be a valid UUID with the exception that zero UUID is
+      not supported (00000000-0000-0000-0000-000000000000).
+    sourceGcsBucket: Cloud Storage source.
+  """
+
+  destinationParallelstore = _messages.MessageField('DestinationParallelstore', 1)
+  requestId = _messages.StringField(2)
+  sourceGcsBucket = _messages.MessageField('SourceGcsBucket', 3)
 
 
 class Instance(_messages.Message):
@@ -62,6 +133,11 @@ class Instance(_messages.Message):
       instance
     description: Optional. The description of the instance. 2048 characters or
       less.
+    effectiveReservedIpRange: Output only. Immutable. Contains the id of the
+      allocated IP address range associated with the private service access
+      connection for example, "test-default" associated with IP range
+      10.0.0.0/29. This field is populated by the service and and contains the
+      value currently used by the service.
     labels: Optional. Cloud Labels are a flexible and lightweight mechanism
       for organizing cloud resources into groups that reflect a customer's
       organizational needs and deployment strategies. Cloud Labels can be used
@@ -85,7 +161,7 @@ class Instance(_messages.Message):
     network: Optional. Immutable. The name of the Google Compute Engine [VPC
       network](https://cloud.google.com/vpc/docs/vpc) to which the instance is
       connected.
-    reservedIpRange: Optional. Immutable. Contains the id of allocated IP
+    reservedIpRange: Optional. Immutable. Contains the id of the allocated IP
       address range associated with the private service access connection for
       example, "test-default" associated with IP range 10.0.0.0/29. If no
       range id is provided all ranges will be considered.
@@ -154,12 +230,13 @@ class Instance(_messages.Message):
   createTime = _messages.StringField(3)
   daosVersion = _messages.StringField(4)
   description = _messages.StringField(5)
-  labels = _messages.MessageField('LabelsValue', 6)
-  name = _messages.StringField(7)
-  network = _messages.StringField(8)
-  reservedIpRange = _messages.StringField(9)
-  state = _messages.EnumField('StateValueValuesEnum', 10)
-  updateTime = _messages.StringField(11)
+  effectiveReservedIpRange = _messages.StringField(6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  name = _messages.StringField(8)
+  network = _messages.StringField(9)
+  reservedIpRange = _messages.StringField(10)
+  state = _messages.EnumField('StateValueValuesEnum', 11)
+  updateTime = _messages.StringField(12)
 
 
 class ListInstancesResponse(_messages.Message):
@@ -482,6 +559,19 @@ class ParallelstoreProjectsLocationsInstancesDeleteRequest(_messages.Message):
   requestId = _messages.StringField(2)
 
 
+class ParallelstoreProjectsLocationsInstancesExportDataRequest(_messages.Message):
+  r"""A ParallelstoreProjectsLocationsInstancesExportDataRequest object.
+
+  Fields:
+    exportDataRequest: A ExportDataRequest resource to be passed as the
+      request body.
+    name: Required. Name of the resource.
+  """
+
+  exportDataRequest = _messages.MessageField('ExportDataRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class ParallelstoreProjectsLocationsInstancesGetRequest(_messages.Message):
   r"""A ParallelstoreProjectsLocationsInstancesGetRequest object.
 
@@ -491,6 +581,19 @@ class ParallelstoreProjectsLocationsInstancesGetRequest(_messages.Message):
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class ParallelstoreProjectsLocationsInstancesImportDataRequest(_messages.Message):
+  r"""A ParallelstoreProjectsLocationsInstancesImportDataRequest object.
+
+  Fields:
+    importDataRequest: A ImportDataRequest resource to be passed as the
+      request body.
+    name: Required. Name of the resource.
+  """
+
+  importDataRequest = _messages.MessageField('ImportDataRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class ParallelstoreProjectsLocationsInstancesListRequest(_messages.Message):
@@ -615,6 +718,27 @@ class ParallelstoreProjectsLocationsOperationsListRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
   pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(4)
+
+
+class SourceGcsBucket(_messages.Message):
+  r"""Google Cloud Storage as a source.
+
+  Fields:
+    uri: Required. URI to a Cloud Storage object in format: 'gs:///'.
+  """
+
+  uri = _messages.StringField(1)
+
+
+class SourceParallelstore(_messages.Message):
+  r"""Pa as a source.
+
+  Fields:
+    path: Optional. Root directory path to the Paralellstore filesystem,
+      starting with '/'. Defaults to '/' if unset.
+  """
+
+  path = _messages.StringField(1)
 
 
 class StandardQueryParameters(_messages.Message):

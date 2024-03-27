@@ -67,6 +67,16 @@ class InstanceCompleter(completers.ListCommandCompleter):
         **kwargs)
 
 
+class InstancePartitionCompleter(completers.ListCommandCompleter):
+
+  def __init__(self, **kwargs):
+    super(InstancePartitionCompleter, self).__init__(
+        collection='spanner.projects.instances.instancePartitions',
+        list_command='alpha spanner instance-partitions list --uri',
+        **kwargs
+    )
+
+
 class InstanceConfigCompleter(completers.ListCommandCompleter):
 
   def __init__(self, **kwargs):
@@ -205,20 +215,25 @@ def GetProtoDescriptors(args):
   return None
 
 
-def Config(required=True):
+def Config(
+    required=True,
+    text=(
+        'Instance configuration defines the geographic placement and'
+        ' replication of the databases in that instance. Available'
+        ' configurations can be found by running "gcloud spanner'
+        ' instance-configs list"'
+    ),
+):
   return base.Argument(
       '--config',
       completer=InstanceConfigCompleter,
       required=required,
-      help='Instance configuration defines the geographic placement and '
-      'replication of the databases in that instance. Available '
-      'configurations can be found by running '
-      '"gcloud spanner instance-configs list"')
+      help=text,
+  )
 
 
-def Description(required=True):
-  return base.Argument(
-      '--description', required=required, help='Description of the instance.')
+def Description(required=True, text='Description of the instance.'):
+  return base.Argument('--description', required=required, help=text)
 
 
 def Instance(positional=True, text='Cloud Spanner instance ID.'):
@@ -229,20 +244,50 @@ def Instance(positional=True, text='Cloud Spanner instance ID.'):
         '--instance', required=True, completer=InstanceCompleter, help=text)
 
 
-def Nodes(required=False):
+def InstancePartition(
+    positional=True,
+    required=True,
+    hidden=True,
+    text='Cloud Spanner instance partition ID.',
+):
+  """Initialize an instance partition flag.
+
+  Args:
+    positional: bool. If true, then it's a positional flag.
+    required: bool. If true, then this flag is required.
+    hidden: bool. If true, then this flag is hidden.
+    text: helper test.
+
+  Returns:
+  """
+  if positional:
+    return base.Argument(
+        'instance_partition',
+        completer=InstancePartitionCompleter,
+        hidden=hidden,
+        help=text,
+    )
+  else:
+    return base.Argument(
+        '--instance-partition', required=required, hidden=hidden, help=text
+    )
+
+
+def Nodes(required=False, text='Number of nodes for the instance.'):
   return base.Argument(
       '--nodes',
       required=required,
       type=int,
-      help='Number of nodes for the instance.')
+      help=text,
+  )
 
 
-def ProcessingUnits(required=False):
+def ProcessingUnits(
+    required=False, text='Number of processing units for the instance.'
+):
   return base.Argument(
-      '--processing-units',
-      required=required,
-      type=int,
-      help='Number of processing units for the instance.')
+      '--processing-units', required=required, type=int, help=text
+  )
 
 
 def AutoscalingMaxNodes(required=False):
@@ -373,6 +418,23 @@ def AddCapacityArgsForInstance(
   AutoscalingMaxProcessingUnits(
       required=require_all_autoscaling_args
   ).AddToParser(autoscaling_pu_limits_group_parser)
+
+
+def AddCapacityArgsForInstancePartition(parser):
+  """Parse the instance partition capacity arguments.
+
+  Args:
+    parser: the argparse parser for the command.
+  """
+  capacity_parser = parser.add_argument_group(mutex=True, required=False)
+
+  # Manual scaling.
+  Nodes(text='Number of nodes for the instance partition.').AddToParser(
+      capacity_parser
+  )
+  ProcessingUnits(
+      text='Number of processing units for the instance partition.'
+  ).AddToParser(capacity_parser)
 
 
 def TargetConfig(required=True):

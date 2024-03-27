@@ -137,6 +137,25 @@ def _ConstructClusterForCreateRequestBeta(alloydb_messages, args):
           cluster.continuousBackupConfig, args
       )
   )
+  configure_maintenance_window = (
+      args.maintenance_window_day
+      or args.maintenance_window_hour
+  )
+  configure_deny_period = (
+      args.deny_maintenance_period_start_date
+      or args.deny_maintenance_period_end_date
+      or args.deny_maintenance_period_time
+  )
+  if configure_maintenance_window or configure_deny_period:
+    cluster.maintenanceUpdatePolicy = alloydb_messages.MaintenanceUpdatePolicy()
+    if configure_maintenance_window:
+      cluster.maintenanceUpdatePolicy.maintenanceWindows = (
+          _ConstructMaintenanceWindows(alloydb_messages, args)
+      )
+    if configure_deny_period:
+      cluster.maintenanceUpdatePolicy.denyMaintenancePeriods = (
+          _ConstructDenyPeriods(alloydb_messages, args)
+      )
   return cluster
 
 
@@ -329,6 +348,71 @@ def _ConstructClusterAndMaskForPatchRequestGA(alloydb_messages, args):
   return cluster, update_masks
 
 
+def _ConstructClusterAndMaskForPatchRequestBeta(alloydb_messages, args):
+  """Returns the cluster resource for patch request."""
+  cluster, update_masks = _ConstructClusterAndMaskForPatchRequestGA(
+      alloydb_messages, args
+  )
+  update_maintenance_window = (
+      args.maintenance_window_any
+      or args.maintenance_window_day
+      or args.maintenance_window_hour
+  )
+  update_deny_period = (
+      args.remove_deny_maintenance_period
+      or args.deny_maintenance_period_start_date
+      or args.deny_maintenance_period_end_date
+      or args.deny_maintenance_period_time
+  )
+  if update_maintenance_window or update_deny_period:
+    cluster.maintenanceUpdatePolicy = alloydb_messages.MaintenanceUpdatePolicy()
+    if update_maintenance_window:
+      cluster.maintenanceUpdatePolicy.maintenanceWindows = (
+          _ConstructMaintenanceWindows(alloydb_messages, args, update=True)
+      )
+      update_masks.append('maintenance_update_policy.maintenance_windows')
+
+    if update_deny_period:
+      cluster.maintenanceUpdatePolicy.denyMaintenancePeriods = (
+          _ConstructDenyPeriods(alloydb_messages, args, update=True)
+      )
+      update_masks.append('maintenance_update_policy.deny_maintenance_periods')
+  return cluster, update_masks
+
+
+def _ConstructClusterAndMaskForPatchRequestAlpha(alloydb_messages, args):
+  """Returns the cluster resource for patch request."""
+  cluster, update_masks = _ConstructClusterAndMaskForPatchRequestBeta(
+      alloydb_messages, args
+  )
+  return cluster, update_masks
+
+
+def _ConstructMaintenanceWindows(alloydb_messages, args, update=False):
+  """Returns the maintenance windows based on args."""
+  if update and args.maintenance_window_any:
+    return []
+
+  maintenance_window = alloydb_messages.MaintenanceWindow()
+  maintenance_window.day = args.maintenance_window_day
+  maintenance_window.startTime = alloydb_messages.GoogleTypeTimeOfDay(
+      hours=args.maintenance_window_hour
+  )
+  return [maintenance_window]
+
+
+def _ConstructDenyPeriods(alloydb_messages, args, update=False):
+  """Returns the deny periods based on args."""
+  if update and args.remove_deny_maintenance_period:
+    return []
+
+  deny_period = alloydb_messages.DenyMaintenancePeriod()
+  deny_period.startDate = args.deny_maintenance_period_start_date
+  deny_period.endDate = args.deny_maintenance_period_end_date
+  deny_period.time = args.deny_maintenance_period_time
+  return [deny_period]
+
+
 def ConstructPatchRequestFromArgsGA(alloydb_messages, cluster_ref, args):
   """Returns the cluster patch request for GA release track based on args."""
   cluster, update_masks = _ConstructClusterAndMaskForPatchRequestGA(
@@ -337,3 +421,53 @@ def ConstructPatchRequestFromArgsGA(alloydb_messages, cluster_ref, args):
       name=cluster_ref.RelativeName(),
       cluster=cluster,
       updateMask=','.join(update_masks))
+
+
+def ConstructPatchRequestFromArgsBeta(alloydb_messages, cluster_ref, args):
+  """Returns the cluster patch request for Beta release track based on args."""
+  cluster, update_masks = _ConstructClusterAndMaskForPatchRequestBeta(
+      alloydb_messages, args
+  )
+  return alloydb_messages.AlloydbProjectsLocationsClustersPatchRequest(
+      name=cluster_ref.RelativeName(),
+      cluster=cluster,
+      updateMask=','.join(update_masks),
+  )
+
+
+def ConstructCreatesecondaryRequestFromArgs(
+    alloydb_messages, cluster_ref, args
+):
+  """Returns the cluster create-secondary request based on args."""
+
+  cluster = alloydb_messages.Cluster()
+  cluster.secondaryConfig = alloydb_messages.SecondaryConfig(
+      primaryClusterName=args.primary_cluster
+  )
+  kms_key = flags.GetAndValidateKmsKeyName(args)
+  if kms_key:
+    encryption_config = alloydb_messages.EncryptionConfig()
+    encryption_config.kmsKeyName = kms_key
+    cluster.encryptionConfig = encryption_config
+
+  if (
+      args.enable_continuous_backup is not None
+      or args.continuous_backup_recovery_window_days
+      or args.continuous_backup_encryption_key
+  ):
+    cluster.continuousBackupConfig = _ConstructContinuousBackupConfig(
+        alloydb_messages, args
+    )
+
+  if args.allocated_ip_range_name:
+    cluster.networkConfig = alloydb_messages.NetworkConfig(
+        allocatedIpRange=args.allocated_ip_range_name
+    )
+
+  return (
+      alloydb_messages.AlloydbProjectsLocationsClustersCreatesecondaryRequest(
+          cluster=cluster,
+          clusterId=args.cluster,
+          parent=cluster_ref.RelativeName(),
+      )
+  )

@@ -76,9 +76,10 @@ class Create(base.CreateCommand):
   _support_network_queue_count = True
   _support_performance_monitoring_unit = True
   _support_custom_hostnames = True
-  _support_storage_pool = False
   _support_specific_then_x = True
   _support_ipv6_only = True
+  _support_watchdog_timer = True
+  _support_per_interface_stack_type = True
 
   @classmethod
   def Args(cls, parser):
@@ -109,6 +110,8 @@ class Create(base.CreateCommand):
         support_custom_hostnames=cls._support_custom_hostnames,
         support_specific_then_x_affinity=cls._support_specific_then_x,
         support_ipv6_only=cls._support_ipv6_only,
+        support_watchdog_timer=cls._support_watchdog_timer,
+        support_per_interface_stack_type=cls._support_per_interface_stack_type,
     )
     cls.AddSourceInstanceTemplate(parser)
     instances_flags.AddSecureTagsArgs(parser)
@@ -191,8 +194,8 @@ class Create(base.CreateCommand):
         self._support_max_count_per_zone,
         self._support_performance_monitoring_unit,
         self._support_custom_hostnames,
-        self._support_storage_pool,
         self._support_specific_then_x,
+        self._support_watchdog_timer,
     )
     bulk_insert_instance_resource = bulk_util.CreateBulkInsertInstanceResource(
         args, holder, client, holder.resources, queued_resource_ref.project,
@@ -213,7 +216,7 @@ class Create(base.CreateCommand):
         queuedResource=queued_resource,
         project=queued_resource_ref.project,
         zone=queued_resource_ref.zone,
-        requestId=uuid.uuid4().hex,
+        requestId=str(uuid.uuid4()),
     )
     if args.async_:
       response = client.apitools_client.zoneQueuedResources.Insert(request)

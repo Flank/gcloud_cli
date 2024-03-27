@@ -57,7 +57,6 @@ class Update(base.UpdateCommand):
     workstations_flags.AddNetworkTags(parser)
     workstations_flags.AddPoolSize(parser, use_default=False)
     workstations_flags.AddDisablePublicIpAddresses(parser, use_default=False)
-
     workstations_flags.AddEnableTcpConnections(parser)
     workstations_flags.AddServiceAccountScopes(parser)
     workstations_flags.AddShieldedSecureBoot(parser, use_default=False)
@@ -66,6 +65,7 @@ class Update(base.UpdateCommand):
     workstations_flags.AddEnableAuditAgent(parser, use_default=False)
     workstations_flags.AddEnableConfidentialCompute(parser, use_default=False)
     workstations_flags.AddEnableNestedVirtualization(parser, use_default=False)
+    workstations_flags.AddEnableSSHToVM(parser)
     workstations_flags.AddBootDiskSize(parser, use_default=False)
     workstations_flags.AddContainerImageField(parser, use_default=False)
     workstations_flags.AddContainerCommandField(parser)
@@ -74,9 +74,9 @@ class Update(base.UpdateCommand):
     workstations_flags.AddContainerWorkingDirField(parser)
     workstations_flags.AddContainerRunAsUserField(parser)
     workstations_flags.AddLabelsField(parser)
+    workstations_flags.AddAcceleratorFields(parser)
     if (cls.ReleaseTrack() != base.ReleaseTrack.GA):
-      workstations_flags.AddAcceleratorFields(parser)
-      workstations_flags.AddEnableSSHToVM(parser)
+      workstations_flags.AddBoostConfigs(parser)
 
   def Collection(self):
     return (

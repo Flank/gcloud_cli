@@ -406,7 +406,8 @@ def CreateAdvancedMachineFeaturesMessage(messages,
                                          numa_node_count=None,
                                          visible_core_count=None,
                                          enable_uefi_networking=None,
-                                         performance_monitoring_unit=None):
+                                         performance_monitoring_unit=None,
+                                         enable_watchdog_timer=None):
   """Create AdvancedMachineFeatures message for an Instance."""
   # Start with an empty AdvancedMachineFeatures and optionally add on
   # the features we have like CreateSchedulingMessage does. This lets us
@@ -432,6 +433,9 @@ def CreateAdvancedMachineFeaturesMessage(messages,
     features.performanceMonitoringUnit = messages.AdvancedMachineFeatures.PerformanceMonitoringUnitValueValuesEnum(
         performance_monitoring_unit.upper()
     )
+
+  if enable_watchdog_timer is not None:
+    features.enableWatchdogTimer = enable_watchdog_timer
 
   return features
 
@@ -528,21 +532,34 @@ def GetDiskDeviceName(disk, name, container_mount_disk):
           '--container-mount-disk',
           'Attempting to mount disk named [{}] with device-name [{}]. If '
           'being mounted to container, disk name must match device-name.'
-          .format(name, disk.get('device-name')))
+          .format(name, disk.get('device-name')),
+      )
   return disk.get('device-name')
 
 
-def ParseDiskType(resources, disk_type, project, location, scope):
+def ParseDiskType(
+    resources, disk_type, project, location, scope, replica_zone_cnt=0
+):
   """Parses disk type reference based on location scope."""
   if scope == compute_scopes.ScopeEnum.ZONE:
-    collection = 'compute.diskTypes'
-    params = {'project': project, 'zone': location}
+    if replica_zone_cnt != 2:
+      collection = 'compute.diskTypes'
+      params = {'project': project, 'zone': location}
+    else:
+      collection = 'compute.regionDiskTypes'
+      location = GetRegionFromZone(location)
+      params = {'project': project, 'region': location}
   elif scope == compute_scopes.ScopeEnum.REGION:
     collection = 'compute.regionDiskTypes'
     params = {'project': project, 'region': location}
   disk_type_ref = resources.Parse(
       disk_type, collection=collection, params=params)
   return disk_type_ref
+
+
+def GetRegionFromZone(zone):
+  """Returns the GCP region that the input zone is in."""
+  return '-'.join(zone.split('-')[:-1]).lower()
 
 
 def ParseStoragePool(resources, storage_pool, project, location):

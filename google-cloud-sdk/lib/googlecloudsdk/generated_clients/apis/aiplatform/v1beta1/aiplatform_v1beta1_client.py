@@ -4066,6 +4066,195 @@ class AiplatformV1beta1(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
+    def Delete(self, request, global_params=None):
+      r"""Deletes an Extension.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions/{extensionsId}',
+        http_method='DELETE',
+        method_id='aiplatform.projects.locations.extensions.delete',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='AiplatformProjectsLocationsExtensionsDeleteRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def Execute(self, request, global_params=None):
+      r"""Executes the request against a given extension.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsExecuteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1ExecuteExtensionResponse) The response message.
+      """
+      config = self.GetMethodConfig('Execute')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Execute.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions/{extensionsId}:execute',
+        http_method='POST',
+        method_id='aiplatform.projects.locations.extensions.execute',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}:execute',
+        request_field='googleCloudAiplatformV1beta1ExecuteExtensionRequest',
+        request_type_name='AiplatformProjectsLocationsExtensionsExecuteRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1ExecuteExtensionResponse',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Gets an Extension.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1Extension) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions/{extensionsId}',
+        http_method='GET',
+        method_id='aiplatform.projects.locations.extensions.get',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='AiplatformProjectsLocationsExtensionsGetRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1Extension',
+        supports_download=False,
+    )
+
+    def Import(self, request, global_params=None):
+      r"""Imports an Extension.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsImportRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('Import')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Import.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions:import',
+        http_method='POST',
+        method_id='aiplatform.projects.locations.extensions.import',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=[],
+        relative_path='v1beta1/{+parent}/extensions:import',
+        request_field='googleCloudAiplatformV1beta1Extension',
+        request_type_name='AiplatformProjectsLocationsExtensionsImportRequest',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists Extensions in a location.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1ListExtensionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions',
+        http_method='GET',
+        method_id='aiplatform.projects.locations.extensions.list',
+        ordered_params=['parent'],
+        path_params=['parent'],
+        query_params=['filter', 'orderBy', 'pageSize', 'pageToken'],
+        relative_path='v1beta1/{+parent}/extensions',
+        request_field='',
+        request_type_name='AiplatformProjectsLocationsExtensionsListRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1ListExtensionsResponse',
+        supports_download=False,
+    )
+
+    def Patch(self, request, global_params=None):
+      r"""Updates an Extension.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1Extension) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions/{extensionsId}',
+        http_method='PATCH',
+        method_id='aiplatform.projects.locations.extensions.patch',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=['updateMask'],
+        relative_path='v1beta1/{+name}',
+        request_field='googleCloudAiplatformV1beta1Extension',
+        request_type_name='AiplatformProjectsLocationsExtensionsPatchRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1Extension',
+        supports_download=False,
+    )
+
+    def Query(self, request, global_params=None):
+      r"""Queries an extension with a default controller.
+
+      Args:
+        request: (AiplatformProjectsLocationsExtensionsQueryRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1QueryExtensionResponse) The response message.
+      """
+      config = self.GetMethodConfig('Query')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Query.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/extensions/{extensionsId}:query',
+        http_method='POST',
+        method_id='aiplatform.projects.locations.extensions.query',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}:query',
+        request_field='googleCloudAiplatformV1beta1QueryExtensionRequest',
+        request_type_name='AiplatformProjectsLocationsExtensionsQueryRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1QueryExtensionResponse',
+        supports_download=False,
+    )
+
   class ProjectsLocationsFeatureGroupsFeaturesOperationsService(base_api.BaseApiService):
     """Service class for the projects_locations_featureGroups_features_operations resource."""
 
@@ -5024,6 +5213,33 @@ class AiplatformV1beta1(base_api.BaseApiClient):
         request_field='googleIamV1SetIamPolicyRequest',
         request_type_name='AiplatformProjectsLocationsFeatureOnlineStoresFeatureViewsSetIamPolicyRequest',
         response_type_name='GoogleIamV1Policy',
+        supports_download=False,
+    )
+
+    def StreamingFetchFeatureValues(self, request, global_params=None):
+      r"""Bidirectional streaming RPC to fetch feature values under a FeatureView. Requests may not have a one-to-one mapping to responses and responses may be returned out-of-order to reduce latency.
+
+      Args:
+        request: (AiplatformProjectsLocationsFeatureOnlineStoresFeatureViewsStreamingFetchFeatureValuesRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1StreamingFetchFeatureValuesResponse) The response message.
+      """
+      config = self.GetMethodConfig('StreamingFetchFeatureValues')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    StreamingFetchFeatureValues.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/locations/{locationsId}/featureOnlineStores/{featureOnlineStoresId}/featureViews/{featureViewsId}:streamingFetchFeatureValues',
+        http_method='POST',
+        method_id='aiplatform.projects.locations.featureOnlineStores.featureViews.streamingFetchFeatureValues',
+        ordered_params=['featureView'],
+        path_params=['featureView'],
+        query_params=[],
+        relative_path='v1beta1/{+featureView}:streamingFetchFeatureValues',
+        request_field='googleCloudAiplatformV1beta1StreamingFetchFeatureValuesRequest',
+        request_type_name='AiplatformProjectsLocationsFeatureOnlineStoresFeatureViewsStreamingFetchFeatureValuesRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1StreamingFetchFeatureValuesResponse',
         supports_download=False,
     )
 
@@ -16296,6 +16512,60 @@ class AiplatformV1beta1(base_api.BaseApiClient):
       super(AiplatformV1beta1.ProjectsService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def GetCacheConfig(self, request, global_params=None):
+      r"""Gets a GenAI cache config.
+
+      Args:
+        request: (AiplatformProjectsGetCacheConfigRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudAiplatformV1beta1CacheConfig) The response message.
+      """
+      config = self.GetMethodConfig('GetCacheConfig')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetCacheConfig.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/cacheConfig',
+        http_method='GET',
+        method_id='aiplatform.projects.getCacheConfig',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='',
+        request_type_name='AiplatformProjectsGetCacheConfigRequest',
+        response_type_name='GoogleCloudAiplatformV1beta1CacheConfig',
+        supports_download=False,
+    )
+
+    def UpdateCacheConfig(self, request, global_params=None):
+      r"""Updates a cache config.
+
+      Args:
+        request: (GoogleCloudAiplatformV1beta1CacheConfig) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleLongrunningOperation) The response message.
+      """
+      config = self.GetMethodConfig('UpdateCacheConfig')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateCacheConfig.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path='v1beta1/projects/{projectsId}/cacheConfig',
+        http_method='PATCH',
+        method_id='aiplatform.projects.updateCacheConfig',
+        ordered_params=['name'],
+        path_params=['name'],
+        query_params=[],
+        relative_path='v1beta1/{+name}',
+        request_field='<request>',
+        request_type_name='GoogleCloudAiplatformV1beta1CacheConfig',
+        response_type_name='GoogleLongrunningOperation',
+        supports_download=False,
+    )
 
   class PublishersModelsService(base_api.BaseApiService):
     """Service class for the publishers_models resource."""
