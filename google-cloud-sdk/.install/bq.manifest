@@ -25,10 +25,16 @@ platform/bq/discovery_next/iam-policy.json
 platform/bq/frontend/bigquery_command.py
 platform/bq/frontend/bq_cached_client.py
 platform/bq/frontend/command_info.py
+platform/bq/frontend/command_load.py
 platform/bq/frontend/command_make.py
+platform/bq/frontend/command_query.py
+platform/bq/frontend/command_repl.py
 platform/bq/frontend/command_show.py
+platform/bq/frontend/command_update.py
 platform/bq/frontend/commands.py
+platform/bq/frontend/commands_iam.py
 platform/bq/frontend/utils.py
+platform/bq/frontend/utils_data_transfer.py
 platform/bq/remove_pyreadline.py
 platform/bq/table_formatter.py
 platform/bq/third_party/absl/LICENSE
@@ -384,9 +390,7 @@ platform/bq/third_party/uritemplate/template.py
 platform/bq/third_party/uritemplate/variable.py
 platform/bq/third_party/urllib3/LICENSE
 platform/bq/third_party/urllib3/__init__.py
-platform/bq/third_party/urllib3/_base_connection.py
 platform/bq/third_party/urllib3/_collections.py
-platform/bq/third_party/urllib3/_request_methods.py
 platform/bq/third_party/urllib3/_version.py
 platform/bq/third_party/urllib3/connection.py
 platform/bq/third_party/urllib3/connectionpool.py
@@ -422,7 +426,6 @@ platform/bq/third_party/urllib3/util/ssl_match_hostname.py
 platform/bq/third_party/urllib3/util/ssltransport.py
 platform/bq/third_party/urllib3/util/timeout.py
 platform/bq/third_party/urllib3/util/url.py
-platform/bq/third_party/urllib3/util/util.py
 platform/bq/third_party/urllib3/util/wait.py
 platform/bq/third_party/wcwidth/LICENSE
 platform/bq/third_party/wcwidth/__init__.py
