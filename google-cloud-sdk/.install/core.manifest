@@ -93,9 +93,6 @@ lib/googlecloudsdk/api_lib/app/docker_image.py
 lib/googlecloudsdk/api_lib/app/env.py
 lib/googlecloudsdk/api_lib/app/exceptions.py
 lib/googlecloudsdk/api_lib/app/ext_runtime_adapter.py
-lib/googlecloudsdk/api_lib/app/ext_runtimes/__init__.py
-lib/googlecloudsdk/api_lib/app/ext_runtimes/fingerprinting.py
-lib/googlecloudsdk/api_lib/app/ext_runtimes/loader.py
 lib/googlecloudsdk/api_lib/app/images/__init__.py
 lib/googlecloudsdk/api_lib/app/images/config.py
 lib/googlecloudsdk/api_lib/app/instances_util.py
@@ -2259,6 +2256,9 @@ lib/googlecloudsdk/command_lib/looker/instances_update_util.py
 lib/googlecloudsdk/command_lib/looker/instances_util.py
 lib/googlecloudsdk/command_lib/looker/operations_util.py
 lib/googlecloudsdk/command_lib/looker/resources.yaml
+lib/googlecloudsdk/command_lib/managed_flink/__init__.py
+lib/googlecloudsdk/command_lib/managed_flink/flags.yaml
+lib/googlecloudsdk/command_lib/managed_flink/resources.yaml
 lib/googlecloudsdk/command_lib/managed_kafka/__init__.py
 lib/googlecloudsdk/command_lib/managed_kafka/flags.yaml
 lib/googlecloudsdk/command_lib/managed_kafka/resources.yaml
@@ -2714,6 +2714,8 @@ lib/googlecloudsdk/command_lib/storage/component_stream.py
 lib/googlecloudsdk/command_lib/storage/copying.py
 lib/googlecloudsdk/command_lib/storage/cp_command_util.py
 lib/googlecloudsdk/command_lib/storage/diagnose/__init__.py
+lib/googlecloudsdk/command_lib/storage/diagnose/diagnostic.py
+lib/googlecloudsdk/command_lib/storage/diagnose/latency_diagnostic.py
 lib/googlecloudsdk/command_lib/storage/diagnose/system_info.py
 lib/googlecloudsdk/command_lib/storage/du_command_util.py
 lib/googlecloudsdk/command_lib/storage/encryption_util.py
@@ -2761,6 +2763,7 @@ lib/googlecloudsdk/command_lib/storage/resources/shim_format_util.py
 lib/googlecloudsdk/command_lib/storage/rm_command_util.py
 lib/googlecloudsdk/command_lib/storage/rsync_command_util.py
 lib/googlecloudsdk/command_lib/storage/sign_url_util.py
+lib/googlecloudsdk/command_lib/storage/statistics_util.py
 lib/googlecloudsdk/command_lib/storage/stdin_iterator.py
 lib/googlecloudsdk/command_lib/storage/storage_parallel.py
 lib/googlecloudsdk/command_lib/storage/storage_url.py
@@ -4253,6 +4256,10 @@ lib/googlecloudsdk/generated_clients/apis/osconfig/v1beta/__init__.py
 lib/googlecloudsdk/generated_clients/apis/osconfig/v1beta/osconfig_v1beta_client.py
 lib/googlecloudsdk/generated_clients/apis/osconfig/v1beta/osconfig_v1beta_messages.py
 lib/googlecloudsdk/generated_clients/apis/osconfig/v1beta/resources.py
+lib/googlecloudsdk/generated_clients/apis/osconfig/v2alpha/__init__.py
+lib/googlecloudsdk/generated_clients/apis/osconfig/v2alpha/osconfig_v2alpha_client.py
+lib/googlecloudsdk/generated_clients/apis/osconfig/v2alpha/osconfig_v2alpha_messages.py
+lib/googlecloudsdk/generated_clients/apis/osconfig/v2alpha/resources.py
 lib/googlecloudsdk/generated_clients/apis/oslogin/__init__.py
 lib/googlecloudsdk/generated_clients/apis/oslogin/v1/__init__.py
 lib/googlecloudsdk/generated_clients/apis/oslogin/v1/oslogin_v1_client.py
@@ -8373,6 +8380,7 @@ lib/surface/container/fleet/rollouts/list.py
 lib/surface/container/fleet/rollouts/pause.py
 lib/surface/container/fleet/rollouts/resume.py
 lib/surface/container/fleet/scopes/__init__.py
+lib/surface/container/fleet/scopes/add_app_operator_binding.py
 lib/surface/container/fleet/scopes/add_iam_policy_binding.yaml
 lib/surface/container/fleet/scopes/create.yaml
 lib/surface/container/fleet/scopes/delete.yaml
@@ -8651,6 +8659,7 @@ lib/surface/dataplex/aspect_types/get_iam_policy.yaml
 lib/surface/dataplex/aspect_types/list.yaml
 lib/surface/dataplex/aspect_types/remove_iam_policy_binding.py
 lib/surface/dataplex/aspect_types/set_iam_policy.py
+lib/surface/dataplex/aspect_types/update.py
 lib/surface/dataplex/assets/__init__.py
 lib/surface/dataplex/assets/actions/__init__.py
 lib/surface/dataplex/assets/actions/list.yaml
@@ -10247,6 +10256,12 @@ lib/surface/looker/operations/describe.yaml
 lib/surface/looker/operations/list.yaml
 lib/surface/looker/regions/__init__.py
 lib/surface/looker/regions/list.yaml
+lib/surface/managed_flink/__init__.py
+lib/surface/managed_flink/deployments/__init__.py
+lib/surface/managed_flink/deployments/create.yaml
+lib/surface/managed_flink/deployments/delete.yaml
+lib/surface/managed_flink/deployments/describe.yaml
+lib/surface/managed_flink/deployments/list.yaml
 lib/surface/managed_kafka/__init__.py
 lib/surface/managed_kafka/clusters/__init__.py
 lib/surface/managed_kafka/clusters/create.yaml
@@ -11956,6 +11971,7 @@ lib/surface/spanner/backup_schedules/create.py
 lib/surface/spanner/backup_schedules/delete.py
 lib/surface/spanner/backup_schedules/describe.py
 lib/surface/spanner/backup_schedules/list.py
+lib/surface/spanner/backup_schedules/update.py
 lib/surface/spanner/backups/__init__.py
 lib/surface/spanner/backups/add_iam_policy_binding.yaml
 lib/surface/spanner/backups/copy.py
