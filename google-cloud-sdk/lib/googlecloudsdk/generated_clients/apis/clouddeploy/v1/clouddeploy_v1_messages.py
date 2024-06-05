@@ -433,20 +433,17 @@ class AutomationRolloutMetadata(_messages.Message):
   performed on a rollout.
 
   Fields:
-    advanceAutomationRuns: Output only. The IDs of the AutomationRuns
+    advanceAutomationRuns: Output only. The names of the AutomationRuns
       initiated by an advance rollout rule.
-    currentRepairAutomationRun: Output only. The current AutomationRun
-      repairing the rollout.
-    promoteAutomationRun: Output only. The ID of the AutomationRun initiated
+    promoteAutomationRun: Output only. The name of the AutomationRun initiated
       by a promote release rule.
-    repairAutomationRuns: Output only. The IDs of the AutomationRuns initiated
-      by a repair rollout rule.
+    repairAutomationRuns: Output only. The names of the AutomationRuns
+      initiated by a repair rollout rule.
   """
 
   advanceAutomationRuns = _messages.StringField(1, repeated=True)
-  currentRepairAutomationRun = _messages.StringField(2)
-  promoteAutomationRun = _messages.StringField(3)
-  repairAutomationRuns = _messages.StringField(4, repeated=True)
+  promoteAutomationRun = _messages.StringField(2)
+  repairAutomationRuns = _messages.StringField(3, repeated=True)
 
 
 class AutomationRule(_messages.Message):
@@ -3092,6 +3089,7 @@ class Empty(_messages.Message):
   """
 
 
+
 class ExecutionConfig(_messages.Message):
   r"""Configuration of the environment to use when calling Skaffold.
 
@@ -3112,6 +3110,8 @@ class ExecutionConfig(_messages.Message):
       unspecified, the project execution service account
       (-compute@developer.gserviceaccount.com) is used.
     usages: Required. Usages when this configuration should be applied.
+    verbose: Optional. If true, additional logging will be enabled when
+      running builds in this execution environment.
     workerPool: Optional. The resource name of the `WorkerPool`, with the
       format
       `projects/{project}/locations/{location}/workerPools/{worker_pool}`. If
@@ -3144,7 +3144,8 @@ class ExecutionConfig(_messages.Message):
   privatePool = _messages.MessageField('PrivatePool', 4)
   serviceAccount = _messages.StringField(5)
   usages = _messages.EnumField('UsagesValueListEntryValuesEnum', 6, repeated=True)
-  workerPool = _messages.StringField(7)
+  verbose = _messages.BooleanField(7)
+  workerPool = _messages.StringField(8)
 
 
 class Expr(_messages.Message):
@@ -4081,7 +4082,7 @@ class PolicyViolationDetails(_messages.Message):
     policy: Name of the policy that was violated. Policy resource will be in
       the format of
       `projects/{project}/locations/{location}/policies/{policy}`.
-    ruleId: Name of the rule that triggered the policy violation.
+    ruleId: Id of the rule that triggered the policy violation.
   """
 
   failureMessage = _messages.StringField(1)
@@ -4776,21 +4777,9 @@ class RenderMetadata(_messages.Message):
   custom = _messages.MessageField('CustomMetadata', 2)
 
 
-class RepairMode(_messages.Message):
-  r"""Configuration of the repair action.
-
-  Fields:
-    retry: Optional. Retries a failed job.
-    rollback: Optional. Rolls back a `Rollout`.
-  """
-
-  retry = _messages.MessageField('Retry', 1)
-  rollback = _messages.MessageField('Rollback', 2)
-
-
 class RepairPhase(_messages.Message):
   r"""RepairPhase tracks the repair attempts that have been made for each
-  `RepairMode` specified in the `Automation` resource.
+  `RepairPhaseConfig` specified in the `Automation` resource.
 
   Fields:
     retry: Output only. Records of the retry attempts for retry repair mode.
@@ -4801,11 +4790,23 @@ class RepairPhase(_messages.Message):
   rollback = _messages.MessageField('RollbackAttempt', 2)
 
 
+class RepairPhaseConfig(_messages.Message):
+  r"""Configuration of the repair phase.
+
+  Fields:
+    retry: Optional. Retries a failed job.
+    rollback: Optional. Rolls back a `Rollout`.
+  """
+
+  retry = _messages.MessageField('Retry', 1)
+  rollback = _messages.MessageField('Rollback', 2)
+
+
 class RepairRolloutOperation(_messages.Message):
   r"""Contains the information for an automated `repair rollout` operation.
 
   Fields:
-    currentRepairModeIndex: Output only. The index of the current repair
+    currentRepairPhaseIndex: Output only. The index of the current repair
       action in the repair sequence.
     jobId: Output only. The job ID for the Job to repair.
     phaseId: Output only. The phase ID of the phase that includes the job
@@ -4816,7 +4817,7 @@ class RepairRolloutOperation(_messages.Message):
       `AutomationRun`.
   """
 
-  currentRepairModeIndex = _messages.IntegerField(1)
+  currentRepairPhaseIndex = _messages.IntegerField(1)
   jobId = _messages.StringField(2)
   phaseId = _messages.StringField(3)
   repairPhases = _messages.MessageField('RepairPhase', 4, repeated=True)
@@ -4844,15 +4845,15 @@ class RepairRolloutRule(_messages.Message):
       start with a letter and end with a letter or a number, and have a max
       length of 63 characters. In other words, it must match the following
       regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.
-    repairModes: Required. Defines the types of automatic repair actions for
-      failed jobs.
-    sourcePhases: Optional. Phases within which jobs are subject to automatic
-      repair actions on failure. Proceeds only after phase name matched any
-      one in the list, or for all phases if unspecified. This value must
-      consist of lower-case letters, numbers, and hyphens, start with a letter
-      and end with a letter or a number, and have a max length of 63
-      characters. In other words, it must match the following regex:
+    phases: Optional. Phases within which jobs are subject to automatic repair
+      actions on failure. Proceeds only after phase name matched any one in
+      the list, or for all phases if unspecified. This value must consist of
+      lower-case letters, numbers, and hyphens, start with a letter and end
+      with a letter or a number, and have a max length of 63 characters. In
+      other words, it must match the following regex:
       `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.
+    repairPhases: Required. Defines the types of automatic repair phases for
+      failed jobs.
     waitPolicy: Optional. WaitForDeployPolicy delays a `Rollout` repair when a
       deploy policy violation is encountered.
   """
@@ -4874,8 +4875,8 @@ class RepairRolloutRule(_messages.Message):
   condition = _messages.MessageField('AutomationRuleCondition', 1)
   id = _messages.StringField(2)
   jobs = _messages.StringField(3, repeated=True)
-  repairModes = _messages.MessageField('RepairMode', 4, repeated=True)
-  sourcePhases = _messages.StringField(5, repeated=True)
+  phases = _messages.StringField(4, repeated=True)
+  repairPhases = _messages.MessageField('RepairPhaseConfig', 5, repeated=True)
   waitPolicy = _messages.EnumField('WaitPolicyValueValuesEnum', 6)
 
 
@@ -4885,12 +4886,17 @@ class RestrictRollout(_messages.Message):
   Enums:
     ActionsValueListEntryValuesEnum:
     InvokerValueListEntryValuesEnum:
+    InvokersValueListEntryValuesEnum:
 
   Fields:
     actions: Rollout actions to be restricted as part of the policy. If left
       empty, all actions will be restricted.
+    id: Optional. Restriction rule ID. Required and must be unique within a
+      DeployPolicy. The format is `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`.
     invoker: What invoked the action. If left empty, all invoker types will be
       restricted.
+    invokers: Optional. What invoked the action. If left empty, all invoker
+      types will be restricted.
     name: Required. Restriction rule name. Required and must be unique within
       a DeployPolicy.
     timeWindow: Required. Time Window within which actions are restricted.
@@ -4933,10 +4939,25 @@ class RestrictRollout(_messages.Message):
     USER = 1
     DEPLOY_AUTOMATION = 2
 
+  class InvokersValueListEntryValuesEnum(_messages.Enum):
+    r"""InvokersValueListEntryValuesEnum enum type.
+
+    Values:
+      INVOKER_UNSPECIFIED: Unspecified.
+      USER: The action is user-driven (e.g. creating a rollout manually via a
+        gcloud create command).
+      DEPLOY_AUTOMATION: Automated action by Cloud Deploy.
+    """
+    INVOKER_UNSPECIFIED = 0
+    USER = 1
+    DEPLOY_AUTOMATION = 2
+
   actions = _messages.EnumField('ActionsValueListEntryValuesEnum', 1, repeated=True)
-  invoker = _messages.EnumField('InvokerValueListEntryValuesEnum', 2, repeated=True)
-  name = _messages.StringField(3)
-  timeWindow = _messages.MessageField('TimeWindow', 4)
+  id = _messages.StringField(2)
+  invoker = _messages.EnumField('InvokerValueListEntryValuesEnum', 3, repeated=True)
+  invokers = _messages.EnumField('InvokersValueListEntryValuesEnum', 4, repeated=True)
+  name = _messages.StringField(5)
+  timeWindow = _messages.MessageField('TimeWindow', 6)
 
 
 class Retry(_messages.Message):
@@ -4998,7 +5019,6 @@ class RetryAttempt(_messages.Message):
       REPAIR_STATE_FAILED: The `repair` action has failed.
       REPAIR_STATE_IN_PROGRESS: The `repair` action is in progress.
       REPAIR_STATE_PENDING: The `repair` action is pending.
-      REPAIR_STATE_SKIPPED: The `repair` action was skipped.
       REPAIR_STATE_ABORTED: The `repair` action was aborted.
     """
     REPAIR_STATE_UNSPECIFIED = 0
@@ -5007,8 +5027,7 @@ class RetryAttempt(_messages.Message):
     REPAIR_STATE_FAILED = 3
     REPAIR_STATE_IN_PROGRESS = 4
     REPAIR_STATE_PENDING = 5
-    REPAIR_STATE_SKIPPED = 6
-    REPAIR_STATE_ABORTED = 7
+    REPAIR_STATE_ABORTED = 6
 
   attempt = _messages.IntegerField(1)
   state = _messages.EnumField('StateValueValuesEnum', 2)
@@ -5047,9 +5066,6 @@ class RetryPhase(_messages.Message):
     attempts: Output only. Detail of a retry action.
     backoffMode: Output only. The pattern of how the wait time of the retry
       attempt is calculated.
-    jobId: Output only. The job ID for the Job to retry.
-    phaseId: Output only. The phase ID of the phase that includes the job
-      being retried.
     totalAttempts: Output only. The number of attempts that have been made.
   """
 
@@ -5068,9 +5084,7 @@ class RetryPhase(_messages.Message):
 
   attempts = _messages.MessageField('RetryAttempt', 1, repeated=True)
   backoffMode = _messages.EnumField('BackoffModeValueValuesEnum', 2)
-  jobId = _messages.StringField(3)
-  phaseId = _messages.StringField(4)
-  totalAttempts = _messages.IntegerField(5)
+  totalAttempts = _messages.IntegerField(3)
 
 
 class Rollback(_messages.Message):
@@ -5114,7 +5128,6 @@ class RollbackAttempt(_messages.Message):
       REPAIR_STATE_FAILED: The `repair` action has failed.
       REPAIR_STATE_IN_PROGRESS: The `repair` action is in progress.
       REPAIR_STATE_PENDING: The `repair` action is pending.
-      REPAIR_STATE_SKIPPED: The `repair` action was skipped.
       REPAIR_STATE_ABORTED: The `repair` action was aborted.
     """
     REPAIR_STATE_UNSPECIFIED = 0
@@ -5123,8 +5136,7 @@ class RollbackAttempt(_messages.Message):
     REPAIR_STATE_FAILED = 3
     REPAIR_STATE_IN_PROGRESS = 4
     REPAIR_STATE_PENDING = 5
-    REPAIR_STATE_SKIPPED = 6
-    REPAIR_STATE_ABORTED = 7
+    REPAIR_STATE_ABORTED = 6
 
   destinationPhase = _messages.StringField(1)
   disableRollbackIfRolloutPending = _messages.BooleanField(2)
@@ -5212,6 +5224,8 @@ class Rollout(_messages.Message):
       to be <= 128 bytes.
 
   Fields:
+    activeRepairAutomationRun: Output only. The AutomationRun actively
+      repairing the rollout.
     annotations: User annotations. These attributes can only be set and used
       by the user, and not by Cloud Deploy. See
       https://google.aip.dev/128#annotations for more details such as format
@@ -5400,28 +5414,29 @@ class Rollout(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  annotations = _messages.MessageField('AnnotationsValue', 1)
-  approvalState = _messages.EnumField('ApprovalStateValueValuesEnum', 2)
-  approveTime = _messages.StringField(3)
-  controllerRollout = _messages.StringField(4)
-  createTime = _messages.StringField(5)
-  deployEndTime = _messages.StringField(6)
-  deployFailureCause = _messages.EnumField('DeployFailureCauseValueValuesEnum', 7)
-  deployStartTime = _messages.StringField(8)
-  deployingBuild = _messages.StringField(9)
-  description = _messages.StringField(10)
-  enqueueTime = _messages.StringField(11)
-  etag = _messages.StringField(12)
-  failureReason = _messages.StringField(13)
-  labels = _messages.MessageField('LabelsValue', 14)
-  metadata = _messages.MessageField('Metadata', 15)
-  name = _messages.StringField(16)
-  phases = _messages.MessageField('Phase', 17, repeated=True)
-  rollbackOfRollout = _messages.StringField(18)
-  rolledBackByRollouts = _messages.StringField(19, repeated=True)
-  state = _messages.EnumField('StateValueValuesEnum', 20)
-  targetId = _messages.StringField(21)
-  uid = _messages.StringField(22)
+  activeRepairAutomationRun = _messages.StringField(1)
+  annotations = _messages.MessageField('AnnotationsValue', 2)
+  approvalState = _messages.EnumField('ApprovalStateValueValuesEnum', 3)
+  approveTime = _messages.StringField(4)
+  controllerRollout = _messages.StringField(5)
+  createTime = _messages.StringField(6)
+  deployEndTime = _messages.StringField(7)
+  deployFailureCause = _messages.EnumField('DeployFailureCauseValueValuesEnum', 8)
+  deployStartTime = _messages.StringField(9)
+  deployingBuild = _messages.StringField(10)
+  description = _messages.StringField(11)
+  enqueueTime = _messages.StringField(12)
+  etag = _messages.StringField(13)
+  failureReason = _messages.StringField(14)
+  labels = _messages.MessageField('LabelsValue', 15)
+  metadata = _messages.MessageField('Metadata', 16)
+  name = _messages.StringField(17)
+  phases = _messages.MessageField('Phase', 18, repeated=True)
+  rollbackOfRollout = _messages.StringField(19)
+  rolledBackByRollouts = _messages.StringField(20, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 21)
+  targetId = _messages.StringField(22)
+  uid = _messages.StringField(23)
 
 
 class RolloutNotificationEvent(_messages.Message):

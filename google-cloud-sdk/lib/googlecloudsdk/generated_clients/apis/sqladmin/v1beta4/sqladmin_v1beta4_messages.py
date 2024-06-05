@@ -517,9 +517,13 @@ class CloneContext(_messages.Message):
     pitrTimestampMs: Reserved for future use.
     pointInTime: Timestamp, if specified, identifies the time to which the
       source instance is cloned.
-    preferredZone: Optional. (Point-in-time recovery for PostgreSQL only)
-      Clone to an instance in the specified zone. If no zone is specified,
-      clone to the same zone as the source instance.
+    preferredSecondaryZone: Optional. Copy clone and point-in-time recovery
+      clone of a regional instance in the specified zones. If not specified,
+      clone to the same secondary zone as the source instance. This value
+      cannot be the same as the preferred_zone field.
+    preferredZone: Optional. Copy clone and point-in-time recovery clone of an
+      instance to the specified zone. If no zone is specified, clone to the
+      same primary zone as the source instance.
   """
 
   allocatedIpRange = _messages.StringField(1)
@@ -529,7 +533,8 @@ class CloneContext(_messages.Message):
   kind = _messages.StringField(5)
   pitrTimestampMs = _messages.IntegerField(6)
   pointInTime = _messages.StringField(7)
-  preferredZone = _messages.StringField(8)
+  preferredSecondaryZone = _messages.StringField(8)
+  preferredZone = _messages.StringField(9)
 
 
 class ConnectSettings(_messages.Message):
@@ -1495,6 +1500,18 @@ class ExportContext(_messages.Message):
       differentialBase: Whether or not the backup can be used as a
         differential base copy_only backup can not be served as differential
         base
+      exportLogEndTime: Optional. The end timestamp when transaction log will
+        be included in the export operation. [RFC
+        3339](https://tools.ietf.org/html/rfc3339) format (for example,
+        `2023-10-01T16:19:00.094`) in UTC. When omitted, all available logs
+        until current time will be included. Only applied to Cloud SQL for SQL
+        Server.
+      exportLogStartTime: Optional. The begin timestamp when transaction log
+        will be included in the export operation. [RFC
+        3339](https://tools.ietf.org/html/rfc3339) format (for example,
+        `2023-10-01T16:19:00.094`) in UTC. When omitted, all available logs
+        from the beginning of retention period will be included. Only applied
+        to Cloud SQL for SQL Server.
       stripeCount: Option for specifying how many stripes to use for the
         export. If blank, and the value of the striped field is true, the
         number of stripes is automatically chosen.
@@ -1518,8 +1535,10 @@ class ExportContext(_messages.Message):
     bakType = _messages.EnumField('BakTypeValueValuesEnum', 1)
     copyOnly = _messages.BooleanField(2)
     differentialBase = _messages.BooleanField(3)
-    stripeCount = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-    striped = _messages.BooleanField(5)
+    exportLogEndTime = _messages.StringField(4)
+    exportLogStartTime = _messages.StringField(5)
+    stripeCount = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+    striped = _messages.BooleanField(7)
 
   class CsvExportOptionsValue(_messages.Message):
     r"""Options for exporting data as CSV. `MySQL` and `PostgreSQL` instances
@@ -1549,10 +1568,14 @@ class ExportContext(_messages.Message):
 
     Messages:
       MysqlExportOptionsValue: Options for exporting from MySQL.
+      PostgresExportOptionsValue: Options for exporting from a Cloud SQL for
+        PostgreSQL instance.
 
     Fields:
       mysqlExportOptions: Options for exporting from MySQL.
       parallel: Optional. Whether or not the export should be parallel.
+      postgresExportOptions: Options for exporting from a Cloud SQL for
+        PostgreSQL instance.
       schemaOnly: Export only schemas.
       tables: Tables to export, or that were exported, from the specified
         database. If you specify tables, specify one and only one database.
@@ -1574,11 +1597,26 @@ class ExportContext(_messages.Message):
 
       masterData = _messages.IntegerField(1, variant=_messages.Variant.INT32)
 
+    class PostgresExportOptionsValue(_messages.Message):
+      r"""Options for exporting from a Cloud SQL for PostgreSQL instance.
+
+      Fields:
+        clean: Optional. Use this option to include DROP SQL statements. These
+          statements are used to delete database objects before running the
+          import operation.
+        ifExists: Optional. Option to include an IF EXISTS SQL statement with
+          each DROP statement produced by clean.
+      """
+
+      clean = _messages.BooleanField(1)
+      ifExists = _messages.BooleanField(2)
+
     mysqlExportOptions = _messages.MessageField('MysqlExportOptionsValue', 1)
     parallel = _messages.BooleanField(2)
-    schemaOnly = _messages.BooleanField(3)
-    tables = _messages.StringField(4, repeated=True)
-    threads = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+    postgresExportOptions = _messages.MessageField('PostgresExportOptionsValue', 3)
+    schemaOnly = _messages.BooleanField(4)
+    tables = _messages.StringField(5, repeated=True)
+    threads = _messages.IntegerField(6, variant=_messages.Variant.INT32)
 
   bakExportOptions = _messages.MessageField('BakExportOptionsValue', 1)
   csvExportOptions = _messages.MessageField('CsvExportOptionsValue', 2)
@@ -2002,13 +2040,36 @@ class ImportContext(_messages.Message):
   class SqlImportOptionsValue(_messages.Message):
     r"""Optional. Options for importing data from SQL statements.
 
+    Messages:
+      PostgresImportOptionsValue: Optional. Options for importing from a Cloud
+        SQL for PostgreSQL instance.
+
     Fields:
       parallel: Optional. Whether or not the import should be parallel.
+      postgresImportOptions: Optional. Options for importing from a Cloud SQL
+        for PostgreSQL instance.
       threads: Optional. The number of threads to use for parallel import.
     """
 
+    class PostgresImportOptionsValue(_messages.Message):
+      r"""Optional. Options for importing from a Cloud SQL for PostgreSQL
+      instance.
+
+      Fields:
+        clean: Optional. The --clean flag for the pg_restore utility. This
+          flag applies only if you enabled Cloud SQL to import files in
+          parallel.
+        ifExists: Optional. The --if-exists flag for the pg_restore utility.
+          This flag applies only if you enabled Cloud SQL to import files in
+          parallel.
+      """
+
+      clean = _messages.BooleanField(1)
+      ifExists = _messages.BooleanField(2)
+
     parallel = _messages.BooleanField(1)
-    threads = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+    postgresImportOptions = _messages.MessageField('PostgresImportOptionsValue', 2)
+    threads = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
   bakImportOptions = _messages.MessageField('BakImportOptionsValue', 1)
   csvImportOptions = _messages.MessageField('CsvImportOptionsValue', 2)

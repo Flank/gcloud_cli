@@ -24,9 +24,75 @@ _DEFAULT_API_VERSION = 'v1alpha'
 _RESOURCE_BUNDLE_PROJECT_SEGMENT = 1
 _RESOURCE_BUNDLE_LOCATION_SEGMENT = 3
 
+ROLLOUTS_DESCRIBE_ROLLING_TRUNCATED_MESSAGES_FORMAT = """table(info.rolloutStrategyInfo.rollingStrategyInfo.clusters.membership.basename():label=CLUSTER,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.current.version:label=CURRENT_VERSION,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.current.syncState:label=CURRENT_STATE,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.desired.version:label=DESIRED_VERSION,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.desired.syncState:label=DESIRED_STATE,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.startTime:label=START_TIME,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.endTime:label=END_TIME,
+                    trim_message():label=MESSAGE)"""
+
+ROLLOUTS_DESCRIBE_ALLATONCE_TRUNCATED_MESSAGES_FORMAT = """table(info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.membership.basename():label=CLUSTER,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.current.version:label=CURRENT_VERSION,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.current.syncState:label=CURRENT_STATE,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.desired.version:label=DESIRED_VERSION,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.desired.syncState:label=DESIRED_STATE,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.startTime:label=START_TIME,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.endTime:label=END_TIME,
+                    trim_message():label=MESSAGE)"""
+
+ROLLOUTS_DESCRIBE_ROLLING_FULL_MESSAGES_FORMAT = """table(info.rolloutStrategyInfo.rollingStrategyInfo.clusters.membership.basename():label=CLUSTER,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.current.version:label=CURRENT_VERSION,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.current.syncState:label=CURRENT_STATE,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.desired.version:label=DESIRED_VERSION,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.desired.syncState:label=DESIRED_STATE,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.startTime:label=START_TIME,
+                    info.rolloutStrategyInfo.rollingStrategyInfo.clusters.endTime:label=END_TIME,
+                    all_messages():label=MESSAGES)"""
+
+ROLLOUTS_DESCRIBE_ALLATONCE_FULL_MESSAGES_FORMAT = """table(info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.membership.basename():label=CLUSTER,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.current.version:label=CURRENT_VERSION,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.current.syncState:label=CURRENT_STATE,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.desired.version:label=DESIRED_VERSION,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.desired.syncState:label=DESIRED_STATE,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.startTime:label=START_TIME,
+                    info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.endTime:label=END_TIME,
+                    all_messages():label=MESSAGES)"""
+
 
 def ApiVersion():
   return _DEFAULT_API_VERSION
+
+
+def FormatForRolloutsDescribe(rollout, args, less=True):
+  """Sets format for `rollouts describe` depending on rollout strategy.
+
+  Args:
+    rollout: Rollout from `rollouts describe`
+    args: Command line args
+    less: Whether to show truncate rollout messages
+
+  Returns:
+    None
+  """
+  if rollout is None:
+    return
+  if rollout.info and rollout.info.rolloutStrategyInfo:
+    if rollout.info.rolloutStrategyInfo.rollingStrategyInfo:
+      if less:
+        args.format = ROLLOUTS_DESCRIBE_ROLLING_TRUNCATED_MESSAGES_FORMAT
+      else:
+        args.format = ROLLOUTS_DESCRIBE_ROLLING_FULL_MESSAGES_FORMAT
+      args.flatten = ['info.rolloutStrategyInfo.rollingStrategyInfo.clusters[]']
+    if rollout.info.rolloutStrategyInfo.allAtOnceStrategyInfo:
+      if less:
+        args.format = ROLLOUTS_DESCRIBE_ALLATONCE_TRUNCATED_MESSAGES_FORMAT
+      else:
+        args.format = ROLLOUTS_DESCRIBE_ALLATONCE_FULL_MESSAGES_FORMAT
+      args.flatten = [
+          'info.rolloutStrategyInfo.allAtOnceStrategyInfo.clusters[]'
+      ]
 
 
 def _LoadResourcesFromFile(path):
@@ -84,19 +150,6 @@ def _GetClientInstance(no_http=False):
 
 def _GetMessagesModule():
   return _GetClientInstance().MESSAGES_MODULE
-
-
-def UpsertDefaultVariants(fleet_package):
-  if (
-      fleet_package.resourceBundleSelector
-      and fleet_package.resourceBundleSelector.cloudBuildRepository
-  ):
-    if not fleet_package.resourceBundleSelector.cloudBuildRepository.variants:
-      messages = _GetMessagesModule()
-      fleet_package.resourceBundleSelector.cloudBuildRepository.variants = (
-          messages.Variants(directories=messages.Directories(pattern='.'))
-      )
-  return fleet_package
 
 
 def GlobPatternFromSourceAndVariantsPattern(source, variants_pattern=None):
@@ -209,12 +262,75 @@ def TransformTrimMessage(resource):
     Message limited to 40 characters
   """
   truncated_message_length = 40
-  if not resource.get('info') or not resource.get('info').get('message'):
+  messages = _GetMessagesFromResource(resource)
+  if not messages:
     return ''
-  message = resource.get('info').get('message')
-  if len(message) > truncated_message_length:
-    return message[:truncated_message_length] + '...'
-  return message
+  if len(messages) >= 1 and len(messages[0]) > truncated_message_length:
+    return messages[0][:truncated_message_length] + '...'
+  return messages[0]
+
+
+def _GetMessagesFromResource(resource):
+  """Gathers messages from different levels of a Rollout resource.
+
+  Args:
+    resource: A RolloutInfo resource, from `... rollouts describe ...`
+
+  Returns:
+    A list of messages from the Rollout resource.
+  """
+  messages = []
+  if resource is None:
+    return messages
+  info_message = resource.get('info', {}).get('message', '')
+  if info_message:
+    messages.append(info_message)
+  cluster_messages = (
+      resource.get('info', {})
+      .get('rolloutStrategyInfo', {})
+      .get('rollingStrategyInfo', {})
+      .get('clusters', {})
+      .get('messages', [])
+  )
+  if cluster_messages:
+    messages.extend(cluster_messages)
+  current_messages = (
+      resource.get('info', {})
+      .get('rolloutStrategyInfo', {})
+      .get('rollingStrategyInfo', {})
+      .get('clusters', {})
+      .get('current', {})
+      .get('messages', [])
+  )
+  if current_messages:
+    messages.extend(current_messages)
+  cluster_messages = (
+      resource.get('info', {})
+      .get('rolloutStrategyInfo', {})
+      .get('allAtOnceStrategyInfo', {})
+      .get('clusters', {})
+      .get('messages', [])
+  )
+  if cluster_messages:
+    messages.extend(cluster_messages)
+  current_messages = (
+      resource.get('info', {})
+      .get('rolloutStrategyInfo', {})
+      .get('allAtOnceStrategyInfo', {})
+      .get('clusters', {})
+      .get('current', {})
+      .get('messages', [])
+  )
+  if current_messages:
+    messages.extend(current_messages)
+  info_errors = resource.get('info', {}).get('errors', [])
+  if info_errors:
+    for error in info_errors:
+      info_message = error.get('errorMessage', '')
+      if info_message:
+        messages.append(info_message)
+
+  return messages
 
 
 def TransformAllMessages(resource):
@@ -227,54 +343,28 @@ def TransformAllMessages(resource):
     All messages on a Rollout, including sync-level, cluster-level, and
     rollout-level messages.
   """
-  messages = []
-  if 'message' in resource.get('info'):
-    messages.append(resource.get('info').get('message'))
-  if (
-      'rolloutStrategyInfo.rollingStrategyInfo.clusters.messages'
-      in resource.get('info')
-  ):
-    messages.extend(
-        resource.get('info')
-        .get('rolloutStrategyInfo')
-        .get('rollingStrategyInfo')
-        .get('clusters')
-        .get('messages')
-    )
-  if (
-      'rolloutStrategyInfo.rollingStrategyInfo.clusters.current.messages'
-      in resource.get('info')
-  ):
-    messages.extend(
-        resource.get('info')
-        .get('rolloutStrategyInfo')
-        .get('rollingStrategyInfo')
-        .get('clusters')
-        .get('current')
-        .get('messages')
-    )
-  if (
-      'rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.messages'
-      in resource.get('info')
-  ):
-    messages.extend(
-        resource.get('info')
-        .get('rolloutStrategyInfo')
-        .get('allAtOnceStrategyInfo')
-        .get('clusters')
-        .get('messages')
-    )
-  if (
-      'rolloutStrategyInfo.allAtOnceStrategyInfo.clusters.current.messages'
-      in resource.get('info')
-  ):
-    messages.extend(
-        resource.get('info')
-        .get('rolloutStrategyInfo')
-        .get('allAtOnceStrategyInfo')
-        .get('clusters')
-        .get('current')
-        .get('messages')
-    )
+  messages = _GetMessagesFromResource(resource)
+  if not messages:
+    return ''
+  elif len(messages) == 1:
+    return messages[0]
+  return messages
 
+
+def TransformListFleetPackageErrors(resource):
+  """Gathers errors from 'info.Errors' and returns their errorMessages."""
+  messages = []
+  if resource is None:
+    return ''
+
+  errors = resource.get('info', {}).get('errors', [])
+  for error in errors:
+    error_message = error.get('errorMessage', '')
+    if error_message:
+      messages.append(error_message)
+
+  if not messages:
+    return ''
+  elif len(messages) == 1:
+    return messages[0]
   return messages

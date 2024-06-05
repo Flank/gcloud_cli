@@ -17,7 +17,6 @@
 from googlecloudsdk.api_lib.container.fleet.packages import fleet_packages as apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.fleet.packages import flags
-from googlecloudsdk.command_lib.container.fleet.packages import utils as command_utils
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core.console import console_io
@@ -59,8 +58,26 @@ class Update(base.UpdateCommand):
         message_type=client.messages.FleetPackage,
         stream=data,
     )
-    fleet_package = command_utils.UpsertDefaultVariants(fleet_package)
+
+    possible_attributes = [
+        'resourceBundleSelector',
+        'target',
+        'variantSelector',
+        'rolloutStrategy',
+    ]
+    update_mask_attrs = []
+    for attr in possible_attributes:
+      attr_value = getattr(fleet_package, attr, None)
+      if attr_value is not None:
+        update_mask_attrs.append(attr)
+    update_mask = ','.join(update_mask_attrs)
 
     fully_qualified_name = f'projects/{flags.GetProject(args)}/locations/{flags.GetLocation(args)}/fleetPackages/{args.fleet_package}'
+    if not fleet_package.name:
+      fleet_package.name = fully_qualified_name
 
-    return client.Update(fleet_package=fleet_package, name=fully_qualified_name)
+    return client.Update(
+        fleet_package=fleet_package,
+        name=fully_qualified_name,
+        update_mask=update_mask,
+    )

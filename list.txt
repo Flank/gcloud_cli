@@ -225,6 +225,10 @@
   23112359  2024-05-14T14:36:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_476.0.0.orig_amd64.tar.gz
   21402311  2024-05-21T14:46:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_477.0.0.orig_aarch64.tar.gz
   23112359  2024-05-21T14:45:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_477.0.0.orig_amd64.tar.gz
+  21402304  2024-05-29T14:28:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_478.0.0.orig_aarch64.tar.gz
+  23112362  2024-05-29T14:29:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_478.0.0.orig_amd64.tar.gz
+  21402303  2024-06-04T17:35:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_479.0.0.orig_aarch64.tar.gz
+  23112358  2024-06-04T17:35:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthos-auth_479.0.0.orig_amd64.tar.gz
   67455346  2024-04-23T14:44:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_473.0.0.orig_aarch64.tar.gz
   72231244  2024-04-23T14:42:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_473.0.0.orig_amd64.tar.gz
   67455360  2024-04-30T15:19:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_474.0.0.orig_aarch64.tar.gz
@@ -235,6 +239,10 @@
   72539806  2024-05-14T14:37:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_476.0.0.orig_amd64.tar.gz
   67809067  2024-05-21T14:45:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_477.0.0.orig_aarch64.tar.gz
   72539803  2024-05-21T14:44:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_477.0.0.orig_amd64.tar.gz
+  67809067  2024-05-29T14:28:21Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_478.0.0.orig_aarch64.tar.gz
+  72539789  2024-05-29T14:28:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_478.0.0.orig_amd64.tar.gz
+  67809068  2024-06-04T17:34:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_479.0.0.orig_aarch64.tar.gz
+  72539803  2024-06-04T17:34:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-anthoscli_479.0.0.orig_amd64.tar.gz
    4408130  2022-02-01T15:42:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_371.0.0.orig_amd64.tar.gz
    4420341  2022-02-01T15:41:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_371.0.0.orig_i386.tar.gz
    4408128  2022-02-08T17:36:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_372.0.0.orig_amd64.tar.gz
@@ -499,6 +507,12 @@
    4629472  2024-05-21T14:45:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_477.0.0.orig_aarch64.tar.gz
    4958389  2024-05-21T14:45:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_477.0.0.orig_amd64.tar.gz
    4811393  2024-05-21T14:45:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_477.0.0.orig_i386.tar.gz
+   4629476  2024-05-29T14:28:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_478.0.0.orig_aarch64.tar.gz
+   4958389  2024-05-29T14:28:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_478.0.0.orig_amd64.tar.gz
+   4811389  2024-05-29T14:27:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_478.0.0.orig_i386.tar.gz
+   4629475  2024-06-04T17:35:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_479.0.0.orig_aarch64.tar.gz
+   4958387  2024-06-04T17:35:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_479.0.0.orig_amd64.tar.gz
+   4811394  2024-06-04T17:35:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-go_479.0.0.orig_i386.tar.gz
    2139690  2022-02-01T15:42:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_371.0.0.orig_amd64.tar.gz
    2086014  2022-02-01T15:42:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_371.0.0.orig_i386.tar.gz
    2139691  2022-02-08T17:36:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_372.0.0.orig_amd64.tar.gz
@@ -739,6 +753,10 @@
    2087570  2024-05-14T14:35:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_476.0.0.orig_i386.tar.gz
    2141298  2024-05-21T14:44:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_477.0.0.orig_amd64.tar.gz
    2087570  2024-05-21T14:44:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_477.0.0.orig_i386.tar.gz
+   2141300  2024-05-29T14:27:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_478.0.0.orig_amd64.tar.gz
+   2087572  2024-05-29T14:28:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_478.0.0.orig_i386.tar.gz
+   2141297  2024-06-04T17:35:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_479.0.0.orig_amd64.tar.gz
+   2087572  2024-06-04T17:35:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-grpc_479.0.0.orig_i386.tar.gz
   54157877  2022-02-01T15:42:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_371.0.0.orig.tar.gz
   54157856  2022-02-08T17:35:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_372.0.0.orig.tar.gz
   54157857  2022-02-15T16:36:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_373.0.0.orig.tar.gz
@@ -859,6 +877,8 @@
  132337477  2024-05-07T15:20:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_475.0.0.orig.tar.gz
  133079968  2024-05-14T14:36:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_476.0.0.orig.tar.gz
  133080006  2024-05-21T14:44:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_477.0.0.orig.tar.gz
+ 133079978  2024-05-29T14:27:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_478.0.0.orig.tar.gz
+ 133079978  2024-06-04T17:35:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-java_479.0.0.orig.tar.gz
   27968600  2022-02-01T15:42:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_371.0.0.orig.tar.gz
   27968624  2022-02-08T17:36:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_372.0.0.orig.tar.gz
   27968624  2022-02-15T16:35:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_373.0.0.orig.tar.gz
@@ -979,6 +999,8 @@
       2543  2024-05-07T15:20:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_475.0.0.orig.tar.gz
       2544  2024-05-14T14:37:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_476.0.0.orig.tar.gz
       2544  2024-05-21T14:45:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_477.0.0.orig.tar.gz
+      2543  2024-05-29T14:28:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_478.0.0.orig.tar.gz
+      2543  2024-06-04T17:34:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python-extras_479.0.0.orig.tar.gz
    8187003  2022-02-01T15:42:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_371.0.0.orig.tar.gz
    8186995  2022-02-08T17:35:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_372.0.0.orig.tar.gz
    8187002  2022-02-15T16:31:31Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_373.0.0.orig.tar.gz
@@ -1099,6 +1121,8 @@
    5248046  2024-05-07T15:21:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_475.0.0.orig.tar.gz
    5248046  2024-05-14T14:36:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_476.0.0.orig.tar.gz
    5248040  2024-05-21T14:44:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_477.0.0.orig.tar.gz
+   5248040  2024-05-29T14:27:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_478.0.0.orig.tar.gz
+   5248046  2024-06-04T17:34:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-app-engine-python_479.0.0.orig.tar.gz
    6335013  2022-02-01T15:42:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_371.0.0.orig_amd64.tar.gz
    6024186  2022-02-01T15:42:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_371.0.0.orig_i386.tar.gz
    6335013  2022-02-08T17:36:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_372.0.0.orig_amd64.tar.gz
@@ -1363,6 +1387,12 @@
    7211115  2024-05-21T14:44:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_477.0.0.orig_aarch64.tar.gz
    7669219  2024-05-21T14:44:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_477.0.0.orig_amd64.tar.gz
    7374814  2024-05-21T14:46:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_477.0.0.orig_i386.tar.gz
+   7211123  2024-05-29T14:28:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_478.0.0.orig_aarch64.tar.gz
+   7669233  2024-05-29T14:28:10Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_478.0.0.orig_amd64.tar.gz
+   7374823  2024-05-29T14:28:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_478.0.0.orig_i386.tar.gz
+   7211114  2024-06-04T17:35:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_479.0.0.orig_aarch64.tar.gz
+   7669218  2024-06-04T17:35:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_479.0.0.orig_amd64.tar.gz
+   7374814  2024-06-04T17:34:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-bigtable-emulator_479.0.0.orig_i386.tar.gz
    8460747  2022-02-01T15:42:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_371.0.0.orig_amd64.tar.gz
    8009607  2022-02-01T15:41:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_371.0.0.orig_i386.tar.gz
    8460747  2022-02-08T17:36:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_372.0.0.orig_amd64.tar.gz
@@ -1700,6 +1730,12 @@
   17422814  2024-05-21T14:44:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_477.0.0.orig_aarch64.tar.gz
   18566455  2024-05-21T14:46:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_477.0.0.orig_amd64.tar.gz
   17238329  2024-05-21T14:45:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_477.0.0.orig_i386.tar.gz
+  17422826  2024-05-29T14:27:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_478.0.0.orig_aarch64.tar.gz
+  18566464  2024-05-29T14:28:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_478.0.0.orig_amd64.tar.gz
+  17238329  2024-05-29T14:28:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_478.0.0.orig_i386.tar.gz
+  17422814  2024-06-04T17:34:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_479.0.0.orig_aarch64.tar.gz
+  18566443  2024-06-04T17:34:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_479.0.0.orig_amd64.tar.gz
+  17238327  2024-06-04T17:34:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cbt_479.0.0.orig_i386.tar.gz
    6592347  2022-02-01T15:41:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_371.0.0.orig_amd64.tar.gz
    6347370  2022-02-01T15:42:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_371.0.0.orig_i386.tar.gz
    6592353  2022-02-08T17:35:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_372.0.0.orig_amd64.tar.gz
@@ -1940,6 +1976,10 @@
    6347334  2024-05-14T14:36:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_476.0.0.orig_i386.tar.gz
    6592380  2024-05-21T14:45:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_477.0.0.orig_amd64.tar.gz
    6347335  2024-05-21T14:44:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_477.0.0.orig_i386.tar.gz
+   6592380  2024-05-29T14:27:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_478.0.0.orig_amd64.tar.gz
+   6347336  2024-05-29T14:27:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_478.0.0.orig_i386.tar.gz
+   6592377  2024-06-04T17:34:50Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_479.0.0.orig_amd64.tar.gz
+   6347331  2024-06-04T17:34:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-build-local_479.0.0.orig_i386.tar.gz
    5378491  2022-02-01T15:42:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_371.0.0.orig_amd64.tar.gz
    5378492  2022-02-08T17:36:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_372.0.0.orig_amd64.tar.gz
    5378491  2022-02-15T16:34:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_373.0.0.orig_amd64.tar.gz
@@ -2084,6 +2124,10 @@
   13963562  2024-05-14T14:36:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_476.0.0.orig_amd64.tar.gz
   11807955  2024-05-21T14:44:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_477.0.0.orig_aarch64.tar.gz
   13963562  2024-05-21T14:45:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_477.0.0.orig_amd64.tar.gz
+  11807975  2024-05-29T14:27:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_478.0.0.orig_aarch64.tar.gz
+  13963548  2024-05-29T14:27:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_478.0.0.orig_amd64.tar.gz
+  11807975  2024-06-04T17:34:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_479.0.0.orig_aarch64.tar.gz
+  13963562  2024-06-04T17:34:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-cloud-run-proxy_479.0.0.orig_amd64.tar.gz
   51871663  2022-02-01T15:42:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_371.0.0.orig_amd64.tar.gz
   51999533  2022-02-08T17:35:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_372.0.0.orig_amd64.tar.gz
   52015183  2022-02-15T16:35:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_373.0.0.orig_amd64.tar.gz
@@ -2301,6 +2345,10 @@
   59463189  2024-05-14T14:35:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_476.0.0.orig_amd64.tar.gz
   54695146  2024-05-21T14:44:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_477.0.0.orig_aarch64.tar.gz
   59463179  2024-05-21T14:44:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_477.0.0.orig_amd64.tar.gz
+  90084073  2024-05-29T14:29:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_478.0.0.orig_aarch64.tar.gz
+  95474119  2024-05-29T14:27:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_478.0.0.orig_amd64.tar.gz
+  90084073  2024-06-04T17:35:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_479.0.0.orig_aarch64.tar.gz
+  95474119  2024-06-04T17:34:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-config-connector_479.0.0.orig_amd64.tar.gz
      75758  2022-02-01T15:41:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datalab_371.0.0.orig.tar.gz
      75761  2022-02-08T17:36:38Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datalab_372.0.0.orig.tar.gz
      75760  2022-02-15T16:31:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datalab_373.0.0.orig.tar.gz
@@ -2468,6 +2516,8 @@
   37925565  2024-05-07T15:21:31Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datastore-emulator_475.0.0.orig.tar.gz
   37925560  2024-05-14T14:36:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datastore-emulator_476.0.0.orig.tar.gz
   37925552  2024-05-21T14:44:37Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datastore-emulator_477.0.0.orig.tar.gz
+  37925564  2024-05-29T14:28:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datastore-emulator_478.0.0.orig.tar.gz
+  37925560  2024-06-04T17:34:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-datastore-emulator_479.0.0.orig.tar.gz
    2081584  2023-12-05T16:18:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_456.0.0.orig_aarch64.tar.gz
    1884077  2023-12-05T16:18:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_456.0.0.orig_amd64.tar.gz
    2081588  2023-12-12T15:46:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_457.0.0.orig_aarch64.tar.gz
@@ -2516,6 +2566,10 @@
    1884070  2024-05-14T14:36:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_476.0.0.orig_amd64.tar.gz
    2081585  2024-05-21T14:44:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_477.0.0.orig_aarch64.tar.gz
    1884078  2024-05-21T14:45:01Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_477.0.0.orig_amd64.tar.gz
+   2081574  2024-05-29T14:27:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_478.0.0.orig_aarch64.tar.gz
+   1884070  2024-05-29T14:27:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_478.0.0.orig_amd64.tar.gz
+   2081585  2024-06-04T17:34:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_479.0.0.orig_aarch64.tar.gz
+   1884078  2024-06-04T17:35:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-docker-credential-gcr_479.0.0.orig_amd64.tar.gz
    8594088  2023-01-24T16:52:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_415.0.0.orig_amd64.tar.gz
    8594156  2023-01-31T17:05:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_416.0.0.orig_amd64.tar.gz
    8594157  2023-02-07T16:03:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_417.0.0.orig_amd64.tar.gz
@@ -2588,6 +2642,8 @@
    9015730  2024-05-07T15:21:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_475.0.0.orig_amd64.tar.gz
    9015729  2024-05-14T14:36:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_476.0.0.orig_amd64.tar.gz
    9015730  2024-05-21T14:45:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_477.0.0.orig_amd64.tar.gz
+   9015715  2024-05-29T14:27:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_478.0.0.orig_amd64.tar.gz
+   9015729  2024-06-04T17:34:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-enterprise-certificate-proxy_479.0.0.orig_amd64.tar.gz
   42435217  2022-02-01T15:42:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_371.0.0.orig.tar.gz
   42435206  2022-02-08T17:36:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_372.0.0.orig.tar.gz
   42435217  2022-02-15T16:33:16Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_373.0.0.orig.tar.gz
@@ -2708,6 +2764,8 @@
   47265405  2024-05-07T15:20:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_475.0.0.orig.tar.gz
   47265405  2024-05-14T14:36:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_476.0.0.orig.tar.gz
   47265405  2024-05-21T14:44:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_477.0.0.orig.tar.gz
+  47379878  2024-05-29T14:27:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_478.0.0.orig.tar.gz
+  47379901  2024-06-04T17:35:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-firestore-emulator_479.0.0.orig.tar.gz
    3612386  2022-02-01T15:42:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_371.0.0.orig_amd64.tar.gz
    3612386  2022-02-08T17:35:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_372.0.0.orig_amd64.tar.gz
    3612393  2022-02-15T16:31:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_373.0.0.orig_amd64.tar.gz
@@ -2925,6 +2983,10 @@
    8324349  2024-05-14T14:37:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_476.0.0.orig_amd64.tar.gz
    7696628  2024-05-21T14:44:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_477.0.0.orig_aarch64.tar.gz
    8324349  2024-05-21T14:45:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_477.0.0.orig_amd64.tar.gz
+   7696638  2024-05-29T14:28:53Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_478.0.0.orig_aarch64.tar.gz
+   8324369  2024-05-29T14:27:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_478.0.0.orig_amd64.tar.gz
+   7696628  2024-06-04T17:35:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_479.0.0.orig_aarch64.tar.gz
+   8324348  2024-06-04T17:34:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-gke-gcloud-auth-plugin_479.0.0.orig_amd64.tar.gz
   15547472  2022-07-20T02:22:24Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_394.0.0.orig_amd64.tar.gz
   15547461  2022-07-26T16:31:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_395.0.0.orig_amd64.tar.gz
   15547460  2022-08-02T15:37:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_396.0.0.orig_amd64.tar.gz
@@ -3020,6 +3082,8 @@
   21898008  2024-05-07T15:21:06Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_475.0.0.orig_amd64.tar.gz
   21897999  2024-05-14T14:37:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_476.0.0.orig_amd64.tar.gz
   21897999  2024-05-21T14:46:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_477.0.0.orig_amd64.tar.gz
+  21898017  2024-05-29T14:28:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_478.0.0.orig_amd64.tar.gz
+  21898027  2024-06-04T17:34:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-harbourbridge_479.0.0.orig_amd64.tar.gz
   22325481  2023-12-19T15:47:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_458.0.0.orig_aarch64.tar.gz
   24474583  2023-12-19T15:45:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_458.0.0.orig_amd64.tar.gz
   22325480  2023-12-21T03:08:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_458.0.1.orig_aarch64.tar.gz
@@ -3064,6 +3128,10 @@
   25203155  2024-05-14T14:35:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_476.0.0.orig_amd64.tar.gz
   23006372  2024-05-21T14:46:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_477.0.0.orig_aarch64.tar.gz
   25203172  2024-05-21T14:44:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_477.0.0.orig_amd64.tar.gz
+  23006371  2024-05-29T14:27:21Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_478.0.0.orig_aarch64.tar.gz
+  25203183  2024-05-29T14:26:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_478.0.0.orig_amd64.tar.gz
+  23006370  2024-06-04T17:35:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_479.0.0.orig_aarch64.tar.gz
+  25203177  2024-06-04T17:34:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-istioctl_479.0.0.orig_amd64.tar.gz
   12167585  2022-02-01T15:41:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_371.0.0.orig_amd64.tar.gz
   12142466  2022-02-08T17:37:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_372.0.0.orig_amd64.tar.gz
   12142465  2022-02-15T16:33:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_373.0.0.orig_amd64.tar.gz
@@ -3208,6 +3276,10 @@
   15267659  2024-05-14T14:36:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_476.0.0.orig_amd64.tar.gz
   13818733  2024-05-21T14:44:50Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_477.0.0.orig_aarch64.tar.gz
   15267659  2024-05-21T14:45:53Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_477.0.0.orig_amd64.tar.gz
+  13818739  2024-05-29T14:27:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_478.0.0.orig_aarch64.tar.gz
+  15267659  2024-05-29T14:27:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_478.0.0.orig_amd64.tar.gz
+  13818738  2024-06-04T17:34:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_479.0.0.orig_aarch64.tar.gz
+  15267659  2024-06-04T17:35:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kpt_479.0.0.orig_amd64.tar.gz
   19045402  2022-02-01T15:41:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_371.0.0.orig_amd64.tar.gz
   19045394  2022-02-08T17:37:08Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_372.0.0.orig_amd64.tar.gz
   19045393  2022-02-15T16:33:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_373.0.0.orig_amd64.tar.gz
@@ -3425,6 +3497,10 @@
   23112380  2024-05-14T14:36:22Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_476.0.0.orig_amd64.tar.gz
   21402323  2024-05-21T14:44:21Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_477.0.0.orig_aarch64.tar.gz
   23112380  2024-05-21T14:45:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_477.0.0.orig_amd64.tar.gz
+  21402327  2024-05-29T14:27:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_478.0.0.orig_aarch64.tar.gz
+  23112376  2024-05-29T14:28:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_478.0.0.orig_amd64.tar.gz
+  21402322  2024-06-04T17:35:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_479.0.0.orig_aarch64.tar.gz
+  23112380  2024-06-04T17:35:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-kubectl-oidc_479.0.0.orig_amd64.tar.gz
   15284419  2022-02-01T15:41:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_371.0.0.orig_amd64.tar.gz
   15563587  2022-02-08T17:37:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_372.0.0.orig_amd64.tar.gz
   15563583  2022-02-15T16:32:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_373.0.0.orig_amd64.tar.gz
@@ -3569,6 +3645,10 @@
   15051616  2024-05-14T14:36:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_476.0.0.orig_amd64.tar.gz
   14150039  2024-05-21T14:44:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_477.0.0.orig_aarch64.tar.gz
   15051616  2024-05-21T14:46:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_477.0.0.orig_amd64.tar.gz
+  14150027  2024-05-29T14:27:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_478.0.0.orig_aarch64.tar.gz
+  15051620  2024-05-29T14:27:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_478.0.0.orig_amd64.tar.gz
+  14150044  2024-06-04T17:34:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_479.0.0.orig_aarch64.tar.gz
+  15051612  2024-06-04T17:34:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-local-extract_479.0.0.orig_amd64.tar.gz
   14361121  2022-10-18T01:51:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_406.0.0.orig_amd64.tar.gz
   14361110  2022-10-25T16:12:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_407.0.0.orig_amd64.tar.gz
   14571302  2022-11-01T16:33:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_408.0.0.orig_amd64.tar.gz
@@ -3675,6 +3755,10 @@
   14571306  2024-05-14T14:37:01Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_476.0.0.orig_amd64.tar.gz
   12320048  2024-05-21T14:44:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_477.0.0.orig_aarch64.tar.gz
   14571306  2024-05-21T14:46:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_477.0.0.orig_amd64.tar.gz
+  12320048  2024-05-29T14:26:57Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_478.0.0.orig_aarch64.tar.gz
+  14571293  2024-05-29T14:28:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_478.0.0.orig_amd64.tar.gz
+  12320038  2024-06-04T17:34:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_479.0.0.orig_aarch64.tar.gz
+  14571293  2024-06-04T17:34:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-log-streaming_479.0.0.orig_amd64.tar.gz
   28379133  2022-02-01T15:41:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_371.0.0.orig_amd64.tar.gz
   28379141  2022-02-08T17:36:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_372.0.0.orig_amd64.tar.gz
   28379132  2022-02-15T16:31:10Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_373.0.0.orig_amd64.tar.gz
@@ -3973,6 +4057,10 @@
   37113486  2024-05-14T14:36:56Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_476.0.0.orig_amd64.tar.gz
   34569279  2024-05-21T14:45:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_477.0.0.orig_aarch64.tar.gz
   37113486  2024-05-21T14:45:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_477.0.0.orig_amd64.tar.gz
+  35837667  2024-05-29T14:27:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_478.0.0.orig_aarch64.tar.gz
+  36038319  2024-05-29T14:28:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_478.0.0.orig_amd64.tar.gz
+  35837676  2024-06-04T17:35:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_479.0.0.orig_aarch64.tar.gz
+  36038318  2024-06-04T17:35:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-minikube_479.0.0.orig_amd64.tar.gz
   25057451  2022-02-01T15:41:43Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_371.0.0.orig_amd64.tar.gz
   25058573  2022-02-08T17:36:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_372.0.0.orig_amd64.tar.gz
   25058573  2022-02-15T16:31:21Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_373.0.0.orig_amd64.tar.gz
@@ -4093,6 +4181,8 @@
   30146193  2024-05-07T15:20:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_475.0.0.orig_amd64.tar.gz
   30217988  2024-05-14T14:36:50Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_476.0.0.orig_amd64.tar.gz
   30217988  2024-05-21T14:44:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_477.0.0.orig_amd64.tar.gz
+  30217991  2024-05-29T14:29:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_478.0.0.orig_amd64.tar.gz
+  31772419  2024-06-04T17:35:03Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-nomos_479.0.0.orig_amd64.tar.gz
     836460  2022-07-20T02:22:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_394.0.0.orig_amd64.tar.gz
     836460  2022-07-26T16:31:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_395.0.0.orig_amd64.tar.gz
     836455  2022-08-02T15:38:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_396.0.0.orig_amd64.tar.gz
@@ -4266,6 +4356,10 @@
     886891  2024-05-14T14:37:04Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_476.0.0.orig_amd64.tar.gz
     831477  2024-05-21T14:46:01Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_477.0.0.orig_aarch64.tar.gz
     886893  2024-05-21T14:46:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_477.0.0.orig_amd64.tar.gz
+    831475  2024-05-29T14:27:47Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_478.0.0.orig_aarch64.tar.gz
+    886893  2024-05-29T14:27:11Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_478.0.0.orig_amd64.tar.gz
+    831475  2024-06-04T17:35:35Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_479.0.0.orig_aarch64.tar.gz
+    886893  2024-06-04T17:34:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-package-go-module_479.0.0.orig_amd64.tar.gz
   63688194  2022-02-01T15:41:49Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_371.0.0.orig.tar.gz
   63688194  2022-02-08T17:35:58Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_372.0.0.orig.tar.gz
   63688193  2022-02-15T16:34:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_373.0.0.orig.tar.gz
@@ -4386,6 +4480,8 @@
   66777563  2024-05-07T15:21:45Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_475.0.0.orig.tar.gz
   66777548  2024-05-14T14:36:07Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_476.0.0.orig.tar.gz
   66777563  2024-05-21T14:44:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_477.0.0.orig.tar.gz
+  66777563  2024-05-29T14:26:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_478.0.0.orig.tar.gz
+  66777548  2024-06-04T17:35:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-pubsub-emulator_479.0.0.orig.tar.gz
   18510946  2022-02-01T15:41:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_371.0.0.orig_amd64.tar.gz
   18510938  2022-02-08T17:35:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_372.0.0.orig_amd64.tar.gz
   18510946  2022-02-15T16:33:36Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_373.0.0.orig_amd64.tar.gz
@@ -4611,6 +4707,10 @@
   25254209  2024-05-14T14:36:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_476.0.0.orig_amd64.tar.gz
   23133925  2024-05-21T14:44:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_477.0.0.orig_aarch64.tar.gz
   25254199  2024-05-21T14:45:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_477.0.0.orig_amd64.tar.gz
+  23133916  2024-05-29T14:28:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_478.0.0.orig_aarch64.tar.gz
+  25254192  2024-05-29T14:27:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_478.0.0.orig_amd64.tar.gz
+  23133925  2024-06-04T17:35:29Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_479.0.0.orig_aarch64.tar.gz
+  25254210  2024-06-04T17:35:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-skaffold_479.0.0.orig_amd64.tar.gz
   23802124  2022-02-01T15:42:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_371.0.0.orig_amd64.tar.gz
   23802128  2022-02-08T17:36:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_372.0.0.orig_amd64.tar.gz
   28511323  2022-02-15T16:34:01Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_373.0.0.orig_amd64.tar.gz
@@ -4731,6 +4831,8 @@
   38255415  2024-05-07T15:21:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_475.0.0.orig_amd64.tar.gz
   38255415  2024-05-14T14:36:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_476.0.0.orig_amd64.tar.gz
   38326285  2024-05-21T14:46:23Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_477.0.0.orig_amd64.tar.gz
+  38326290  2024-05-29T14:28:09Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_478.0.0.orig_amd64.tar.gz
+  38326289  2024-06-04T17:34:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-emulator_479.0.0.orig_amd64.tar.gz
   21911846  2023-08-08T15:09:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_442.0.0.orig_amd64.tar.gz
   21911844  2023-08-15T11:48:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_443.0.0.orig_amd64.tar.gz
   21916451  2023-08-22T18:51:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_444.0.0.orig_amd64.tar.gz
@@ -4772,6 +4874,8 @@
   24681717  2024-05-07T15:21:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_475.0.0.orig_amd64.tar.gz
   24681738  2024-05-14T14:35:53Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_476.0.0.orig_amd64.tar.gz
   24696307  2024-05-21T14:45:17Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_477.0.0.orig_amd64.tar.gz
+  24696320  2024-05-29T14:28:54Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_478.0.0.orig_amd64.tar.gz
+  24696306  2024-06-04T17:35:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-spanner-migration-tool_479.0.0.orig_amd64.tar.gz
   50158472  2022-03-29T17:41:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_379.0.0.orig_amd64.tar.gz
   50158446  2022-04-05T16:04:34Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_380.0.0.orig_amd64.tar.gz
   50158834  2022-04-12T13:54:05Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_381.0.0.orig_amd64.tar.gz
@@ -4908,6 +5012,10 @@
   69360348  2024-05-14T14:36:18Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_476.0.0.orig_amd64.tar.gz
   64184130  2024-05-21T14:45:19Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_477.0.0.orig_aarch64.tar.gz
   69360349  2024-05-21T14:45:14Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_477.0.0.orig_amd64.tar.gz
+  64184130  2024-05-29T14:28:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_478.0.0.orig_aarch64.tar.gz
+  69360358  2024-05-29T14:26:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_478.0.0.orig_amd64.tar.gz
+  64184130  2024-06-04T17:35:42Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_479.0.0.orig_aarch64.tar.gz
+  69360357  2024-06-04T17:35:25Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-tools_479.0.0.orig_amd64.tar.gz
   48998093  2022-02-01T15:41:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-validator_371.0.0.orig_amd64.tar.gz
   48998093  2022-02-08T17:37:00Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-validator_372.0.0.orig_amd64.tar.gz
   48998099  2022-02-15T16:32:50Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-terraform-validator_373.0.0.orig_amd64.tar.gz
@@ -5036,6 +5144,8 @@
   57087419  2024-05-07T15:21:15Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-tests_475.0.0.orig.tar.gz
   57132931  2024-05-14T14:35:51Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-tests_476.0.0.orig.tar.gz
   57160236  2024-05-21T14:44:32Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-tests_477.0.0.orig.tar.gz
+  57236982  2024-05-29T14:27:20Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-tests_478.0.0.orig.tar.gz
+  57271649  2024-06-04T17:34:48Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli-tests_479.0.0.orig.tar.gz
  158902954  2022-02-01T15:41:27Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_371.0.0.orig.tar.gz
  158947132  2022-02-08T17:35:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_372.0.0.orig.tar.gz
  159185567  2022-02-15T16:36:52Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_373.0.0.orig.tar.gz
@@ -5327,6 +5437,10 @@
  137268666  2024-05-14T14:36:33Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_476.0.0.orig_amd64.tar.gz
   58803959  2024-05-21T14:45:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_477.0.0.orig_aarch64.tar.gz
  137283341  2024-05-21T14:45:26Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_477.0.0.orig_amd64.tar.gz
+  58939010  2024-05-29T14:27:30Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_478.0.0.orig_aarch64.tar.gz
+ 137407890  2024-05-29T14:28:44Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_478.0.0.orig_amd64.tar.gz
+  58982981  2024-06-04T17:34:28Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_479.0.0.orig_aarch64.tar.gz
+ 137457954  2024-06-04T17:35:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-cli_479.0.0.orig_amd64.tar.gz
    9131189  2020-03-24T15:26:55Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_286.0.0.orig_amd64.tar.gz
    9131213  2020-04-01T14:31:13Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_287.0.0.orig_amd64.tar.gz
    9131217  2020-04-07T15:44:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-anthos-auth_288.0.0.orig_amd64.tar.gz
@@ -8042,6 +8156,8 @@
   78201929  2024-05-07T15:20:46Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bundled-python3-unix_475.0.0.orig_amd64.tar.gz
   78405418  2024-05-14T14:36:59Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bundled-python3-unix_476.0.0.orig_amd64.tar.gz
   78405426  2024-05-21T14:44:40Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bundled-python3-unix_477.0.0.orig_amd64.tar.gz
+  78405426  2024-05-29T14:27:02Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bundled-python3-unix_478.0.0.orig_amd64.tar.gz
+  78405426  2024-06-04T17:35:16Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-bundled-python3-unix_479.0.0.orig_amd64.tar.gz
    4290542  2017-07-14T13:03:41Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.0.orig_amd64.tar.gz
    4033104  2017-07-14T13:03:12Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.0.orig_i386.tar.gz
    4290581  2017-07-14T13:03:39Z  gs://cloud-sdk-release/for_packagers/linux/google-cloud-sdk-cbt_162.0.1.orig_amd64.tar.gz
@@ -11975,4 +12091,8 @@
   76989439  2024-05-14T14:36:47Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_476.0.0.orig_amd64.tar.gz
   73512918  2024-05-21T14:44:54Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_477.0.0.orig_aarch64.tar.gz
   76989560  2024-05-21T14:46:12Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_477.0.0.orig_amd64.tar.gz
-TOTAL: 11977 objects, 334048668591 bytes (311.11 GiB)
+  73512983  2024-05-29T14:27:28Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_478.0.0.orig_aarch64.tar.gz
+  76989563  2024-05-29T14:27:10Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_478.0.0.orig_amd64.tar.gz
+  73512917  2024-06-04T17:35:21Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_479.0.0.orig_aarch64.tar.gz
+  76989580  2024-06-04T17:35:14Z  gs://cloud-sdk-release/for_packagers/linux/kubectl_479.0.0.orig_amd64.tar.gz
+TOTAL: 12097 objects, 337757793398 bytes (314.56 GiB)

@@ -14,8 +14,10 @@ platform/bq/bq_utils.py
 platform/bq/clients/bigquery_client.py
 platform/bq/clients/bigquery_client_extended.py
 platform/bq/clients/bigquery_http.py
+platform/bq/clients/client_connection.py
 platform/bq/clients/client_dataset.py
 platform/bq/clients/client_reservation.py
+platform/bq/clients/client_routine.py
 platform/bq/clients/table_reader.py
 platform/bq/clients/utils.py
 platform/bq/credential_loader.py
@@ -43,6 +45,7 @@ platform/bq/frontend/commands_iam.py
 platform/bq/frontend/flags.py
 platform/bq/frontend/utils.py
 platform/bq/frontend/utils_data_transfer.py
+platform/bq/frontend/utils_id.py
 platform/bq/remove_pyreadline.py
 platform/bq/table_formatter.py
 platform/bq/third_party/absl/LICENSE
@@ -389,6 +392,8 @@ platform/bq/third_party/socks/sockshandler.py
 platform/bq/third_party/tcmalloc/LICENSE
 platform/bq/third_party/termcolor/LICENSE
 platform/bq/third_party/termcolor/__init__.py
+platform/bq/third_party/typing_extensions/LICENSE
+platform/bq/third_party/typing_extensions/__init__.py
 platform/bq/third_party/tz/LICENSE
 platform/bq/third_party/uritemplate/LICENSE
 platform/bq/third_party/uritemplate/__init__.py
